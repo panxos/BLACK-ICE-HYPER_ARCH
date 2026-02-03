@@ -44,6 +44,10 @@ log_success() {
     log_raw "SUCCESS" "$message"
 }
 
+success() {
+    log_success "$1"
+}
+
 log_warn() {
     local message="$1"
     echo -e "${YELLOW}[WARN]${NC} $message"

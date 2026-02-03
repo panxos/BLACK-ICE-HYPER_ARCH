@@ -28,7 +28,7 @@ ask_option() {
     local choice=""
     
     # Save old PS3
-    local OLD_PS3="$PS3"
+    local OLD_PS3="${PS3:-}"
     PS3="Selecciona una opción: "
     
     select opt in "${options[@]}"; do
