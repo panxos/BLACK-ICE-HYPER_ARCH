@@ -35,7 +35,7 @@ if command -v reflector &>/dev/null; then
     echo -e "${YELLOW}>> ¿Optimizar mirrors con reflector?"
     echo -e "   Esto puede tardar unos minutos pero mejora la velocidad de descarga.${NC}"
     echo -n "   [y/N]: "
-    read -r -t 10 OPT_MIRRORS || OPT_MIRRORS="n"
+    read -r -t 10 OPT_MIRRORS < /dev/tty || OPT_MIRRORS="n"
     echo ""
     
     if [[ "$OPT_MIRRORS" =~ ^[Yy]$ ]]; then

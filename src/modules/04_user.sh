@@ -32,7 +32,7 @@ else
     # --- USERNAME SECTION ---
     while true; do
         echo -ne "${NEON_BLUE}[USER]${NC} Introduzca el nombre del nuevo usuario (ej: P4nx0z): "
-        read USER_NAME
+        read -r USER_NAME < /dev/tty
         if [[ "$USER_NAME" =~ ^[a-z_][a-z0-9_-]*$ ]]; then
             break
         else

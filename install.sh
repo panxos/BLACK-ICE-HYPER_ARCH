@@ -48,7 +48,7 @@ source "$INSTALL_DIR/src/modules/00_environment.sh"
 # --- Check for Existing System (Idempotency) ---
 if [ -f "/etc/black-ice-release" ] || [ -f "/mnt/etc/black-ice-release" ]; then
     log_warn "Sistema BLACK-ICE detectado."
-    read -p "¿Desea reinstalar el sistema base y formatear disco? (y/N) " REINSTALL_CHOICE
+    read -p "¿Desea reinstalar el sistema base y formatear disco? (y/N) " REINSTALL_CHOICE < /dev/tty
     if [[ ! "$REINSTALL_CHOICE" =~ ^[Yy]$ ]]; then
         log_info "Saltando formateo e instalación base. Pasando a configuración..."
         SKIP_BASE=true

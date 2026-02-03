@@ -229,7 +229,7 @@ main() {
     # Confirmation prompt
     echo -e "${YELLOW}¿Deseas continuar con la instalación?${NC}"
     echo -e "${CYAN}Presiona Enter para continuar o Ctrl+C para cancelar...${NC}"
-    read -r
+    read -r < /dev/tty
     
     # Execute installer
     execute_installer

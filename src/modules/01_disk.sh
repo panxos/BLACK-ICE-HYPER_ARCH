@@ -53,7 +53,7 @@ else
         else
             log_warn "Índice no válido. Reintenta."
         fi
-    done
+    done < /dev/tty
     
     if [ ! -b "$DISK" ]; then
         log_error "La unidad $DISK ha dejado de estar disponible."
@@ -69,7 +69,7 @@ else
         echo -e "${RED}╚══════════════════════════════════════════════════════╝${NC}"
         
         echo -ne "${YELLOW}[CONFIRM]${NC} Escribe ${BOLD}SI${NC} para continuar o ${BOLD}NO${NC} para abortar: "
-        read CONFIRM
+        read -r CONFIRM < /dev/tty
         
         if [ "$CONFIRM" == "SI" ]; then
             log_info "Autorización concedida. Iniciando purga de datos..."

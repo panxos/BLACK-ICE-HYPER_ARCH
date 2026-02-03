@@ -38,7 +38,7 @@ ask_option() {
         else
             echo -e "${RED}Opción inválida.${NC}" >&2
         fi
-    done
+    done < /dev/tty
     
     # Restore PS3
     PS3="$OLD_PS3"
@@ -87,7 +87,7 @@ read_password() {
     
     echo -ne "$prompt" >&2
     
-    while IFS= read -r -s -n 1 char; do
+    while IFS= read -r -s -n 1 char < /dev/tty; do
         # Enter key
         if [[ $char == $'\0' || $char == $'\n' || $char == "" ]]; then
             break

@@ -45,7 +45,7 @@ done
 mkdir -p "$SCREENSHOT_DIR" "$TEMP_DIR"
 echo -e "${GREEN}✓${NC} Created directories"
 
-# Function to pixelate region (bottom-right for IP)
+# Function to pixelate region (bottom-center for IP)
 pixelate_ip() {
     local input="$1"
     local output="$2"
@@ -54,13 +54,14 @@ pixelate_ip() {
     local width=$(identify -format "%w" "$input")
     local height=$(identify -format "%h" "$input")
     
-    # Calculate region to pixelate (bottom-right 300x50 pixels)
-    local region_width=300
-    local region_height=50
-    local region_x=$((width - region_width - 20))
-    local region_y=$((height - region_height - 10))
+    # Calculate region to pixelate (bottom-center module for IP)
+    # Target: Center of bottom bar (1366x768 res)
+    local region_width=600  # Wide enough to cover both IPs
+    local region_height=40
+    local region_x=$(( (width - region_width) / 2 ))
+    local region_y=$(( height - region_height - 0 )) # Bottom 40px
     
-    echo -e "${CYAN}  Pixelating IP region...${NC}"
+    echo -e "${CYAN}  Pixelating IP region (X:$region_x Y:$region_y W:$region_width H:$region_height)...${NC}"
     
     # Create pixelated version
     magick "$input" \
