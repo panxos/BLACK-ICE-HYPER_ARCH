@@ -124,23 +124,15 @@ curl -L http://is.gd/blackice | bash
 
 BLACK-ICE ARCH incluye **4 temas cyberpunk personalizados** para Hyprland y Waybar. Cambia entre ellos con `Win+Alt+Y`.
 
-````carousel
-### 🌞 Ra-Solar
-![Ra-Solar Theme](docs/images/Ra-Solar.png)
-*Tema solar con tonos dorados y amarillos brillantes*
-<!-- slide -->
-### 🔷 Horus-Cyber
-![Horus-Cyber Theme](docs/images/Horus-Cyber.png)
-*Tema cibernético con azules neón y efectos futuristas*
-<!-- slide -->
-### 💀 Anubis-Death
-![Anubis-Death Theme](docs/images/Anubis-Death.png)
-*Tema oscuro con verdes lima y estética hacker*
-<!-- slide -->
-### 🔮 Isis-Magic
-![Isis-Magic Theme](docs/images/Isis-Magic.png)
-*Tema mágico con púrpuras y magentas vibrantes*
-````
+| 🌞 Ra-Solar | 🔷 Horus-Cyber |
+| :---: | :---: |
+| ![Ra-Solar Theme](docs/images/Ra-Solar.png) | ![Horus-Cyber Theme](docs/images/Horus-Cyber.png) |
+| *Tema solar con tonos dorados y amarillos brillantes* | *Tema cibernético con azules neón y efectos futuristas* |
+
+| 💀 Anubis-Death | 🔮 Isis-Magic |
+| :---: | :---: |
+| ![Anubis-Death Theme](docs/images/Anubis-Death.png) | ![Isis-Magic Theme](docs/images/Isis-Magic.png) |
+| *Tema oscuro con verdes lima y estética hacker* | *Tema mágico con púrpuras y magentas vibrantes* |
 
 ---
 
