@@ -1,0 +1,17 @@
+#!/bin/bash
+# public_ip (Clean - No Colors)
+# Cache para no saturar APIs
+CACHE_FILE="/tmp/public_ip_cache"
+
+if [ -f "$CACHE_FILE" ] && [ $(($(date +%s) - $(stat -c %Y "$CACHE_FILE"))) -lt 300 ]; then
+    ip=$(cat "$CACHE_FILE")
+else
+    ip=$(curl -s --max-time 2 https://api.ipify.org || echo "Offline")
+    echo "$ip" > "$CACHE_FILE"
+fi
+
+if [ "$ip" != "Offline" ]; then
+    echo "{\"text\": \"  $ip\", \"class\": \"connected\", \"tooltip\": \"Public IP: $ip\"}"
+else
+    echo "{\"text\": \"  Offline\", \"class\": \"disconnected\", \"tooltip\": \"No Internet Connection\"}"
+fi

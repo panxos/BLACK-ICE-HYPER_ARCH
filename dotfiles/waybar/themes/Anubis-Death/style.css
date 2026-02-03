@@ -1,0 +1,106 @@
+/* Mechanically Rounded/Floating - Anubis-Death-p4nx0z */
+* {
+    border: none;
+    border-radius: 0;
+    font-family: "JetBrains Mono Nerd Font", monospace;
+    font-size: 13px;
+    font-weight: bold;
+    color: #44ff00;
+    /* Verde Tóxico Más Puro (Menos amarillo) */
+}
+
+window#waybar {
+    background: transparent;
+}
+
+.modules-left,
+.modules-center,
+.modules-right {
+    background: #2d2d2d;
+    border-radius: 15px;
+    margin: 8px 10px;
+    padding: 2px 15px;
+    /* GLOW SUTIL ANUBIS: Verde Neon */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.7), 0 0 8px rgba(68, 255, 0, 0.3);
+    border: 1px solid rgba(68, 255, 0, 0.2);
+}
+
+@define-color toxic_green #44ff00;
+@define-color bgreen #00ff00;
+@define-color bg_bar #2d2d2d;
+@define-color red #ff0000;
+@define-color green #00ff00;
+
+/* TODOS los módulos en VERDE TOXICO */
+#custom-launcher,
+#workspaces,
+#custom-vpn,
+#clock,
+#custom-settarget,
+#pulseaudio,
+#battery,
+#custom-power,
+#cpu,
+#memory,
+#temperature,
+#custom-docker,
+#custom-kvm,
+#custom-updates,
+#custom-local_ip,
+#custom-public_ip,
+#tray {
+    padding: 0 10px;
+    color: @toxic_green;
+}
+
+/* Forzar color explícito en barra inferior */
+#cpu,
+#memory,
+#temperature,
+#custom-docker,
+#custom-kvm,
+#custom-updates,
+#custom-local_ip,
+#custom-public_ip {
+    color: #44ff00;
+}
+
+/* Estados especiales */
+#custom-vpn.connected,
+#custom-settarget.active {
+    color: @green;
+    background: rgba(0, 255, 0, 0.2);
+    border-radius: 8px;
+}
+
+#custom-vpn.disconnected,
+#custom-settarget.inactive,
+#cpu.critical,
+#temperature.critical {
+    color: @red;
+    background: rgba(255, 0, 0, 0.2);
+    border-radius: 8px;
+}
+
+/* Workspaces */
+#workspaces button {
+    color: @toxic_green;
+    padding: 0 5px;
+    border-radius: 50%;
+}
+
+#workspaces button.active {
+    color: #ffffff;
+    text-shadow: 0 0 8px #44ff00;
+    background: radial-gradient(circle, #44ff00 0%, #33cc00 100%);
+    box-shadow: 0 0 10px rgba(68, 255, 0, 0.6);
+}
+
+#workspaces button:hover {
+    box-shadow: 0 0 8px #44ff00;
+}
+
+/* Launcher */
+#custom-launcher {
+    font-size: 18px;
+}

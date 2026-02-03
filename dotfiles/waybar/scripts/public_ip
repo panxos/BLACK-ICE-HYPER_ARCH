@@ -1,0 +1,55 @@
+#!/bin/bash
+#
+# Script: public_ip
+# Description: Muestra la IP pública para Waybar
+# Author: Francisco Aravena (P4nX0Z)
+# Created: 2026-02-02
+# Version: 1.0.0
+
+set -euo pipefail
+
+# Cache para evitar requests excesivos
+CACHE_FILE="/tmp/waybar_public_ip_cache"
+CACHE_DURATION=300  # 5 minutos
+
+# Verificar si existe cache válido
+if [[ -f "$CACHE_FILE" ]]; then
+    CACHE_AGE=$(($(date +%s) - $(stat -c %Y "$CACHE_FILE" 2>/dev/null || echo 0)))
+    if [[ $CACHE_AGE -lt $CACHE_DURATION ]]; then
+        cat "$CACHE_FILE"
+        exit 0
+    fi
+fi
+
+# Intentar obtener IP pública (múltiples servicios como fallback)
+PUBLIC_IP=""
+
+# Servicio 1: ipify (rápido y confiable)
+if [[ -z "$PUBLIC_IP" ]]; then
+    PUBLIC_IP=$(curl -s --max-time 3 https://api.ipify.org 2>/dev/null || echo "")
+fi
+
+# Servicio 2: icanhazip (fallback)
+if [[ -z "$PUBLIC_IP" ]]; then
+    PUBLIC_IP=$(curl -s --max-time 3 https://icanhazip.com 2>/dev/null | tr -d '\n' || echo "")
+fi
+
+# Servicio 3: ifconfig.me (segundo fallback)
+if [[ -z "$PUBLIC_IP" ]]; then
+    PUBLIC_IP=$(curl -s --max-time 3 https://ifconfig.me 2>/dev/null || echo "")
+fi
+
+# Verificar si se obtuvo una IP válida
+if [[ -z "$PUBLIC_IP" ]] || [[ ! "$PUBLIC_IP" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+    OUTPUT='{"text":"󰞉 Offline","tooltip":"No se puede obtener IP pública\\nVerifica tu conexión a Internet","class":"inactive"}'
+    echo "$OUTPUT"
+    echo "$OUTPUT" > "$CACHE_FILE"
+else
+    # Obtener información de geolocalización (opcional, solo si curl funciona)
+    LOCATION=$(curl -s --max-time 2 "https://ipapi.co/$PUBLIC_IP/json" 2>/dev/null | jq -r '.city + ", " + .country_name' 2>/dev/null || echo "Desconocido")
+    [[ "$LOCATION" == "null, null" ]] && LOCATION="Desconocido"
+    
+    OUTPUT="{\"text\":\"󰞉 $PUBLIC_IP\",\"tooltip\":\"IP Pública: $PUBLIC_IP\\nUbicación: $LOCATION\",\"class\":\"active\"}"
+    echo "$OUTPUT"
+    echo "$OUTPUT" > "$CACHE_FILE"
+fi

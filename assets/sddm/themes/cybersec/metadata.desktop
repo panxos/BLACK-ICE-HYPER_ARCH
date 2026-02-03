@@ -1,0 +1,11 @@
+[SddmGreeterTheme]
+Name=CyberSec
+Description=Cyberpunk/Infosec themed SDDM login
+Type=sddm-theme
+Version=1.0
+Author=Antigravity
+License=GPLv3
+MainScript=Main.qml
+ConfigFile=theme.conf
+Theme-Id=cybersec
+Theme-API=2.0

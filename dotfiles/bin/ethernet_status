@@ -1,0 +1,27 @@
+#!/bin/bash
+# ═══════════════════════════════════════════════════════════════════════════
+# ETHERNET STATUS - Muestra estado de conexión Ethernet
+# ═══════════════════════════════════════════════════════════════════════════
+
+# Buscar interfaz Ethernet activa (excluyendo lo, wlan, tun)
+ETH_IFACE=$(ip -br link | grep -E '^(en|eth)' | awk '{print $1}' | head -n1)
+
+if [ -z "$ETH_IFACE" ]; then
+    echo '{"text": "󰈀 No ETH", "tooltip": "No Ethernet interface found", "class": "disabled"}'
+    exit 0
+fi
+
+# Verificar estado de la interfaz
+ETH_STATE=$(ip -br link show "$ETH_IFACE" | awk '{print $2}')
+
+if [ "$ETH_STATE" = "UP" ]; then
+    # Obtener IP si está disponible
+    ETH_IP=$(ip -br addr show "$ETH_IFACE" | awk '{print $3}' | cut -d/ -f1)
+    if [ -n "$ETH_IP" ]; then
+        echo "{\"text\": \"<span color='#00FFFF'>󰈀</span> <span color='#bd93f9'>$ETH_IP</span>\", \"tooltip\": \"$ETH_IFACE: $ETH_IP\", \"class\": \"connected\"}"
+    else
+        echo "{\"text\": \"󰈀 $ETH_IFACE\", \"tooltip\": \"$ETH_IFACE: No IP assigned\", \"class\": \"no-ip\"}"
+    fi
+else
+    echo "{\"text\": \"󰈀 DOWN\", \"tooltip\": \"$ETH_IFACE is down\", \"class\": \"disconnected\"}"
+fi

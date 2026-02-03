@@ -1,0 +1,5 @@
+# SOTA Project GitIgnore
+config/install.conf
+*.log
+*.tmp
+.DS_Store

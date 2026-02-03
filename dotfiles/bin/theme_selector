@@ -1,0 +1,47 @@
+#!/bin/bash
+# theme_selector - Black-Ice Arch v1.0
+USER_HOME="/home/faravena"
+THEMES_DIR="$USER_HOME/.config/waybar/themes"
+W_DIR="$USER_HOME/.config/waybar"
+WALL_DIR="$(xdg-user-dir PICTURES 2>/dev/null || echo "$HOME/Pictures")/wallpapers"
+CACHE_WALL="$HOME/.cache/current_wallpaper"
+CACHE_THEME="$HOME/.cache/current_theme"
+FF_DIR="$USER_HOME/.config/fastfetch"
+
+selection=$(echo -e "Horus-Cyber\nRa-Solar\nIsis-Magic\nAnubis-Death" | wofi --dmenu --prompt "Select Theme:")
+[ -z "$selection" ] && exit 0
+
+echo "$selection" > "$CACHE_THEME"
+
+case $selection in
+    "Horus-Cyber")   T="Horus-Cyber";   W="HORUS-CYBER.jpg";  C="0xee00ffff 0xee003333" ;;
+    "Ra-Solar")      T="Ra-Solar";      W="RA-SOLAR.jpg";     C="0xeeffaa00 0xee552200" ;;
+    "Isis-Magic")    T="Isis-Magic";    W="ISIS-MAGIC.jpg";   C="0xeeff00ff 0xee330033" ;;
+    "Anubis-Death")  T="Anubis-Death";  W="ANUBIS-DEATH.jpg"; C="0xee44ff00 0xee002200" ;;
+esac
+
+# Waybar links
+rm -f "$W_DIR/config" "$W_DIR/config.jsonc" "$W_DIR/style.css"
+ln -sf "$THEMES_DIR/$T/config.jsonc" "$W_DIR/config.jsonc"
+ln -sf "$THEMES_DIR/$T/style.css" "$W_DIR/style.css"
+
+# Wallpaper & Pywal
+if [ -f "$WALL_DIR/$W" ]; then
+    echo "$WALL_DIR/$W" > "$CACHE_WALL"
+    swww img "$WALL_DIR/$W" --transition-type grow --transition-duration 1
+    wal -i "$WALL_DIR/$W" -n -q 2>/dev/null || true
+fi
+
+# PREPARAR LOGO
+RANDOM_LOGO=$(find "$FF_DIR/logos" -name "*.png" 2>/dev/null | shuf -n 1)
+[ -f "$RANDOM_LOGO" ] && cp "$RANDOM_LOGO" "$FF_DIR/current_logo.png"
+
+# Hyprland borders
+hyprctl keyword general:col.active_border "$C 45deg" 2>/dev/null
+
+# Restart Waybar
+pkill -9 waybar 2>/dev/null
+sleep 0.5
+waybar &>/dev/null &
+
+notify-send "BLACK-ICE" "Theme Active: $selection"

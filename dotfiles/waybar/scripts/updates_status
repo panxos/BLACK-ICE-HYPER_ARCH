@@ -1,0 +1,39 @@
+#!/bin/bash
+#
+# Script: updates_status
+# Description: Muestra actualizaciones pendientes de pacman para Waybar
+# Author: Francisco Aravena (P4nX0Z)
+# Created: 2026-02-02
+# Version: 1.0.0
+
+set -euo pipefail
+
+# Verificar si pacman está disponible
+if ! command -v pacman &>/dev/null; then
+    echo '{"text":"󰏔 N/A","tooltip":"pacman no disponible","class":"inactive"}'
+    exit 0
+fi
+
+# Verificar actualizaciones (usando checkupdates si está disponible, sino pacman -Qu)
+if command -v checkupdates &>/dev/null; then
+    UPDATES=$(checkupdates 2>/dev/null | wc -l)
+else
+    UPDATES=$(pacman -Qu 2>/dev/null | wc -l)
+fi
+
+if [[ $UPDATES -eq 0 ]]; then
+    echo '{"text":"󰏔 0","tooltip":"Sistema actualizado","class":"inactive"}'
+else
+    # Obtener primeros 5 paquetes para tooltip
+    if command -v checkupdates &>/dev/null; then
+        PACKAGES=$(checkupdates 2>/dev/null | head -5 | awk '{print $1}' | tr '\n' ', ' | sed 's/,$//')
+    else
+        PACKAGES=$(pacman -Qu 2>/dev/null | head -5 | awk '{print $1}' | tr '\n' ', ' | sed 's/,$//')
+    fi
+    
+    if [[ $UPDATES -gt 5 ]]; then
+        PACKAGES="$PACKAGES... (+$((UPDATES - 5)) más)"
+    fi
+    
+    echo "{\"text\":\"󰏔 $UPDATES\",\"tooltip\":\"Actualizaciones disponibles:\\n$PACKAGES\",\"class\":\"active\"}"
+fi

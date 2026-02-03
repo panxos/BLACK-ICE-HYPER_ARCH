@@ -1,0 +1,19 @@
+#!/bin/bash
+# target_status (Clean - No Colors)
+TARGET_FILE="$HOME/.config/bin/target"
+
+if [ -f "$TARGET_FILE" ]; then
+    TARGET_INFO=$(cat "$TARGET_FILE")
+    IP=$(echo $TARGET_INFO | awk '{print $1}')
+    NAME=$(echo $TARGET_INFO | awk '{print $2}')
+    
+    if [ -n "$IP" ]; then
+        # Icono NO incluido aquí si ya está en Waybar config, pero para asegurar: 
+        # Si el config tiene {}, el script debe mandar el texto limpio.
+        echo "{\"text\": \"$IP - $NAME\", \"class\": \"active\", \"tooltip\": \"Target: $NAME ($IP)\"}"
+    else
+        echo "{\"text\": \"No Target\", \"class\": \"inactive\", \"tooltip\": \"No target set\"}"
+    fi
+else
+    echo "{\"text\": \"No Target\", \"class\": \"inactive\", \"tooltip\": \"No target set\"}"
+fi

@@ -1,0 +1,158 @@
+[
+    {
+        "layer": "top",
+        "position": "top",
+        "height": 30,
+        "spacing": 0,
+        "modules-left": [
+            "custom/launcher",
+            "hyprland/workspaces",
+            "custom/vpn"
+        ],
+        "modules-center": [
+            "clock"
+        ],
+        "modules-right": [
+            "custom/settarget",
+            "pulseaudio",
+            "battery",
+            "custom/power"
+        ],
+        "custom/launcher": {
+            "format": " 󰣇 ",
+            "on-click": "wofi --show drun",
+            "tooltip": false
+        },
+        "hyprland/workspaces": {
+            "format": "{id}",
+            "on-click": "activate",
+            "persistent-workspaces": {
+                "*": 5
+            }
+        },
+        "custom/vpn": {
+            "format": "{}",
+            "exec": "~/.config/bin/vpn_status",
+            "interval": 5,
+            "return-type": "json"
+        },
+        "clock": {
+            "format": " 󰥔 {:%H:%M   %m-%d} ",
+            "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
+            "on-click": "gnome-calendar || kcalc"
+        },
+        "custom/settarget": {
+            "format": "{}",
+            "exec": "~/.config/bin/target_status",
+            "interval": 5,
+            "return-type": "json",
+            "on-click": "~/.config/bin/settarget"
+        },
+        "pulseaudio": {
+            "format": " {icon} {volume}% ",
+            "format-muted": " 󰝟 {volume}% ",
+            "format-icons": {
+                "headphone": "󰋋",
+                "default": [
+                    "󰕿",
+                    "󰖀",
+                    "󰕾"
+                ]
+            },
+            "on-click": "pavucontrol"
+        },
+        "battery": {
+            "format": " {icon} {capacity}% ",
+            "format-icons": [
+                "󰁺",
+                "󰁻",
+                "󰁼",
+                "󰁽",
+                "󰁾",
+                "󰁿",
+                "󰂀",
+                "󰂁",
+                "󰂂",
+                "󰁹"
+            ]
+        },
+        "custom/power": {
+            "format": "⏻",
+            "tooltip": false,
+            "on-click": "~/.config/bin/power_menu.sh"
+        }
+    },
+    {
+        "layer": "top",
+        "position": "bottom",
+        "height": 30,
+        "spacing": 0,
+        "modules-left": [
+            "custom/docker",
+            "custom/kvm",
+            "custom/updates"
+        ],
+        "modules-center": [
+            "custom/local_ip",
+            "custom/public_ip"
+        ],
+        "modules-right": [
+            "cpu",
+            "memory",
+            "temperature",
+            "tray"
+        ],
+        "custom/docker": {
+            "exec": "~/.config/bin/docker_status",
+            "return-type": "json",
+            "interval": 10,
+            "format": " {} "
+        },
+        "custom/kvm": {
+            "exec": "~/.config/bin/kvm_status",
+            "return-type": "json",
+            "interval": 10,
+            "format": " {} "
+        },
+        "custom/updates": {
+            "exec": "~/.config/bin/updates_status",
+            "return-type": "json",
+            "interval": 300,
+            "format": " {} ",
+            "on-click": "kitty -e sudo pacman -Syu"
+        },
+        "custom/local_ip": {
+            "exec": "~/.config/bin/local_ip",
+            "return-type": "json",
+            "interval": 10,
+            "format": " {} "
+        },
+        "custom/public_ip": {
+            "exec": "~/.config/bin/public_ip",
+            "return-type": "json",
+            "interval": 60,
+            "format": " {} "
+        },
+        "cpu": {
+            "format": " 󰻠 {usage}% ",
+            "states": {
+                "critical": 60
+            }
+        },
+        "memory": {
+            "format": " 󰍛 {percentage}% ",
+            "states": {
+                "critical": 80
+            }
+        },
+        "temperature": {
+            "critical-threshold": 60,
+            "format": "  {temperatureC}°C ",
+            "format-critical": "  {temperatureC}°C "
+        },
+        "tray": {
+            "icon-size": 18,
+            "spacing": 10
+        }
+    }
+]

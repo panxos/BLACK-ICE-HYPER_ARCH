@@ -1,0 +1,77 @@
+[
+  {
+    "layer": "top",
+    "position": "top",
+    "height": 32,
+    "modules-left": ["hyprland/workspaces", "hyprland/window"],
+    "modules-center": ["clock"],
+    "modules-right": ["custom/target", "custom/vpn", "tray"],
+    
+    "hyprland/workspaces": { 
+      "format": "{icon}", 
+      "on-click": "activate",
+      "format-icons": {
+        "1": "󰲠",
+        "2": "󰲢",
+        "3": "󰲤",
+        "4": "󰲦",
+        "5": "󰲨",
+        "active": "",
+        "default": ""
+      }
+    },
+    
+    "hyprland/window": {
+      "format": "{}",
+      "max-length": 50,
+      "separate-outputs": true
+    },
+    
+    "clock": {
+      "format": "{:%H:%M:%S}",
+      "format-alt": "{:%Y-%m-%d %H:%M:%S}",
+      "tooltip-format": "<tt><small>{calendar}</small></tt>",
+      "interval": 1
+    },
+    
+    "custom/target": { 
+      "exec": "~/.config/bin/target_status", 
+      "interval": 2, 
+      "format": "🎯 {}"
+    },
+    
+    "custom/vpn": { 
+      "exec": "~/.config/bin/vpn_status", 
+      "return-type": "json", 
+      "interval": 5, 
+      "format": "{}"
+    },
+    
+    "tray": { 
+      "spacing": 10,
+      "icon-size": 18
+    }
+  },
+  {
+    "layer": "top",
+    "position": "bottom",
+    "height": 28,
+    "modules-left": [],
+    "modules-center": ["custom/local_ip", "custom/public_ip"],
+    "modules-right": [],
+    
+    "custom/local_ip": { 
+      "exec": "~/.config/bin/local_ip", 
+      "return-type": "json", 
+      "interval": 5, 
+      "format": "{}"
+    },
+    
+    "custom/public_ip": { 
+      "exec": "~/.config/bin/public_ip", 
+      "return-type": "json", 
+      "interval": 30,
+      "format": "{}"
+    }
+  }
+]

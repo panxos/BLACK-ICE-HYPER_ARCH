@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>BLACK-ICE Shortcuts</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;800&display=swap');
+        
+        body {
+            font-family: 'JetBrains Mono', monospace;
+            background-color: #0a0a0a;
+            color: #dcdcdc;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        h1 {
+            color: #00ffff;
+            text-shadow: 0 0 10px #00ffff;
+            text-align: center;
+            border-bottom: 2px solid #00ffff;
+            padding-bottom: 10px;
+        }
+
+        h2 {
+            color: #bd93f9;
+            border-left: 5px solid #bd93f9;
+            padding-left: 10px;
+            margin-top: 30px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th {
+            background-color: #1a1a1a;
+            color: #ff79c6;
+            text-align: left;
+            padding: 10px;
+            border: 1px solid #444;
+        }
+
+        td {
+            padding: 8px;
+            border: 1px solid #333;
+        }
+
+        tr:nth-child(even) {
+            background-color: #111;
+        }
+
+        .key {
+            background-color: #333;
+            color: #fff;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+            border: 1px solid #555;
+        }
+
+        footer {
+            text-align: center;
+            font-size: 10px;
+            color: #666;
+            margin-top: 50px;
+            border-top: 1px solid #333;
+            padding-top: 10px;
+        }
+        
+        @media print {
+            body { background-color: white; color: black; }
+            h1 { color: black; text-shadow: none; border-color: black; }
+            h2 { color: black; border-color: black; }
+            th { background-color: #eee; color: black; border-color: #000; }
+            td { border-color: #000; }
+            tr:nth-child(even) { background-color: #f9f9f9; }
+            .key { background-color: #ddd; color: black; border: 1px solid #000; }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>BLACK-ICE ARCH // SHORTCUTS</h1>
+
+    <h2>SYSTEM CONTROL</h2>
+    <table>
+        <tr><th>Shortcut</th><th>Action</th><th>Description</th></tr>
+        <tr><td><span class="key">Win</span> + <span class="key">Enter</span></td><td>Terminal</td><td>Spawns Kitty Terminal</td></tr>
+        <tr><td><span class="key">Win</span> + <span class="key">D</span></td><td>Launcher</td><td>Wofi Application Menu</td></tr>
+        <tr><td><span class="key">Win</span> + <span class="key">L</span></td><td>Lock Screen</td><td>Hyprlock Security Screen</td></tr>
+        <tr><td><span class="key">Win</span> + <span class="key">Shift</span> + <span class="key">E</span></td><td>Power Menu</td><td>Wlogout menu</td></tr>
+        <tr><td><span class="key">Win</span> + <span class="key">Q</span></td><td>Close Active</td><td>Kill current window</td></tr>
+    </table>
+
+    <h2>WINDOW MANAGEMENT</h2>
+    <table>
+        <tr><th>Shortcut</th><th>Action</th><th>Description</th></tr>
+        <tr><td><span class="key">Win</span> + <span class="key">F</span></td><td>Float</td><td>Toggle Floating Mode</td></tr>
+        <tr><td><span class="key">Win</span> + <span class="key">Shift</span> + <span class="key">F</span></td><td>Fullscreen</td><td>Toggle Fullscreen</td></tr>
+        <tr><td><span class="key">Win</span> + <span class="key">P</span></td><td>Pseudo</td><td>Pseudo-tiling mode</td></tr>
+        <tr><td><span class="key">Win</span> + <span class="key">Arrows</span></td><td>Focus</td><td>Move focus</td></tr>
+    </table>
+
+    <h2>VISUALS</h2>
+    <table>
+        <tr><th>Shortcut</th><th>Action</th><th>Description</th></tr>
+        <tr><td><span class="key">Win</span> + <span class="key">Alt</span> + <span class="key">W</span></td><td>Wallpaper</td><td>Next SOTA Wallpaper</td></tr>
+        <tr><td><span class="key">Win</span> + <span class="key">Alt</span> + <span class="key">T</span></td><td>Theme</td><td>Switch Color Scheme</td></tr>
+    </table>
+
+    <footer>
+        BLACK-ICE ARCH v2.0.0 (SOTA Edition) - Designed by P4nx0s
+    </footer>
+
+</body>
+</html>

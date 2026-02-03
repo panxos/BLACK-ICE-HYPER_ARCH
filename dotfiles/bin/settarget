@@ -1,0 +1,41 @@
+#!/bin/bash
+# settarget: Comando CLI para establecer objetivo desde terminal
+# Uso: settarget <nombre> <ip>
+# Ejemplo: settarget maquinavictima 10.0.0.1
+
+TARGET_FILE="$HOME/.config/bin/target"
+
+# Verificar argumentos
+if [ $# -eq 0 ]; then
+    # Sin argumentos: mostrar target actual
+    if [ -f "$TARGET_FILE" ]; then
+        cat "$TARGET_FILE"
+    else
+        echo "No Target"
+    fi
+    exit 0
+fi
+
+if [ $# -eq 1 ]; then
+    # Solo nombre: guardar solo nombre
+    TARGET="$1"
+elif [ $# -eq 2 ]; then
+    # Nombre e IP: formato "IP Nombre"
+    TARGET="$2 $1"
+else
+    echo "Uso: settarget <nombre> <ip>"
+    echo "Ejemplo: settarget maquinavictima 10.0.0.1"
+    exit 1
+fi
+
+# Crear directorio si no existe
+mkdir -p "$HOME/.config/bin"
+
+# Guardar target
+echo "$TARGET" > "$TARGET_FILE"
+echo "✓ Target establecido: $TARGET"
+
+# Notificar si notify-send está disponible
+if command -v notify-send &>/dev/null; then
+    notify-send "Target Set" "$TARGET"
+fi

@@ -1,0 +1,45 @@
+#!/bin/bash
+# wallpaper_switcher: Selector interactivo optimizado para BLACK-ICE 
+# Detect dynamic XDG Pictures dir
+if command -v xdg-user-dir &>/dev/null; then
+    PICTURES_DIR=$(xdg-user-dir PICTURES)
+    [ -z "$PICTURES_DIR" ] && PICTURES_DIR="$HOME/Pictures"
+else
+    PICTURES_DIR="$HOME/Pictures"
+fi
+
+WALL_DIR="$PICTURES_DIR/wallpapers"
+STATE_FILE="$HOME/.config/hypr/.current_wallpaper"
+
+# Ensure swww-daemon is running
+if ! pgrep -x "swww-daemon" > /dev/null; then
+    swww-daemon &
+    sleep 1
+fi
+
+# Recoger todos los wallpapers PNG y JPG
+shopt -s nullglob
+wallpapers=("$WALL_DIR"/*.{png,jpg,jpeg})
+num_walls=${#wallpapers[@]}
+
+if [ $num_walls -eq 0 ]; then
+    notify-send "Wallpaper System" "Error: No se encontraron archivos black_ice_wallpaper_*.png"
+    exit 1
+fi
+
+# Calcular siguiente índice
+current_idx=$(cat "$STATE_FILE" 2>/dev/null || echo "0")
+next_idx=$(( (current_idx + 1) % num_walls ))
+echo "$next_idx" > "$STATE_FILE"
+
+new_wall="${wallpapers[$next_idx]}"
+
+# Aplicar usando swww (más confiable)
+swww img "$new_wall" --transition-type wipe --transition-duration 2
+
+# Sincronizar colores de terminal (Kitty) - solo si wal está instalado
+if command -v wal &> /dev/null; then
+    wal -i "$new_wall" -n -q
+fi
+
+notify-send "BLACK-ICE" "Applied: $(basename "$new_wall")"

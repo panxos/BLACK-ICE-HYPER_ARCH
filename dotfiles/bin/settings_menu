@@ -1,0 +1,31 @@
+#!/bin/bash
+# ═══════════════════════════════════════════════════════════════════════════
+# SETTINGS MENU - Menú de configuración rápida
+# ═══════════════════════════════════════════════════════════════════════════
+
+# Opciones del menú
+OPTIONS="System Settings\nWaybar Settings\nHyprland Settings\nTheme Selector\nNetwork Settings\nBluetooth Settings"
+
+# Mostrar menú con wofi
+SELECTION=$(echo -e "$OPTIONS" | wofi --dmenu --prompt "Settings:")
+
+case "$SELECTION" in
+    "System Settings")
+        kitty -e btop &
+        ;;
+    "Waybar Settings")
+        kitty -e nvim ~/.config/waybar/themes/Mecabar-p4nx0z/config.jsonc &
+        ;;
+    "Hyprland Settings")
+        kitty -e nvim ~/.config/hypr/hyprland.conf &
+        ;;
+    "Theme Selector")
+        ~/.config/bin/theme_selector &
+        ;;
+    "Network Settings")
+        nm-connection-editor &
+        ;;
+    "Bluetooth Settings")
+        blueman-manager &
+        ;;
+esac

@@ -1,0 +1,32 @@
+# BLACK-ICE ARCH - Configuration Template
+# Copy this file to install.conf and customize for automated installation
+
+# --- HARDWARE & DISK ---
+TARGET_DISK="nvme0n1"              # Target disk (nvme0n1, sda, vda, etc.)
+ENABLE_LUKS="yes"                  # Enable full disk encryption
+LUKS_PASSWORD="YourSecurePassword" # LUKS encryption password
+FILESYSTEM="btrfs"                 # Filesystem: btrfs, ext4, xfs, f2fs
+NVME_STABILITY="yes"               # Disable APST for NVMe stability (ThinkPads)
+
+# --- LOCALIZATION ---
+SELECTED_COUNTRY="Chile"           # Mirror country
+SYSTEM_LANG="en_US"                # System language
+SYSTEM_LOCALE="es_CL"              # Locale formats
+KEYBOARD_LAYOUT="la-latin1"        # Keyboard layout
+TIMEZONE="America/Santiago"        # Timezone
+
+# --- IDENTITY ---
+HOSTNAME="blackice"                # System hostname
+USERNAME="youruser"                # Your username
+ROOT_PASSWORD="YourRootPassword"   # Root password
+USER_PASSWORD="YourUserPassword"   # User password
+
+# --- SYSTEM & KERNEL ---
+KERNEL="linux"                     # Kernel: linux, linux-zen, linux-hardened
+AUTO_MODE="true"                   # Unattended installation
+
+# SECURITY WARNING:
+# - NEVER commit this file with real passwords to Git
+# - Add install.conf to .gitignore
+# - Use strong, unique passwords
+# - Change all passwords after installation
