@@ -16,7 +16,7 @@ cp -r "${INSTALL_DIR:-}/"* "/mnt/root/BLACK-ICE_ARCH/"
 
 # Ensure scripts are executable
 chmod +x "/mnt/home/${USER_NAME:-}/BLACK-ICE_ARCH/deploy_hyprland.sh"
-chmod +x "/mnt/home/${USER_NAME:-}/BLACK-ICE_ARCH/deploy-modules/"*.sh
+chmod +x "/mnt/home/${USER_NAME:-}/BLACK-ICE_ARCH/src/deploy/"*.sh
 
 # Fix ownership for the new user
 arch-chroot /mnt chown -R "${USER_NAME:-}:${USER_NAME:-}" "/home/${USER_NAME:-}/BLACK-ICE_ARCH"
@@ -106,7 +106,7 @@ AUDIT_EOF
 chmod +x /mnt/root/audit_system.sh
 if arch-chroot /mnt /root/audit_system.sh; then
     rm /mnt/root/audit_system.sh
-    success "Instalación y Auditoría Completadas. System Ready."
+    log_success "Instalación y Auditoría Completadas. System Ready."
 else
     log_warn "La auditoría final detectó problemas."
     log_error "Instalación completada con ERRORES. Revisa el reporte arriba."
