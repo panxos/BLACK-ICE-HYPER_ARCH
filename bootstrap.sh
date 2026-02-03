@@ -71,9 +71,9 @@ log_error() {
 
 # Check if running as root
 check_root() {
-    if [ "$EUID" -eq 0 ]; then
-        log_error "No ejecutes este script como root"
-        log_info "El script solicitará privilegios sudo cuando sea necesario"
+    if [ "$EUID" -ne 0 ]; then
+        log_error "Este script debe ejecutarse como root (especialmente en la ISO de Arch)"
+        log_info "Usa: sudo bash o ejecuta como usuario root"
         exit 1
     fi
 }
