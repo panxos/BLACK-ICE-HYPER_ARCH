@@ -214,7 +214,15 @@ fi
 for pkg in "${HYPRLAND_PKGS[@]}"; do
     if ! pacman -Q "$pkg" &> /dev/null; then
         echo -e "  ${CYAN}→${NC} Instalando $pkg..."
-        sudo -n pacman -S --needed --noconfirm "$pkg" || yay -S --needed --noconfirm "$pkg"
+        # Intento con pacman (incluye chaotic-aur si está activo)
+        if ! sudo -n pacman -S --needed --noconfirm "$pkg" 2>/dev/null; then
+            # Si es candy-icons, intentar nombre alternativo en repo
+            if [[ "$pkg" == "candy-icons-git" ]]; then
+                sudo -n pacman -S --needed --noconfirm candy-icons 2>/dev/null && continue
+            fi
+            # Último recurso: AUR
+            yay -S --needed --noconfirm "$pkg" || log_warn "No se pudo instalar $pkg. Se intentará en la fase de personalización."
+        fi
     fi
 done
 
@@ -745,9 +753,10 @@ chown -R $CURRENT_USER:$CURRENT_USER "$WALLPAPER_DEST" 2>/dev/null || true
 # --- PLYMOUTH (Boot Splash - via AUR) ---
 log_info "Instalando y configurando Plymouth (Boot Splash)..."
 
-# Instalar plymouth y un tema desde AUR
+# Instalar plymouth y un tema desde AUR (Hacemos que no aborte la instalación si falla)
 if ! pacman -Q plymouth &>/dev/null; then
-    retry_command yay -S --needed --noconfirm plymouth plymouth-theme-abstract-ring-git
+    log_info "Instalando Plymouth desde AUR (esto puede tardar)..."
+    retry_command yay -S --needed --noconfirm plymouth plymouth-theme-abstract-ring-git || log_warn "Fallo la instalación de Plymouth. El sistema arrancará sin splash dinámico."
 fi
 
 # Validate Abstract Ring Installation (Fix Path with better discovery)

@@ -61,17 +61,18 @@ retry_command() {
                 sleep $delay
             else
                 log_error "Comando falló tras $max intentos: $*"
-                # Si estamos en modo no interactivo, abortamos
-                if [ "$AUTO_MODE" == "true" ] || [ "$NON_INTERACTIVE" == "true" ]; then
+                # Si estamos en modo no interactivo, fallamos pero permitimos continuar al script si el caller lo maneja
+                if [ "${AUTO_MODE:-}" == "true" ] || [ "${NON_INTERACTIVE:-}" == "true" ]; then
                     return 1
                 fi
                 # Si existe ask_option, preguntamos al usuario
                 if command -v ask_option >/dev/null; then
-                    if [[ $(ask_option "¿Deseas reintentar manualmente o abortar?" "Reintentar" "Abortar") == "Abortar" ]]; then
-                        return 1
-                    else
-                        n=1 # Reset counter for manual retry
-                    fi
+                    local ACTION=$(ask_option "¿Qué deseas hacer con este fallo?" "Reintentar" "Saltar" "Abortar")
+                    case "$ACTION" in
+                        "Reintentar") n=1 ;;
+                        "Saltar") return 1 ;;
+                        "Abortar") exit 1 ;;
+                    esac
                 else
                     return 1
                 fi

@@ -35,9 +35,13 @@ if [ ! -d "/usr/share/themes/$REQUIRED_THEME" ] && [ ! -d "$USER_HOME/.themes/$R
     retry_command yay -S --needed --noconfirm sweet-theme-git
 fi
 
-if [ ! -d "/usr/share/icons/$REQUIRED_ICON" ] && [ ! -d "$USER_HOME/.icons/$REQUIRED_ICON" ]; then
-    log_warn "Iconos $REQUIRED_ICON no encontrados. Instalando..."
-    retry_command yay -S --needed --noconfirm candy-icons-git
+if [ -n "$REQUIRED_ICON" ] && ! pacman -Q "$REQUIRED_ICON" &>/dev/null; then
+    log_info "Instalando librería de iconos: $REQUIRED_ICON..."
+    # Intentar candy-icons-git y candy-icons
+    sudo -n pacman -S --needed --noconfirm candy-icons-git 2>/dev/null || \
+    sudo -n pacman -S --needed --noconfirm candy-icons 2>/dev/null || \
+    retry_command yay -S --needed --noconfirm candy-icons-git || \
+    log_warn "No se pudo instalar los iconos. El sistema usará Papirus como respaldo."
 fi
 
 # NOTE: Kvantum linking is already handled in Module 01 (Advanced Detection)
