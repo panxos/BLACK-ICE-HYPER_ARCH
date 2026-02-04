@@ -6,10 +6,10 @@
 - [Web Application Security](#web-application-security)
 - [Networking & Sniffing](#networking--sniffing)
 - [Wireless Security](#wireless-security)
-- [Exploitation & Frameworks](#exploitation--frameworks)
+- [Exploitation & C2 Frameworks](#exploitation--c2-frameworks)
 - [Active Directory & Windows](#active-directory--windows)
 - [Forensics & Analysis](#forensics--analysis)
-- [Cracking & Wordlists](#cracking--wordlists)
+- [Cracking & Secrets](#cracking--secrets)
 - [Reverse Engineering](#reverse-engineering)
 
 ---
@@ -56,23 +56,41 @@
 
 ---
 
-## 💥 Exploitation & Frameworks
+## 💥 Exploitation & C2 Frameworks
 
 - **metasploit** - Industry-standard exploit framework.
+- **sliver** - Modern, cross-platform C2 framework (Go) replacing MSF in many ops.
+- **villain** - Advanced reverse shell manager and multi-session handler.
 - **searchsploit** - Command-line interface for Exploit-DB (offline search).
 - **routersploit** - Framework for exploiting embedded devices/routers.
 - **beef** - Browser Exploitation Framework (XSS focused).
-- **set** - Social Engineering Toolkit for phishing and credential harvesting.
+- **set** - Social Engineering Toolkit for phishing.
 
 ---
 
-## 🔐 Cracking & Wordlists
+## 🏗️ Active Directory & Windows
+
+- **netexec (nxc)** - The successor to CrackMapExec; the "Swiss Army Knife" for AD pentesting.
+- **certipy** - Specialized tool for auditing and exploiting AD Certificate Services (AD CS).
+- **impacket** - Collection of Python classes for working with network protocols (SMB, MSRPC).
+- **bloodhound.py** - Python ingestor for BloodHound (collects AD data from Linux).
+- **evil-winrm** - Ultimate shell for WinRM (Windows Remote Management).
+- **coercer** - Automatic coercion of Windows authentication (MS-RPC).
+- **kerbrute** - Fast Kerberos pre-authenticator for user enumeration and bruteforce.
+- **responder** - Poisoner for LLMNR, NBT-NS and MDNS.
+
+---
+
+## 🔐 Cracking & Secrets
 
 - **hashcat** - World's fastest password recovery tool (GPU accelerated).
 - **john** - John the Ripper, versatile password cracker.
-- **hydra** - Fast and flexible network login brute-forcing tool.
-- **crunch** - Wordlist generator based on character sets.
-- **seclists** - Massive collection of security lists for all types of testing.
+- **trufflehog** - Scans repositories, S3 buckets, and filesystems for secrets/keys.
+- **gitleaks** - Highly effective tool for detecting secrets in Git history.
+- **pcredz** - Extracts credit card numbers and credentials from PCAP/Live traffic.
+- **hydra** - Parallel network login brute-forcing tool.
+- **cewl** - Custom wordlist generator based on target website content.
+- **seclists** - Massive collection of lists for payloads, passwords, and discovery.
 
 ---
 

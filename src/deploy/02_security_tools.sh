@@ -215,14 +215,17 @@ install_wireless() {
 install_windows_ad() {
     local tools=(
         "impacket|Impacket - Python SMB/MSRPC"
-        "crackmapexec|CrackMapExec - AD Swiss Army"
+        "netexec|NetExec - Modern AD Swiss Army (CME successor)"
+        "crackmapexec|CrackMapExec - Legacy AD Swiss Army"
         "evil-winrm|Evil-WinRM - WinRM Shell"
-        "bloodhound|BloodHound - AD Mapper"
-        "neo4j|Neo4j - Graph Database"
+        "bloodhound|BloodHound - AD Mapper (GUI)"
+        "bloodhound.py|BloodHound.py - AD Ingestor"
+        "certipy|Certipy - AD CS Enumeration & Attack"
+        "coercer|Coercer - Forced Authentication Tool"
+        "kerbrute|Kerbrute - Kerberos Bruteforce/Enum"
+        "ldapdomaindump|LDAPDomainDump - Active Directory Dumper"
+        "responder|Responder - LLMNR/NBT-NS Poisoner"
         "smbmap|SMBMap - SMB Enumeration"
-        "responder|Responder - LLMNR Poisoner"
-        "rdesktop|RDesktop - RDP Client"
-        "freerdp|FreeRDP - Modern RDP Client"
         "chntpw|Chntpw - Windows Password Reset"
     )
     show_category_menu "Windows y Active Directory" "${tools[@]}"
@@ -233,14 +236,16 @@ install_cracking() {
     local tools=(
         "john|John the Ripper - Password Cracker"
         "hashcat|Hashcat - Advanced Cracker"
-        "ophcrack|Ophcrack - Rainbow Tables"
         "hydra|Hydra - Network Logon Cracker"
         "medusa|Medusa - Parallel Bruteforcer"
+        "trufflehog|TruffleHog - Secret Scanner (Git/S3)"
+        "gitleaks|Gitleaks - Secret Scanner (Repo)"
+        "pcredz|PCredz - Credentials from PCAP"
         "cewl|CeWL - Wordlist Generator"
         "crunch|Crunch - Wordlist Creator"
         "hashid|HashID - Hash Identifier"
         "seclists|SecLists - Security Wordlists"
-        "wordlists|Wordlists - RockyYou & More"
+        "wordlists|Wordlists - ROCKY-YOU & More"
     )
     show_category_menu "Cracking y Wordlists" "${tools[@]}"
 }
@@ -249,6 +254,8 @@ install_cracking() {
 install_exploitation() {
     local tools=(
         "metasploit|Metasploit Framework"
+        "sliver|Sliver - Advanced C2 Framework (Go)"
+        "villain|Villain - Reverse Shell Manager"
         "armitage|Armitage - MSF GUI"
         "exploitdb|ExploitDB - Exploit Archive"
         "searchsploit|SearchSploit - Exploit Search"
@@ -368,12 +375,12 @@ install_all() {
         # Wireless
         "aircrack-ng" "kismet" "wifite" "reaver" "bully" "pixiewps" "bluez-tools" "bluez-utils"
         # Windows/AD
-        "impacket" "crackmapexec" "evil-winrm" "bloodhound" "neo4j" "smbmap" "responder" 
-        "rdesktop" "freerdp" "chntpw"
+        "impacket" "netexec" "evil-winrm" "bloodhound" "bloodhound.py" "certipy"
+        "coercer" "kerbrute" "ldapdomaindump" "responder" "smbmap" "chntpw"
         # Cracking
-        "john" "hashcat" "ophcrack" "hydra" "medusa" "cewl" "crunch" "hashid" "seclists" "wordlists"
+        "john" "hashcat" "hydra" "medusa" "trufflehog" "gitleaks" "pcredz" "cewl" "crunch" "hashid" "seclists" "wordlists"
         # Exploitation
-        "metasploit" "armitage" "exploitdb" "searchsploit" "set" "routersploit"
+        "metasploit" "sliver" "villain" "armitage" "exploitdb" "searchsploit" "set" "routersploit" "beef"
         # Sniffing
         "wireshark-qt" "tcpdump" "netsniff-ng" "ettercap" "bettercap" "mitmproxy" 
         "dsniff" "macchanger" "scapy"
