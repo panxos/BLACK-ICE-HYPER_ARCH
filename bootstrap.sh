@@ -103,23 +103,44 @@ check_arch_livecd() {
     log_success "Arch Linux detectado"
 }
 
+# --- Resilience: Retry Logic ---
+retry_command() {
+    local n=1
+    local max=3
+    local delay=5
+    while true; do
+        if "$@"; then
+            return 0
+        else
+            if [[ $n -lt $max ]]; then
+                ((n++))
+                log_warn "Fallo en comando: $*. Reintentando ($n/$max) en ${delay}s..."
+                sleep $delay
+            else
+                log_error "Comando falló tras $max intentos: $*"
+                return 1
+            fi
+        fi
+    done
+}
+
 # Install required dependencies for bootstrap
 install_dependencies() {
     log_info "Instalando dependencias necesarias..."
     
     # Update package database
-    if ! pacman -Sy --noconfirm &> /dev/null; then
-        log_error "Error al actualizar base de datos de paquetes"
+    retry_command pacman -Sy --noconfirm || {
+        log_error "Error crítico: No se pudo actualizar la base de datos de paquetes."
         exit 1
-    fi
+    }
     
     # Install git if not present
     if ! command -v git &> /dev/null; then
         log_info "Instalando git..."
-        if ! pacman -S --needed --noconfirm git &> /dev/null; then
-            log_error "Error al instalar git"
+        retry_command pacman -S --needed --noconfirm git || {
+            log_error "Error crítico: No se pudo instalar git."
             exit 1
-        fi
+        }
         log_success "Git instalado"
     else
         log_success "Git ya está instalado"
@@ -137,11 +158,11 @@ clone_repository() {
     fi
     
     # Clone repository
-    if git clone --depth 1 --branch "$BRANCH" "$REPO_URL" "$INSTALL_DIR" &> /dev/null; then
+    if retry_command git clone --depth 1 --branch "$BRANCH" "$REPO_URL" "$INSTALL_DIR"; then
         log_success "Repositorio clonado exitosamente"
     else
-        log_error "Error al clonar repositorio"
-        log_info "Verifica que la URL sea correcta: $REPO_URL"
+        log_error "Error crítico: No se pudo clonar el repositorio."
+        log_info "Verifica que la URL sea correcta o tu conexión: $REPO_URL"
         exit 1
     fi
 }
