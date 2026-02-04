@@ -117,16 +117,31 @@ Rectangle {
 
             // Input Fields
             TextField {
+                id: usernameField
+                Layout.fillWidth: true
+                placeholderText: "USER_IDENTITY_"
+                text: userModel.lastUser || ""
+                color: "white"
+                font.pixelSize: 18
+                font.family: "JetBrains Mono"
+                background: Rectangle { 
+                    color: "#22000000"; border.color: "#bc00ff"; border.width: 1 
+                }
+                onAccepted: passwordField.focus = true
+            }
+
+            TextField {
                 id: passwordField
                 Layout.fillWidth: true
                 placeholderText: "CREDENTIAL_HASH_"
                 echoMode: TextInput.Password
                 color: "white"
                 font.pixelSize: 18
+                font.family: "JetBrains Mono"
                 background: Rectangle { 
                     color: "#22000000"; border.color: "#00f3ff"; border.width: 1 
                 }
-                onAccepted: sddm.login(userModel.lastUser, passwordField.text, sessionList.currentIndex)
+                onAccepted: sddm.login(usernameField.text, passwordField.text, sessionList.currentIndex)
                 focus: true
             }
 
@@ -150,7 +165,7 @@ Rectangle {
                     color: authButton.pressed ? "#00f3ff" : "transparent"
                     border.color: "#00f3ff"; border.width: 2
                 }
-                onClicked: sddm.login(userModel.lastUser, passwordField.text, sessionList.currentIndex)
+                onClicked: sddm.login(usernameField.text, passwordField.text, sessionList.currentIndex)
             }
         }
     }

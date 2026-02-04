@@ -10,7 +10,7 @@ sudo -u $CURRENT_USER xdg-user-dirs-update
 chown -R $CURRENT_USER:$CURRENT_USER "$USER_HOME"
 
 # --- Hacer ejecutables los módulos ---
-chmod +x "$SCRIPT_DIR/deploy-modules/"*.sh
+chmod +x "$SCRIPT_DIR/src/deploy/"*.sh
 
 # --- Generar resumen de instalación ---
 log_info "Generando resumen..."
