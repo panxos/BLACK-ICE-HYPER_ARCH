@@ -103,7 +103,7 @@ banner() {
     
     # Línea 2: WEB y LNKD
     # Need +2 spaces (Total 29 padding spaces)
-    echo -e "${NEON_BLUE}│${NC}  ${BOLD}WEB:${NC} ${WHITE}soporteinfo.net${NC}               ${GREY}|${NC} ${BOLD}LNKD:${NC} ${CYAN}linkedin.com/in/youruser${NC}                             ${NEON_BLUE}│${NC}"
+    echo -e "${NEON_BLUE}│${NC}  ${BOLD}WEB:${NC} ${WHITE}soporteinfo.net${NC}               ${GREY}|${NC} ${BOLD}LNKD:${NC} ${CYAN}https://www.linkedin.com/in/faravena/${NC}                 ${NEON_BLUE}│${NC}"
     
     # Línea 3: YTB y DATE
     local TODAY=$(date +%Y-%m-%d)
