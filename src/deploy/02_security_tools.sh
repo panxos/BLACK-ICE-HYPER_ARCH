@@ -322,6 +322,17 @@ install_networking() {
         "chisel|Chisel - Fast TCP/UDP Tunnel"
         "ptunnel|PTunnel - ICMP Tunnel"
         "httptunnel|HTTPTunnel - HTTP Tunnel"
+        "traceroute|Traceroute - Network Path Trace"
+        "minicom|Minicom - Serial Terminal (Cisco/Console)"
+        "bind|Bind-tools - DNS Utils (dig, nslookup)"
+        "whois|Whois - Domain Lookup"
+        "mtr|MTR - Combined Ping/Traceroute"
+        "iperf3|IPerf3 - Network Performance"
+        "net-tools|Net-tools - Legacy Base (arp, ifconfig)"
+        "nethogs|Nethogs - Bandwidth per Process"
+        "iftop|Iftop - Bandwidth per Host"
+        "iptraf-ng|IPTraf-ng - Network Monitoring"
+        "ethtool|Ethtool - Interface Settings"
     )
     show_category_menu "Utilidades de Red y Tunneling" "${tools[@]}"
 }
@@ -366,7 +377,8 @@ install_all() {
         "pdf-parser" "stegseek" "steghide" "hexedit" "ghex"
         # Networking
         "openbsd-netcat" "socat" "curl" "wget" "git" "proxychains-ng" "sshuttle" 
-        "chisel" "ptunnel" "httptunnel"
+        "chisel" "ptunnel" "httptunnel" "traceroute" "minicom" "bind" "whois" "mtr"
+        "iperf3" "net-tools" "nethogs" "iftop" "iptraf-ng" "ethtool"
     )
     
     for tool in "${all_tools[@]}"; do
