@@ -22,21 +22,20 @@ trap cleanup SIGINT
 SCRIPT_DIR=$(dirname "$(readlink -f "$0")")
 DOTFILES_DIR="$SCRIPT_DIR/dotfiles"
 
+# --- Importar utilidades y colores SOTA ---
+source "$SCRIPT_DIR/src/lib/colors.sh"
+source "$SCRIPT_DIR/src/lib/logging.sh"
+source "$SCRIPT_DIR/src/lib/utils.sh"
+
 # --- Logging Setup (Global Redirection) ---
 # Save original stdout/stderr for interactive menus (whiptail/read)
 exec 3>&1
 exec 4>&2
 
 # Captura TODO (stdout y stderr) en un archivo de log y lo muestra en pantalla
-LOG_FILE="$HOME/black_ice_deploy.log"
 exec > >(tee -i "$LOG_FILE") 2>&1
 echo "--- BLACK-ICE DEPLOYMENT STARTED: $(date) ---"
-
-
-# --- Importar utilidades y colores SOTA ---
-source "$SCRIPT_DIR/src/lib/colors.sh"
-source "$SCRIPT_DIR/src/lib/logging.sh"
-source "$SCRIPT_DIR/src/lib/utils.sh"
+log_info "Log de sesión: $LOG_FILE"
 
 # --- Verificar que NO sea root ---
 if [ "$EUID" -eq 0 ]; then

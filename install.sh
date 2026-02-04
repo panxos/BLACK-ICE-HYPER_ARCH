@@ -8,15 +8,23 @@
 # ========================================================================
 
 # --- Variables Globales ---
-# SOTA: INSTALL_DIR es la raíz del proyecto
 INSTALL_DIR=$(dirname "$(readlink -f "$0")")
-LOG_FILE="/tmp/black_ice_install.log"
-CONFIG_FILE="$INSTALL_DIR/config/install.conf"
 
 # --- Importar Librerías SOTA ---
 source "$INSTALL_DIR/src/lib/colors.sh"
 source "$INSTALL_DIR/src/lib/logging.sh"
 source "$INSTALL_DIR/src/lib/utils.sh"
+
+# --- Logging Setup (Global Redirection) ---
+exec 3>&1 # Save stdout
+exec 4>&2 # Save stderr
+
+# Redirigir stdout/stderr al archivo de log y pantalla
+exec > >(tee -i "$LOG_FILE") 2>&1
+echo "--- BLACK-ICE INSTALLATION STARTED: $(date) ---"
+log_info "Log de sesión: $LOG_FILE"
+
+CONFIG_FILE="$INSTALL_DIR/config/install.conf"
 
 # --- STRICT MODE ---
 set -uo pipefail

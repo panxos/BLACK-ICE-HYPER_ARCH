@@ -17,7 +17,11 @@ if [ -z "${NEON_CYAN:-}" ]; then
     BOLD='\033[1m'
 fi
 
-LOG_FILE="${LOG_FILE:-/tmp/black_ice_install.log}"
+# LOG_FILE is derived from INSTALL_DIR or SCRIPT_DIR if available
+PROJECT_ROOT="${INSTALL_DIR:-${SCRIPT_DIR:-$(pwd)}}"
+LOG_DIR="$PROJECT_ROOT/logs"
+mkdir -p "$LOG_DIR" 2>/dev/null || LOG_DIR="/tmp"
+LOG_FILE="${LOG_FILE:-$LOG_DIR/black_ice_$(date +%Y%m%d_%H%M%S).log}"
 
 # Timestamp function
 timestamp() {

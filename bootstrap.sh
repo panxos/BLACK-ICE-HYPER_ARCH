@@ -25,7 +25,13 @@ readonly NC='\033[0m'
 # Configuration
 readonly REPO_URL="https://github.com/panxos/BLACK-ICE-HYPER_ARCH.git"
 readonly INSTALL_DIR="/tmp/black-ice-arch"
+readonly LOG_DIR="$INSTALL_DIR/logs"
+readonly LOG_FILE="$LOG_DIR/bootstrap.log"
 readonly BRANCH="main"
+
+# Pre-initialize log dir
+mkdir -p "$LOG_DIR"
+exec > >(tee -i "$LOG_FILE") 2>&1
 
 # Banner
 show_banner() {
