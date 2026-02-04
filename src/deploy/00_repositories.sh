@@ -82,12 +82,17 @@ log_info "Verificando siguiente fase: chaotic-aur"
 if ! grep -q "\[chaotic-aur\]" /etc/pacman.conf; then
     log_info "Añadiendo repositorio chaotic-aur..."
     
-    # Importar claves
-    retry_command sudo -n pacman-key --recv-key 3056513887B78AEB --keyserver keyserver.ubuntu.com
+    # Importar claves (Mejorado con reintentos y servidor alternativo)
+    retry_command sudo -n pacman-key --recv-key 3056513887B78AEB --keyserver keyserver.ubuntu.com || \
+    retry_command sudo -n pacman-key --recv-key 3056513887B78AEB --keyserver hkps://keys.gnupg.net
+    
     retry_command sudo -n pacman-key --lsign-key 3056513887B78AEB
     
     # Instalar keyring y mirrorlist
     retry_command sudo -n pacman -U --noconfirm 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-keyring.pkg.tar.zst' 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-mirrorlist.pkg.tar.zst'
+    
+    # Asegurar que se confíe en la llave de TNE (Garuda/Chaotic)
+    sudo -n pacman-key --populate archlinux chaotic
     
     # Añadir al pacman.conf
     echo -e "\n[chaotic-aur]\nInclude = /etc/pacman.d/chaotic-mirrorlist" | sudo -n tee -a /etc/pacman.conf
@@ -98,6 +103,8 @@ if ! grep -q "\[chaotic-aur\]" /etc/pacman.conf; then
     success "chaotic-aur añadido correctamente"
 else
     log_info "chaotic-aur ya está configurado"
+    # Forzar actualización de llaves por si acaso
+    sudo -n pacman-key --populate archlinux chaotic >/dev/null 2>&1 || true
 fi
 
 # --- Añadir BlackArch (Método Tradicional) ---
