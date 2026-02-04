@@ -254,6 +254,7 @@ install_exploitation() {
         "searchsploit|SearchSploit - Exploit Search"
         "set|Social Engineer Toolkit"
         "routersploit|RouterSploit - Router Exploitation"
+        "beef|BeEF - Browser Exploitation"
     )
     show_category_menu "Explotación y Frameworks" "${tools[@]}"
 }
@@ -324,6 +325,12 @@ install_networking() {
         "httptunnel|HTTPTunnel - HTTP Tunnel"
         "traceroute|Traceroute - Network Path Trace"
         "minicom|Minicom - Serial Terminal (Cisco/Console)"
+        "expect|Expect - Interactive Automation"
+        "tcl|Tcl - Tool Command Language"
+        "cisco-torch|Cisco-Torch - Cisco Scanner"
+        "snmpcheck|SNMPCheck - SNMP Enumerator"
+        "onesixtyone|Onesixtyone - SNMP Scanner"
+        "ike-scan|IKE-Scan - VPN Scanner"
         "bind|Bind-tools - DNS Utils (dig, nslookup)"
         "whois|Whois - Domain Lookup"
         "mtr|MTR - Combined Ping/Traceroute"
@@ -378,7 +385,8 @@ install_all() {
         # Networking
         "openbsd-netcat" "socat" "curl" "wget" "git" "proxychains-ng" "sshuttle" 
         "chisel" "ptunnel" "httptunnel" "traceroute" "minicom" "bind" "whois" "mtr"
-        "iperf3" "net-tools" "nethogs" "iftop" "iptraf-ng" "ethtool"
+        "iperf3" "net-tools" "nethogs" "iftop" "iptraf-ng" "ethtool" "expect" "tcl"
+        "cisco-torch" "snmpcheck" "onesixtyone" "ike-scan"
     )
     
     for tool in "${all_tools[@]}"; do
