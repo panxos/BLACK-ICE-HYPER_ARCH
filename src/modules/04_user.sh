@@ -54,26 +54,32 @@ else
     done
 fi
 
-# Create in chroot
+# Create in chroot with safe escaping
+# We use printf %q to ensure that even complex passwords are safe from shell injection/corruption
 cat <<EOF > /mnt/root/user_config.sh
 #!/bin/bash
 set -e
 
-echo "[INFO] Inyectando Hash de ROOT..."
-printf "%s:%s\n" "root" "${ROOT_PASS:-}" | chpasswd
+# Escaped variables
+ROOT_PASS=$(printf '%q' "${ROOT_PASS:-}")
+USER_NAME=$(printf '%q' "${USER_NAME:-}")
+USER_PASS=$(printf '%q' "${USER_PASS:-}")
 
-echo "[INFO] Autorizando nuevo operador: $USER_NAME..."
+echo "[INFO] Inyectando Hash de ROOT..."
+printf "%s:%s\n" "root" "\$ROOT_PASS" | chpasswd
+
+echo "[INFO] Autorizando nuevo operador: \$USER_NAME..."
 # Ensure groups exist
 groupadd -f wheel
 
 # Create user with BASH (Stability first)
-if ! id "${USER_NAME:-}" &>/dev/null; then
-    useradd -m -G wheel,video,audio,storage,input -s /bin/bash "${USER_NAME:-}"
-    printf "%s:%s\n" "${USER_NAME:-}" "${USER_PASS:-}" | chpasswd
-    echo "[SUCCESS] Operador ${USER_NAME:-} activo en el sistema."
+if ! id "\$USER_NAME" &>/dev/null; then
+    useradd -m -G wheel,video,audio,storage,input -s /bin/bash "\$USER_NAME"
+    printf "%s:%s\n" "\$USER_NAME" "\$USER_PASS" | chpasswd
+    echo "[SUCCESS] Operador \$USER_NAME activo en el sistema."
 else
-    echo "[WARN] Operador ${USER_NAME:-} ya existe. Actualizando credenciales..."
-    printf "%s:%s\n" "${USER_NAME:-}" "${USER_PASS:-}" | chpasswd
+    echo "[WARN] Operador \$USER_NAME ya existe. Actualizando credenciales..."
+    printf "%s:%s\n" "\$USER_NAME" "\$USER_PASS" | chpasswd
 fi
 
 # Sudoers hardening

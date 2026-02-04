@@ -43,43 +43,50 @@ fi
 log_info "Generando fstab..."
 genfstab -U /mnt >> /mnt/etc/fstab
 
-# Chroot config setup
-# Use /root to ensure persistence during execution
+# Chroot config setup with safe escaping
 cat <<EOF > /mnt/root/chroot_config.sh
 #!/bin/bash
+set -e
+
+# Escaped variables
+TIMEZONE=$(printf '%q' "${TIMEZONE:-America/Santiago}")
+SYSTEM_LANG=$(printf '%q' "${SYSTEM_LANG:-es_CL}")
+SYSTEM_LOCALE=$(printf '%q' "${SYSTEM_LOCALE:-es_CL}")
+KEYMAP=$(printf '%q' "${KEYMAP:-us}")
+HOSTNAME=$(printf '%q' "${HOSTNAME:-black-ice}")
+
 # Timezone
-ln -sf /usr/share/zoneinfo/${TIMEZONE:-} /etc/localtime
+ln -sf "/usr/share/zoneinfo/\$TIMEZONE" /etc/localtime
 hwclock --systohc
 
 # Localization
-echo "${SYSTEM_LANG:-}.UTF-8 UTF-8" >> /etc/locale.gen
-if [ "${SYSTEM_LANG:-}" != "${SYSTEM_LOCALE:-}" ]; then
-    echo "${SYSTEM_LOCALE:-}.UTF-8 UTF-8" >> /etc/locale.gen
+echo "\$SYSTEM_LANG.UTF-8 UTF-8" >> /etc/locale.gen
+if [ "\$SYSTEM_LANG" != "\$SYSTEM_LOCALE" ]; then
+    echo "\$SYSTEM_LOCALE.UTF-8 UTF-8" >> /etc/locale.gen
 fi
 echo "es_ES.UTF-8 UTF-8" >> /etc/locale.gen
 echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen
 locale-gen
 
 # Set Language
-echo "LANG=${SYSTEM_LANG:-}.UTF-8" > /etc/locale.conf
+echo "LANG=\$SYSTEM_LANG.UTF-8" > /etc/locale.conf
 # Set Regional Formats if different
-if [ "${SYSTEM_LANG:-}" != "${SYSTEM_LOCALE:-}" ]; then
+if [ "\$SYSTEM_LANG" != "\$SYSTEM_LOCALE" ]; then
     {
-        echo "LC_ADDRESS=${SYSTEM_LOCALE:-}.UTF-8"
-        echo "LC_IDENTIFICATION=${SYSTEM_LOCALE:-}.UTF-8"
-        echo "LC_MEASUREMENT=${SYSTEM_LOCALE:-}.UTF-8"
-        echo "LC_MONETARY=${SYSTEM_LOCALE:-}.UTF-8"
-        echo "LC_NAME=${SYSTEM_LOCALE:-}.UTF-8"
-        echo "LC_NUMERIC=${SYSTEM_LOCALE:-}.UTF-8"
-        echo "LC_PAPER=${SYSTEM_LOCALE:-}.UTF-8"
-        echo "LC_TELEPHONE=${SYSTEM_LOCALE:-}.UTF-8"
-        echo "LC_TIME=${SYSTEM_LOCALE:-}.UTF-8"
+        echo "LC_ADDRESS=\$SYSTEM_LOCALE.UTF-8"
+        echo "LC_IDENTIFICATION=\$SYSTEM_LOCALE.UTF-8"
+        echo "LC_MEASUREMENT=\$SYSTEM_LOCALE.UTF-8"
+        echo "LC_MONETARY=\$SYSTEM_LOCALE.UTF-8"
+        echo "LC_NAME=\$SYSTEM_LOCALE.UTF-8"
+        echo "LC_NUMERIC=\$SYSTEM_LOCALE.UTF-8"
+        echo "LC_PAPER=\$SYSTEM_LOCALE.UTF-8"
+        echo "LC_TELEPHONE=\$SYSTEM_LOCALE.UTF-8"
+        echo "LC_TIME=\$SYSTEM_LOCALE.UTF-8"
     } >> /etc/locale.conf
 fi
 
 # Keymap
-if [ -z "${KEYMAP:-}" ]; then KEYMAP="us"; fi
-echo "KEYMAP=$KEYMAP" > /etc/vconsole.conf
+echo "KEYMAP=\$KEYMAP" > /etc/vconsole.conf
 
 # Verify vconsole creation
 if [ ! -f /etc/vconsole.conf ]; then
@@ -88,10 +95,10 @@ if [ ! -f /etc/vconsole.conf ]; then
 fi
 
 # Hostname
-echo "${HOSTNAME:-}" > /etc/hostname
+echo "\$HOSTNAME" > /etc/hostname
 echo "127.0.0.1   localhost" >> /etc/hosts
 echo "::1         localhost" >> /etc/hosts
-echo "127.0.1.1   ${HOSTNAME:-}.localdomain ${HOSTNAME:-}" >> /etc/hosts
+echo "127.0.1.1   \$HOSTNAME.localdomain \$HOSTNAME" >> /etc/hosts
 
 exit 0
 EOF

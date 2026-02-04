@@ -100,24 +100,25 @@ echo -e "${YELLOW}El primer prompt de contraseña (el de pantalla negra de GRUB)
 echo -e "${YELLOW}Si tu clave tiene '-', usa la tecla a la derecha del '0' en esa pantalla.${NC}"
 echo -e "\nEscribe ${BOLD}reboot${NC} para reiniciar."
 
-# --- Guardar configuración para uso futuro ---
+# --- Guardar configuración para uso futuro con escapado seguro ---
 log_info "Respaldando configuración de sesión (install.conf.auto)..."
-cat <<EOF > "$INSTALL_DIR/install.conf.auto"
-# BLACK-ICE ARCH - Configuración Auto-Generada
-KEYBOARD_LAYOUT="$KEYMAP"
-TARGET_DISK="${DISK#/dev/}"
-ENABLE_LUKS="$( [ "$ENCRYPT" == "true" ] && echo "yes" || echo "no" )"
-LUKS_PASSWORD="$LUKS_PASS"
-FILESYSTEM="${FILESYSTEM:-ext4}"
-KERNEL="${SELECTED_KERNEL:-linux}"
-TIMEZONE="${TIMEZONE:-America/Santiago}"
-SYSTEM_LANG="${SYSTEM_LANG:-es_CL}"
-SYSTEM_LOCALE="${SYSTEM_LOCALE:-es_CL}"
-SELECTED_COUNTRY="${SELECTED_COUNTRY:-Chile}"
-HOSTNAME="${HOSTNAME:-black-ice}"
-NVME_STABILITY="${NVME_STABILITY:-no}"
-USERNAME="${USER_NAME:-admin}"
-#Nota: Las contraseñas de root y usuario no se guardan por seguridad en este archivo auto-generado
-EOF
+CONFIG_FILE="$INSTALL_DIR/install.conf.auto"
+{
+    echo "# BLACK-ICE ARCH - Configuración Auto-Generada"
+    printf "KEYBOARD_LAYOUT=%q\n" "${KEYMAP:-us}"
+    printf "TARGET_DISK=%q\n" "${DISK#/dev/}"
+    printf "ENABLE_LUKS=%q\n" "$( [ "$ENCRYPT" == "true" ] && echo "yes" || echo "no" )"
+    printf "LUKS_PASSWORD=%q\n" "$LUKS_PASS"
+    printf "FILESYSTEM=%q\n" "${FILESYSTEM:-ext4}"
+    printf "KERNEL=%q\n" "${SELECTED_KERNEL:-linux}"
+    printf "TIMEZONE=%q\n" "${TIMEZONE:-America/Santiago}"
+    printf "SYSTEM_LANG=%q\n" "${SYSTEM_LANG:-es_CL}"
+    printf "SYSTEM_LOCALE=%q\n" "${SYSTEM_LOCALE:-es_CL}"
+    printf "SELECTED_COUNTRY=%q\n" "${SELECTED_COUNTRY:-Chile}"
+    printf "HOSTNAME=%q\n" "${HOSTNAME:-black-ice}"
+    printf "NVME_STABILITY=%q\n" "${NVME_STABILITY:-no}"
+    printf "USERNAME=%q\n" "${USER_NAME:-admin}"
+    echo "#Nota: Las contraseñas de root y usuario no se guardan por seguridad en este archivo auto-generado"
+} > "$CONFIG_FILE"
 
 exit 0
