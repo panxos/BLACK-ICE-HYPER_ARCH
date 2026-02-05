@@ -7,7 +7,12 @@ banner "MÓDULO 4" "Configuración de Terminal (Zsh)"
 # --- Instalar Zsh y plugins ---
 log_info "Instalando Zsh, powerlevel10k, plugins, fastfetch y chafa..."
 sudo -n pacman -S --needed --noconfirm zsh zsh-syntax-highlighting zsh-autosuggestions fastfetch chafa
-yay -S --needed --noconfirm zsh-theme-powerlevel10k-git
+
+# Intentar instalar p10k desde chaotic-aur primero (más rápido/seguro), luego yay
+if ! sudo -n pacman -S --needed --noconfirm zsh-theme-powerlevel10k 2>/dev/null; then
+    log_warn "zsh-theme-powerlevel10k no encontrado en repositorios, intentando via yay..."
+    yay -S --needed --noconfirm zsh-theme-powerlevel10k-git || log_error "No se pudo instalar powerlevel10k. El prompt inicial será básico."
+fi
 
 # Instalar zsh-sudo manualmente (no oficial en arch repos aveces)
 sudo -n mkdir -p /usr/share/zsh/plugins/zsh-sudo

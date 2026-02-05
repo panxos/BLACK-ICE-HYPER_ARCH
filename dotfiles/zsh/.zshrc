@@ -1456,13 +1456,14 @@ function man() {
 
 # ---------- CARGA DE PLUGINS ----------
 
-# Powerlevel10k (cargado una sola vez)
-source /usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme
+# Powerlevel10k (cargado una sola vez con verificación)
+P10k_THEME="/usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme"
+[ -f "$P10k_THEME" ] && source "$P10k_THEME"
 
 # Plugins de ZSH
-source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
-source /usr/share/zsh/plugins/zsh-sudo/sudo.plugin.zsh
+[ -f /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ] && source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+[ -f /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh ] && source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+[ -f /usr/share/zsh/plugins/zsh-sudo/sudo.plugin.zsh ] && source /usr/share/zsh/plugins/zsh-sudo/sudo.plugin.zsh
 
 # Configuración adicional
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
@@ -1485,7 +1486,8 @@ export PATH=~/.npm-global/bin:$PATH
 export LS_COLORS='di=1;38;5;141:ln=38;5;81:so=38;5;183:pi=38;5;226:ex=38;5;118:bd=38;5;208:cd=38;5;208:su=38;5;196:sg=38;5;196:tw=38;5;141:ow=38;5;141'
 
 # Fastfetch Cyberpunk Display (Nuclear Kitty & Pywal Sync)
-(cat ~/.cache/wal/sequences &) 
+# Verificación de secuencias de pywal (Evita error de 'bat' si no existe)
+[ -f ~/.cache/wal/sequences ] && (/usr/bin/cat ~/.cache/wal/sequences &) 
 export DE=gnome
 FF_LOGOS=($HOME/.config/fastfetch/logos/*.png)
 RANDOM_LOGO=$(printf "%s\n" "${FF_LOGOS[@]}" | shuf -n 1)
