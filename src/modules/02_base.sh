@@ -27,10 +27,30 @@ PACKAGES="base base-devel linux-firmware dialog efibootmgr grub git go nano netw
 # Añadir Kernel y sus Headers correspondientes
 PACKAGES="$PACKAGES $SELECTED_KERNEL ${SELECTED_KERNEL}-headers"
 
-# 4. Detección de Hardware / Microcode
-log_info "Escaneando arquitectura de CPU..."
-if systemd-detect-virt --quiet; then
-    log_warn "Entorno Virtualizado detectado. Omitiendo Microcode."
+# 4. Detección de Hardware y Optimización de Virtualización
+log_info "Escaneando entorno de hardware/virtualización..."
+VIRT_TYPE=$(systemd-detect-virt)
+
+if [ "$VIRT_TYPE" != "none" ]; then
+    log_info "Entorno Virtualizado detectado: ${NEON_BLUE}$VIRT_TYPE${NC}"
+    case "$VIRT_TYPE" in
+        kvm|qemu)
+            PACKAGES="$PACKAGES virtio-vga-gl qemu-guest-agent spice-vdagent"
+            log_info "Optimizaciones KVM (VirtIO) activadas"
+            ;;
+        vmware)
+            PACKAGES="$PACKAGES open-vm-tools"
+            log_info "Optimizaciones VMware (Open-VM-Tools) activadas"
+            ;;
+        microsoft)
+            PACKAGES="$PACKAGES hyperv"
+            log_info "Optimizaciones Hyper-V activadas"
+            ;;
+        xen|oracle)
+            PACKAGES="$PACKAGES xf86-video-vmware virtualbox-guest-utils"
+            log_info "Soporte para Xen/VirtualBox activado"
+            ;;
+    esac
 else
     if grep -q "GenuineIntel" /proc/cpuinfo; then
         PACKAGES="$PACKAGES intel-ucode"
