@@ -85,10 +85,13 @@ source "$INSTALL_DIR/src/modules/03_config.sh"
 # 5. User & Root Setup (Wheel/Sudoers)
 source "$INSTALL_DIR/src/modules/04_user.sh"
 
-# 6. Bootloader (GRUB Encrypted)
+# 6. Power Management & Optimization
+source "$INSTALL_DIR/src/modules/06_power.sh"
+
+# 7. Bootloader (GRUB Encrypted)
 source "$INSTALL_DIR/src/modules/05_bootloader.sh"
 
-# 7. Post-Install Prep (Deployment Scripts)
+# 8. Post-Install Prep (Deployment Scripts)
 source "$INSTALL_DIR/src/modules/99_final.sh"
 
 

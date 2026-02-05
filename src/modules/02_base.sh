@@ -30,6 +30,13 @@ PACKAGES="$PACKAGES $SELECTED_KERNEL ${SELECTED_KERNEL}-headers"
 # 4. Detección de Hardware y Optimización de Virtualización
 log_info "Escaneando entorno de hardware/virtualización..."
 VIRT_TYPE=$(systemd-detect-virt)
+IS_LAPTOP=false
+
+# Detectar si es laptop (presencia de batería)
+if [ -d /sys/class/power_supply/BAT* ] || [ -d /sys/class/power_supply/battery ]; then
+    IS_LAPTOP=true
+    log_info "Laptop detectado: Activando gestión de energía adaptativa"
+fi
 
 if [ "$VIRT_TYPE" != "none" ]; then
     log_info "Entorno Virtualizado detectado: ${NEON_BLUE}$VIRT_TYPE${NC}"
@@ -51,7 +58,12 @@ if [ "$VIRT_TYPE" != "none" ]; then
             log_info "Soporte para Xen/VirtualBox activado"
             ;;
     esac
+    
+    # VMs siempre en modo performance
+    PACKAGES="$PACKAGES cpupower"
+    log_info "Governor de CPU: Performance (VM)"
 else
+    # Hardware real: microcode + gestión de energía según tipo
     if grep -q "GenuineIntel" /proc/cpuinfo; then
         PACKAGES="$PACKAGES intel-ucode"
         log_info "CPU Intel detectada: Inyectando intel-ucode"
@@ -59,6 +71,19 @@ else
         PACKAGES="$PACKAGES amd-ucode"
         log_info "CPU AMD detectada: Inyectando amd-ucode"
     fi
+    
+    # Gestión de energía adaptativa
+    if [ "$IS_LAPTOP" = true ]; then
+        PACKAGES="$PACKAGES tlp tlp-rdw brightnessctl"
+        log_info "Gestión de energía: TLP (adaptativo AC/Batería)"
+    else
+        PACKAGES="$PACKAGES cpupower"
+        log_info "Gestión de energía: CPUpower (Performance)"
+    fi
+    
+    # Multi-monitor para Wayland (solo hardware real)
+    PACKAGES="$PACKAGES wlr-randr nwg-displays"
+    log_info "Soporte multi-monitor: wlr-randr + nwg-displays"
 fi
 
 # 5. Herramientas de Sistema de Archivos
