@@ -24,6 +24,7 @@ sudo -n curl -L https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/plugins
 log_info "Instalando Powerlevel10k (método git clone oficial)..."
 
 # 1. Instalar para el usuario actual
+cd "$USER_HOME" || { log_error "No se pudo acceder a $USER_HOME"; exit 1; }
 if [ -d "$USER_HOME/powerlevel10k" ]; then
     log_info "Powerlevel10k ya existe en $USER_HOME/powerlevel10k, actualizando..."
     git -C "$USER_HOME/powerlevel10k" pull --depth=1 2>/dev/null || true
