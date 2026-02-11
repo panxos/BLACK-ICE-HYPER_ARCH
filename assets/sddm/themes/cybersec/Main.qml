@@ -99,11 +99,22 @@ Rectangle {
                 Image {
                     id: userAvatar
                     anchors.fill: parent; anchors.margins: 2
-                    source: userModel.lastUser ? "file:///var/lib/AccountsService/icons/" + userModel.lastUser : ""
+                    // Try AccountsService icon first, then ~/.face.icon
+                    source: {
+                        if (userModel.lastUser) {
+                            return "file:///var/lib/AccountsService/icons/" + userModel.lastUser
+                        }
+                        return "assets/avatar.png"
+                    }
                     fillMode: Image.PreserveAspectCrop
                     onStatusChanged: {
-                        if (status == Image.Error || source == "") {
-                            source = "assets/avatar.png"
+                        if (status == Image.Error) {
+                            // Fallback: try ~/.face.icon
+                            if (source.toString().indexOf("AccountsService") !== -1 && userModel.lastUser) {
+                                source = "file:///home/" + userModel.lastUser + "/.face.icon"
+                            } else {
+                                source = "assets/avatar.png"
+                            }
                         }
                     }
                 }
@@ -111,7 +122,7 @@ Rectangle {
 
             Text {
                 Layout.alignment: Qt.AlignHCenter
-                text: (userModel.lastUser || "faravena").toUpperCase()
+                text: (userModel.lastUser || "USER").toUpperCase()
                 color: "white"; font.pixelSize: 26; font.family: "JetBrains Mono"
             }
 

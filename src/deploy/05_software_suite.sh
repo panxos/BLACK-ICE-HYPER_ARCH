@@ -4,17 +4,10 @@
 
 banner "MÓDULO 6" "Premium Software Suite"
 
-# Función para verificar si un paquete existe en AUR o Pacman
+# Función para instalar paquetes (delega a safe_install para resiliencia PGP)
 pkg_install() {
     local pkg=$1
-    log_info "Instalando: $pkg..."
-    if pacman -Si "$pkg" &>/dev/null; then
-        # Forzamos 'yes' para cualquier prompt inesperado (ej. selección de proveedor)
-        yes | sudo -n pacman -S --needed --noconfirm "$pkg"
-    else
-        # yay con flags robustas para modo no interactivo
-        yes | yay -S --needed --noconfirm --answerdiff None --answerclean None --mflags "--noconfirm" "$pkg"
-    fi
+    safe_install "$pkg"
 }
 
 # --- Selección Interactiva de Software ---

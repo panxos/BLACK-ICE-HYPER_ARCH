@@ -191,13 +191,12 @@ EOF
     fi
 fi
 
-# FIX KEYRING (BlackArch/Arch) - FORCE REPAIR due to persistent GPG errors
-log_info "Forzando reparación de Keyring (GPG)..."
-sudo rm -rf /etc/pacman.d/gnupg
-sudo pacman-key --init
-sudo pacman-key --populate archlinux blackarch
-sudo pacman -Sy --noconfirm --overwrite '*' archlinux-keyring blackarch-keyring
-log_success "Keyring reinicializado."
+# FIX KEYRING (BlackArch/Arch) - Repair using centralized function
+log_info "Verificando integridad del keyring (GPG)..."
+rebuild_keyring
+safe_install archlinux-keyring
+safe_install blackarch-keyring
+log_success "Keyring verificado y actualizado."
 
 log_info "Instalando Hyprland y componentes base..."
 
@@ -212,18 +211,7 @@ if pacman -Q jack2 &>/dev/null; then
 fi
 
 for pkg in "${HYPRLAND_PKGS[@]}"; do
-    if ! pacman -Q "$pkg" &> /dev/null; then
-        echo -e "  ${CYAN}→${NC} Instalando $pkg..."
-        # Intento con pacman (incluye chaotic-aur si está activo)
-        if ! sudo -n pacman -S --needed --noconfirm "$pkg" 2>/dev/null; then
-            # Si es candy-icons, intentar nombre alternativo en repo
-            if [[ "$pkg" == "candy-icons-git" ]]; then
-                sudo -n pacman -S --needed --noconfirm candy-icons 2>/dev/null && continue
-            fi
-            # Último recurso: AUR
-            yay -S --needed --noconfirm "$pkg" || log_warn "No se pudo instalar $pkg. Se intentará en la fase de personalización."
-        fi
-    fi
+    safe_install "$pkg" || log_warn "No se pudo instalar $pkg. Se intentará en la fase de personalización."
 done
 
 # --- Validación Post-Instalación ---
@@ -753,10 +741,11 @@ chown -R $CURRENT_USER:$CURRENT_USER "$WALLPAPER_DEST" 2>/dev/null || true
 # --- PLYMOUTH (Boot Splash - via AUR) ---
 log_info "Instalando y configurando Plymouth (Boot Splash)..."
 
-# Instalar plymouth y un tema desde AUR (Hacemos que no aborte la instalación si falla)
+# Instalar plymouth y un tema desde AUR (No aborta si falla)
 if ! pacman -Q plymouth &>/dev/null; then
     log_info "Instalando Plymouth desde AUR (esto puede tardar)..."
-    retry_command yay -S --needed --noconfirm plymouth plymouth-theme-abstract-ring-git || log_warn "Fallo la instalación de Plymouth. El sistema arrancará sin splash dinámico."
+    safe_install plymouth || log_warn "Fallo la instalación de Plymouth. El sistema arrancará sin splash dinámico."
+    safe_install plymouth-theme-abstract-ring-git || log_warn "Tema Abstract Ring no disponible."
 fi
 
 # Validate Abstract Ring Installation (Fix Path with better discovery)

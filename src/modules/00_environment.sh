@@ -175,3 +175,42 @@ fi
 log_info "Sincronizando reloj atómico (NTP)..."
 timedatectl set-ntp true
 success "Tiempo sincronizado con el núcleo."
+
+# 6. Hostname Configuration
+echo -e "\n${NEON_PURPLE}┌──────────────────────────────────────────────┐${NC}"
+echo -e "${NEON_PURPLE}│${NC}  ${BOLD}CONFIGURACIÓN DE IDENTIDAD (HOSTNAME)     ${NC} ${NEON_PURPLE}│${NC}"
+echo -e "${NEON_PURPLE}└──────────────────────────────────────────────┘${NC}"
+
+if [ -n "${HOSTNAME:-}" ] && [ "${AUTO_MODE:-}" == "true" ]; then
+    # Unattended mode: use hostname from config file
+    if validate_hostname "$HOSTNAME"; then
+        success "Hostname pre-configurado: $HOSTNAME (Protocolo Auto)"
+    else
+        log_warn "Hostname inválido en config ('$HOSTNAME'). Usando default."
+        HOSTNAME="black-ice"
+        success "Hostname establecido: $HOSTNAME (default)"
+    fi
+else
+    # Attended mode: prompt user
+    while true; do
+        echo -e "${CYAN}Introduce el hostname del sistema (ej: black-ice, mi-laptop):${NC}"
+        echo -e "${GREY}  Solo letras, números y guiones. Máx 63 chars. Sin espacios.${NC}"
+        read -rp "> " USER_HOSTNAME < /dev/tty
+
+        # Default fallback
+        if [ -z "$USER_HOSTNAME" ]; then
+            USER_HOSTNAME="black-ice"
+            log_info "Sin entrada. Usando hostname por defecto: $USER_HOSTNAME"
+        fi
+
+        if validate_hostname "$USER_HOSTNAME"; then
+            HOSTNAME="$USER_HOSTNAME"
+            success "Hostname configurado: ${NEON_BLUE}$HOSTNAME${NC}"
+            break
+        else
+            log_error "Hostname inválido. Solo alfanuméricos y guiones (1-63 chars, sin empezar/terminar con -)."
+        fi
+    done
+fi
+
+export HOSTNAME

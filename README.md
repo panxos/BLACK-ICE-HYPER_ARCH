@@ -118,6 +118,17 @@ curl -L http://is.gd/blackice | bash
 - ✅ Fastfetch con logos aleatorios
 - ✅ Scripts de utilidad para pentesting
 
+### 🆕 Nuevas Funcionalidades (v2.0)
+
+- **Configuración de Hostname**: Prompt interactivo durante la instalación.
+- **Gestión de Energía**:
+  - Detección automática de Laptop/Desktop/VM.
+  - Perfiles de energía (Performance/Balanced/Power Saver) con `Win+Shift+P`.
+  - Integración de TLP y thermald.
+- **Terminal Mejorada**: Instalación robusta de Powerlevel10k con `git clone`.
+- **SDDM Dinámico**: Soporte para avatares de usuario (`~/.config/bin/set_avatar.sh`).
+- **Instalación Resiliente**: Wrapper `safe_install` con auto-reparación de firmas PGP.
+
 ---
 
 ## 🎨 Galería de Temas

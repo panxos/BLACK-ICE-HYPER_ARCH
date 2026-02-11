@@ -1,21 +1,64 @@
 #!/bin/bash
-# modules/06_power.sh - Configuración de Gestión de Energía
+# modules/06_power.sh - Configuración de Gestión de Energía y Rendimiento
+# Author: Francisco Aravena (P4nX0Z)
+# Modified: 2026-02-11 — Fix: Detección completa de hardware, lm_sensors, perfiles de energía
 
 banner "PASO 6" "Optimización de Energía y Rendimiento"
 
-# Detectar tipo de hardware
-VIRT_TYPE=$(systemd-detect-virt)
-IS_LAPTOP=false
+# --- Detección de hardware (VM/Desktop/Laptop) ---
+# detect_power_profile() — Detecta tipo de dispositivo y asigna perfil inicial
+detect_power_profile() {
+    if systemd-detect-virt -q 2>/dev/null; then
+        POWER_PROFILE="performance"  # VM → siempre alto rendimiento
+        DEVICE_TYPE="vm"
+        VIRT_NAME=$(systemd-detect-virt)
+    elif [[ -d /sys/class/power_supply/BAT0 ]] || [[ -d /sys/class/power_supply/BAT1 ]]; then
+        POWER_PROFILE="auto"  # Laptop → perfiles dinámicos
+        DEVICE_TYPE="laptop"
+        VIRT_NAME="none"
+    else
+        POWER_PROFILE="performance"  # Desktop/servidor → alto rendimiento
+        DEVICE_TYPE="desktop"
+        VIRT_NAME="none"
+    fi
+    log_info "Dispositivo: $DEVICE_TYPE | Perfil inicial: $POWER_PROFILE | Virt: $VIRT_NAME"
+}
 
-if [ -d /sys/class/power_supply/BAT* ] || [ -d /sys/class/power_supply/battery ]; then
-    IS_LAPTOP=true
+detect_power_profile
+
+# --- Instalar paquetes comunes de gestión de energía ---
+log_info "Instalando paquetes de monitoreo y gestión de energía..."
+
+# Paquetes comunes para TODOS los sistemas
+POWER_COMMON_PKGS=("lm_sensors" "cpupower" "acpi" "acpid")
+
+# thermald solo para hardware Intel real (no VMs)
+CPU_VENDOR=$(grep -m1 'vendor_id' /proc/cpuinfo 2>/dev/null | awk '{print $3}')
+if [[ "$CPU_VENDOR" == "GenuineIntel" ]] && [[ "$DEVICE_TYPE" != "vm" ]]; then
+    POWER_COMMON_PKGS+=("thermald")
 fi
 
-if [ "$IS_LAPTOP" = true ]; then
-    log_info "Configurando TLP para gestión adaptativa de energía..."
-    
-    # Crear configuración optimizada de TLP
-    cat > /mnt/etc/tlp.d/01-black-ice.conf << 'EOF'
+for pkg in "${POWER_COMMON_PKGS[@]}"; do
+    if command -v pacstrap &>/dev/null; then
+        # Fase install.sh (chroot): usar pacstrap
+        pacstrap /mnt "$pkg" 2>/dev/null || log_warn "$pkg no disponible en pacstrap"
+    else
+        log_warn "pacstrap no disponible — paquetes de energía se instalarán en deploy"
+        break
+    fi
+done
+
+# --- Configuración por tipo de dispositivo ---
+case "$DEVICE_TYPE" in
+    laptop)
+        log_info "Configurando TLP para gestión adaptativa de energía (laptop)..."
+
+        # Instalar TLP (no auto-cpufreq — elegimos TLP)
+        pacstrap /mnt tlp tlp-rdw 2>/dev/null || log_warn "TLP no disponible en pacstrap"
+
+        # Crear configuración optimizada de TLP
+        mkdir -p /mnt/etc/tlp.d
+        cat > /mnt/etc/tlp.d/01-black-ice.conf << 'EOF'
 # BLACK-ICE ARCH - TLP Configuration
 # Optimizado para máximo rendimiento en AC y máxima duración en batería
 
@@ -72,17 +115,21 @@ SATA_LINKPWR_ON_AC="max_performance"
 SATA_LINKPWR_ON_BAT="min_power"
 EOF
 
-    # Habilitar TLP
-    arch-chroot /mnt systemctl enable tlp.service
-    arch-chroot /mnt systemctl mask systemd-rfkill.service systemd-rfkill.socket
-    
-    success "TLP configurado con perfiles AC/Batería optimizados"
-    
-elif [ "$VIRT_TYPE" = "none" ]; then
-    # Desktop: Governor de rendimiento fijo
-    log_info "Configurando CPUpower para máximo rendimiento..."
-    
-    cat > /mnt/etc/default/cpupower << 'EOF'
+        # Habilitar TLP y enmascarar conflictos
+        arch-chroot /mnt systemctl enable tlp.service
+        arch-chroot /mnt systemctl mask systemd-rfkill.service systemd-rfkill.socket
+
+        # Activar sensores de hardware
+        log_info "Configurando detección automática de sensores..."
+        arch-chroot /mnt /bin/bash -c "sensors-detect --auto" 2>/dev/null || true
+
+        success "TLP configurado con perfiles AC/Batería optimizados (laptop)"
+        ;;
+
+    desktop)
+        log_info "Configurando CPUpower para máximo rendimiento (desktop)..."
+
+        cat > /mnt/etc/default/cpupower << 'EOF'
 # BLACK-ICE ARCH - CPUpower Configuration
 # Desktop/Workstation: Rendimiento máximo constante
 
@@ -91,23 +138,35 @@ min_freq="0"
 max_freq="0"
 EOF
 
-    arch-chroot /mnt systemctl enable cpupower.service
-    success "CPUpower configurado en modo Performance"
-    
-else
-    # VM: Governor de rendimiento
-    log_info "Configurando CPUpower para VM (Performance)..."
-    
-    cat > /mnt/etc/default/cpupower << 'EOF'
+        arch-chroot /mnt systemctl enable cpupower.service
+        # Desactivar TLP si por error quedó habilitado
+        arch-chroot /mnt systemctl mask tlp.service 2>/dev/null || true
+
+        success "CPUpower configurado en modo Performance (desktop)"
+        ;;
+
+    vm)
+        log_info "Configurando CPUpower para VM (Performance)..."
+
+        cat > /mnt/etc/default/cpupower << 'EOF'
 # BLACK-ICE ARCH - CPUpower Configuration (VM)
+# VMs siempre en modo rendimiento máximo
 governor='performance'
 EOF
 
-    arch-chroot /mnt systemctl enable cpupower.service 2>/dev/null || log_warn "CPUpower no disponible en esta VM"
-    success "Governor de rendimiento configurado para VM"
-fi
+        arch-chroot /mnt systemctl enable cpupower.service 2>/dev/null || log_warn "CPUpower no disponible en esta VM"
+        # Desactivar power saving innecesario en VMs
+        arch-chroot /mnt systemctl mask tlp.service 2>/dev/null || true
 
-# Configurar zram (compresión de RAM) para todos los sistemas
+        success "Governor de rendimiento configurado para VM ($VIRT_NAME)"
+        ;;
+esac
+
+# --- Habilitar servicios comunes ---
+log_info "Habilitando servicios de monitoreo..."
+arch-chroot /mnt systemctl enable acpid.service 2>/dev/null || true
+
+# --- Configurar zram (compresión de RAM) para todos los sistemas ---
 log_info "Configurando zram para optimización de memoria..."
 cat > /mnt/etc/systemd/zram-generator.conf << 'EOF'
 [zram0]
@@ -117,4 +176,9 @@ swap-priority = 100
 fs-type = swap
 EOF
 
-success "Gestión de energía configurada correctamente"
+# --- Exportar variables para uso en deploy ---
+# Guardamos el tipo de dispositivo para que deploy_hyprland.sh pueda usarlo
+echo "DEVICE_TYPE=$DEVICE_TYPE" >> "/mnt/etc/black-ice.env"
+echo "POWER_PROFILE=$POWER_PROFILE" >> "/mnt/etc/black-ice.env"
+
+success "Gestión de energía configurada correctamente ($DEVICE_TYPE: $POWER_PROFILE)"

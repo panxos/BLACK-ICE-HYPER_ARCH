@@ -32,15 +32,13 @@ REQUIRED_ICON="candy-icons"
 
 if [ ! -d "/usr/share/themes/$REQUIRED_THEME" ] && [ ! -d "$USER_HOME/.themes/$REQUIRED_THEME" ]; then
     log_warn "Tema $REQUIRED_THEME no encontrado. Instalando..."
-    retry_command yay -S --needed --noconfirm sweet-theme-git
+    safe_install sweet-theme-git || log_warn "No se pudo instalar el tema Sweet. Se usará un tema alternativo."
 fi
 
 if [ -n "$REQUIRED_ICON" ] && ! pacman -Q "$REQUIRED_ICON" &>/dev/null; then
     log_info "Instalando librería de iconos: $REQUIRED_ICON..."
-    # Intentar candy-icons-git y candy-icons
-    sudo -n pacman -S --needed --noconfirm candy-icons-git 2>/dev/null || \
-    sudo -n pacman -S --needed --noconfirm candy-icons 2>/dev/null || \
-    retry_command yay -S --needed --noconfirm candy-icons-git || \
+    safe_install candy-icons-git || \
+    safe_install candy-icons || \
     log_warn "No se pudo instalar los iconos. El sistema usará Papirus como respaldo."
 fi
 

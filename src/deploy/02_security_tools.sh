@@ -20,7 +20,7 @@ INSTALL_LOG="/tmp/cybersec_install_$(date +%Y%m%d_%H%M%S).log"
 INSTALLED_COUNT=0
 FAILED_COUNT=0
 
-# Function to install a tool
+# Function to install a tool (delegates to safe_install for PGP resilience)
 install_tool() {
     local tool="$1"
     local display_name="${2:-$tool}"
@@ -32,12 +32,8 @@ install_tool() {
     
     echo -e "  ${CYAN}→${NC} Instalando $display_name..."
     
-    if sudo -n pacman -S --needed --noconfirm "$tool" &>>"$INSTALL_LOG"; then
+    if safe_install "$tool"; then
         echo -e "  ${GREEN}✓${NC} $display_name instalado"
-        ((INSTALLED_COUNT++))
-        return 0
-    elif yay -S --needed --noconfirm "$tool" &>>"$INSTALL_LOG"; then
-        echo -e "  ${GREEN}✓${NC} $display_name instalado (AUR)"
         ((INSTALLED_COUNT++))
         return 0
     else

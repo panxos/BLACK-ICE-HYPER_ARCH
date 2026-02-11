@@ -92,7 +92,7 @@ Item {
 
         Text {
             Layout.alignment: Qt.AlignHCenter
-            text: (userModel.lastUser || "ROOT").toUpperCase()
+            text: (userModel.lastUser || "USER").toUpperCase()
             color: "white"
             font.family: "JetBrains Mono"
             font.pixelSize: 26
