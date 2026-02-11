@@ -20,6 +20,9 @@ INSTALL_LOG="/tmp/cybersec_install_$(date +%Y%m%d_%H%M%S).log"
 INSTALLED_COUNT=0
 FAILED_COUNT=0
 
+# Ensure valid working directory for git/yay operations
+cd "$USER_HOME" || { log_error "No se pudo acceder a $USER_HOME"; exit 1; }
+
 # Function to install a tool (delegates to safe_install for PGP resilience)
 install_tool() {
     local tool="$1"

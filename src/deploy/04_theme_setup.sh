@@ -3,6 +3,7 @@
 # Aplica tema cyberpunk y wallpaper inicial
 
 banner "MÓDULO 5" "Tema y Personalización"
+cd "$USER_HOME" || exit 1
 
 log_info "Configurando tema cyberpunk..."
 

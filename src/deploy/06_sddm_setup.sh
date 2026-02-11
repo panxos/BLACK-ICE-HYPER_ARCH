@@ -3,6 +3,7 @@
 # Instala y configura el tema SDDM CyberSec
 
 banner "MÓDULO 6" "Configuración SDDM CyberSec"
+cd "$USER_HOME" || exit 1
 
 log_info "Instalando dependencias de SDDM..."
 

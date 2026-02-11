@@ -3,6 +3,7 @@
 # Instala Hyprland y componentes de desktop
 
 banner "MÓDULO 2" "BLACK-ICE Hyprland & Base"
+cd "$USER_HOME" || exit 1
 
 # --- Lista de paquetes ---
 HYPRLAND_PKGS=(

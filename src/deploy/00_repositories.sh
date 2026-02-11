@@ -3,6 +3,7 @@
 # Configura yay, chaotic-aur, y BlackArch
 
 banner "MÓDULO 1" "BLACK-ICE Repositorios"
+cd "$USER_HOME" || exit 1
 
 # --- Optimización Geográfica (Mirrors) ---
 # Intentar cargar configuración del instalador

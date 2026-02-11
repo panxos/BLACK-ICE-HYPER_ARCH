@@ -3,6 +3,7 @@
 # Suite de aplicaciones profesionales y configuración de servicios
 
 banner "MÓDULO 6" "Premium Software Suite"
+cd "$USER_HOME" || exit 1
 
 # Función para instalar paquetes (delega a safe_install para resiliencia PGP)
 pkg_install() {
