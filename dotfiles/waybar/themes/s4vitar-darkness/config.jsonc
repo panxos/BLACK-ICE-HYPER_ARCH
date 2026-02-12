@@ -15,6 +15,7 @@
             "hyprland/workspaces"
         ],
         "modules-right": [
+            "custom/settarget",
             "clock",
             "pulseaudio",
             "network",
