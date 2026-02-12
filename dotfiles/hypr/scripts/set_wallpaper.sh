@@ -29,11 +29,27 @@ if [ -f "$WALLPAPER_DIR/HORUS-CYBER.jpg" ]; then
 fi
 
 # 3. Fallback: First image found
-WALLPAPER=$(find "$WALLPAPER_DIR" -type f \( -name "*.png" -o -name "*.jpg" \) 2>/dev/null | head -n 1)
+WALLPAPER=$(find "$WALLPAPER_DIR" -type f \( -name "*.png" -o -name "*.jpg" -o -name "*.mp4" \) 2>/dev/null | head -n 1)
 
 if [ -f "$WALLPAPER" ]; then
-    swww img "$WALLPAPER" --transition-type grow
     echo "$WALLPAPER" > "$CACHE_FILE"
+    
+    if [[ "$WALLPAPER" == *.mp4 ]]; then
+        # Handle Video Wallpaper
+        pkill swww-daemon 2>/dev/null
+        pkill mpvpaper 2>/dev/null
+        # Give it a small moment to release the layer
+        sleep 0.5
+        mpvpaper -o "no-audio --loop" "*" "$WALLPAPER" &>/dev/null &
+    else
+        # Handle Static Image
+        pkill mpvpaper 2>/dev/null
+        if ! pgrep -x "swww-daemon" > /dev/null; then
+            swww-daemon &
+            sleep 0.5
+        fi
+        swww img "$WALLPAPER" --transition-type grow
+    fi
 else
     swww img <(convert -size 1920x1080 xc:'#0a0a0a' png:-) 2>/dev/null
 fi

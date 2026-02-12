@@ -17,13 +17,13 @@ if ! pgrep -x "swww-daemon" > /dev/null; then
     sleep 1
 fi
 
-# Recoger todos los wallpapers PNG y JPG
+# Recoger todos los wallpapers PNG, JPG y MP4
 shopt -s nullglob
-wallpapers=("$WALL_DIR"/*.{png,jpg,jpeg})
+wallpapers=("$WALL_DIR"/*.{png,jpg,jpeg,mp4})
 num_walls=${#wallpapers[@]}
 
 if [ $num_walls -eq 0 ]; then
-    notify-send "Wallpaper System" "Error: No se encontraron archivos black_ice_wallpaper_*.png"
+    notify-send "Wallpaper System" "Error: No se encontraron archivos de imagen o video en $WALL_DIR"
     exit 1
 fi
 
@@ -34,12 +34,19 @@ echo "$next_idx" > "$STATE_FILE"
 
 new_wall="${wallpapers[$next_idx]}"
 
-# Aplicar usando swww (más confiable)
-swww img "$new_wall" --transition-type wipe --transition-duration 2
-
-# Sincronizar colores de terminal (Kitty) - desactivado para mantener estilo Pro
-# if command -v wal &> /dev/null; then
-#     wal -i "$new_wall" -n -q
-# fi
+# Aplicar según tipo de archivo
+if [[ "$new_wall" == *.mp4 ]]; then
+    pkill swww-daemon 2>/dev/null
+    pkill mpvpaper 2>/dev/null
+    sleep 0.5
+    mpvpaper -o "no-audio --loop" "*" "$new_wall" &>/dev/null &
+else
+    pkill mpvpaper 2>/dev/null
+    if ! pgrep -x "swww-daemon" > /dev/null; then
+        swww-daemon &
+        sleep 0.5
+    fi
+    swww img "$new_wall" --transition-type wipe --transition-duration 2
+fi
 
 notify-send "BLACK-ICE" "Applied: $(basename "$new_wall")"
