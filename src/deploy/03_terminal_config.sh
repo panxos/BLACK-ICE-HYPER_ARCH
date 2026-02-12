@@ -141,6 +141,16 @@ EOF
     log_info "User .p10k.zsh configurado con Linux Tux Icon"
 fi
 
+# --- Configurar Nano Pro (Highlighter + RC) ---
+log_info "Configurando Nano Pro..."
+safe_install nano-syntax-highlighting
+if [ -f "$DOTFILES_DIR/nano/.nanorc" ]; then
+    cp "$DOTFILES_DIR/nano/.nanorc" "$USER_HOME/.nanorc"
+    sudo cp "$DOTFILES_DIR/nano/.nanorc" "/root/.nanorc"
+    chown "$CURRENT_USER:$CURRENT_USER" "$USER_HOME/.nanorc"
+    log_info "Nano Pro configurado para usuario y root"
+fi
+
 # --- Cambiar shell por defecto a Zsh ---
 log_info "Cambiando shell por defecto a Zsh..."
 

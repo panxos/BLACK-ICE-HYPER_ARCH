@@ -1,0 +1,17 @@
+set linenumbers
+set mouse
+set smooth
+set constantshow
+set autoindent
+set tabsize 4
+set tabstospaces
+
+# Colores UI (Estilo Cyberpunk/Black-Ice)
+set titlecolor white,cyan
+set statuscolor white,magenta
+set keycolor cyan
+set functioncolor green
+set numbercolor yellow
+
+# Incluir resaltado de sintaxis extendido
+include "/usr/share/nano-syntax-highlighting/*.nanorc"
