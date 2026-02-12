@@ -77,6 +77,8 @@ menuFont=Roboto,10,-1,5,50,0,0,0,0,0
 shadeSortColumn=true
 smallestReadableFont=Roboto,9,-1,5,50,0,0,0,0,0
 toolBarFont=Roboto,10,-1,5,50,0,0,0,0,0
+TerminalApplication=kitty
+TerminalService=kitty.desktop
 
 [Icons]
 Theme=candy-icons
