@@ -4,7 +4,7 @@ IFACE=$(ip -o -4 addr show | awk '{print $2}' | grep -E 'tun0|wg0|utun|cscotun' 
 
 if [ -n "$IFACE" ]; then
     IP=$(ip -o -4 addr show $IFACE | awk '{print $4}' | cut -d/ -f1)
-    echo "{\"text\": \"$IP\", \"class\": \"connected\", \"tooltip\": \"VPN Connected: $IFACE ($IP)\"}"
+    echo "{\"text\": \"  $IP\", \"class\": \"connected\", \"tooltip\": \"VPN Connected: $IFACE ($IP)\"}"
 else
-    echo "{\"text\": \"Disconnected\", \"class\": \"disconnected\", \"tooltip\": \"No VPN Active\"}"
+    echo "{\"text\": \"  Disconnected\", \"class\": \"disconnected\", \"tooltip\": \"No VPN Active\"}"
 fi

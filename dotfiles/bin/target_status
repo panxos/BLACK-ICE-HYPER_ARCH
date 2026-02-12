@@ -10,10 +10,10 @@ if [ -f "$TARGET_FILE" ]; then
     if [ -n "$IP" ]; then
         # Icono NO incluido aquí si ya está en Waybar config, pero para asegurar: 
         # Si el config tiene {}, el script debe mandar el texto limpio.
-        echo "{\"text\": \"$IP - $NAME\", \"class\": \"active\", \"tooltip\": \"Target: $NAME ($IP)\"}"
+        echo "{\"text\": \"󰓾  $IP - $NAME\", \"class\": \"active\", \"tooltip\": \"Target: $NAME ($IP)\"}"
     else
-        echo "{\"text\": \"No Target\", \"class\": \"inactive\", \"tooltip\": \"No target set\"}"
+        echo "{\"text\": \"󰓾  No Target\", \"class\": \"inactive\", \"tooltip\": \"No target set\"}"
     fi
 else
-    echo "{\"text\": \"No Target\", \"class\": \"inactive\", \"tooltip\": \"No target set\"}"
+    echo "{\"text\": \"󰓾  No Target\", \"class\": \"inactive\", \"tooltip\": \"No target set\"}"
 fi
