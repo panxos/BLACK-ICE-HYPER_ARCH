@@ -1,107 +1,146 @@
 [
     {
         "layer": "top",
-        "position": "bottom",
-        "height": 35,
+        "position": "top",
+        "height": 32,
         "spacing": 4,
         "modules-left": [
             "custom/launcher",
-            "custom/separator",
-            "cpu",
-            "memory",
-            "disk",
+            "hyprland/workspaces",
             "custom/vpn"
         ],
         "modules-center": [
-            "hyprland/workspaces"
+            "clock"
         ],
         "modules-right": [
-            "custom/player",
-            "network",
+            "custom/settarget",
             "pulseaudio",
-            "custom/updates",
+            "network",
             "custom/power"
         ],
-
         "custom/launcher": {
             "format": " 󰣇 ",
             "on-click": "wofi --show drun",
             "tooltip": false
         },
-
-        "custom/separator": {
-            "format": "|",
-            "tooltip": false
+        "hyprland/workspaces": {
+            "format": "{icon}",
+            "on-click": "activate",
+            "format-icons": {
+                "active": "󰚰",
+                "default": "󰚯",
+                "urgent": "󰚯",
+                "empty": "○"
+            },
+            "persistent-workspaces": {
+                "*": 5
+            }
         },
-
-        "cpu": {
-            "format": "   {usage}% ",
-            "interval": 2
-        },
-
-        "memory": {
-            "format": " 󰍛 {used:0.2f} GiB ",
-            "interval": 2
-        },
-
-        "disk": {
-            "format": " 󰋊 {free} ",
-            "interval": 60
-        },
-
         "custom/vpn": {
             "format": " {}",
             "exec": "~/.config/bin/vpn_status",
             "return-type": "json",
             "interval": 5
         },
-
-        "hyprland/workspaces": {
-            "format": "{icon}",
-            "on-click": "activate",
-            "format-icons": {
-                "active": "●",
-                "default": "○",
-                "urgent": "●"
-            },
-            "persistent-workspaces": {
-                "*": 5
-            }
+        "clock": {
+            "format": " 󰥔 {:%H:%M   %m-%d} ",
+            "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>"
         },
-
-        "custom/player": {
-            "exec": "playerctl metadata --format '󰝚 {{artist}} - {{title}}' 2>/dev/null || echo ''",
-            "format": " {} ",
+        "custom/settarget": {
+            "format": "{}",
+            "exec": "~/.config/bin/target_status",
             "interval": 5,
-            "on-click": "playerctl play-pause"
+            "return-type": "json",
+            "on-click": "~/.config/bin/settarget"
         },
-
+        "pulseaudio": {
+            "format": " {icon} {volume}% ",
+            "format-muted": " 󰝟 Muted ",
+            "format-icons": {
+                "default": [
+                    "󰕿",
+                    "󰖀",
+                    "󰕾"
+                ]
+            },
+            "on-click": "pavucontrol"
+        },
         "network": {
             "format-wifi": " 󰖩 {bandwidthDownBits} ",
             "format-ethernet": " 󰈀 {ipaddr} ",
             "format-disconnected": " 󰖪 ",
             "tooltip-format": "{essid} {signalStrength}%"
         },
-
-        "pulseaudio": {
-            "format": " {icon} {volume}% ",
-            "format-muted": " 󰝟 Muted ",
-            "format-icons": {
-                "default": ["󰕿", "󰖀", "󰕾"]
-            },
-            "on-click": "pavucontrol"
+        "custom/power": {
+            "format": " ⏻ ",
+            "on-click": "~/.config/bin/power_menu.sh",
+            "tooltip": false
+        }
+    },
+    {
+        "layer": "top",
+        "position": "bottom",
+        "height": 30,
+        "spacing": 4,
+        "modules-left": [
+            "custom/docker",
+            "custom/kvm",
+            "custom/updates"
+        ],
+        "modules-center": [
+            "custom/local_ip",
+            "custom/public_ip"
+        ],
+        "modules-right": [
+            "cpu",
+            "memory",
+            "disk",
+            "tray"
+        ],
+        "custom/docker": {
+            "exec": "~/.config/bin/docker_status",
+            "return-type": "json",
+            "interval": 10,
+            "format": " {} "
         },
-
+        "custom/kvm": {
+            "exec": "~/.config/bin/kvm_status",
+            "return-type": "json",
+            "interval": 10,
+            "format": " {} "
+        },
         "custom/updates": {
             "exec": "checkupdates | wc -l",
             "interval": 3600,
             "format": " 󰚰 {} "
         },
-
-        "custom/power": {
-            "format": " ⏻ ",
-            "on-click": "~/.config/bin/power_menu.sh",
-            "tooltip": false
+        "custom/local_ip": {
+            "exec": "~/.config/bin/local_ip",
+            "return-type": "json",
+            "interval": 10,
+            "format": " {} "
+        },
+        "custom/public_ip": {
+            "exec": "~/.config/bin/public_ip",
+            "return-type": "json",
+            "interval": 60,
+            "format": " {} "
+        },
+        "cpu": {
+            "format": "   {usage}% ",
+            "interval": 2
+        },
+        "memory": {
+            "format": " 󰍛 {percentage}% ",
+            "interval": 2
+        },
+        "disk": {
+            "format": " 󰋊 {free} ",
+            "interval": 60
+        },
+        "tray": {
+            "icon-size": 18,
+            "spacing": 10
         }
     }
 ]

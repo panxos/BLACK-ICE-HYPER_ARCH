@@ -10,13 +10,22 @@ window#waybar {
     color: #cdd6f4;
     transition-property: background-color;
     transition-duration: .5s;
-    border-top: 2px solid rgba(106, 13, 173, 0.5); /* suttle glow purple */
+}
+
+/* Glow effect top and bottom */
+window#waybar.top {
+    border-bottom: 2px solid rgba(106, 13, 173, 0.5);
+}
+
+window#waybar.bottom {
+    border-top: 2px solid rgba(106, 13, 173, 0.5);
 }
 
 tooltip {
     background: #1a1a2e;
     border: 1px solid #6a0dad;
 }
+
 tooltip label {
     color: #cdd6f4;
 }
@@ -25,11 +34,6 @@ tooltip label {
     color: #1793d1;
     padding-left: 10px;
     font-size: 18px;
-}
-
-#custom-separator {
-    color: #555555;
-    padding: 0 5px;
 }
 
 #cpu {
@@ -46,33 +50,6 @@ tooltip label {
 
 #custom-vpn {
     color: #98c379;
-}
-
-/* center / workspaces */
-#workspaces button {
-    padding: 0 5px;
-    color: #555555;
-    font-size: 18px;
-    transition: all 0.3s ease;
-}
-
-#workspaces button.active {
-    color: #00d4ff;
-    text-shadow: 0 0 5px rgba(0, 212, 255, 0.8);
-}
-
-#workspaces button.urgent {
-    color: #ff5555;
-}
-
-/* varied colors for occupied workspaces can be simulated by targeting specific IDs if known, 
-   but Waybar doesn't easily distinguish 'occupied' with a unique class unless scripts are used.
-   However, we can style the 'empty' vs 'active' reliably.
-   To match the user's 'varied colors' request for occupied, we can add some 'fake' variety or 
-   just focus on the active/empty contrast which is the most striking. */
-
-#custom-player {
-    color: #bd93f9;
 }
 
 #network {
@@ -93,13 +70,60 @@ tooltip label {
     font-size: 16px;
 }
 
-#custom-power:hover {
-    color: #ff0000;
-    text-shadow: 0 0 8px rgba(255, 0, 0, 0.8);
+#clock {
+    color: #cdd6f4;
+    font-weight: bold;
+}
+
+#custom-settarget {
+    color: #bd93f9;
+}
+
+#custom-docker {
+    color: #56b6c2;
+}
+
+#custom-kvm {
+    color: #bd93f9;
+}
+
+#custom-local_ip,
+#custom-public_ip {
+    color: #cdd6f4;
+}
+
+/* Workspaces - Pacman Style */
+#workspaces button {
+    padding: 0 5px;
+    color: #555555;
+    font-size: 16px;
+    transition: all 0.3s ease;
+}
+
+#workspaces button.active {
+    color: #00d4ff;
+    text-shadow: 0 0 5px rgba(0, 212, 255, 0.8);
+}
+
+#workspaces button.occupied {
+    color: #bd93f9;
+    /* Ghost color */
+}
+
+#workspaces button.urgent {
+    color: #ff5555;
 }
 
 /* Module hover effect */
-#memory:hover, #cpu:hover, #disk:hover, #network:hover, #pulseaudio:hover, #custom-vpn:hover, #custom-updates:hover, #custom-player:hover {
+#memory:hover,
+#cpu:hover,
+#disk:hover,
+#network:hover,
+#pulseaudio:hover,
+#custom-vpn:hover,
+#custom-updates:hover,
+#clock:hover,
+#custom-settarget:hover {
     background-color: rgba(255, 255, 255, 0.1);
     border-radius: 4px;
 }
