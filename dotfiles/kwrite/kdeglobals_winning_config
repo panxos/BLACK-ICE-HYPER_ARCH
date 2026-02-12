@@ -85,7 +85,7 @@ Theme=candy-icons
 LookAndFeelPackage=Sweet
 ShowDeleteCommand=false
 SingleClick=false
-widgetStyle=Fusion
+widgetStyle=kvantum
 
 [PreviewSettings]
 EnableRemoteFolderThumbnail=false
