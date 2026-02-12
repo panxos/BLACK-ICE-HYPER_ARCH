@@ -1,0 +1,95 @@
+/* Mechanically Rounded/Floating - Horus-Cyber-p4nx0z */
+/* HARDCODED COLORS: Cyan #00f3ff, Purple #bd93f9 */
+
+* {
+    border: none;
+    border-radius: 0;
+    font-family: "JetBrains Mono Nerd Font", monospace;
+    font-size: 13px;
+    font-weight: bold;
+    color: #00f3ff;
+}
+
+window#waybar {
+    background: transparent;
+}
+
+.modules-left,
+.modules-center,
+.modules-right {
+    background: #0a0e14;
+    border-radius: 15px;
+    margin: 8px 10px;
+    padding: 2px 15px;
+    /* GLOW SUTIL: Reducido spread de 15px a 8px y opacidad */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.7), 0 0 8px rgba(0, 243, 255, 0.3);
+    border: 1px solid rgba(0, 243, 255, 0.2);
+}
+
+/* TODOS los módulos en CYAN */
+#custom-launcher,
+#workspaces,
+#clock,
+#pulseaudio,
+#battery,
+#custom-power,
+#cpu,
+#memory,
+#temperature,
+#custom-docker,
+#custom-kvm,
+#custom-updates,
+#custom-local_ip,
+#custom-public_ip,
+#tray {
+    padding: 0 10px;
+    color: #00f3ff;
+}
+
+/* Módulos Target/VPN en PURPLE */
+#custom-vpn,
+#custom-settarget {
+    padding: 0 10px;
+    color: #bd93f9;
+}
+
+#custom-vpn.connected,
+#custom-settarget.active {
+    color: #00ff00;
+    background: rgba(0, 255, 0, 0.2);
+    border-radius: 8px;
+}
+
+#custom-vpn.disconnected,
+#custom-settarget.inactive,
+#cpu.critical,
+#temperature.critical {
+    color: #ff5555;
+    background: rgba(255, 0, 0, 0.2);
+    border-radius: 8px;
+}
+
+/* Workspaces - Estilo Horus */
+#workspaces button {
+    color: #bd93f9;
+    padding: 0 5px;
+    border-radius: 50%;
+}
+
+#workspaces button.active {
+    color: #ffffff;
+    text-shadow: 0 0 8px #00f3ff;
+    background: radial-gradient(circle, #00f3ff 0%, #bd93f9 100%);
+    box-shadow: 0 0 10px rgba(0, 243, 255, 0.6);
+}
+
+#workspaces button:hover {
+    box-shadow: 0 0 8px #bd93f9;
+}
+
+/* Launcher */
+#custom-launcher {
+    font-size: 18px;
+    color: #ff79c6;
+    text-shadow: 0 0 5px #00f3ff;
+}

@@ -1,0 +1,33 @@
+#!/bin/bash
+#
+# Script: kvm_status
+# Description: Muestra el estado de VMs KVM/libvirt para Waybar
+# Author: Francisco Aravena (P4nX0Z)
+# Created: 2026-02-02
+# Version: 1.0.0
+
+set -euo pipefail
+
+# Verificar si virsh está instalado
+if ! command -v virsh &>/dev/null; then
+    echo '{"text":"󰢹 N/A","tooltip":"KVM/libvirt no instalado","class":"inactive"}'
+    exit 0
+fi
+
+# Verificar si libvirtd está corriendo
+if ! systemctl is-active --quiet libvirtd 2>/dev/null; then
+    echo '{"text":"󰢹 OFF","tooltip":"libvirtd no está corriendo","class":"inactive"}'
+    exit 0
+fi
+
+# Contar VMs activas
+RUNNING=$(virsh -q list --state-running 2>/dev/null | wc -l)
+TOTAL=$(virsh -q list --all 2>/dev/null | wc -l)
+
+if [[ $RUNNING -eq 0 ]]; then
+    echo "{\"text\":\"󰢹 0/$TOTAL\",\"tooltip\":\"KVM: Sin VMs activas\",\"class\":\"inactive\"}"
+else
+    # Obtener nombres de VMs activas
+    VMS=$(virsh list --state-running --name 2>/dev/null | tr '\n' ', ' | sed 's/,$//' | sed 's/^,//')
+    echo "{\"text\":\"󰢹 $RUNNING/$TOTAL\",\"tooltip\":\"KVM activo\\n$VMS\",\"class\":\"active\"}"
+fi

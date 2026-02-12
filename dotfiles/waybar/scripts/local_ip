@@ -1,0 +1,33 @@
+#!/bin/bash
+#
+# Script: local_ip
+# Description: Muestra la IP local para Waybar
+# Author: Francisco Aravena (P4nX0Z)
+# Created: 2026-02-02
+# Version: 1.0.0
+
+set -euo pipefail
+
+# Obtener IP local (excluyendo loopback)
+# Prioridad: 1) ip command, 2) hostname command, 3) ifconfig
+if command -v ip &>/dev/null; then
+    LOCAL_IP=$(ip -4 addr show | grep -oP '(?<=inet\s)\d+(\.\d+){3}' | grep -v '^127\.' | head -1)
+elif command -v hostname &>/dev/null; then
+    LOCAL_IP=$(hostname -I 2>/dev/null | awk '{print $1}')
+elif command -v ifconfig &>/dev/null; then
+    LOCAL_IP=$(ifconfig | grep -oP '(?<=inet\s)\d+(\.\d+){3}' | grep -v '^127\.' | head -1)
+else
+    echo '{"text":"󰩟 N/A","tooltip":"No se puede obtener IP local","class":"inactive"}'
+    exit 0
+fi
+
+# Verificar si se obtuvo una IP
+if [[ -z "$LOCAL_IP" ]]; then
+    echo '{"text":"󰩟 No IP","tooltip":"Sin conexión de red","class":"inactive"}'
+else
+    # Obtener interfaz activa
+    INTERFACE=$(ip route get 1.1.1.1 2>/dev/null | grep -oP '(?<=dev\s)\w+' | head -1)
+    [[ -z "$INTERFACE" ]] && INTERFACE="unknown"
+    
+    echo "{\"text\":\"󰩟 $LOCAL_IP\",\"tooltip\":\"IP Local: $LOCAL_IP\\nInterfaz: $INTERFACE\",\"class\":\"active\"}"
+fi

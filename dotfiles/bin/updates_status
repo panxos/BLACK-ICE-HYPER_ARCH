@@ -1,0 +1,12 @@
+#!/bin/bash
+# updates_status (Clean - No Colors)
+if command -v checkupdates &>/dev/null; then
+    upd=$(checkupdates 2>/dev/null | wc -l)
+    if [ "$upd" -gt 0 ]; then
+        echo "{\"text\": \"󰮯 $upd\", \"class\": \"updates\", \"tooltip\": \"$upd updates available\"}"
+    else
+        echo "{\"text\": \"󰮯 0\", \"class\": \"cleaned\", \"tooltip\": \"System Up to Date\"}"
+    fi
+else
+    echo "{\"text\": \"\", \"class\": \"error\"}"
+fi

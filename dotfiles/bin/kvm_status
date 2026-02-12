@@ -1,0 +1,13 @@
+#!/bin/bash
+# kvm_status (Clean - No Colors)
+count=$(ls /run/user/$(id -u)/qm_socket_* 2>/dev/null | wc -l) 2>/dev/null
+# Fallback virsh check if needed
+if [ "$count" -eq 0 ] && command -v virsh &>/dev/null; then
+    count=$(virsh list --state-running 2>/dev/null | grep -v "Name" | grep -v "----" | grep -v "^$" | wc -l)
+fi
+
+if [ "$count" -gt 0 ]; then
+    echo "{\"text\": \"  $count\", \"class\": \"active\", \"tooltip\": \"KVM VMs Running: $count\"}"
+else
+    echo "{\"text\": \"  0\", \"class\": \"inactive\", \"tooltip\": \"No KVM VMs active\"}"
+fi

@@ -1,0 +1,32 @@
+#!/bin/bash
+#
+# Script: docker_status
+# Description: Muestra el estado de contenedores Docker para Waybar
+# Author: Francisco Aravena (P4nX0Z)
+# Created: 2026-02-02
+# Version: 1.0.0
+
+set -euo pipefail
+
+# Verificar si Docker está instalado y corriendo
+if ! command -v docker &>/dev/null; then
+    echo '{"text":"󰡨 N/A","tooltip":"Docker no instalado","class":"inactive"}'
+    exit 0
+fi
+
+if ! docker info &>/dev/null 2>&1; then
+    echo '{"text":"󰡨 OFF","tooltip":"Docker daemon no está corriendo","class":"inactive"}'
+    exit 0
+fi
+
+# Contar contenedores activos
+RUNNING=$(docker ps -q 2>/dev/null | wc -l)
+TOTAL=$(docker ps -a -q 2>/dev/null | wc -l)
+
+if [[ $RUNNING -eq 0 ]]; then
+    echo "{\"text\":\"󰡨 0/$TOTAL\",\"tooltip\":\"Docker: Sin contenedores activos\",\"class\":\"inactive\"}"
+else
+    # Obtener nombres de contenedores activos
+    CONTAINERS=$(docker ps --format "{{.Names}}" 2>/dev/null | tr '\n' ', ' | sed 's/,$//')
+    echo "{\"text\":\"󰡨 $RUNNING/$TOTAL\",\"tooltip\":\"Docker activo\\n$CONTAINERS\",\"class\":\"active\"}"
+fi

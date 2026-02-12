@@ -1,0 +1,8 @@
+#!/bin/bash
+# local_ip (Clean - No Colors)
+ip=$(ip route get 1.1.1.1 2>/dev/null | grep -oP 'src \K\S+')
+if [ -n "$ip" ]; then
+    echo "{\"text\": \"󰩟 $ip\", \"class\": \"connected\", \"tooltip\": \"Local IP: $ip\"}"
+else
+    echo "{\"text\": \"󰩟 No IP\", \"class\": \"disconnected\", \"tooltip\": \"Network Disconnected\"}"
+fi
