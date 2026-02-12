@@ -80,7 +80,10 @@ source "$SCRIPT_DIR/src/deploy/05_software_suite.sh"
 # 6. Configuración SDDM (CyberSec Theme)
 source "$SCRIPT_DIR/src/deploy/06_sddm_setup.sh"
 
-# 7. Finalización
+# 7. Setup Neovim Pro (NvChad)
+source "$SCRIPT_DIR/src/deploy/07_neovim_setup.sh"
+
+# 8. Finalización
 source "$SCRIPT_DIR/src/deploy/99_finalization.sh"
 
 echo ""

@@ -49,6 +49,7 @@ HYPRLAND_PKGS=(
     "unrar"
     "xdg-user-dirs"
     "xdg-utils"
+    "kde-cli-tools"         # Required for Dolphin/Kate file associations (keditfiletype)
     
     # Wallpaper daemon
     "hyprpaper"
