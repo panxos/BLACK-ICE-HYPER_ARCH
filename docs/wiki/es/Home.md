@@ -19,6 +19,7 @@ Bienvenido a la wiki oficial de **BLACK-ICE ARCH**, el sistema de despliegue aut
   - Configuración de red
   - Personalización de Hyprland
   - Configuración de Waybar
+  - [🥷 Configuración Profesional de Neovim](Neovim-Professional-Setup.md)
   - Ajustes de rendimiento
   - Variables de entorno
 
