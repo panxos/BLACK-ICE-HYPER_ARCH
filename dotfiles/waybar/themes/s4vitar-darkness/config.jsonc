@@ -47,10 +47,14 @@
             "format": "{icon}",
             "on-click": "activate",
             "format-icons": {
+                "1": "󰚰",
+                "2": "󰚯",
+                "3": "󰚯",
+                "4": "󰚯",
+                "5": "󰚯",
                 "active": "󰚰",
                 "default": "󰚯",
-                "urgent": "󰚯",
-                "empty": "○"
+                "persistent": "○"
             },
             "persistent-workspaces": {
                 "*": 5
