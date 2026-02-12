@@ -1457,7 +1457,7 @@ function man() {
 # ---------- CARGA DE PLUGINS ----------
 
 # Powerlevel10k (cargado una sola vez con verificación)
-P10k_THEME="/usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme"
+P10k_THEME="$HOME/powerlevel10k/powerlevel10k.zsh-theme"
 [ -f "$P10k_THEME" ] && source "$P10k_THEME"
 
 # Plugins de ZSH

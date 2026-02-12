@@ -56,6 +56,9 @@ echo ""
 # --- Módulos de instalación ---
 log_info "Ejecutando módulos de instalación..."
 
+# Asegurar directorio de trabajo válido al inicio del despliegue
+cd "$USER_HOME" || cd "$SCRIPT_DIR" || exit 1
+
 # 1. Repositorios (yay, chaotic-aur, BlackArch)
 source "$SCRIPT_DIR/src/deploy/00_repositories.sh"
 

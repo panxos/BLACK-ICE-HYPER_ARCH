@@ -162,6 +162,9 @@ rebuild_keyring() {
 safe_install() {
     local pkg="$1"
 
+    # Ensure valid working directory for remote execution reliability
+    cd "$HOME" || cd /tmp || { log_error "No se pudo acceder a un directorio de trabajo válido."; return 1; }
+
     # Skip if already installed
     if pacman -Q "$pkg" &>/dev/null; then
         echo -e "  ${GREEN}✓${NC} $pkg (ya instalado)"
