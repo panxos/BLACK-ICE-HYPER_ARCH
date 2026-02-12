@@ -1,0 +1,105 @@
+* {
+    font-family: "JetBrainsMono Nerd Font", "Roboto", "Helvetica", "Arial", sans-serif;
+    font-size: 13px;
+    border: none;
+    border-radius: 0;
+}
+
+window#waybar {
+    background-color: rgba(13, 13, 13, 0.88);
+    color: #cdd6f4;
+    transition-property: background-color;
+    transition-duration: .5s;
+    border-top: 2px solid rgba(106, 13, 173, 0.5); /* suttle glow purple */
+}
+
+tooltip {
+    background: #1a1a2e;
+    border: 1px solid #6a0dad;
+}
+tooltip label {
+    color: #cdd6f4;
+}
+
+#custom-launcher {
+    color: #1793d1;
+    padding-left: 10px;
+    font-size: 18px;
+}
+
+#custom-separator {
+    color: #555555;
+    padding: 0 5px;
+}
+
+#cpu {
+    color: #e06c75;
+}
+
+#memory {
+    color: #56b6c2;
+}
+
+#disk {
+    color: #e5c07b;
+}
+
+#custom-vpn {
+    color: #98c379;
+}
+
+/* center / workspaces */
+#workspaces button {
+    padding: 0 5px;
+    color: #555555;
+    font-size: 18px;
+    transition: all 0.3s ease;
+}
+
+#workspaces button.active {
+    color: #00d4ff;
+    text-shadow: 0 0 5px rgba(0, 212, 255, 0.8);
+}
+
+#workspaces button.urgent {
+    color: #ff5555;
+}
+
+/* varied colors for occupied workspaces can be simulated by targeting specific IDs if known, 
+   but Waybar doesn't easily distinguish 'occupied' with a unique class unless scripts are used.
+   However, we can style the 'empty' vs 'active' reliably.
+   To match the user's 'varied colors' request for occupied, we can add some 'fake' variety or 
+   just focus on the active/empty contrast which is the most striking. */
+
+#custom-player {
+    color: #bd93f9;
+}
+
+#network {
+    color: #98c379;
+}
+
+#pulseaudio {
+    color: #56b6c2;
+}
+
+#custom-updates {
+    color: #e5c07b;
+}
+
+#custom-power {
+    color: #e06c75;
+    padding-right: 15px;
+    font-size: 16px;
+}
+
+#custom-power:hover {
+    color: #ff0000;
+    text-shadow: 0 0 8px rgba(255, 0, 0, 0.8);
+}
+
+/* Module hover effect */
+#memory:hover, #cpu:hover, #disk:hover, #network:hover, #pulseaudio:hover, #custom-vpn:hover, #custom-updates:hover, #custom-player:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
