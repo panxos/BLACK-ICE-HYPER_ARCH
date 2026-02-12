@@ -16,7 +16,6 @@
         ],
         "modules-right": [
             "custom/settarget",
-            "clock",
             "pulseaudio",
             "network",
             "custom/power"
@@ -57,9 +56,12 @@
                 "*": 5
             }
         },
-        "clock": {
-            "format": " 󰥔 {:%H:%M   %m-%d} ",
-            "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>"
+        "custom/settarget": {
+            "format": "{}",
+            "exec": "~/.config/bin/target_status",
+            "interval": 5,
+            "return-type": "json",
+            "on-click": "~/.config/bin/settarget"
         },
         "pulseaudio": {
             "format": " {icon} {volume}% ",
@@ -101,6 +103,7 @@
         ],
         "modules-right": [
             "custom/player",
+            "clock",
             "tray"
         ],
         "custom/docker": {
@@ -141,6 +144,10 @@
         "tray": {
             "icon-size": 18,
             "spacing": 10
+        },
+        "clock": {
+            "format": " 󰥔 {:%H:%M   %m-%d} ",
+            "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>"
         }
     }
 ]
