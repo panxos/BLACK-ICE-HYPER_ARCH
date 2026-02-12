@@ -120,8 +120,8 @@ curl -L http://is.gd/blackice | bash
 - **Candy Icons** Icon Pack
 - **Kvantum** Qt Theme Engine
 - **JetBrains Mono Nerd Font**
-- Cyan/Purple color scheme
-- Smooth animations
+- Cyan/Purple/Purple Glow color scheme
+- Smooth animations and fast animated borders
 
 ### ⚙️ Optimizations
 
@@ -129,6 +129,7 @@ curl -L http://is.gd/blackice | bash
 - ✅ Virtualization support (VMware, KVM, VirtualBox)
 - ✅ Spanish keyboard layout
 - ✅ Fastfetch with random logos
+- ✅ Live Video Wallpapers (.mp4 support with `mpvpaper`)
 - ✅ Utility scripts for pentesting
 
 ### 🆕 New Features (v2.0)
@@ -141,6 +142,9 @@ curl -L http://is.gd/blackice | bash
 - **Improved Terminal**: Robust Powerlevel10k installation via `git clone`.
 - **Dynamic SDDM**: User avatar support (`~/.config/bin/set_avatar.sh`).
 - **Resilient Install**: `safe_install` wrapper with auto-repair for PGP signatures.
+- **s4vitar-darkness Theme**: New Pro theme with dual-bar, Pacman icons, and ultra-dark aesthetic.
+- **Visual Wallpaper Selector**: `wofi` interactive menu for choosing wallpapers and videos (`Win+Alt+W`).
+- **KDE/Qt Pro Integration**: Dolphin and Kate optimized with Kvantum-Sweet and Kitty terminal as default.
 
 ---
 
@@ -386,7 +390,7 @@ sudo ./src/deploy/02_security_tools.sh
 # Change wallpaper
 ~/.config/bin/wallpaper_switcher
 
-# Or use Super + Alt + W
+# Or use Super + Alt + W (Direct Visual Selector)
 ```
 
 ### Fastfetch Logos

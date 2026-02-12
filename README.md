@@ -107,8 +107,8 @@ curl -L http://is.gd/blackice | bash
 - **Candy Icons** Pack de iconos
 - **Kvantum** Motor de temas Qt
 - **JetBrains Mono Nerd Font**
-- Esquema de colores Cyan/Purple
-- Animaciones suaves
+- Esquema de colores Cyan/Purple/Purple Glow
+- Animaciones suaves y bordes animados rápidos
 
 ### ⚙️ Optimizaciones
 
@@ -116,6 +116,7 @@ curl -L http://is.gd/blackice | bash
 - ✅ Soporte de virtualización (VMware, KVM, VirtualBox)
 - ✅ Distribución de teclado español
 - ✅ Fastfetch con logos aleatorios
+- ✅ Live Video Wallpapers (Soporte .mp4 con `mpvpaper`)
 - ✅ Scripts de utilidad para pentesting
 
 ### 🆕 Nuevas Funcionalidades (v2.0)
@@ -128,6 +129,9 @@ curl -L http://is.gd/blackice | bash
 - **Terminal Mejorada**: Instalación robusta de Powerlevel10k con `git clone`.
 - **SDDM Dinámico**: Soporte para avatares de usuario (`~/.config/bin/set_avatar.sh`).
 - **Instalación Resiliente**: Wrapper `safe_install` con auto-reparación de firmas PGP.
+- **Tema s4vitar-darkness**: Nuevo tema Pro con doble barra, iconos Pacman y estética ultra-oscura.
+- **Selector Visual de Wallpapers**: Menú interactivo `wofi` para elegir fondos y videos (`Win+Alt+W`).
+- **Integración KDE/Qt Pro**: Dolphin y Kate optimizados con Kvantum-Sweet y terminal Kitty por defecto.
 
 ---
 
@@ -144,6 +148,11 @@ BLACK-ICE ARCH incluye **4 temas cyberpunk personalizados** para Hyprland y Wayb
 | :---: | :---: |
 | ![Anubis-Death Theme](docs/images/Anubis-Death.png) | ![Isis-Magic Theme](docs/images/Isis-Magic.png) |
 | *Tema oscuro con verdes lima y estética hacker* | *Tema mágico con púrpuras y magentas vibrantes* |
+
+| 👾 s4vitar-darkness |
+| :---: |
+| ![s4vitar-darkness Theme](docs/images/s4vitar-darkness.png) |
+| *Tema PRO ultra-oscuro con Pacman workspaces y aura púrpura* |
 
 ---
 
@@ -413,7 +422,7 @@ sudo ./src/deploy/02_security_tools.sh
 # Cambiar wallpaper
 ~/.config/bin/wallpaper_switcher
 
-# O usar Super + Alt + W
+# O usar Super + Alt + W (Selector Visual Directo)
 ```
 
 ### Logos de Fastfetch
