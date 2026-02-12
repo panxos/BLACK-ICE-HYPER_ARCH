@@ -1,0 +1,52 @@
+#!/bin/bash
+# wallpaper_visual: Selector visual de wallpapers para BLACK-ICE
+
+# Detect dynamic XDG Pictures dir
+if command -v xdg-user-dir &>/dev/null; then
+    PICTURES_DIR=$(xdg-user-dir PICTURES)
+    [ -z "$PICTURES_DIR" ] && PICTURES_DIR="$HOME/Pictures"
+else
+    PICTURES_DIR="$HOME/Pictures"
+fi
+
+WALL_DIR="$PICTURES_DIR/wallpapers"
+CACHE_FILE="$HOME/.cache/current_wallpaper"
+
+if [ ! -d "$WALL_DIR" ]; then
+    notify-send "Wallpaper System" "Error: No se encontró el directorio $WALL_DIR"
+    exit 1
+fi
+
+# Listar archivos y pasarlos a wofii
+selection=$(ls "$WALL_DIR" | grep -E "\.(png|jpg|jpeg|mp4)$" | wofi --dmenu --prompt "Selecciona Wallpaper:")
+
+[ -z "$selection" ] && exit 0
+
+FULL_PATH="$WALL_DIR/$selection"
+
+if [ ! -f "$FULL_PATH" ]; then
+    notify-send "Wallpaper System" "Error: El archivo no existe"
+    exit 1
+fi
+
+# Guardar en cache para persistencia
+echo "$FULL_PATH" > "$CACHE_FILE"
+
+# Aplicar según tipo
+if [[ "$selection" == *.mp4 ]]; then
+    # Video Wallpaper
+    pkill swww-daemon 2>/dev/null
+    pkill mpvpaper 2>/dev/null
+    sleep 0.5
+    mpvpaper -o "no-audio --loop" "*" "$FULL_PATH" &>/dev/null &
+else
+    # Imagen Estática
+    pkill mpvpaper 2>/dev/null
+    if ! pgrep -x "swww-daemon" > /dev/null; then
+        swww-daemon &
+        sleep 0.5
+    fi
+    swww img "$FULL_PATH" --transition-type wipe --transition-duration 2
+fi
+
+notify-send "BLACK-ICE" "Fondo aplicado: $selection"
