@@ -29,7 +29,7 @@ ln -sf "$THEMES_DIR/$T/style.css" "$W_DIR/style.css"
 if [ -f "$WALL_DIR/$W" ]; then
     echo "$WALL_DIR/$W" > "$CACHE_WALL"
     swww img "$WALL_DIR/$W" --transition-type grow --transition-duration 1
-    wal -i "$WALL_DIR/$W" -n -q 2>/dev/null || true
+    # wal -i "$WALL_DIR/$W" -n -q 2>/dev/null || true
 fi
 
 # PREPARAR LOGO

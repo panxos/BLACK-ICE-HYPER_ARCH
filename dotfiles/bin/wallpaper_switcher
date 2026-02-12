@@ -37,9 +37,9 @@ new_wall="${wallpapers[$next_idx]}"
 # Aplicar usando swww (más confiable)
 swww img "$new_wall" --transition-type wipe --transition-duration 2
 
-# Sincronizar colores de terminal (Kitty) - solo si wal está instalado
-if command -v wal &> /dev/null; then
-    wal -i "$new_wall" -n -q
-fi
+# Sincronizar colores de terminal (Kitty) - desactivado para mantener estilo Pro
+# if command -v wal &> /dev/null; then
+#     wal -i "$new_wall" -n -q
+# fi
 
 notify-send "BLACK-ICE" "Applied: $(basename "$new_wall")"

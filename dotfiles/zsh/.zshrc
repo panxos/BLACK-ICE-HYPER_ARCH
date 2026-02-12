@@ -1483,11 +1483,11 @@ if [[ -f "$HOME/bin/vm_sync.sh" ]]; then
 fi
 export PATH=~/.npm-global/bin:$PATH
 
-export LS_COLORS='di=1;38;5;141:ln=38;5;81:so=38;5;183:pi=38;5;226:ex=38;5;118:bd=38;5;208:cd=38;5;208:su=38;5;196:sg=38;5;196:tw=38;5;141:ow=38;5;141'
+export LS_COLORS='di=1;38;5;39:ln=38;5;81:so=38;5;183:pi=38;5;226:ex=38;5;118:bd=38;5;208:cd=38;5;208:su=38;5;196:sg=38;5;196:tw=38;5;141:ow=38;5;141'
 
 # Fastfetch Cyberpunk Display (Nuclear Kitty & Pywal Sync)
-# Verificación de secuencias de pywal (Evita error de 'bat' si no existe)
-[ -f ~/.cache/wal/sequences ] && (/usr/bin/cat ~/.cache/wal/sequences &) 
+# Verificación de secuencias de pywal (Desactivado para estabilidad de colores Pro)
+# [ -f ~/.cache/wal/sequences ] && (/usr/bin/cat ~/.cache/wal/sequences &) 
 export DE=gnome
 FF_LOGOS=($HOME/.config/fastfetch/logos/*.png)
 RANDOM_LOGO=$(printf "%s\n" "${FF_LOGOS[@]}" | shuf -n 1)

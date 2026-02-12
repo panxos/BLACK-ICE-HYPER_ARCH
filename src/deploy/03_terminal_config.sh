@@ -13,8 +13,10 @@ safe_install zsh-syntax-highlighting
 safe_install zsh-autosuggestions
 safe_install fastfetch
 safe_install chafa
+safe_install ttf-jetbrains-mono-nerd
 
 # Instalar zsh-sudo manualmente (no siempre disponible en repos oficiales)
+cd "$USER_HOME" || cd /tmp
 sudo -n mkdir -p /usr/share/zsh/plugins/zsh-sudo
 sudo -n curl -L https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/plugins/sudo/sudo.plugin.zsh \
     -o /usr/share/zsh/plugins/zsh-sudo/sudo.plugin.zsh

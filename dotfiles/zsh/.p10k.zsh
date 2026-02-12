@@ -133,8 +133,8 @@
   # typeset -g POWERLEVEL9K_OS_ICON_CONTENT_EXPANSION='⭐'
 
   ####################################[ user: username ]####################################
-  # User color - Púrpura claro
-  typeset -g POWERLEVEL9K_USER_FOREGROUND=141
+  # User color - Morado claro (S4vitar style)
+  typeset -g POWERLEVEL9K_USER_FOREGROUND='#D0AEEA'
   typeset -g POWERLEVEL9K_USER_BACKGROUND=
   # Mostrar usuario siempre (no solo en SSH o root)
   typeset -g POWERLEVEL9K_USER_CONTENT_EXPANSION='%n'
@@ -146,8 +146,8 @@
   ################################[ prompt_char: prompt symbol ]################################
   # Transparent background.
   typeset -g POWERLEVEL9K_PROMPT_CHAR_BACKGROUND=
-  # Verde suave para el prompt >>
-  typeset -g POWERLEVEL9K_PROMPT_CHAR_OK_{VIINS,VICMD,VIVIS,VIOWR}_FOREGROUND=114
+  # Verde neón suave para el prompt >>
+  typeset -g POWERLEVEL9K_PROMPT_CHAR_OK_{VIINS,VICMD,VIVIS,VIOWR}_FOREGROUND='#ADEC94'
   # Rojo si el último comando falló
   typeset -g POWERLEVEL9K_PROMPT_CHAR_ERROR_{VIINS,VICMD,VIVIS,VIOWR}_FOREGROUND=196
   # Cyberpunk symbol >>
@@ -168,8 +168,8 @@
   typeset -g POWERLEVEL9K_PROMPT_CHAR_LEFT_RIGHT_WHITESPACE=''
 
   ##################################[ dir: current directory ]##################################
-  # ~ y directorios en rosa
-  typeset -g POWERLEVEL9K_DIR_FOREGROUND='#BF7590'
+  # Ruta en Rosa matizado (S4vitar style)
+  typeset -g POWERLEVEL9K_DIR_FOREGROUND='#EF92A3'
   typeset -g POWERLEVEL9K_DIR_BACKGROUND=
   # If directory is too long, shorten some of its segments to the shortest possible unique
   # prefix. The shortened directory can be tab-completed to the original.
@@ -177,11 +177,11 @@
   # Replace removed segment suffixes with this symbol.
   typeset -g POWERLEVEL9K_SHORTEN_DELIMITER=
   # Color of the shortened directory segments.
-  typeset -g POWERLEVEL9K_DIR_SHORTENED_FOREGROUND='#BF7590'
+  typeset -g POWERLEVEL9K_DIR_SHORTENED_FOREGROUND='#EF92A3'
   # Color of the anchor directory segments.
-  typeset -g POWERLEVEL9K_DIR_ANCHOR_FOREGROUND='#BF7590'
+  typeset -g POWERLEVEL9K_DIR_ANCHOR_FOREGROUND='#EF92A3'
   # Display anchor directory segments in bold.
-  typeset -g POWERLEVEL9K_DIR_ANCHOR_BOLD=false
+  typeset -g POWERLEVEL9K_DIR_ANCHOR_BOLD=true
   # Don't shorten directories that contain any of these files. They are anchors.
   local anchor_files=(
     .bzr
@@ -305,17 +305,17 @@
 
   # Casita CYAN, ~ y directorios rosa
   typeset -g POWERLEVEL9K_DIR_HOME_VISUAL_IDENTIFIER_COLOR='#85D3F2'
-  typeset -g POWERLEVEL9K_DIR_HOME_FOREGROUND='#BF7590'
+  typeset -g POWERLEVEL9K_DIR_HOME_FOREGROUND='#EF92A3'
   typeset -g POWERLEVEL9K_DIR_HOME_BACKGROUND=
-  typeset -g POWERLEVEL9K_DIR_HOME_SHORTENED_FOREGROUND='#BF7590'
-  typeset -g POWERLEVEL9K_DIR_HOME_ANCHOR_FOREGROUND='#BF7590'
+  typeset -g POWERLEVEL9K_DIR_HOME_SHORTENED_FOREGROUND='#EF92A3'
+  typeset -g POWERLEVEL9K_DIR_HOME_ANCHOR_FOREGROUND='#EF92A3'
 
   # Carpeta CYAN, ruta rosa
   typeset -g POWERLEVEL9K_DIR_DEFAULT_VISUAL_IDENTIFIER_COLOR='#85D3F2'
-  typeset -g POWERLEVEL9K_DIR_DEFAULT_FOREGROUND='#BF7590'
+  typeset -g POWERLEVEL9K_DIR_DEFAULT_FOREGROUND='#EF92A3'
   typeset -g POWERLEVEL9K_DIR_DEFAULT_BACKGROUND=
-  typeset -g POWERLEVEL9K_DIR_DEFAULT_SHORTENED_FOREGROUND='#BF7590'
-  typeset -g POWERLEVEL9K_DIR_DEFAULT_ANCHOR_FOREGROUND='#BF7590'
+  typeset -g POWERLEVEL9K_DIR_DEFAULT_SHORTENED_FOREGROUND='#EF92A3'
+  typeset -g POWERLEVEL9K_DIR_DEFAULT_ANCHOR_FOREGROUND='#EF92A3'
 
   # Custom prefix.
   # typeset -g POWERLEVEL9K_DIR_PREFIX='%244Fin '
@@ -1678,7 +1678,7 @@
     if [[ $EUID -eq 0 ]]; then
       p10k segment -f orange -t $'\uF120' # Icono # (Terminal)
     else
-      p10k segment -f '#7E9CD9' -t $'\uF303' # Icono Arch
+      p10k segment -f '#85D3F2' -t $'\uF303' # Icono Arch - Cian/Azul
     fi
   }
 
@@ -1687,7 +1687,7 @@
   }
 
   # Configuración del segmento my_lambda
-  typeset -g POWERLEVEL9K_MY_LAMBDA_FOREGROUND='#7E9CD9'
+  typeset -g POWERLEVEL9K_MY_LAMBDA_FOREGROUND='#85D3F2'
   typeset -g POWERLEVEL9K_MY_LAMBDA_BACKGROUND=
 
   # Transient prompt works similarly to the builtin transient_rprompt option. It trims down prompt
