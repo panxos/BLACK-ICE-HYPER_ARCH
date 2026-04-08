@@ -35,7 +35,7 @@ fi
 
 # --- Detectar variantes disponibles ---
 # Las variantes son subdirectorios que contienen theme.txt
-mapfile -t VARIANT_DIRS < <(find "$TMP_REPO" -maxdepth 2 -name "theme.txt" \
+mapfile -t VARIANT_DIRS < <(find "$TMP_REPO" -maxdepth 4 -name "theme.txt" \
     -exec dirname {} \; | sort)
 
 if [ ${#VARIANT_DIRS[@]} -eq 0 ]; then

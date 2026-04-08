@@ -33,50 +33,37 @@ log_info "Instalando Powerlevel10k (método git clone oficial)..."
 
 # 1. Instalar para el usuario actual
 cd "$USER_HOME" || { log_error "No se pudo acceder a $USER_HOME"; exit 1; }
-if [ -d "$USER_HOME/powerlevel10k" ]; then
-    log_info "Powerlevel10k ya existe en $USER_HOME/powerlevel10k, actualizando..."
-    git -C "$USER_HOME/powerlevel10k" pull --depth=1 2>/dev/null || true
+# El .zshrc usa ~/.powerlevel10k (con punto) — clonar con ese nombre
+if [ -d "$USER_HOME/.powerlevel10k" ]; then
+    log_info "Powerlevel10k ya existe, actualizando..."
+    git -C "$USER_HOME/.powerlevel10k" pull --depth=1 2>/dev/null || true
 else
     log_info "Clonando Powerlevel10k para $CURRENT_USER..."
-    git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "$USER_HOME/powerlevel10k"
+    git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "$USER_HOME/.powerlevel10k"
 fi
-chown -R "$CURRENT_USER:$CURRENT_USER" "$USER_HOME/powerlevel10k"
-
-# Agregar source a .zshrc del usuario (si no existe ya)
-if ! grep -q "powerlevel10k.zsh-theme" "$USER_HOME/.zshrc" 2>/dev/null; then
-    echo 'source ~/powerlevel10k/powerlevel10k.zsh-theme' >> "$USER_HOME/.zshrc"
-    log_info "Source de p10k agregado a $USER_HOME/.zshrc"
-fi
+chown -R "$CURRENT_USER:$CURRENT_USER" "$USER_HOME/.powerlevel10k"
 
 # 2. Instalar para root
-if [ -d "/root/powerlevel10k" ]; then
-    log_info "Powerlevel10k ya existe en /root/powerlevel10k, actualizando..."
-    sudo git -C /root/powerlevel10k pull --depth=1 2>/dev/null || true
+if [ -d "/root/.powerlevel10k" ]; then
+    log_info "Powerlevel10k ya existe para root, actualizando..."
+    sudo git -C /root/.powerlevel10k pull --depth=1 2>/dev/null || true
 else
     log_info "Clonando Powerlevel10k para root..."
-    sudo git clone --depth=1 https://github.com/romkatv/powerlevel10k.git /root/powerlevel10k
-fi
-
-# Agregar source a .zshrc de root (si no existe ya)
-if ! sudo grep -q "powerlevel10k.zsh-theme" /root/.zshrc 2>/dev/null; then
-    echo 'source ~/powerlevel10k/powerlevel10k.zsh-theme' | sudo tee -a /root/.zshrc > /dev/null
-    log_info "Source de p10k agregado a /root/.zshrc"
+    sudo git clone --depth=1 https://github.com/romkatv/powerlevel10k.git /root/.powerlevel10k
 fi
 
 success "Powerlevel10k instalado para $CURRENT_USER y root"
 
 # --- Copiar archivos de configuración de Zsh ---
-# IMPORTANTE: Copiar dotfiles DESPUÉS de instalar p10k para sobreescribir config por defecto
-log_info "Copiando dotfiles de Zsh (sobreescriben config por defecto de p10k)..."
+# Desplegar .zshrc del usuario desde dotfiles
+log_info "Desplegando .zshrc personalizado..."
 
 if [ -f "$DOTFILES_DIR/zsh/.zshrc" ]; then
     cp "$DOTFILES_DIR/zsh/.zshrc" "$USER_HOME/.zshrc"
-    # Re-agregar source de p10k si el dotfile no lo incluye
-    if ! grep -q "powerlevel10k.zsh-theme" "$USER_HOME/.zshrc" 2>/dev/null; then
-        echo 'source ~/powerlevel10k/powerlevel10k.zsh-theme' >> "$USER_HOME/.zshrc"
-    fi
     chown "$CURRENT_USER:$CURRENT_USER" "$USER_HOME/.zshrc"
-    log_info ".zshrc del proyecto copiado"
+    log_success ".zshrc desplegado correctamente"
+else
+    log_warn "No se encontró dotfiles/zsh/.zshrc — .zshrc no modificado"
 fi
 
 if [ -f "$DOTFILES_DIR/zsh/.p10k.zsh" ]; then
@@ -102,13 +89,9 @@ fi
 # --- Configurar Zsh para root (con configs y fastfetch) ---
 log_info "Configurando Zsh para root..."
 
-# Copiar .zshrc a root (copia independiente, no symlink, para evitar conflictos de permisos)
+# Copiar .zshrc a root también
 if [ -f "$DOTFILES_DIR/zsh/.zshrc" ]; then
     sudo cp "$DOTFILES_DIR/zsh/.zshrc" "/root/.zshrc"
-    # Asegurar que source de p10k está presente
-    if ! sudo grep -q "powerlevel10k.zsh-theme" /root/.zshrc 2>/dev/null; then
-        echo 'source ~/powerlevel10k/powerlevel10k.zsh-theme' | sudo tee -a /root/.zshrc > /dev/null
-    fi
 fi
 
 # Copiar Fastfetch a root
