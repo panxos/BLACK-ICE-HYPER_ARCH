@@ -1,19 +1,6 @@
 <div align="center">
 
-```
-██████╗ ██╗      █████╗  ██████╗██╗  ██╗    ██╗ ██████╗███████╗
-██╔══██╗██║     ██╔══██╗██╔════╝██║ ██╔╝    ██║██╔════╝██╔════╝
-██████╔╝██║     ███████║██║     █████╔╝     ██║██║     █████╗  
-██╔══██╗██║     ██╔══██║██║     ██╔═██╗     ██║██║     ██╔══╝  
-██████╔╝███████╗██║  ██║╚██████╗██║  ██╗    ██║╚██████╗███████╗
-╚═════╝ ╚══════╝╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝    ╚═╝ ╚═════╝╚══════╝
-     █████╗ ██████╗  ██████╗██╗  ██╗
-    ██╔══██╗██╔══██╗██╔════╝██║  ██║
-    ███████║██████╔╝██║     ███████║
-    ██╔══██║██╔══██╗██║     ██╔══██║
-    ██║  ██║██║  ██║╚██████╗██║  ██║
-    ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝
-```
+![BLACK-ICE ARCH Banner](docs/images/banner.png)
 
 # 🧊 BLACK-ICE ARCH
 
@@ -235,6 +222,18 @@ cd BLACK-ICE-HYPER_ARCH
 ~/.local/bin/theme_selector
 # o desde el atajo: Super + Alt + T
 ```
+
+### Galería de Wallpapers
+
+<div align="center">
+
+| Horus-Cyber | Ra-Solar |
+|:-----------:|:--------:|
+| ![Horus-Cyber](docs/images/Horus-Cyber.png) | ![Ra-Solar](docs/images/Ra-Solar.png) |
+| **Isis-Magic** | **Anubis-Death** |
+| ![Isis-Magic](docs/images/Isis-Magic.png) | ![Anubis-Death](docs/images/Anubis-Death.png) |
+
+</div>
 
 ### Cambiar Wallpaper
 

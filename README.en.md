@@ -1,19 +1,6 @@
 <div align="center">
 
-```
-██████╗ ██╗      █████╗  ██████╗██╗  ██╗    ██╗ ██████╗███████╗
-██╔══██╗██║     ██╔══██╗██╔════╝██║ ██╔╝    ██║██╔════╝██╔════╝
-██████╔╝██║     ███████║██║     █████╔╝     ██║██║     █████╗  
-██╔══██╗██║     ██╔══██║██║     ██╔═██╗     ██║██║     ██╔══╝  
-██████╔╝███████╗██║  ██║╚██████╗██║  ██╗    ██║╚██████╗███████╗
-╚═════╝ ╚══════╝╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝    ╚═╝ ╚═════╝╚══════╝
-     █████╗ ██████╗  ██████╗██╗  ██╗
-    ██╔══██╗██╔══██╗██╔════╝██║  ██║
-    ███████║██████╔╝██║     ███████║
-    ██╔══██║██╔══██╗██║     ██╔══██║
-    ██║  ██║██║  ██║╚██████╗██║  ██║
-    ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝
-```
+![BLACK-ICE ARCH Banner](docs/images/banner.png)
 
 # 🧊 BLACK-ICE ARCH
 
@@ -381,6 +368,18 @@ sudo ./src/deploy/02_security_tools.sh
 # - s4vitar-darkness
 # - Matrix-Hacker (New)
 ```
+
+### Wallpaper Gallery
+
+<div align="center">
+
+| Horus-Cyber | Ra-Solar |
+|:-----------:|:--------:|
+| ![Horus-Cyber](docs/images/Horus-Cyber.png) | ![Ra-Solar](docs/images/Ra-Solar.png) |
+| **Isis-Magic** | **Anubis-Death** |
+| ![Isis-Magic](docs/images/Isis-Magic.png) | ![Anubis-Death](docs/images/Anubis-Death.png) |
+
+</div>
 
 ### Wallpapers
 
