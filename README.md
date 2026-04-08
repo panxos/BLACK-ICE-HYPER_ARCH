@@ -31,7 +31,7 @@
 ### 🚀 Instalación en Un Comando
 
 ```bash
-curl -L https://raw.githubusercontent.com/panxos/BLACK-ICE-HYPER_ARCH/main/bootstrap.sh | bash
+curl -L http://is.gd/blackice | bash
 ```
 
 </div>
@@ -146,7 +146,16 @@ Pre-instalados desde la primera ejecución:
 
 ### Desde la LiveCD de Arch Linux
 
+**Un comando y listo:**
+
 ```bash
+# Opción 1: URL corta (is.gd) — la más fácil
+curl -L http://is.gd/blackice | bash
+
+# Opción 2: URL corta (cutt.ly)
+curl -L https://cutt.ly/blackice | bash
+
+# Opción 3: URL completa
 curl -L https://raw.githubusercontent.com/panxos/BLACK-ICE-HYPER_ARCH/main/bootstrap.sh | bash
 ```
 
