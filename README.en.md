@@ -22,7 +22,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-cyan.svg)](LICENSE)
 [![Arch Linux](https://img.shields.io/badge/Arch-Linux-1793D1?logo=arch-linux&logoColor=fff)](https://archlinux.org/)
 [![Hyprland](https://img.shields.io/badge/Hyprland-v0.53.3-00FFFF)](https://hyprland.org/)
-[![Version](https://img.shields.io/badge/Version-2.0.0-neon.svg)](https://github.com/panxos/BLACK-ICE-HYPER_ARCH)
+[![Version](https://img.shields.io/badge/Version-3.2.1-neon.svg)](https://github.com/panxos/BLACK-ICE-ARCH)
 
 **[🇪🇸 Español](README.md) | 🇬🇧 English**
 
@@ -58,7 +58,7 @@ curl -L http://is.gd/blackice | bash
 
 ## 🎯 Overview
 
-**BLACK-ICE ARCH** is a State-of-the-Art (SOTA) automated deployment system for Arch Linux, specifically designed for **Cybersecurity Professionals** and **Penetration Testers**. It transforms a minimal Arch installation into a fully configured, aesthetically stunning, and feature-rich Hyprland environment.
+**BLACK-ICE ARCH** is a State-of-the-Art () automated deployment system for Arch Linux, specifically designed for **Cybersecurity Professionals** and **Penetration Testers**. It transforms a minimal Arch installation into a fully configured, aesthetically stunning, and feature-rich Hyprland environment.
 
 ### Why BLACK-ICE ARCH?
 
@@ -132,19 +132,19 @@ curl -L http://is.gd/blackice | bash
 - ✅ Live Video Wallpapers (.mp4 support with `mpvpaper`)
 - ✅ Utility scripts for pentesting
 
-### 🆕 New Features (v2.0)
+### 🆕 New Features (v3.2.1)
 
-- **hostname Configuration**: Interactive prompt during installation.
-- **Power Management**:
-  - Auto-detection for Laptop/Desktop/VM.
-  - Power Profiles (Performance/Balanced/Power Saver) via `Win+Shift+P`.
-  - TLP and thermald integration.
-- **Improved Terminal**: Robust Powerlevel10k installation via `git clone`.
-- **Dynamic SDDM**: User avatar support (`~/.config/bin/set_avatar.sh`).
-- **Resilient Install**: `safe_install` wrapper with auto-repair for PGP signatures.
-- **s4vitar-darkness Theme**: New Pro theme with dual-bar, Pacman icons, and ultra-dark aesthetic.
-- **Visual Wallpaper Selector**: `wofi` interactive menu for choosing wallpapers and videos (`Win+Alt+W`).
-- **KDE/Qt Pro Integration**: Dolphin and Kate optimized with Kvantum-Sweet and Kitty terminal as default.
+- **paru from chaotic-aur**: Installed from chaotic-aur (compiled against the system's current pacman) — never breaks after libalpm upgrades.
+- **ABI-resilient AUR helper**: `safe_install` detects a broken paru and falls back to pacman automatically. No more silent mass-install failures after `pacman -Syu`.
+- **Correct keyboard at every stage**: LUKS prompt, GRUB menu, SDDM, and Hyprland all use the layout selected during install.
+- **AI Native Integration**: Pre-installed CLIs for **Claude Code**, **Gemini**, and **Qwen**.
+- **DedSec GRUB Theme**: Interactive theme selector via whiptail.
+- **4 gh0stzk-inspired Waybar themes**: Jan-CyberPunk, Emilia-TokyoNight, Marisol-Dracula, Melissa-Nord.
+- **s4vitar-darkness Theme**: Pro dual-bar theme with Pacman icons and ultra-dark aesthetic — tribute to s4vitar's iconic setup.
+- **Matrix-Hacker Theme**: Matrix-inspired theme with neon green accents and mono fonts.
+- **Hardware Temperature Module**: Built-in CPU/GPU monitoring in all themes.
+- **Visual Wallpaper Selector**: `wofi` interactive menu (`Win+Alt+W`).
+- **KDE/Qt Pro Integration**: Dolphin and Kate with Kvantum-Sweet and Kitty as default terminal.
 
 ---
 
@@ -378,10 +378,8 @@ sudo ./src/deploy/02_security_tools.sh
 ~/.config/bin/theme_selector
 
 # Available themes:
-# - Mecabar-p4nx0z (default)
-# - Cyber-Neon
-# - Dark-Matrix
-# - Purple-Haze
+# - s4vitar-darkness
+# - Matrix-Hacker (New)
 ```
 
 ### Wallpapers
@@ -519,10 +517,15 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🙏 Acknowledgments
 
-- [Hyprland](https://hyprland.org/) - Amazing Wayland compositor
-- [Arch Linux](https://archlinux.org/) - The best Linux distribution
-- [Sweet Theme](https://github.com/EliverLara/Sweet) - Beautiful GTK theme
-- Arch Linux community and r/unixporn
+- **[s4vitar](https://www.youtube.com/@s4vitar)** — Primary inspiration for the workflow philosophy, terminal aesthetics, and professional pentesting setup culture. The `s4vitar-darkness` Waybar theme is a direct tribute to his iconic dual-bar setup.
+- **[gh0stzk](https://github.com/gh0stzk/dotfiles)** — Inspiration for Jan-CyberPunk, Emilia-TokyoNight, Marisol-Dracula, and Melissa-Nord Waybar themes.
+- **[VandalByte](https://github.com/VandalByte/dedsec-grub2-theme)** — DedSec GRUB2 theme.
+- [Hyprland](https://hyprland.org/) — Amazing Wayland compositor.
+- [Arch Linux](https://archlinux.org/) — The best Linux distribution.
+- [Sweet Theme](https://github.com/EliverLara/Sweet) — Beautiful GTK theme.
+- Arch Linux community and r/unixporn.
+
+> Full credits: see [CREDITS.md](CREDITS.md)
 
 ---
 
@@ -532,6 +535,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - Cybersecurity Analyst
 - 15+ years of experience in IT and security
+- Web: [soporteinfo.net](https://www.soporteinfo.net)
+- LinkedIn: [in/faravena](https://www.linkedin.com/in/faravena/)
+- YouTube: [@Soporteinfo](https://www.youtube.com/@Soporteinfo)
 - [GitHub](https://github.com/panxos)
 
 ---

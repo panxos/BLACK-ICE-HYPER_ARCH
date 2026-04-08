@@ -8,7 +8,7 @@ cd "$USER_HOME" || exit 1
 log_info "Instalando dependencias de SDDM..."
 
 # Instalar paquetes necesarios usando safe_install
-SDDM_DEPS=("sddm" "qt5-graphicaleffects" "qt5-quickcontrols2" "ttf-jetbrains-mono" "imagemagick")
+SDDM_DEPS=("sddm" "qt5-quickcontrols" "qt5-quickcontrols2" "qt5-graphicaleffects" "qt5-svg" "qt5-declarative" "qt6-5compat" "qt6-declarative" "qt6-svg" "ttf-jetbrains-mono" "imagemagick")
 for dep in "${SDDM_DEPS[@]}"; do
     safe_install "$dep"
 done
@@ -53,10 +53,13 @@ log_info "Activar tema en sddm.conf..."
 SDDM_CONF_DIR="/etc/sddm.conf.d"
 sudo mkdir -p "$SDDM_CONF_DIR"
 
-# Clean previous conflicting configs
-if [ -f "/etc/sddm.conf" ]; then
-    log_warn "Eliminando archivo /etc/sddm.conf antiguo para usar configuración modular..."
+# Clean previous conflicting configs (idempotente: solo mueve si .bak no existe)
+if [ -f "/etc/sddm.conf" ] && [ ! -f "/etc/sddm.conf.bak" ]; then
+    log_warn "Moviendo /etc/sddm.conf antiguo a .bak para usar configuración modular..."
     sudo mv /etc/sddm.conf /etc/sddm.conf.bak
+elif [ -f "/etc/sddm.conf" ]; then
+    log_info "/etc/sddm.conf presente pero .bak ya existe — eliminando para usar configuración modular..."
+    sudo rm -f /etc/sddm.conf
 fi
 
 # Write new config

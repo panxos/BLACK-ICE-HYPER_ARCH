@@ -54,46 +54,54 @@ else
     done
 fi
 
-# Create in chroot with safe escaping
-# We use printf %q to ensure that even complex passwords are safe from shell injection/corruption
-cat <<EOF > /mnt/root/user_config.sh
+export USER_NAME
+
+# Pasar contraseñas como variables de entorno — sin escribirlas en el script en disco
+# Esto evita doble-escape y exposición de credenciales en archivos temporales
+export _BI_ROOT_PASS="$ROOT_PASS"
+export _BI_USER_NAME="$USER_NAME"
+export _BI_USER_PASS="$USER_PASS"
+
+cat <<'SCRIPT_EOF' > /mnt/root/user_config.sh
 #!/bin/bash
 set -e
 
-# Escaped variables
-ROOT_PASS=$(printf '%q' "${ROOT_PASS:-}")
-USER_NAME=$(printf '%q' "${USER_NAME:-}")
-USER_PASS=$(printf '%q' "${USER_PASS:-}")
+# Variables inyectadas por el entorno del proceso padre (arch-chroot -E)
+ROOT_PASS="${_BI_ROOT_PASS}"
+USER_NAME="${_BI_USER_NAME}"
+USER_PASS="${_BI_USER_PASS}"
 
 echo "[INFO] Inyectando Hash de ROOT..."
-printf "%s:%s\n" "root" "\$ROOT_PASS" | chpasswd
+printf "%s:%s\n" "root" "$ROOT_PASS" | chpasswd
 
-echo "[INFO] Autorizando nuevo operador: \$USER_NAME..."
+echo "[INFO] Autorizando nuevo operador: $USER_NAME..."
 # Ensure groups exist
 groupadd -f wheel
 
 # Create user with BASH (Stability first)
-if ! id "\$USER_NAME" &>/dev/null; then
-    useradd -m -G wheel,video,audio,storage,input -s /bin/bash "\$USER_NAME"
-    printf "%s:%s\n" "\$USER_NAME" "\$USER_PASS" | chpasswd
-    echo "[SUCCESS] Operador \$USER_NAME activo en el sistema."
+if ! id "$USER_NAME" &>/dev/null; then
+    useradd -m -G wheel,video,audio,storage,input -s /bin/bash "$USER_NAME"
+    printf "%s:%s\n" "$USER_NAME" "$USER_PASS" | chpasswd
+    echo "[SUCCESS] Operador $USER_NAME activo en el sistema."
 else
-    echo "[WARN] Operador \$USER_NAME ya existe. Actualizando credenciales..."
-    printf "%s:%s\n" "\$USER_NAME" "\$USER_PASS" | chpasswd
+    echo "[WARN] Operador $USER_NAME ya existe. Actualizando credenciales..."
+    printf "%s:%s\n" "$USER_NAME" "$USER_PASS" | chpasswd
 fi
 
 # Sudoers hardening
 mkdir -p /etc/sudoers.d
 echo "%wheel ALL=(ALL:ALL) NOPASSWD: ALL" > /etc/sudoers.d/wheel
 echo "[SUCCESS] Privilegios sudo (WHEEL) escalados."
-EOF
+SCRIPT_EOF
 
 chmod +x /mnt/root/user_config.sh
 log_info "Sincronizando identidades con el núcleo del sistema..."
-if ! arch-chroot /mnt /root/user_config.sh; then
+if ! arch-chroot /mnt /usr/bin/env _BI_ROOT_PASS="$_BI_ROOT_PASS" _BI_USER_NAME="$_BI_USER_NAME" _BI_USER_PASS="$_BI_USER_PASS" /root/user_config.sh; then
     log_error "Fallo en la sincronización de identidades."
     exit 1
 fi
 rm /mnt/root/user_config.sh
+# Limpiar variables de entorno con contraseñas
+unset _BI_ROOT_PASS _BI_USER_NAME _BI_USER_PASS
 
 success "Entorno de identidades asegurado y Operador listo."

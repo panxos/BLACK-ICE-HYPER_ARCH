@@ -149,8 +149,6 @@ rebuild_keyring() {
     sudo pacman-key --populate archlinux
     # Populate chaotic-aur keys if available
     [[ -f /usr/share/pacman/keyrings/chaotic.gpg ]] && sudo pacman-key --populate chaotic
-    # Populate blackarch keys if available
-    [[ -f /usr/share/pacman/keyrings/blackarch.gpg ]] && sudo pacman-key --populate blackarch
     log_success "Keyring reconstruido exitosamente"
 }
 
@@ -173,9 +171,17 @@ safe_install() {
 
     log_info "Instalando: $pkg"
 
-    # Attempt 1: Normal installation via yay (handles both repos and AUR)
-    if command -v yay &>/dev/null; then
-        if yay -S --noconfirm --needed "$pkg" 2>/dev/null; then
+    # Check if paru is functional (not just present — broken libalpm ABI causes silent failures)
+    local PARU_OK=false
+    if command -v paru &>/dev/null && paru --version &>/dev/null 2>&1; then
+        PARU_OK=true
+    elif command -v paru &>/dev/null; then
+        log_warn "paru existe pero no funciona (libalpm ABI mismatch). Usando pacman como fallback."
+    fi
+
+    # Attempt 1: Normal installation via paru (handles both repos and AUR)
+    if [ "$PARU_OK" = true ]; then
+        if paru -S --noconfirm --needed --skipreview "$pkg" 2>/dev/null; then
             log_success "$pkg instalado correctamente"
             return 0
         fi
@@ -188,10 +194,31 @@ safe_install() {
 
     # Capture error output for analysis
     local error_output
-    if command -v yay &>/dev/null; then
-        error_output=$(yay -S --noconfirm --needed "$pkg" 2>&1)
+    if [ "$PARU_OK" = true ]; then
+        error_output=$(paru -S --noconfirm --needed --skipreview "$pkg" 2>&1)
     else
         error_output=$(sudo -n pacman -S --noconfirm --needed "$pkg" 2>&1)
+    fi
+
+    # Detect package conflict error — resolve by removing the conflicting package
+    if echo "$error_output" | grep -qiE "are in conflict|conflicting dependencies"; then
+        local conflict_pkg
+        conflict_pkg=$(echo "$error_output" | grep -oP 'Remove \K[^\?]+' | head -1 | tr -d ' ')
+        if [ -n "$conflict_pkg" ] && pacman -Q "$conflict_pkg" &>/dev/null; then
+            log_warn "Conflicto detectado: eliminando $conflict_pkg para instalar $pkg..."
+            sudo -n pacman -Rdd --noconfirm "$conflict_pkg" 2>/dev/null || \
+                sudo pacman -Rdd --noconfirm "$conflict_pkg" 2>/dev/null || true
+            # Retry after removing conflicting package
+            if [ "$PARU_OK" = true ]; then
+                paru -S --noconfirm --needed --skipreview "$pkg" 2>/dev/null && \
+                    { log_success "$pkg instalado tras resolver conflicto con $conflict_pkg"; return 0; }
+            else
+                sudo -n pacman -S --noconfirm --needed "$pkg" 2>/dev/null && \
+                    { log_success "$pkg instalado tras resolver conflicto con $conflict_pkg"; return 0; }
+            fi
+        fi
+        log_warn "No se pudo resolver conflicto para $pkg. Saltando."
+        return 1
     fi
 
     # Detect PGP/signature error
@@ -216,8 +243,8 @@ safe_install() {
         fi
 
         # Attempt 2: Retry after key repair
-        if command -v yay &>/dev/null; then
-            if yay -S --noconfirm --needed "$pkg" 2>/dev/null; then
+        if [ "$PARU_OK" = true ]; then
+            if paru -S --noconfirm --needed --skipreview "$pkg" 2>/dev/null; then
                 log_success "$pkg instalado tras reparar firma PGP"
                 return 0
             fi
@@ -235,8 +262,8 @@ safe_install() {
             read -rp "¿Qué deseas hacer? (s/r/N): " choice < /dev/tty
             case "$choice" in
                 s|S)
-                    if command -v yay &>/dev/null; then
-                        yay -S --noconfirm --needed --mflags "--skippgpcheck" "$pkg" && return 0
+                    if [ "$PARU_OK" = true ]; then
+                        paru -S --noconfirm --needed --skipreview --mflags "--skippgpcheck" "$pkg" && return 0
                     else
                         sudo -n pacman -S --noconfirm --needed "$pkg" --overwrite '*' && return 0
                     fi
@@ -244,8 +271,8 @@ safe_install() {
                 r|R)
                     rebuild_keyring
                     # Retry one more time after full rebuild
-                    if command -v yay &>/dev/null; then
-                        yay -S --noconfirm --needed "$pkg" 2>/dev/null && return 0
+                    if [ "$PARU_OK" = true ]; then
+                        paru -S --noconfirm --needed --skipreview "$pkg" 2>/dev/null && return 0
                     else
                         sudo -n pacman -S --noconfirm --needed "$pkg" 2>/dev/null && return 0
                     fi

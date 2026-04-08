@@ -26,7 +26,7 @@
 
 | Shortcut | Action | Description |
 |----------|--------|-------------|
-| `Win + Alt + W` | Wallpaper | Cycle through SOTA cyberpunk wallpapers. |
+| `Win + Alt + W` | Wallpaper | Cycle through  cyberpunk wallpapers. |
 | `Win + Alt + T` | Theme | Switch GTK/Kvantum theme presets. |
 | `Win + Alt + R` | Reload | Reloads Waybar and Hyprland config. |
 

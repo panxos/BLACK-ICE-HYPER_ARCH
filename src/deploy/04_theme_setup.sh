@@ -7,19 +7,25 @@ cd "$USER_HOME" || exit 1
 
 log_info "Configurando tema cyberpunk..."
 
-# --- Inicializar swww (wallpaper daemon) ---
-log_info "Iniciando swww daemon..."
-swww-daemon &
-sleep 2
+# --- Inicializar awww (wallpaper daemon) ---
+log_info "Iniciando awww daemon..."
+if command -v awww &>/dev/null; then
+    awww-daemon &
+    sleep 2
 
-# --- Establecer wallpaper inicial ---
-PICTURES_DIR=$(sudo -u $CURRENT_USER xdg-user-dir PICTURES 2>/dev/null || echo "$USER_HOME/Pictures")
-FIRST_WALLPAPER="$PICTURES_DIR/wallpapers/black_ice_wallpaper_01.png"
+    # --- Establecer wallpaper inicial ---
+    PICTURES_DIR=$(sudo -u "$CURRENT_USER" xdg-user-dir PICTURES 2>/dev/null || echo "$USER_HOME/Pictures")
+    FIRST_WALLPAPER="$PICTURES_DIR/wallpapers/black_ice_wallpaper_01.png"
 
-if [ -f "$FIRST_WALLPAPER" ]; then
-    swww img "$FIRST_WALLPAPER" --transition-type grow
-    echo "0" > "$USER_HOME/.config/hypr/.current_wallpaper"
-    log_info "Wallpaper inicial establecido en: $FIRST_WALLPAPER"
+    if [ -f "$FIRST_WALLPAPER" ]; then
+        awww img "$FIRST_WALLPAPER" --transition-type grow || log_warn "awww img falló — wallpaper se aplicará al próximo login"
+        echo "0" > "$USER_HOME/.config/hypr/.current_wallpaper"
+        log_info "Wallpaper inicial establecido en: $FIRST_WALLPAPER"
+    else
+        log_warn "Wallpaper no encontrado en $FIRST_WALLPAPER — se omite hasta próximo login"
+    fi
+else
+    log_warn "awww no encontrado — el wallpaper se aplicará al primer inicio de Hyprland"
 fi
 
 # --- Crear archivo settarget vacío ---

@@ -15,8 +15,10 @@ BLACK-ICE ARCH es un sistema de despliegue automatizado de Arch Linux diseñado 
 - Recomendaciones
 
 **Estado de Seguridad**: ✅ SEGURO  
-**Última Auditoría**: 2026-01-28  
+**Última Auditoría**: 2026-04-07  
 **Auditor**: Francisco Aravena (P4nX0Z)
+
+> **v3.2.0 Security Changes**: Eliminado bloque BlackArch que escribía `allow-weak-key-signatures` en el GPG system config (downgrade de seguridad). Eliminada referencia a `blackarch.gpg` en `rebuild_keyring()`. Variables sin default con `set -u` corregidas para evitar ejecución inesperada de código.
 
 ---
 
@@ -389,6 +391,7 @@ makepkg -si
 | Error en script de instalación | MEDIA | ALTO | MEDIO | Error handling, testing |
 | Credenciales expuestas | MUY BAJA | ALTO | BAJO | Sin credenciales hardcodeadas |
 | Permisos incorrectos | BAJA | MEDIO | BAJO | Verificación automática |
+| ABI mismatch de paru tras upgrade pacman | MEDIA | ALTO | MEDIO | `safe_install` valida `paru --version`; `00_repositories.sh` reinstala paru-bin si ABI rompe |
 
 ---
 

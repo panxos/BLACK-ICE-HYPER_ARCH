@@ -1,7 +1,6 @@
 #!/bin/bash
 # modules/00_environment.sh
 
-banner "PASO 1" "Verificación de Entorno y Red"
 
 # 1. Root Check
 check_root
@@ -28,7 +27,7 @@ if [ "$INTERNET_OK" = true ]; then
         success "Enlace DNS activo y verificado."
     else
         log_warn "Conexión IP detectada, pero falla resolución DNS."
-        echo -e "${YELLOW}Posible problema local de DNS. Continuando bajo riesgo.${NC}"
+        echo -e "${YELLOW}Posible problema de DNS. Continuando bajo riesgo.${NC}"
     fi
 else
     log_warn "Sin enlace exterior detectado (8.8.8.8 off)."
@@ -36,7 +35,7 @@ else
     echo -e "${NEON_PURPLE}│${NC}  ${BOLD}CONFIGURACIÓN DE RED REQUERIDA            ${NC} ${NEON_PURPLE}│${NC}"
     echo -e "${NEON_PURPLE}└──────────────────────────────────────────────┘${NC}"
     echo -e "${YELLOW}¿Deseas activar la red ahora (Protocolo BLACK-ICE)?${NC}"
-    local NET_CHOICE=$(ask_option "Elige herramienta:" "iwctl (WiFi)" "nmtui (General/Ethernet)" "No")
+    NET_CHOICE=$(ask_option "Elige herramienta:" "iwctl (WiFi)" "nmtui (General/Ethernet)" "No")
     if [ "$NET_CHOICE" == "iwctl (WiFi)" ]; then
         while true; do
             iwctl
@@ -98,7 +97,7 @@ echo -e "${CYAN}Elegir los servidores más cercanos acelerará la descarga.${NC}
 if [ -n "${SELECTED_COUNTRY:-}" ]; then
     success "País pre-configurado: $SELECTED_COUNTRY"
 else
-    SELECTED_COUNTRY=$(ask_option "Selecciona tu país de origen:" "Chile" "United States" "Spain" "Brazil" "Germany")
+    SELECTED_COUNTRY=$(ask_option "Selecciona tu país de origen:" "Chile" "United States" "Spain" "Brazil" "Germany" "Worldwide")
     export SELECTED_COUNTRY
 fi
 
@@ -107,11 +106,12 @@ log_info "Optimizando mirrors para $SELECTED_COUNTRY (Protocolo HTTPS)..."
 # Definir lista de países para reflector basados en la elección
 REFLECTOR_COUNTRIES=""
 case "$SELECTED_COUNTRY" in
-    "Chile")   REFLECTOR_COUNTRIES="Chile,Brazil,United States" ;;
-    "Brazil")  REFLECTOR_COUNTRIES="Brazil,Chile,United States" ;;
-    "Spain")   REFLECTOR_COUNTRIES="Spain,France,Germany" ;;
-    "Germany") REFLECTOR_COUNTRIES="Germany,France,Netherlands" ;;
-    *)         REFLECTOR_COUNTRIES="$SELECTED_COUNTRY" ;;
+    "Chile")     REFLECTOR_COUNTRIES="Chile,Brazil,United States" ;;
+    "Brazil")    REFLECTOR_COUNTRIES="Brazil,Chile,United States" ;;
+    "Spain")     REFLECTOR_COUNTRIES="Spain,France,Germany" ;;
+    "Germany")   REFLECTOR_COUNTRIES="Germany,France,Netherlands" ;;
+    "Worldwide") REFLECTOR_COUNTRIES="Worldwide" ;;
+    *)           REFLECTOR_COUNTRIES="$SELECTED_COUNTRY" ;;
 esac
 
 while true; do
@@ -138,7 +138,13 @@ while true; do
     echo -e "${YELLOW}>> PROCESANDO MIRRORS... POR FAVOR ESPERE (ESTO PUEDE TARDAR UNOS MINUTOS)${NC}"
     echo -e "${GREY}   Buscando los servidores más rápidos y recientes...${NC}"
     
-    if reflector --country "$REFLECTOR_COUNTRIES" --protocol https --latest 100 --number 10 --sort rate --connection-timeout 5 --download-timeout 5 --verbose --save /etc/pacman.d/mirrorlist; then
+    if [ "$REFLECTOR_COUNTRIES" == "Worldwide" ]; then
+        REFLECTOR_CMD="reflector --protocol https --latest 100 --number 10 --sort rate --connection-timeout 5 --download-timeout 5 --verbose --save /etc/pacman.d/mirrorlist"
+    else
+        REFLECTOR_CMD="reflector --country \"$REFLECTOR_COUNTRIES\" --protocol https --latest 100 --number 10 --sort rate --connection-timeout 5 --download-timeout 5 --verbose --save /etc/pacman.d/mirrorlist"
+    fi
+    
+    if eval "$REFLECTOR_CMD"; then
         success "Nodos de descarga optimizados para tu región."
         break
     else

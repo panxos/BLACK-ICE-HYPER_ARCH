@@ -7,13 +7,13 @@ cd "$USER_HOME" || exit 1
 
 # Función para instalar paquetes (delega a safe_install para resiliencia PGP)
 pkg_install() {
-    local pkg=$1
+    pkg=$1
     safe_install "$pkg"
 }
 
 # --- Selección Interactiva de Software ---
 # Usamos whiptail para una experiencia profesional, a menos que estemos en NON_INTERACTIVE
-if [ "$NON_INTERACTIVE" == "true" ]; then
+if [ "${NON_INTERACTIVE:-false}" == "true" ]; then
     log_info "Modo No-Interactivo detectado. Instalando suite completa por defecto."
     CHOICES="Browsers DevTools Security AI_Tools Productivity Multimedia Remote Cloud Office System"
 elif command -v whiptail &>/dev/null; then
@@ -33,8 +33,13 @@ elif command -v whiptail &>/dev/null; then
     "Office" "OnlyOffice, Okular (PDF), Fonts" ON \
     "System" "GParted, BleachBit, 7Zip" ON 2>"$TMP_CHOICES" < /dev/tty || true
     
-    CHOICES=$(cat "$TMP_CHOICES")
-    rm -f "$TMP_CHOICES"
+    if CHOICES=$(cat "$TMP_CHOICES" 2>/dev/null) && [ -n "$CHOICES" ]; then
+        rm -f "$TMP_CHOICES"
+    else
+        log_warn "Error leyendo selecciones. Instalando suite completa."
+        CHOICES="Browsers DevTools Security AI_Tools Productivity Multimedia Remote Cloud Office System"
+        rm -f "$TMP_CHOICES"
+    fi
 else
     log_warn "Whiptail no detectado. Instalando suite completa por defecto."
     CHOICES="Browsers DevTools Security AI_Tools Productivity Multimedia Remote Cloud Office System"
@@ -67,7 +72,7 @@ for choice in $CHOICES; do
                 
                 log_info "Tuning KVM/Libvirt..."
                 sudo -n systemctl enable --now libvirtd.service
-                sudo -n usermod -aG libvirt "$USER"
+                sudo -n usermod -aG libvirt "$CURRENT_USER"
                 # Habilitar red por defecto de libvirt
                 sudo -n virsh net-autostart default 2>/dev/null || true
                 sudo -n virsh net-start default 2>/dev/null || true
@@ -79,14 +84,14 @@ for choice in $CHOICES; do
             # Configuración Docker
             log_info "Tuning Docker..."
             sudo -n systemctl enable --now docker.service
-            sudo -n usermod -aG docker "$USER"
+            sudo -n usermod -aG docker "$CURRENT_USER"
             ;;
         "\"Security\""|"Security")
             log_info "Instalando Herramientas de Pentesting PRO..."
             pkg_install "caido"
             pkg_install "wireshark-qt"
             pkg_install "ipscan"
-            sudo -n usermod -aG wireshark "$USER"
+            sudo -n usermod -aG wireshark "$CURRENT_USER"
             ;;
         "\"AI_Tools\""|"AI_Tools")
             log_info "Instalando Ecosistema IA..."
@@ -125,7 +130,7 @@ for choice in $CHOICES; do
             
             # Soporte Multilenguaje (Español)
             # Detectar si el sistema está en español
-            CURRENT_LANG=$(echo $LANG | cut -d_ -f1)
+            CURRENT_LANG=$(echo "${LANG:-}" | cut -d_ -f1)
             if [ "$CURRENT_LANG" == "es" ]; then
                 log_info "Idioma español detectado: Instalando diccionarios..."
                 pkg_install "hunspell-es_CL" 2>/dev/null || pkg_install "hunspell-es_ES" 2>/dev/null || pkg_install "hunspell-es_any"

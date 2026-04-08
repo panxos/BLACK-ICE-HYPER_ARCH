@@ -2,7 +2,7 @@
 
 **Date**: 2026-01-27
 **Target**: BLACK-ICE ARCH Project (v1.2.0)
-**Auditor**: Google Antigravity (SOTA Agent)
+**Auditor**: Google Antigravity ( Agent)
 
 ---
 
@@ -49,7 +49,7 @@
   └── lib/
   ```
 
-- **Recommended SOTA**:
+- **Recommended **:
 
   ```
   /
@@ -78,7 +78,7 @@
 
 ## 4. 📝 Action Plan (Phase 2)
 
-1. **Restructure Directory**: Adopt the SOTA structure.
-2. **Refactor Core Libs**: Create `lib/logging.sh` (SOTA Logging) and `lib/error.sh` (Trap handling).
+1. **Restructure Directory**: Adopt the  structure.
+2. **Refactor Core Libs**: Create `lib/logging.sh` ( Logging) and `lib/error.sh` (Trap handling).
 3. **Enhance Scripts**: Rewrite `install.sh` header to use new libs and strict mode.
 4. **Docs**: Start populating `docs/` with architectural decisions.

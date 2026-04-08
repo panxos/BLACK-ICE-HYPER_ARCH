@@ -29,7 +29,7 @@ helpline=white,black
 roottext=white,black
 '
 
-whiptail --title "BLACK-ICE ARCH SOTA" --msgbox "Welcome to the SOTA Configuration Wizard.\n\nThis tool will generate the 'install.conf' file for automated deployment." 10 60
+whiptail --title "BLACK-ICE ARCH " --msgbox "Welcome to the  Configuration Wizard.\n\nThis tool will generate the 'install.conf' file for automated deployment." 10 60
 
 # 1. Hostname
 HOSTNAME=$(whiptail --title "Hostname" --inputbox "Enter Hostname:" 8 40 "black-ice-node" 3>&1 1>&2 2>&3)
@@ -44,12 +44,13 @@ else
 fi
 
 # 3. Country
-SELECTED_COUNTRY=$(whiptail --title "Mirrors" --menu "Select Country for Mirrors:" 15 40 5 \
+SELECTED_COUNTRY=$(whiptail --title "Mirrors" --menu "Select Country for Mirrors:" 15 40 6 \
 "Chile" "South America (Fast)" \
 "United States" "Global (Reliable)" \
 "Spain" "Europe" \
 "Germany" "Europe" \
-"Brazil" "South America" 3>&1 1>&2 2>&3)
+"Brazil" "South America" \
+"Worldwide" "Global (All Mirrors)" 3>&1 1>&2 2>&3)
 
 # 4. Filesystem
 FILESYSTEM=$(whiptail --title "Filesystem" --radiolist "Select Root Filesystem:" 10 40 2 \

@@ -1,0 +1,59 @@
+#!/bin/bash
+# docker_menu - Interactive Docker manager for Waybar (Wofi)
+# Author: Francisco Aravena (P4nx0s)
+
+# Check if docker is installed
+if ! command -v docker &>/dev/null; then
+    notify-send "Docker Error" "Docker is not installed"
+    exit 1
+fi
+
+# Function to show menu
+show_menu() {
+    local containers=$(docker ps -a --format '{{.Status}}\t{{.Names}}\t({{.Image}})')
+    
+    if [ -z "$containers" ]; then
+        echo -e "No containers found" | wofi --dmenu --prompt "Docker Manager" -i
+        exit 0
+    fi
+
+    # Format for menu: Icon Status Name (Image)
+    local menu_options=""
+    while IFS=	 read -r status name image; do
+        if [[ "$status" == Up* ]]; then
+            menu_options+="󰡄 Stop  $name\t$image\n"
+        else
+            menu_options+="󰡈 Start $name\t$image\n"
+        fi
+    done <<< "$containers"
+    
+    menu_options+="󰡂 Logs  (last 20 lines)\n"
+    menu_options+="󰡃 Restart all containers"
+
+    local choice=$(echo -e "$menu_options" | column -t -s $'\t' | wofi --dmenu --prompt "🐳 Docker Manager" -i -p "Select action:")
+    
+    if [ -z "$choice" ]; then exit 0; fi
+
+    local action=$(echo "$choice" | awk '{print $1}')
+    local target=$(echo "$choice" | awk '{print $3}')
+
+    case "$action" in
+        "󰡄") # Stop
+            docker stop "$target" && notify-send "Docker" "Stopped $target"
+            ;;
+        "󰡈") # Start
+            docker start "$target" && notify-send "Docker" "Started $target"
+            ;;
+        "󰡂") # Logs
+            local logs_target=$(docker ps -a --format '{{.Names}}' | wofi --dmenu --prompt "View Logs")
+            if [ -n "$logs_target" ]; then
+                kitty --title "Docker Logs: $logs_target" sh -c "docker logs -f --tail 20 $logs_target" &
+            fi
+            ;;
+        "󰡃") # Restart All
+            docker restart $(docker ps -q) && notify-send "Docker" "Restarted all running containers"
+            ;;
+    esac
+}
+
+show_menu

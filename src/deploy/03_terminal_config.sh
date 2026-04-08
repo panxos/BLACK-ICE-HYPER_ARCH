@@ -5,6 +5,12 @@
 # Modified: 2026-02-11 — Fix: Instalar p10k vía git clone oficial
 
 banner "MÓDULO 4" "Configuración de Terminal (Zsh)"
+# --- Configurar bin/ del usuario (Scripts Tácticos) ---
+log_info "Configurando scripts tácticos (~/bin/)..."
+mkdir -p "$USER_HOME/bin"
+cp -rf "$SCRIPT_DIR/dotfiles/bin/"* "$USER_HOME/bin/"
+chmod +x "$USER_HOME/bin/"*.sh
+chown -R "$CURRENT_USER:$CURRENT_USER" "$USER_HOME/bin"
 
 # --- Instalar Zsh y plugins base ---
 log_info "Instalando Zsh, plugins, fastfetch y chafa..."
@@ -115,7 +121,7 @@ if [ -d "$DOTFILES_DIR/fastfetch" ]; then
 fi
 
 # --- Customizar prompt de root: Fire Icon (Yellow) ---
-if [ -f "/root/.p10k.zsh" ]; then
+if [ -f "/root/.p10k.zsh" ] && ! sudo grep -q "BLACK-ICE ROOT CUSTOMIZATION" /root/.p10k.zsh 2>/dev/null; then
     sudo tee -a "/root/.p10k.zsh" > /dev/null << 'EOF'
 
 # --- BLACK-ICE ROOT CUSTOMIZATION (FIRE) ---
@@ -128,18 +134,7 @@ EOF
     log_info "Root .p10k.zsh configurado con Fire Icon (Yellow)"
 fi
 
-# --- Customizar prompt de usuario: Tux Icon ---
-if [ -f "$USER_HOME/.p10k.zsh" ]; then
-    cat >> "$USER_HOME/.p10k.zsh" << 'EOF'
-
-# --- BLACK-ICE USER CUSTOMIZATION (TUX) ---
-typeset -g POWERLEVEL9K_PROMPT_CHAR_OK_{VIINS,VICMD,VIVIS,VIOWR}_CONTENT_EXPANSION=''
-typeset -g POWERLEVEL9K_DIR_ANCHOR_BOLD=true
-typeset -g POWERLEVEL9K_HOME_ICON=''
-EOF
-    chown "$CURRENT_USER:$CURRENT_USER" "$USER_HOME/.p10k.zsh"
-    log_info "User .p10k.zsh configurado con Linux Tux Icon"
-fi
+# Customization removed to preserve dotfiles .p10k.zsh
 
 # --- Configurar Nano Pro (Highlighter + RC) ---
 log_info "Configurando Nano Pro..."

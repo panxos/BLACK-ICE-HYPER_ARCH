@@ -1,13 +1,12 @@
 #!/bin/bash
 # deploy-modules/00_repositories.sh
-# Configura yay, chaotic-aur, y BlackArch
+# Configura chaotic-aur primero, luego paru desde chaotic-aur (ABI siempre correcta)
 
 banner "MÓDULO 1" "BLACK-ICE Repositorios"
 cd "$USER_HOME" || exit 1
 
 # --- Optimización Geográfica (Mirrors) ---
-# Intentar cargar configuración del instalador
-# Buscamos en el directorio del script o en /root como respaldo
+CONF_FILE=""
 if [ -f "$SCRIPT_DIR/install.conf.auto" ]; then
     CONF_FILE="$SCRIPT_DIR/install.conf.auto"
 elif [ -f "/root/BLACK-ICE_ARCH/install.conf.auto" ]; then
@@ -18,7 +17,7 @@ if [ -n "$CONF_FILE" ]; then
     source "$CONF_FILE"
     log_info "Pre-detección de país: $SELECTED_COUNTRY (vía $(basename "$CONF_FILE"))"
 else
-    SELECTED_COUNTRY="Chile" # Default safe
+    SELECTED_COUNTRY="Chile"
 fi
 
 log_info "Optimizando mirrors para $SELECTED_COUNTRY..."
@@ -31,14 +30,13 @@ case "$SELECTED_COUNTRY" in
     *)         REFLECTOR_COUNTRIES="$SELECTED_COUNTRY" ;;
 esac
 
-# Ejecutar reflector de forma condicional
 if command -v reflector &>/dev/null; then
     echo -e "${YELLOW}>> ¿Optimizar mirrors con reflector?"
     echo -e "   Esto puede tardar unos minutos pero mejora la velocidad de descarga.${NC}"
     echo -n "   [y/N]: "
     read -r -t 10 OPT_MIRRORS < /dev/tty || OPT_MIRRORS="n"
     echo ""
-    
+
     if [[ "$OPT_MIRRORS" =~ ^[Yy]$ ]]; then
         echo -e "${YELLOW}>> OPTIMIZANDO MIRRORS... (NO CANCELE EL PROCESO)${NC}"
         sudo -n reflector --country "$REFLECTOR_COUNTRIES" --protocol https --latest 100 --number 10 --sort rate --connection-timeout 5 --download-timeout 5 --verbose --save /etc/pacman.d/mirrorlist || true
@@ -48,100 +46,69 @@ if command -v reflector &>/dev/null; then
     fi
 fi
 
-# --- Instalar yay (AUR Helper) ---
-if ! command -v yay &> /dev/null; then
-    log_info "Instalando yay (AUR Helper)..."
-    
-    # Dependencias para compilar
-    retry_command sudo -n pacman -S --needed --noconfirm base-devel git
-    
-    # Clonar y compilar yay
-    cd /tmp
-    rm -rf yay
-    retry_command git clone https://aur.archlinux.org/yay.git || { log_error "No se pudo clonar yay"; exit 1; }
-    cd yay
-    
-    # makepkg no puede ejecutarse como root, pero necesita dependencias
-    # makepkg -s instalará las dependencias usando sudo -n automáticamente
-    makepkg -si --noconfirm --needed || {
-        log_warn "makepkg estándar falló. Intentando instalación forzada de dependencias..."
-        sudo -n pacman -S --needed --noconfirm go
-        makepkg -si --noconfirm --needed
-    }
-    
-    log_info "Retornando al directorio principal: $SCRIPT_DIR"
-    cd "$SCRIPT_DIR"
-    
-    success "yay instalado correctamente"
-else
-    log_info "yay ya está instalado"
-fi
-
+# --- Chaotic-AUR PRIMERO (paru vive aquí, compilado contra pacman actual) ---
 log_info "Verificando siguiente fase: chaotic-aur"
-
-# --- Añadir chaotic-aur ---
 if ! grep -q "\[chaotic-aur\]" /etc/pacman.conf; then
     log_info "Añadiendo repositorio chaotic-aur..."
-    
-    # Importar claves (Mejorado con reintentos y servidor alternativo)
+
     retry_command sudo -n pacman-key --recv-key 3056513887B78AEB --keyserver keyserver.ubuntu.com || \
     retry_command sudo -n pacman-key --recv-key 3056513887B78AEB --keyserver hkps://keys.gnupg.net
-    
+
     retry_command sudo -n pacman-key --lsign-key 3056513887B78AEB
-    
-    # Instalar keyring y mirrorlist
-    retry_command sudo -n pacman -U --noconfirm 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-keyring.pkg.tar.zst' 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-mirrorlist.pkg.tar.zst'
-    
-    # Asegurar que se confíe en la llave de TNE (Garuda/Chaotic)
+
+    retry_command sudo -n pacman -U --noconfirm \
+        'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-keyring.pkg.tar.zst' \
+        'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-mirrorlist.pkg.tar.zst'
+
     sudo -n pacman-key --populate archlinux chaotic
-    
-    # Añadir al pacman.conf
+
     echo -e "\n[chaotic-aur]\nInclude = /etc/pacman.d/chaotic-mirrorlist" | sudo -n tee -a /etc/pacman.conf
-    
-    # Actualizar bases de datos
+
     retry_command sudo -n pacman -Sy
-    
+
     success "chaotic-aur añadido correctamente"
 else
     log_info "chaotic-aur ya está configurado"
-    # Forzar actualización de llaves por si acaso
     sudo -n pacman-key --populate archlinux chaotic >/dev/null 2>&1 || true
+    sudo -n pacman -Sy --noconfirm >/dev/null 2>&1 || true
 fi
 
-# --- Añadir BlackArch (Método Tradicional) ---
-if ! grep -q "\[blackarch\]" /etc/pacman.conf; then
-    log_info "Añadiendo repositorio BlackArch mediante strap.sh..."
-    
-    # Descargar el script oficial
-    cd /tmp
-    retry_command curl -O https://blackarch.org/strap.sh
-    
-    # Convertir en ejecutable
-    chmod +x strap.sh
-    
-    # Ejecutar con privilegios elevados (formato tradicional)
-    retry_command sudo -n ./strap.sh
-    
-    # Optimizar mirrors (Halifax suele fallar)
-    log_info "Optimizando lista de mirrors de BlackArch..."
-    sudo -n sed -i 's/^Server = .*halifax.rwth-aachen.de/#&/' /etc/pacman.d/blackarch-mirrorlist
-    sudo -n sed -i '/mirror.cedia.org.ec/s/^#//' /etc/pacman.d/blackarch-mirrorlist
-    sudo -n sed -i '/mirrors.ocf.berkeley.edu/s/^#//' /etc/pacman.d/blackarch-mirrorlist
-    sudo -n sed -i '/ftp2.osuosl.org/s/^#//' /etc/pacman.d/blackarch-mirrorlist
-    
-    # Limpieza
-    rm strap.sh
-    
-    # Actualizar bases de datos sincronizando doble
-    retry_command sudo -n pacman -Syy
-    
-    success "Repositorio BlackArch configurado y mirrors optimizados"
-else
-    log_info "El repositorio BlackArch ya se encuentra en /etc/pacman.conf"
-fi
-
-# --- Actualizar sistema ---
+# --- Actualizar sistema ANTES de instalar paru (ABI correcta garantizada) ---
 log_info "Actualizando sistema completo..."
 retry_command sudo -n pacman -Syu --noconfirm
 
+# --- Instalar paru desde chaotic-aur (compilado contra el pacman actual del sistema) ---
+# paru-bin de AUR es un binario pre-compilado: queda roto si pacman sube de versión mayor.
+# chaotic-aur provee 'paru' compilado fresh contra la libalpm del sistema — siempre compatible.
+_PARU_OK=false
+if command -v paru &>/dev/null && paru --version &>/dev/null 2>&1; then
+    _PARU_OK=true
+fi
+
+if [ "$_PARU_OK" = false ]; then
+    log_info "Instalando paru desde chaotic-aur..."
+    # Eliminar CUALQUIER versión previa (paru-bin conflicta con paru de chaotic-aur)
+    sudo -n pacman -Rns --noconfirm paru-bin 2>/dev/null || true
+    sudo -n pacman -Rns --noconfirm paru 2>/dev/null || true
+
+    # Instalar desde chaotic-aur (compilado contra libalpm del sistema)
+    if sudo -n pacman -S --noconfirm --needed paru; then
+        log_success "paru instalado desde chaotic-aur ($(paru --version | head -1))"
+    else
+        # Fallback: compilar desde AUR (requiere Rust, más lento pero siempre funciona)
+        log_warn "paru no disponible en chaotic-aur. Compilando desde AUR (puede tardar)..."
+        retry_command sudo -n pacman -S --needed --noconfirm base-devel git rust
+        cd /tmp || { log_error "No se pudo acceder a /tmp"; return 1; }
+        rm -rf paru
+        retry_command git clone https://aur.archlinux.org/paru.git || { log_error "No se pudo clonar paru"; exit 1; }
+        cd paru
+        makepkg -si --noconfirm --needed || { log_error "makepkg falló para paru"; exit 1; }
+        cd "$SCRIPT_DIR"
+        log_success "paru compilado e instalado ($(paru --version | head -1))"
+    fi
+else
+    log_info "paru operativo ($(paru --version | head -1))"
+fi
+
+# BlackArch eliminado (v3.2+): Issues GPG/SHA1 persistentes. Tools vía AUR + Chaotic-AUR.
 success "Repositorios configurados y sistema actualizado"

@@ -1,7 +1,3 @@
-# BLACK-ICE ARCH Project Wiki
+# Home
 
-Bienvenido a la documentación oficial.
-
-## Secciones
-- [[Neovim-Configuration-and-Keymaps]]
-- [[Home]]
+[[Neovim-Configuration-and-Keymaps]]

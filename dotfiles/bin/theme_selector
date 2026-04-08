@@ -1,48 +1,145 @@
 #!/bin/bash
-# theme_selector - Black-Ice Arch v1.0
-USER_HOME="/home/faravena"
-THEMES_DIR="$USER_HOME/.config/waybar/themes"
-W_DIR="$USER_HOME/.config/waybar"
-WALL_DIR="$(xdg-user-dir PICTURES 2>/dev/null || echo "$HOME/Pictures")/wallpapers"
+# theme_selector — BLACK-ICE ARCH
+# Selector dinámico de temas Waybar + wallpaper + border color
+# Temas gh0stzk-inspired: credits https://github.com/gh0stzk/dotfiles
+
+THEMES_DIR="$HOME/.config/waybar/themes"
+W_DIR="$HOME/.config/waybar"
+WALL_DIR="$HOME/Pictures/wallpapers"
 CACHE_WALL="$HOME/.cache/current_wallpaper"
 CACHE_THEME="$HOME/.cache/current_theme"
-FF_DIR="$USER_HOME/.config/fastfetch"
+FF_DIR="$HOME/.config/fastfetch"
 
-selection=$(echo -e "Horus-Cyber\nRa-Solar\nIsis-Magic\nAnubis-Death\ns4vitar-darkness" | wofi --dmenu --prompt "Select Theme:")
-[ -z "$selection" ] && exit 0
+# ---------------------------------------------------------------------------
+# Colores de borde Hyprland por tema (col.active_border)
+# formato: "0xeeACCENT1 0xeeACCENT2"
+# ---------------------------------------------------------------------------
+declare -A BORDER_COLORS=(
+    ["Horus-Cyber"]="0xee00f3ff 0xeebd93f9"
+    ["Ra-Solar"]="0xeeffaa00 0xee552200"
+    ["Isis-Magic"]="0xeeff00ff 0xee330033"
+    ["Anubis-Death"]="0xee44ff00 0xee002200"
+    ["s4vitar-darkness"]="0xee6a0dad 0xee0d0d0d"
+    ["Matrix-Hacker"]="0xee00ff00 0xee001100"
+    # --- gh0stzk inspired ---
+    ["Jan-CyberPunk"]="0xee27fbfe 0xeefb007a"
+    ["Emilia-TokyoNight"]="0xee7aa2f7 0xeebb9af7"
+    ["Marisol-Dracula"]="0xeebd93f9 0xeeff79c6"
+    ["Melissa-Nord"]="0xee81a1c1 0xee88c0d0"
+)
 
-echo "$selection" > "$CACHE_THEME"
+# ---------------------------------------------------------------------------
+# Wallpapers por tema (nombre del archivo en $WALL_DIR)
+# Si no existe el archivo, awww mantiene el wallpaper actual
+# ---------------------------------------------------------------------------
+declare -A WALLPAPERS=(
+    ["Horus-Cyber"]="HORUS-CYBER.jpg"
+    ["Ra-Solar"]="RA-SOLAR.jpg"
+    ["Isis-Magic"]="ISIS-MAGIC.jpg"
+    ["Anubis-Death"]="ANUBIS-DEATH.jpg"
+    ["s4vitar-darkness"]="ARCH-CYBERPUNK.jpg"
+    ["Matrix-Hacker"]="cyber.jpg"
+    # gh0stzk-inspired: descargar con ~/.config/bin/gh0stzk-walls
+    ["Jan-CyberPunk"]="jan-cyberpunk-01.webp"
+    ["Emilia-TokyoNight"]="emilia-tokyonight-01.webp"
+    ["Marisol-Dracula"]="marisol-dracula-01.webp"
+    ["Melissa-Nord"]="melissa-nord-01.webp"
+)
 
-case $selection in
-    "Horus-Cyber")   T="Horus-Cyber";   W="HORUS-CYBER.jpg";  C="0xee00ffff 0xee003333" ;;
-    "Ra-Solar")      T="Ra-Solar";      W="RA-SOLAR.jpg";     C="0xeeffaa00 0xee552200" ;;
-    "Isis-Magic")    T="Isis-Magic";    W="ISIS-MAGIC.jpg";   C="0xeeff00ff 0xee330033" ;;
-    "Anubis-Death")  T="Anubis-Death";  W="ANUBIS-DEATH.jpg"; C="0xee44ff00 0xee002200" ;;
-    "s4vitar-darkness") T="s4vitar-darkness"; W="ARCH-CYBERPUNK.jpg"; C="0xee6a0dad 0xee0d0d0d" ;;
-esac
+# ---------------------------------------------------------------------------
+# Auto-detectar temas disponibles desde el directorio
+# (cualquier carpeta con config.jsonc + style.css)
+# ---------------------------------------------------------------------------
+mapfile -t AVAILABLE_THEMES < <(
+    find "$THEMES_DIR" -maxdepth 1 -mindepth 1 -type d \
+        -exec sh -c 'test -f "$1/config.jsonc" && test -f "$1/style.css"' _ {} \; \
+        -print | xargs -I{} basename {} | sort
+)
 
-# Waybar links
-rm -f "$W_DIR/config" "$W_DIR/config.jsonc" "$W_DIR/style.css"
-ln -sf "$THEMES_DIR/$T/config.jsonc" "$W_DIR/config.jsonc"
-ln -sf "$THEMES_DIR/$T/style.css" "$W_DIR/style.css"
-
-# Wallpaper & Pywal
-if [ -f "$WALL_DIR/$W" ]; then
-    echo "$WALL_DIR/$W" > "$CACHE_WALL"
-    swww img "$WALL_DIR/$W" --transition-type grow --transition-duration 1
-    # wal -i "$WALL_DIR/$W" -n -q 2>/dev/null || true
+if [ ${#AVAILABLE_THEMES[@]} -eq 0 ]; then
+    notify-send "BLACK-ICE" "No se encontraron temas en $THEMES_DIR" --urgency=critical
+    exit 1
 fi
 
-# PREPARAR LOGO
+# ---------------------------------------------------------------------------
+# Mostrar selector (wofi)
+# ---------------------------------------------------------------------------
+CURRENT_THEME=$(cat "$CACHE_THEME" 2>/dev/null || echo "")
+
+SELECTION=$(printf '%s\n' "${AVAILABLE_THEMES[@]}" | \
+    wofi --dmenu \
+         --prompt "󰉼  Theme:" \
+         --width 300 \
+         --height 400 \
+         --cache-file /dev/null \
+         --no-actions \
+         --insensitive)
+
+[ -z "$SELECTION" ] && exit 0
+[ "$SELECTION" == "$CURRENT_THEME" ] && {
+    notify-send "BLACK-ICE" "Tema '$SELECTION' ya está activo"
+    exit 0
+}
+
+echo "$SELECTION" > "$CACHE_THEME"
+
+# ---------------------------------------------------------------------------
+# Aplicar config + style via symlinks
+# ---------------------------------------------------------------------------
+rm -f "$W_DIR/config.jsonc" "$W_DIR/style.css"
+ln -sf "$THEMES_DIR/$SELECTION/config.jsonc" "$W_DIR/config.jsonc"
+ln -sf "$THEMES_DIR/$SELECTION/style.css"    "$W_DIR/style.css"
+
+# ---------------------------------------------------------------------------
+# Wallpaper
+# ---------------------------------------------------------------------------
+WALL_FILE="${WALLPAPERS[$SELECTION]:-}"
+WALL_APPLIED=false
+
+# 1. Wallpaper específico del tema en $WALL_DIR
+if [ -n "$WALL_FILE" ] && [ -f "$WALL_DIR/$WALL_FILE" ]; then
+    echo "$WALL_DIR/$WALL_FILE" > "$CACHE_WALL"
+    awww img "$WALL_DIR/$WALL_FILE" --transition-type grow --transition-duration 1
+    WALL_APPLIED=true
+fi
+
+# 2. Estructura gh0stzk-walls descargada
+if ! $WALL_APPLIED && [ -f "$WALL_DIR/gh0stzk/$SELECTION/wall-01.webp" ]; then
+    WALL="$WALL_DIR/gh0stzk/$SELECTION/wall-01.webp"
+    echo "$WALL" > "$CACHE_WALL"
+    awww img "$WALL" --transition-type grow --transition-duration 1
+    WALL_APPLIED=true
+fi
+
+# 3. Fallback: wallpaper aleatorio disponible
+if ! $WALL_APPLIED; then
+    RANDOM_WALL=$(find "$WALL_DIR" -maxdepth 2 \
+        \( -name "*.jpg" -o -name "*.png" -o -name "*.webp" \) 2>/dev/null | shuf -n 1)
+    [ -n "$RANDOM_WALL" ] && awww img "$RANDOM_WALL" --transition-type grow --transition-duration 1
+fi
+
+# ---------------------------------------------------------------------------
+# Border color Hyprland
+# ---------------------------------------------------------------------------
+BORDER="${BORDER_COLORS[$SELECTION]:-"0xee00f3ff 0xee6800d2"}"
+hyprctl keyword general:col.active_border "$BORDER 45deg" 2>/dev/null
+
+# ---------------------------------------------------------------------------
+# Fastfetch logo aleatorio
+# ---------------------------------------------------------------------------
 RANDOM_LOGO=$(find "$FF_DIR/logos" -name "*.png" 2>/dev/null | shuf -n 1)
 [ -f "$RANDOM_LOGO" ] && cp "$RANDOM_LOGO" "$FF_DIR/current_logo.png"
 
-# Hyprland borders
-hyprctl keyword general:col.active_border "$C 45deg" 2>/dev/null
-
-# Restart Waybar
-pkill -9 waybar 2>/dev/null
-sleep 0.5
+# ---------------------------------------------------------------------------
+# Reiniciar Waybar (graceful kill + wait loop)
+# ---------------------------------------------------------------------------
+pkill waybar 2>/dev/null
+# Wait for waybar to actually exit (max 2 seconds)
+for _i in 1 2 3 4; do
+    pgrep -x waybar > /dev/null || break
+    sleep 0.5
+done
 waybar &>/dev/null &
+disown
 
-notify-send "BLACK-ICE" "Theme Active: $selection"
+notify-send "BLACK-ICE" "Theme Active: $SELECTION"

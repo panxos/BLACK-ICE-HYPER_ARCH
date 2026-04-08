@@ -1,13 +1,22 @@
 #!/bin/bash
-# kvm_status (Clean - No Colors)
-count=$(ls /run/user/$(id -u)/qm_socket_* 2>/dev/null | wc -l) 2>/dev/null
-# Fallback virsh check if needed
-if [ "$count" -eq 0 ] && command -v virsh &>/dev/null; then
-    count=$(virsh list --state-running 2>/dev/null | grep -v "Name" | grep -v "----" | grep -v "^$" | wc -l)
-fi
+# kvm_status (Enhanced for Waybar)
 
-if [ "$count" -gt 0 ]; then
-    echo "{\"text\": \"  $count\", \"class\": \"active\", \"tooltip\": \"KVM VMs Running: $count\"}"
+if command -v virsh &>/dev/null; then
+    running_vms=$(virsh list --state-running --name | grep -v "^$" | sort)
+    count=$(echo "$running_vms" | grep -v "^$" | wc -l)
+    
+    if [ "$count" -gt 0 ]; then
+        tooltip="<b>󰐵 Running VMs: $count</b>\n\n$running_vms"
+        echo "{\"text\": \"  $count\", \"class\": \"active\", \"tooltip\": \"$tooltip\"}"
+    else
+        echo "{\"text\": \"  0\", \"class\": \"inactive\", \"tooltip\": \"KVM Active\nNo VMs running\"}"
+    fi
 else
-    echo "{\"text\": \"  0\", \"class\": \"inactive\", \"tooltip\": \"No KVM VMs active\"}"
+    # Check for qm sockets (Proxmox/Local)
+    count=$(ls /run/user/$(id -u)/qm_socket_* 2>/dev/null | wc -l)
+    if [ "$count" -gt 0 ]; then
+        echo "{\"text\": \"  $count\", \"class\": \"active\", \"tooltip\": \"KVM VMs Running: $count\"}"
+    else
+        echo "{\"text\": \"  0\", \"class\": \"inactive\", \"tooltip\": \"No KVM VMs active\"}"
+    fi
 fi

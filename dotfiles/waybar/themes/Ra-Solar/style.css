@@ -60,6 +60,14 @@ window#waybar {
     border-radius: 8px;
 }
 
+#battery.warning {
+    color: #ffff00;
+}
+
+#battery.critical {
+    color: #ff5555;
+}
+
 #custom-vpn.disconnected,
 #custom-settarget.inactive,
 #cpu.critical,
@@ -92,4 +100,39 @@ window#waybar {
     font-size: 18px;
     color: @orange;
     text-shadow: 0 0 5px @gold;
+}
+#custom-hardware_temp {
+    color: #00ff00;
+    padding: 0 10px;
+    font-weight: bold;
+}
+
+#custom-hardware_temp {
+    color: #00ff00;
+    padding: 0 10px;
+    font-weight: bold;
+}
+
+#custom-hardware_temp {
+    color: #00ff00;
+    padding: 0 10px;
+    font-weight: bold;
+}
+
+#custom-hardware_temp {
+    color: #00ff00;
+    padding: 0 10px;
+    font-weight: bold;
+}
+
+#custom-hardware_temp {
+    color: #00ff00;
+    padding: 0 10px;
+    font-weight: bold;
+}
+
+#custom-hardware_temp {
+    color: #00ff00;
+    padding: 0 10px;
+    font-weight: bold;
 }

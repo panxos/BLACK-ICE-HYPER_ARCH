@@ -11,6 +11,8 @@ HYPRLAND_PKGS=(
     "hyprland"
     "hyprpaper"
     "hyprlock"
+    "hypridle"
+    "hyprcursor"
     "xdg-desktop-portal-hyprland"
     "xdg-desktop-portal-gtk"
     "qt5-wayland"
@@ -30,17 +32,23 @@ HYPRLAND_PKGS=(
     "libinput"              # Input handling
     "socat"                 # IPC communication
     
-    # Notificaciones
-    "dunst"
+    # Notificaciones ( Fix: SwayNC over Dunst)
+    "swaync"
     "libnotify"
+    "libayatana-appindicator-gtk3"
+    "libappindicator-gtk3"
     
+    # Manejo de discos y tray
+    "udiskie"
+    "openvpn"
+
     # Terminal y Navegadores
     "kitty"
     "firefox"
     "brave-bin"
     "kate"
     "neovim"
-    
+
     # File manager y utilidades
     "dolphin"
     "ark"
@@ -50,9 +58,6 @@ HYPRLAND_PKGS=(
     "xdg-user-dirs"
     "xdg-utils"
     "kde-cli-tools"         # Required for Dolphin/Kate file associations (keditfiletype)
-    
-    # Wallpaper daemon
-    "hyprpaper"
     
     # Screenshot tools
     "grim"
@@ -78,7 +83,6 @@ HYPRLAND_PKGS=(
     "qt6ct"
     "kvantum"
     "kvantum-qt5"
-    "kvantum-qt5"
     "nwg-look"
     "python-pywal"
     "sddm"
@@ -101,7 +105,7 @@ HYPRLAND_PKGS=(
     "pamixer"               # Audio control for multimedia keys
     "brightnessctl"
     "playerctl"
-    "swww"                  # Wallpaper daemon
+    "awww"                  # Wallpaper daemon
     "hypridle"              # Idle daemon
     "grimblast-git"         # Screenshot helper
     "cliphist"              # Clipboard manager
@@ -115,7 +119,7 @@ HYPRLAND_PKGS=(
     "chafa"                 # For terminal image display (Fastfetch fallback)
 )
 
-# --- Detección de Hardware y Virtualización (SOTA Smart-Detect) ---
+# --- Detección de Hardware y Virtualización ( Smart-Detect) ---
 log_info "Analizando hardware para optimización de drivers..."
 
 # 1. CPU Microcode
@@ -197,7 +201,7 @@ fi
 log_info "Verificando integridad del keyring (GPG)..."
 rebuild_keyring
 safe_install archlinux-keyring
-safe_install blackarch-keyring
+safe_install chaotic-keyring 2>/dev/null || true
 log_success "Keyring verificado y actualizado."
 
 log_info "Instalando Hyprland y componentes base..."
@@ -209,7 +213,8 @@ if pacman -Q hyprpicker &>/dev/null || pacman -Q hyprpicker-git &>/dev/null; the
 fi
 if pacman -Q jack2 &>/dev/null; then
     log_warn "Conflicto detectado: Eliminando jack2 con -Rdd (allow pipewire-jack replacement)..."
-    sudo -n pacman -Rdd --noconfirm jack2 || true
+    sudo -n pacman -Rdd --noconfirm jack2 2>/dev/null || \
+        sudo pacman -Rdd --noconfirm jack2 2>/dev/null || true
 fi
 
 for pkg in "${HYPRLAND_PKGS[@]}"; do
@@ -218,7 +223,7 @@ done
 
 # --- Validación Post-Instalación ---
 log_info "Validando instalación de componentes críticos..."
-CRITICAL_PKGS=("waybar" "jq" "ttf-font-awesome" "python-pywal" "swww" "imagemagick")
+CRITICAL_PKGS=("waybar" "jq" "ttf-font-awesome" "python-pywal" "awww" "imagemagick")
 VALIDATION_FAILED=false
 
 for pkg in "${CRITICAL_PKGS[@]}"; do
@@ -238,11 +243,13 @@ fi
 success "Todos los paquetes críticos instalados correctamente"
 
 
-# --- Configuración de Teclado (Sistema) ---
-log_info "Configurando teclado en español (ES)..."
-sudo -n localectl set-x11-keymap es
-sudo -n localectl set-locale LANG=es_ES.UTF-8
-echo "KEYMAP=es" | sudo -n tee /etc/vconsole.conf
+# --- Configuración de Teclado y Locale (desde install.conf.auto) ---
+_KBD="${KEYBOARD_LAYOUT:-es}"
+_LANG="${SYSTEM_LANG:-es_ES}"
+log_info "Aplicando teclado '$_KBD' y locale '${_LANG}.UTF-8'..."
+sudo -n localectl set-x11-keymap "$_KBD"
+sudo -n localectl set-locale "LANG=${_LANG}.UTF-8"
+echo "KEYMAP=$_KBD" | sudo -n tee /etc/vconsole.conf > /dev/null
 
 # --- Configuración de SDDM (CyberSec Theme) ---
 # Limpiar configuración antigua para evitar conflictos
@@ -296,47 +303,13 @@ log_info "Instalando scripts de utilidad (EARLY)..."
 mkdir -p "$USER_HOME/.config/bin"
 if [ -d "$DOTFILES_DIR/bin" ]; then
     cp -r "$DOTFILES_DIR/bin/"* "$USER_HOME/.config/bin/"
-    chmod +x "$USER_HOME/.config/bin/"*
+    if [ -d "$USER_HOME/.config/bin" ]; then
+        chmod +x "$USER_HOME/.config/bin/"* 2>/dev/null || true
+    fi
     log_info "Scripts de utilidad instalados en ~/.config/bin"
 fi
 
-# INTEGRACIÓN: Crear scripts helper para Waybar (Robustez)
-log_info "Creando scripts helper para Waybar..."
-cat > "$USER_HOME/.config/bin/check_target_status.sh" << 'EOF'
-#!/bin/bash
-TARGET_FILE="$HOME/.config/target_ip"
-if [ -f "$TARGET_FILE" ] && [ -s "$TARGET_FILE" ]; then
-    TARGET=$(cat "$TARGET_FILE")
-    echo "{\"text\":\"$TARGET\",\"class\":\"active\"}"
-else
-    echo "{\"text\":\"No Target\",\"class\":\"inactive\"}"
-fi
-EOF
-
-cat > "$USER_HOME/.config/bin/check_vpn_status.sh" << 'EOF'
-#!/bin/bash
-if ip link show | grep -q "tun0\|wg0\|vpn"; then
-    echo "{\"text\":\"VPN ON\",\"class\":\"connected\"}"
-else
-    echo "{\"text\":\"VPN OFF\",\"class\":\"disconnected\"}"
-fi
-EOF
-
-cat > "$USER_HOME/.config/bin/power_menu.sh" << 'EOF'
-#!/bin/bash
-OPTIONS="🔒 Lock\n⏾ Sleep\n🔄 Reboot\n⏻ Shutdown\n🚪 Logout"
-CHOICE=$(echo -e "$OPTIONS" | wofi --dmenu --prompt "Power Menu" -i)
-case "$CHOICE" in
-    "🔒 Lock") hyprlock || swaylock ;;
-    "⏾ Sleep") systemctl suspend ;;
-    "🔄 Reboot") systemctl reboot ;;
-    "⏻ Shutdown") systemctl poweroff ;;
-    "🚪 Logout") hyprctl dispatch exit ;;
-esac
-EOF
-
-chmod +x "$USER_HOME/.config/bin/"*.sh
-log_success "Scripts helper instalados y permisos ajustados."
+# Scripts helper removed (using dotfiles/bin versions)
 
 if [ -d "$DOTFILES_DIR/waybar" ]; then
     # Clean and Copy (Force Refresh)
@@ -344,14 +317,15 @@ if [ -d "$DOTFILES_DIR/waybar" ]; then
     mkdir -p "$USER_HOME/.config/waybar"
     cp -r "$DOTFILES_DIR/waybar/"* "$USER_HOME/.config/waybar/"
     
-    # Set Horus-Cyber (formerly Mechabar) as default
-    cp "$DOTFILES_DIR/waybar/themes/Horus-Cyber/config.jsonc" "$USER_HOME/.config/waybar/config" 2>/dev/null || true
-    cp "$DOTFILES_DIR/waybar/themes/Horus-Cyber/config.jsonc" "$USER_HOME/.config/waybar/config.jsonc"
-    cp "$DOTFILES_DIR/waybar/themes/Horus-Cyber/style.css" "$USER_HOME/.config/waybar/style.css"
+    # Set s4vitar-darkness as default
+    cp "$DOTFILES_DIR/waybar/themes/s4vitar-darkness/config.jsonc" "$USER_HOME/.config/waybar/config" 2>/dev/null || true
+    cp "$DOTFILES_DIR/waybar/themes/s4vitar-darkness/config.jsonc" "$USER_HOME/.config/waybar/config.jsonc"
+    cp "$DOTFILES_DIR/waybar/themes/s4vitar-darkness/style.css" "$USER_HOME/.config/waybar/style.css"
     
     # Fix Permissions
     chown -R $CURRENT_USER:$CURRENT_USER "$USER_HOME/.config/waybar"
-    chmod -R +rwx "$USER_HOME/.config/waybar" # Ensure readable/executable
+    find "$USER_HOME/.config/waybar" -type d -exec chmod 755 {} \;
+    find "$USER_HOME/.config/waybar" -type f -exec chmod 644 {} \;
     log_info "Configuración de Waybar copiada (Horus-Cyber set as default)"
 fi
 
@@ -404,7 +378,9 @@ WALLPAPER_DEST="$PICTURES_DIR/wallpapers"
 
 if [ -d "$DOTFILES_DIR/wallpapers" ]; then
     # Ensure destination is writable by current user
-    sudo -n chown -R $CURRENT_USER:$CURRENT_USER "$PICTURES_DIR" 2>/dev/null
+    if [ -d "$PICTURES_DIR" ]; then
+        sudo -n chown -R "$CURRENT_USER:$CURRENT_USER" "$PICTURES_DIR" 2>/dev/null || true
+    fi
     mkdir -p "$WALLPAPER_DEST"
     
     log_info "Copiando desde $DOTFILES_DIR/wallpapers/ a $WALLPAPER_DEST/"
@@ -423,9 +399,9 @@ if [ -d "$DOTFILES_DIR/wallpapers" ]; then
     fi
      
     # Update initial wallpaper in hyprland.conf
-    # We do a safer replacement for the initial swww img command
+    # We do a safer replacement for the initial awww img command
     if [ -f "$USER_HOME/.config/hypr/hyprland.conf" ]; then
-         sed -i "s|swww img ~/Pictures/wallpapers|swww img $WALLPAPER_DEST|g" "$USER_HOME/.config/hypr/hyprland.conf"
+         sed -i "s|awww img ~/Pictures/wallpapers|awww img $WALLPAPER_DEST|g" "$USER_HOME/.config/hypr/hyprland.conf"
          log_info "Hyprland conf actualizado con ruta de wallpapers: $WALLPAPER_DEST"
     fi
 fi
@@ -433,7 +409,7 @@ fi
 # --- Configurar GTK Theme & Fonts (Atomic Dark Mode Force) ---
 log_info "Configurando temas GTK e Iconos (Hard Copy for Discovery)..."
 
-# Create local directories
+# Create directories
 mkdir -p "$USER_HOME/.themes" "$USER_HOME/.local/share/icons" "$USER_HOME/.icons"
 
 # Hard Copy (Definitive Fix for discovery)
@@ -444,7 +420,7 @@ cp -r /usr/share/icons/candy-icons "$USER_HOME/.icons/" 2>/dev/null
 # Apply Gsettings with DBUS Wrapper
 log_info "Aplicando configuraciones GNOME/GTK (vía dbus-launch)..."
 apply_gsettings() {
-    sudo -u $CURRENT_USER dbus-launch gsettings set "$1" "$2" "$3"
+    sudo -u "$CURRENT_USER" dbus-launch gsettings set "$1" "$2" "$3"
 }
 
 apply_gsettings org.gnome.desktop.interface gtk-theme 'Sweet-Dark'
@@ -458,27 +434,43 @@ log_info "Corrigiendo rama de tema (Sweet-Dark) y configuración de Portales..."
 
 # 1. Asegurar rama Ambar-Blue-Dark ( DARK REAL )
 if [ -d "/usr/share/themes/Sweet-Dark" ]; then
-    cd /usr/share/themes/Sweet-Dark
-    if [ ! -d ".git" ]; then
+    if [ ! -d "/usr/share/themes/Sweet-Dark/.git" ]; then
+        # Salir del directorio ANTES de borrarlo (evita CWD inválido en git clone)
+        cd /tmp || true
         sudo rm -rf /usr/share/themes/Sweet-Dark
-        sudo git clone https://github.com/EliverLara/Sweet.git /usr/share/themes/Sweet-Dark
-        cd /usr/share/themes/Sweet-Dark
+        sudo git clone --depth=1 -b Ambar-Blue-Dark https://github.com/EliverLara/Sweet.git /usr/share/themes/Sweet-Dark \
+            || log_warn "No se pudo clonar Sweet-Dark desde GitHub, continuando sin tema Ambar-Blue-Dark"
+    else
+        cd /usr/share/themes/Sweet-Dark \
+            && { sudo git checkout Ambar-Blue-Dark 2>/dev/null \
+                 || sudo git checkout -b Ambar-Blue-Dark origin/Ambar-Blue-Dark 2>/dev/null \
+                 || log_warn "No se pudo cambiar rama Sweet-Dark"; }
+        cd "$HOME"
     fi
-    sudo git checkout Ambar-Blue-Dark || sudo git checkout -b Ambar-Blue-Dark origin/Ambar-Blue-Dark
-    sudo sed -i 's/GtkTheme=Sweet/GtkTheme=Sweet-Dark/' /usr/share/themes/Sweet-Dark/index.theme
+    [ -f "/usr/share/themes/Sweet-Dark/index.theme" ] && \
+        sudo sed -i 's/GtkTheme=Sweet/GtkTheme=Sweet-Dark/' /usr/share/themes/Sweet-Dark/index.theme
 fi
 
 # 2. Configuración de Portales (xdg-desktop-portal 1.20+)
 mkdir -p "$USER_HOME/.config/xdg-desktop-portal"
 cat > "$USER_HOME/.config/xdg-desktop-portal/portals.conf" << 'EOF'
 [preferred]
-default=hyprland;gtk
+# Priorizamos GTK para la estabilidad en links (OpenURI) y diálogos
+default=gtk;hyprland
+# Dejamos Hyprland para las cosas específicas del compositor
+org.freedesktop.impl.portal.Screencast=hyprland
+org.freedesktop.impl.portal.Screenshot=hyprland
+org.freedesktop.impl.portal.Inhibit=hyprland
 EOF
 
 # 3. GTK 4.0 CSS Link (Atomic Dark Mode)
 mkdir -p "$USER_HOME/.config/gtk-4.0"
-ln -sf /usr/share/themes/Sweet-Dark/gtk-4.0/gtk.css "$USER_HOME/.config/gtk-4.0/gtk.css"
-ln -sf /usr/share/themes/Sweet-Dark/gtk-4.0/assets "$USER_HOME/.config/gtk-4.0/assets"
+if [ -f "/usr/share/themes/Sweet-Dark/gtk-4.0/gtk.css" ]; then
+    ln -sf /usr/share/themes/Sweet-Dark/gtk-4.0/gtk.css "$USER_HOME/.config/gtk-4.0/gtk.css"
+fi
+if [ -d "/usr/share/themes/Sweet-Dark/gtk-4.0/assets" ]; then
+    ln -sf /usr/share/themes/Sweet-Dark/gtk-4.0/assets "$USER_HOME/.config/gtk-4.0/assets"
+fi
 
 # 4. Qt/KDE Styling (Dolphin & Kate Fix - Premium Sweet Mode)
 log_info "Configurando estilos Qt/KDE Premium (Sweet-Dark + Kvantum)..."
@@ -704,7 +696,9 @@ fi
 
 if [ -d "$DOTFILES_DIR/bin" ]; then
     cp -r "$DOTFILES_DIR/bin/"* "$USER_HOME/.config/bin/"
-    chmod +x "$USER_HOME/.config/bin/"*
+    if [ -d "$USER_HOME/.config/bin" ]; then
+        chmod +x "$USER_HOME/.config/bin/"* 2>/dev/null || true
+    fi
     log_info "Scripts binarios copiados y chmod +x aplicado"
 fi
 
@@ -729,7 +723,7 @@ chown $CURRENT_USER:$CURRENT_USER "$USER_HOME/.config/kwriterc" "$USER_HOME/.con
 # scripts ya instalados en fase EARLY
 log_info "Verificando scripts de utilidad..."
 if [ -d "$USER_HOME/.config/bin" ]; then
-    chmod +x "$USER_HOME/.config/bin/"*
+    chmod +x "$USER_HOME/.config/bin/"* 2>/dev/null || true
     success "Scripts de utilidad verificados"
 fi
 
@@ -743,12 +737,18 @@ chown -R $CURRENT_USER:$CURRENT_USER "$WALLPAPER_DEST" 2>/dev/null || true
 # --- PLYMOUTH (Boot Splash - via AUR) ---
 log_info "Instalando y configurando Plymouth (Boot Splash)..."
 
-# Instalar plymouth y un tema desde AUR (No aborta si falla)
+# Instalar plymouth con --noscriptlet para evitar que el hook post-install
+# dispare mkinitcpio prematuramente (causa crash del deploy).
+# Configuramos mkinitcpio.conf manualmente y regeneramos una sola vez al final.
 if ! pacman -Q plymouth &>/dev/null; then
-    log_info "Instalando Plymouth desde AUR (esto puede tardar)..."
-    safe_install plymouth || log_warn "Fallo la instalación de Plymouth. El sistema arrancará sin splash dinámico."
-    safe_install plymouth-theme-abstract-ring-git || log_warn "Tema Abstract Ring no disponible."
+    log_info "Instalando Plymouth (sin hook mkinitcpio automático)..."
+    if sudo -n pacman -S --noconfirm --needed --noscriptlet plymouth 2>/dev/null; then
+        log_success "Plymouth instalado"
+    else
+        log_warn "Fallo la instalación de Plymouth. El sistema arrancará sin splash dinámico."
+    fi
 fi
+safe_install plymouth-theme-abstract-ring-git || log_warn "Tema Abstract Ring no disponible."
 
 # Validate Abstract Ring Installation (Fix Path with better discovery)
 PLYMOUTH_THEME_DIR=$(pacman -Ql plymouth-theme-abstract-ring-git 2>/dev/null | grep ".plymouth$" | head -n 1 | awk '{print $2}' | xargs dirname)
@@ -764,11 +764,19 @@ else
     log_warn "No se pudo detectar el volumen del tema Abstract Ring. Usando default..."
 fi
 
-# Inyectar hook en mkinitcpio.conf
+# Inyectar hook en mkinitcpio.conf y regenerar initramfs con manejo de error.
+# Esta es la ÚNICA invocación de mkinitcpio para Plymouth en todo el deploy.
 if ! grep -q "plymouth" /etc/mkinitcpio.conf; then
     log_info "Inyectando hook 'plymouth' en mkinitcpio.conf..."
-    sudo -n sed -i 's/base udev/base udev plymouth/' /etc/mkinitcpio.conf
-    sudo -n mkinitcpio -P
+    sudo -n sed -i 's/\(HOOKS=.*\)udev/\1udev plymouth/' /etc/mkinitcpio.conf
+fi
+if grep -q "plymouth" /etc/mkinitcpio.conf; then
+    log_info "Regenerando initramfs con Plymouth..."
+    if sudo -n mkinitcpio -P >> "$LOG_FILE" 2>&1; then
+        log_success "initramfs regenerado con Plymouth"
+    else
+        log_warn "mkinitcpio -P falló (código: $?). Plymouth puede no activarse en el próximo boot, pero el sistema arranca igualmente."
+    fi
 fi
 
 # Añadir quiet splash a GRUB

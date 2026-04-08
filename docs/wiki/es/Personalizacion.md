@@ -62,7 +62,7 @@ kvantummanager --set Sweet-Dark
 Super + Alt + W
 
 # Cambiar manualmente
-swww img /ruta/a/imagen.png
+awww img /ruta/a/imagen.png
 ```
 
 ### Agregar Wallpapers Propios
@@ -72,7 +72,7 @@ swww img /ruta/a/imagen.png
 cp mi-wallpaper.jpg ~/.config/wallpapers/
 
 # Aplicar
-swww img ~/.config/wallpapers/mi-wallpaper.jpg
+awww img ~/.config/wallpapers/mi-wallpaper.jpg
 ```
 
 ### Wallpaper Aleatorio al Inicio
@@ -503,25 +503,37 @@ bind = SUPER ALT, S, exec, ~/.config/bin/mi_script.sh
 
 ### Temas Incluidos
 
-1. **Mecabar-p4nx0z** (Default)
-   - Cyberpunk aesthetic
-   - Cyan/Purple colors
-   - Neon effects
+1. **s4vitar-darkness** (Predeterminado - PRO)
+   - Estética ultra-oscura
+   - Doble barra de estado
+   - Iconos Pacman en espacios de trabajo
+   - Aura púrpura y diseño minimalista
 
-2. **Cyber-Neon**
-   - Bright neon colors
-   - High contrast
-   - Matrix-style
+2. **Matrix-Hacker** (Nuevo)
+   - Inspirado en la estética de The Matrix
+   - Colores verde neón sobre negro puro
+   - Fuentes JetBrains Mono
+   - Efecto degradado verde en bordes
 
-3. **Dark-Matrix**
-   - Green on black
-   - Minimal
-   - Hacker aesthetic
+3. **Horus-Cyber**
+   - Tonos azules neón y cian
+   - Alta tecnología y efectos futuristas
+   - Inspiración egipcia cibernética
 
-4. **Purple-Haze**
-   - Purple/Pink tones
-   - Soft gradients
-   - Modern look
+4. **Isis-Magic**
+   - Púrpuras y magentas vibrantes
+   - Estética mística y moderna
+   - Transiciones suaves
+
+5. **Ra-Solar**
+   - Tonos dorados, naranjas y rojos
+   - Energía solar y brillo cálido
+   - Contraste equilibrado
+
+6. **Anubis-Death**
+   - Verdes lima y negros profundos
+   - Estética hacker clásica
+   - Bordes marcados
 
 ### Aplicar Tema
 

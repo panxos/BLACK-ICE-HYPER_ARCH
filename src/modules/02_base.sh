@@ -1,7 +1,15 @@
 #!/bin/bash
 # modules/02_base.sh ( Cyberpunk Edition)
 
-banner "PASO 3" "Inyección de Núcleos y Sistema Base"
+# --- Protocolo Anti-PGP Error (SOTA Fix) ---
+log_info "Sincronizando reloj del sistema para validación PGP..."
+timedatectl set-ntp true
+log_info "Actualizando archlinux-keyring de la ISO..."
+pacman -Sy --noconfirm archlinux-keyring || {
+    log_warn "Fallo al actualizar keyring vía pacman. Intentando refresco manual..."
+    pacman-key --init
+    pacman-key --populate archlinux
+}
 
 # 1. Normalización de Kernel
 case "${KERNEL:-}" in
@@ -12,17 +20,15 @@ esac
 
 # 2. Modo Interactivo si no hay kernel predefinido
 if [ -z "${KERNEL:-}" ] && [ "${AUTO_MODE:-}" != "true" ]; then
-    echo -e "${NEON_PURPLE}┌──────────────────────────────────────────────┐${NC}"
-    echo -e "${NEON_PURPLE}│${NC}  ${BOLD}SELECCIÓN DE NÚCLEO (KERNEL)              ${NC} ${NEON_PURPLE}│${NC}"
-    echo -e "${NEON_PURPLE}└──────────────────────────────────────────────┘${NC}"
     
     SELECTED_KERNEL=$(ask_option "Elige la arquitectura del kernel:" "linux" "linux-zen" "linux-hardened")
 fi
 
+export SELECTED_KERNEL
 success "Núcleo seleccionado: ${NEON_BLUE}$SELECTED_KERNEL${NC}"
 
 # 3. Construcción de lista de paquetes base
-PACKAGES="base base-devel linux-firmware dialog efibootmgr grub git go nano networkmanager sudo vim openssh man-db man-pages texinfo lvm2 screen expect cryptsetup kbd sof-firmware iwd smartmontools xdg-user-dirs wireless_tools wpa_supplicant"
+PACKAGES="base base-devel rsync wget sshpass linux-firmware dialog efibootmgr grub git go nano networkmanager sudo vim openssh man-db man-pages texinfo lvm2 screen expect cryptsetup kbd sof-firmware iwd smartmontools xdg-user-dirs wireless_tools wpa_supplicant"
 
 # Añadir Kernel y sus Headers correspondientes
 PACKAGES="$PACKAGES $SELECTED_KERNEL ${SELECTED_KERNEL}-headers"
@@ -42,7 +48,7 @@ if [ "$VIRT_TYPE" != "none" ]; then
     log_info "Entorno Virtualizado detectado: ${NEON_BLUE}$VIRT_TYPE${NC}"
     case "$VIRT_TYPE" in
         kvm|qemu)
-            PACKAGES="$PACKAGES virtio-vga-gl qemu-guest-agent spice-vdagent"
+            PACKAGES="$PACKAGES  qemu-guest-agent spice-vdagent"
             log_info "Optimizaciones KVM (VirtIO) activadas"
             ;;
         vmware)
@@ -125,7 +131,7 @@ while true; do
             echo -e "${YELLOW}[WARN] Las firmas PGP siguen fallando a pesar de la limpieza.${NC}"
             echo -e "${YELLOW}Esto ocurre si la ISO es incompatible con las llaves nuevas.${NC}"
             
-            local BYPASS="No"
+            BYPASS="No"
             if [ "${AUTO_MODE:-}" == "true" ]; then
                 BYPASS="Si"
                 log_info "Modo Automático: Activando bypass de PGP temporalmente."

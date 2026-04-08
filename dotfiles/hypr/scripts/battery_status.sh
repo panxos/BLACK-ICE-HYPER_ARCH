@@ -8,9 +8,13 @@ if [ ! -d "/sys/class/power_supply/BAT0" ] && [ ! -d "/sys/class/power_supply/BA
 fi
 
 # Get battery info
-BATTERY=$(ls /sys/class/power_supply/ | grep BAT | head -1)
-CAPACITY=$(cat /sys/class/power_supply/$BATTERY/capacity 2>/dev/null || echo "0")
-STATUS=$(cat /sys/class/power_supply/$BATTERY/status 2>/dev/null || echo "Unknown")
+BATTERY=$(find /sys/class/power_supply/ -maxdepth 1 -name 'BAT*' -printf '%f\n' 2>/dev/null | head -1)
+if [ -z "$BATTERY" ]; then
+    echo ""
+    exit 0
+fi
+CAPACITY=$(cat "/sys/class/power_supply/$BATTERY/capacity" 2>/dev/null || echo "0")
+STATUS=$(cat "/sys/class/power_supply/$BATTERY/status" 2>/dev/null || echo "Unknown")
 
 # Battery icon based on level
 if [ $CAPACITY -ge 80 ]; then

@@ -45,12 +45,12 @@ PICTURES_DIR=$(xdg-user-dir PICTURES 2>/dev/null || echo "$HOME/Pictures")
 WALLPAPER_PATH="$PICTURES_DIR/wallpapers/$WALLPAPER"
 
 if [ -f "$WALLPAPER_PATH" ]; then
-    swww img "$WALLPAPER_PATH" --transition-type grow
+    awww img "$WALLPAPER_PATH" --transition-type grow
 else
     # Fallback to .config if that's where they are
     ALT_PATH="$HOME/.config/wallpapers/$WALLPAPER"
     if [ -f "$ALT_PATH" ]; then
-        swww img "$ALT_PATH" --transition-type grow
+        awww img "$ALT_PATH" --transition-type grow
     fi
 fi
 

@@ -9,8 +9,8 @@ TRANSITION_DURATION="2"
 TRANSITION_FPS="60"
 
 # Check SWWW daemon
-if ! pgrep -x "swww-daemon" > /dev/null; then
-    swww init &
+if ! pgrep -x "awww-daemon" > /dev/null; then
+    awww init &
     sleep 1
 fi
 
@@ -57,7 +57,7 @@ case $1 in
 esac
 
 # Apply Wallpaper
-swww img "$target_file" \
+awww img "$target_file" \
     --transition-type $TRANSITION_TYPE \
     --transition-duration $TRANSITION_DURATION \
     --transition-fps $TRANSITION_FPS \

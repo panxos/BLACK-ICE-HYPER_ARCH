@@ -18,11 +18,11 @@ cleanup() {
 trap cleanup SIGINT
 
 # --- Variables Globales ---
-# SOTA: SCRIPT_DIR es la raíz del proyecto
+# : SCRIPT_DIR es la raíz del proyecto
 SCRIPT_DIR=$(dirname "$(readlink -f "$0")")
 DOTFILES_DIR="$SCRIPT_DIR/dotfiles"
 
-# --- Importar utilidades y colores SOTA ---
+# --- Importar utilidades y colores  ---
 source "$SCRIPT_DIR/src/lib/colors.sh"
 source "$SCRIPT_DIR/src/lib/logging.sh"
 source "$SCRIPT_DIR/src/lib/utils.sh"
@@ -83,7 +83,13 @@ source "$SCRIPT_DIR/src/deploy/06_sddm_setup.sh"
 # 7. Setup Neovim Pro (NvChad)
 source "$SCRIPT_DIR/src/deploy/07_neovim_setup.sh"
 
-# 8. Finalización
+# 8. AI CLIs (Claude Code, Gemini, Qwen)
+source "$SCRIPT_DIR/src/deploy/08_ai_tools.sh"
+
+# 9. GRUB Theme (DedSec)
+source "$SCRIPT_DIR/src/deploy/09_grub_theme.sh"
+
+# 99. Finalización
 source "$SCRIPT_DIR/src/deploy/99_finalization.sh"
 
 echo ""

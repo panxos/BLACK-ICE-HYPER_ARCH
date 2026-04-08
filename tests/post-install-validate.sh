@@ -33,7 +33,7 @@ check_bin hyprland
 check_bin waybar
 check_bin wofi
 check_bin kitty
-check_bin swww
+check_bin awww
 check_bin yay
 
 log_info "Checking Configurations..."

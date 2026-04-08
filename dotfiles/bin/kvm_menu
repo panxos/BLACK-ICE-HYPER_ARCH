@@ -1,0 +1,63 @@
+#!/bin/bash
+# kvm_menu - Interactive KVM manager for Waybar (Wofi)
+# Author: Francisco Aravena (P4nx0s)
+
+# Check for virsh
+if ! command -v virsh &>/dev/null; then
+    notify-send "KVM Error" "virsh not found. libvirt might not be installed."
+    exit 1
+fi
+
+# Function to show menu
+show_menu() {
+    # List all VMs (running and shut off)
+    local vms=$(virsh list --all --name | grep -v "^$")
+    
+    if [ -z "$vms" ]; then
+        echo -e "No VMs found" | wofi --dmenu --prompt "KVM Manager" -i
+        exit 0
+    fi
+
+    local menu_options=""
+    while read -r name; do
+        local state=$(virsh domstate "$name")
+        if [[ "$state" == "running" ]]; then
+            menu_options+="󰡄 Stop  $name\n"
+        else
+            menu_options+="󰡈 Start $name\n"
+        fi
+    done <<< "$vms"
+    
+    menu_options+="󰡂 Console $name\n"
+    menu_options+="󰡃 Force Off"
+
+    local choice=$(echo -e "$menu_options" | wofi --dmenu --prompt "󰐵 KVM Manager" -i -p "Select action:")
+    
+    if [ -z "$choice" ]; then exit 0; fi
+
+    local action=$(echo "$choice" | awk '{print $1}')
+    local target=$(echo "$choice" | awk '{print $3}')
+
+    case "$action" in
+        "󰡄") # Stop
+            virsh shutdown "$target" && notify-send "KVM" "Shutting down $target..."
+            ;;
+        "󰡈") # Start
+            virsh start "$target" && notify-send "KVM" "Starting $target..."
+            ;;
+        "󰡂") # Console
+            local console_target=$(virsh list --all --name | grep -v "^$" | wofi --dmenu --prompt "Select VM for Console")
+            if [ -n "$console_target" ]; then
+                kitty --title "KVM Console: $console_target" sh -c "virsh console $console_target" &
+            fi
+            ;;
+        "󰡃") # Force Off (Destroy)
+            local force_target=$(virsh list --state-running --name | grep -v "^$" | wofi --dmenu --prompt "FORCE OFF VM")
+            if [ -n "$force_target" ]; then
+                virsh destroy "$force_target" && notify-send "KVM" "Forced OFF $force_target"
+            fi
+            ;;
+    esac
+}
+
+show_menu

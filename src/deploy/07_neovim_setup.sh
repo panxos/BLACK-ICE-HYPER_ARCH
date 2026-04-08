@@ -17,15 +17,18 @@ safe_install npm
 safe_install python-pip
 safe_install unzip
 
-# --- Limpieza de configuraciones antiguas ---
-log_info "Limpiando instalaciones previas de Neovim..."
-rm -rf "$USER_HOME/.config/nvim"
-rm -rf "$USER_HOME/.local/state/nvim"
-rm -rf "$USER_HOME/.local/share/nvim"
-
-# --- Instalación de NvChad Starter ---
-log_info "Clonando NvChad Starter..."
-git clone https://github.com/NvChad/starter "$USER_HOME/.config/nvim"
+# --- Instalación de NvChad Starter (idempotente) ---
+if [ -d "$USER_HOME/.config/nvim/.git" ]; then
+    log_info "NvChad ya instalado — actualizando..."
+    git -C "$USER_HOME/.config/nvim" pull --depth=1 2>/dev/null || true
+else
+    log_info "Limpiando instalaciones previas de Neovim..."
+    rm -rf "$USER_HOME/.config/nvim"
+    rm -rf "$USER_HOME/.local/state/nvim"
+    rm -rf "$USER_HOME/.local/share/nvim"
+    log_info "Clonando NvChad Starter..."
+    git clone --depth=1 https://github.com/NvChad/starter "$USER_HOME/.config/nvim"
+fi
 
 # --- Desplegar Custom Configuration ---
 # Si existe configuración personalizada en dotfiles, la usamos.

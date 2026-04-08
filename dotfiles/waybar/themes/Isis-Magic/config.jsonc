@@ -2,44 +2,65 @@
     {
         "layer": "top",
         "position": "top",
-        "height": 30,
-        "spacing": 0,
+        "height": 32,
+        "spacing": 4,
         "modules-left": [
             "custom/launcher",
-            "hyprland/workspaces",
+            "custom/hardware_temp",
+            "cpu",
+            "memory",
+            "disk",
             "custom/vpn"
         ],
         "modules-center": [
-            "clock"
+            "hyprland/workspaces"
         ],
         "modules-right": [
             "custom/settarget",
             "pulseaudio",
-            "battery",
+            "network",
             "custom/power"
         ],
+        "custom/hardware_temp": {
+            "exec": "~/.config/bin/hardware_temp.sh",
+            "return-type": "json",
+            "interval": 2,
+            "tooltip": true
+        },
         "custom/launcher": {
             "format": " 󰣇 ",
             "on-click": "wofi --show drun",
             "tooltip": false
         },
+        "cpu": {
+            "format": "   {usage}% ",
+            "interval": 2
+        },
+        "memory": {
+            "format": " 󰍛 {percentage}% ",
+            "interval": 2
+        },
+        "disk": {
+            "format": " 󰋊 {free} ",
+            "interval": 60
+        },
+        "custom/vpn": {
+            "format": " {}",
+            "exec": "~/.config/bin/vpn_status",
+            "return-type": "json",
+            "interval": 5
+        },
         "hyprland/workspaces": {
-            "format": "{id}",
+            "format": "{icon}",
             "on-click": "activate",
+            "format-icons": {
+                "active": "󰚰",
+                "default": "󰚯",
+                "urgent": "󰗖"
+            },
             "persistent-workspaces": {
                 "*": 5
             }
-        },
-        "custom/vpn": {
-            "format": "{}",
-            "exec": "~/.config/bin/vpn_status",
-            "interval": 5,
-            "return-type": "json"
-        },
-        "clock": {
-            "format": " 󰥔 {:%H:%M   %m-%d} ",
-            "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
-            "on-click": "gnome-calendar || kcalc"
         },
         "custom/settarget": {
             "format": "{}",
@@ -50,43 +71,29 @@
         },
         "pulseaudio": {
             "format": " {icon} {volume}% ",
-            "format-muted": " 󰝟 {volume}% ",
+            "format-muted": " 󰝟 Muted ",
             "format-icons": {
-                "headphone": "󰋋",
-                "default": [
-                    "󰕿",
-                    "󰖀",
-                    "󰕾"
-                ]
+                "default": ["󰕿", "󰖀", "󰕾"]
             },
             "on-click": "pavucontrol"
         },
-        "battery": {
-            "format": " {icon} {capacity}% ",
-            "format-icons": [
-                "󰁺",
-                "󰁻",
-                "󰁼",
-                "󰁽",
-                "󰁾",
-                "󰁿",
-                "󰂀",
-                "󰂁",
-                "󰂂",
-                "󰁹"
-            ]
+        "network": {
+            "format-wifi": " 󰖩 {bandwidthDownBits} ",
+            "format-ethernet": " 󰈀 {ipaddr} ",
+            "format-disconnected": " 󰖪 ",
+            "tooltip-format": "{essid} {signalStrength}%"
         },
         "custom/power": {
-            "format": "⏻",
-            "tooltip": false,
-            "on-click": "~/.config/bin/power_menu.sh"
+            "format": " ⏻ ",
+            "on-click": "~/.config/bin/power_menu.sh",
+            "tooltip": false
         }
     },
     {
         "layer": "top",
         "position": "bottom",
         "height": 30,
-        "spacing": 0,
+        "spacing": 4,
         "modules-left": [
             "custom/docker",
             "custom/kvm",
@@ -97,29 +104,40 @@
             "custom/public_ip"
         ],
         "modules-right": [
-            "cpu",
-            "memory",
-            "temperature",
+            "custom/player",
+            "battery",
+            "clock",
             "tray"
         ],
+        "battery": {
+            "states": {
+                "good": 80,
+                "warning": 50,
+                "critical": 10
+            },
+            "format": "{icon} {capacity}%",
+            "format-charging": "󱐋 {capacity}%",
+            "format-plugged": " {capacity}%",
+            "format-icons": ["󰂎", "󰁺", "󰁻", "󰁼", "󰁽", "󰁾", "󰁿", "󰂀", "󰂁", "󰂂", "󰁹"]
+        },
         "custom/docker": {
             "exec": "~/.config/bin/docker_status",
             "return-type": "json",
             "interval": 10,
-            "format": " {} "
+            "format": " {} ",
+            "on-click-right": "~/.config/bin/docker_menu"
         },
         "custom/kvm": {
             "exec": "~/.config/bin/kvm_status",
             "return-type": "json",
             "interval": 10,
-            "format": " {} "
+            "format": " {} ",
+            "on-click-right": "~/.config/bin/kvm_menu"
         },
         "custom/updates": {
-            "exec": "~/.config/bin/updates_status",
-            "return-type": "json",
-            "interval": 300,
-            "format": " {} ",
-            "on-click": "kitty -e sudo pacman -Syu"
+            "exec": "checkupdates | wc -l",
+            "interval": 3600,
+            "format": " 󰚰 {} "
         },
         "custom/local_ip": {
             "exec": "~/.config/bin/local_ip",
@@ -133,26 +151,19 @@
             "interval": 60,
             "format": " {} "
         },
-        "cpu": {
-            "format": " 󰻠 {usage}% ",
-            "states": {
-                "critical": 60
-            }
-        },
-        "memory": {
-            "format": " 󰍛 {percentage}% ",
-            "states": {
-                "critical": 80
-            }
-        },
-        "temperature": {
-            "critical-threshold": 60,
-            "format": "  {temperatureC}°C ",
-            "format-critical": "  {temperatureC}°C "
+        "custom/player": {
+            "exec": "playerctl metadata --format '󰝚 {{artist}} - {{title}}' 2>/dev/null || echo ''",
+            "format": " {} ",
+            "interval": 5,
+            "on-click": "playerctl play-pause"
         },
         "tray": {
             "icon-size": 18,
             "spacing": 10
+        },
+        "clock": {
+            "format": " 󰥔 {:%H:%M   %m-%d} ",
+            "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>"
         }
     }
 ]

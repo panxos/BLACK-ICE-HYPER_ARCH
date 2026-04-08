@@ -1,7 +1,6 @@
 #!/bin/bash
 # modules/01_disk.sh
 
-banner "PASO 2" "Almacenamiento y Criptografía"
 
 if [ -n "${TARGET_DISK:-}" ]; then
     # Modo automatizado
@@ -29,12 +28,10 @@ if [ -n "${TARGET_DISK:-}" ]; then
     
 else
     # Modo interactivo
-    echo -e "${NEON_PURPLE}┌──────────────────────────────────────────────┐${NC}"
-    echo -e "${NEON_PURPLE}│${NC}  ${BOLD}ESCANEANDO HARDWARE: UNIDADES DISPONIBLES ${NC} ${NEON_PURPLE}│${NC}"
-    echo -e "${NEON_PURPLE}└──────────────────────────────────────────────┘${NC}"
     
     # Obtener lista de discos (incluye SATA/NVMe/VirtIO/Xen)
     # Soporta: /dev/sda, /dev/nvme*, /dev/vda (KVM), /dev/xvda (Xen), /dev/mmcblk*
+    print_step "ESCANEANDO HARDWARE: UNIDADES DISPONIBLES"
     mapfile -t DISK_LIST < <(lsblk -d -n -o NAME,SIZE,MODEL | grep -E "^(sd|nvme|vd|xvd|mmcblk)" | grep -v "loop" | grep -v "sr0")
     
     if [ ${#DISK_LIST[@]} -eq 0 ]; then
@@ -84,9 +81,6 @@ else
     done
     
     # Encryption Choice
-    echo -e "\n${NEON_PURPLE}┌──────────────────────────────────────────────┐${NC}"
-    echo -e "${NEON_PURPLE}│${NC}  ${BOLD}PROTOCOLO CRYPT: CIFRADO DE DISCO LUKS    ${NC} ${NEON_PURPLE}│${NC}"
-    echo -e "${NEON_PURPLE}└──────────────────────────────────────────────┘${NC}"
     
     if [[ $(ask_option "¿Deseas cifrar el núcleo del sistema? (Recomendado)" "Si" "No") == "Si" ]]; then
         ENCRYPT="true"
@@ -112,9 +106,6 @@ else
     fi
     
     # Filesystem Choice
-    echo -e "\n${NEON_PURPLE}┌──────────────────────────────────────────────┐${NC}"
-    echo -e "${NEON_PURPLE}│${NC}  ${BOLD}SELECCIÓN DE ARQUITECTURA DE ARCHIVOS     ${NC} ${NEON_PURPLE}│${NC}"
-    echo -e "${NEON_PURPLE}└──────────────────────────────────────────────┘${NC}"
     echo -e "${NEON_PURPLE}Recomendado: btrfs (Soporta Snapshots del Sistema)${NC}"
     
     FILESYSTEM=$(ask_option "Elige el sistema de archivos:" "btrfs" "ext4" "xfs" "f2fs")
@@ -165,6 +156,15 @@ elif [[ "$DISK" == *"vd"* ]] || [[ "$DISK" == *"xvd"* ]]; then
         PART_BIOS="${DISK}1"
         PART_ROOT="${DISK}2"
     fi
+else
+    # SATA estándar (/dev/sda, /dev/sdb, etc.) — sin prefijo 'p'
+    if [ "$BOOT_MODE" == "UEFI" ]; then
+        PART_BOOT="${DISK}1"
+        PART_ROOT="${DISK}2"
+    else
+        PART_BIOS="${DISK}1"
+        PART_ROOT="${DISK}2"
+    fi
 fi
 
 # --- FORMATTING ---
@@ -175,8 +175,8 @@ fi
 
 if [ "$ENCRYPT" == "true" ]; then
     log_info "Iniciando despliegue de contenedor LUKS..."
-    printf "%s" "$LUKS_PASS" | cryptsetup -q luksFormat "$PART_ROOT" --type luks2 --pbkdf pbkdf2 --key-file -
-    printf "%s" "$LUKS_PASS" | cryptsetup open "$PART_ROOT" cryptroot --key-file -
+    cryptsetup -q luksFormat "$PART_ROOT" --type luks2 --pbkdf pbkdf2 <<< "$LUKS_PASS"
+    cryptsetup open "$PART_ROOT" cryptroot <<< "$LUKS_PASS"
     ROOT_DEV="/dev/mapper/cryptroot"
 else
     ROOT_DEV="$PART_ROOT"
@@ -192,14 +192,18 @@ case "$FILESYSTEM" in
         btrfs subvolume create /mnt/@snapshots >/dev/null 2>&1
         btrfs subvolume create /mnt/@var_log >/dev/null 2>&1
         btrfs subvolume create /mnt/@audit >/dev/null 2>&1
+        btrfs subvolume create /mnt/@pkg >/dev/null 2>&1
         
         umount /mnt
         mount -o noatime,compress=zstd,subvol=@ "$ROOT_DEV" /mnt
-        mkdir -p /mnt/{home,.snapshots,var/log,var/log/audit,boot}
+        mkdir -p /mnt/{home,.snapshots,var/log,var/cache/pacman/pkg,boot}
         mount -o noatime,compress=zstd,subvol=@home "$ROOT_DEV" /mnt/home
         mount -o noatime,compress=zstd,subvol=@snapshots "$ROOT_DEV" /mnt/.snapshots
         mount -o noatime,compress=zstd,subvol=@var_log "$ROOT_DEV" /mnt/var/log
+        
         mkdir -p /mnt/var/log/audit
+        mount -o noatime,compress=zstd,subvol=@audit "$ROOT_DEV" /mnt/var/log/audit
+        mount -o noatime,compress=zstd,subvol=@pkg "$ROOT_DEV" /mnt/var/cache/pacman/pkg
         ;;
     xfs)
         mkfs.xfs -f "$ROOT_DEV" >/dev/null 2>&1
@@ -224,4 +228,5 @@ if [ "$BOOT_MODE" == "UEFI" ]; then
     mount "$PART_BOOT" /mnt/boot/efi
 fi
 
+export ENCRYPT FILESYSTEM DISK PART_ROOT PART_BOOT PART_BIOS
 success "Estructura de almacenamiento finalizada."

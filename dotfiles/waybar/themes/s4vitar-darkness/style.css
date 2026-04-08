@@ -74,7 +74,7 @@ tooltip label {
 }
 
 #clock {
-    color: #cdd6f4;
+    color: #bd93f9;
 }
 
 #custom-settarget {
@@ -89,9 +89,12 @@ tooltip label {
     color: #bd93f9;
 }
 
-#custom-local_ip,
+#custom-local_ip {
+    color: #e5c07b;
+}
+
 #custom-public_ip {
-    color: #cdd6f4;
+    color: #e06c75;
 }
 
 /* Workspaces - Pacman Style */
@@ -129,4 +132,62 @@ tooltip label {
 #custom-settarget:hover {
     background-color: rgba(255, 255, 255, 0.1);
     border-radius: 4px;
+}
+#custom-hardware_temp {
+    color: #00ff00;
+    padding: 0 10px;
+    font-weight: bold;
+}
+
+#custom-hardware_temp {
+    color: #00ff00;
+    padding: 0 10px;
+    font-weight: bold;
+}
+
+#custom-hardware_temp {
+    color: #00ff00;
+    padding: 0 10px;
+    font-weight: bold;
+}
+
+#custom-hardware_temp {
+    color: #00ff00;
+    padding: 0 10px;
+    font-weight: bold;
+}
+
+#custom-hardware_temp {
+    color: #00ff00;
+    padding: 0 10px;
+    font-weight: bold;
+}
+
+#custom-hardware_temp {
+    color: #00ff00;
+    padding: 0 10px;
+    font-weight: bold;
+}
+
+/* Estilos de Batería Cyber para s3th */
+#battery {
+    color: #00ff88; /* Verde por defecto (Good) */
+    padding: 0 10px;
+}
+
+#battery.warning {
+    color: #ffff00; /* Amarillo */
+}
+
+#battery.critical:not(.charging) {
+    color: #ff5555; /* Rojo */
+    animation-name: blink;
+    animation-duration: 0.5s;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+}
+
+#battery.charging {
+    color: #64ffda; /* Cian cuando carga */
 }

@@ -10,7 +10,7 @@
 # --- Variables Globales ---
 INSTALL_DIR=$(dirname "$(readlink -f "$0")")
 
-# --- Importar Librerías SOTA ---
+# --- Importar Librerías  ---
 source "$INSTALL_DIR/src/lib/colors.sh"
 source "$INSTALL_DIR/src/lib/logging.sh"
 source "$INSTALL_DIR/src/lib/utils.sh"
@@ -46,7 +46,7 @@ fi
 
 # --- MAIN INSTALLATION FLOW ---
 
-banner "SYSTEM INITIALIZATION" "v2.0.0 (SOTA Edition)"
+banner "SYSTEM INITIALIZATION" "v2.0.0 ( Edition)"
 
 log_info "Inicializando protocolo de instalación BLACK-ICE..."
 
@@ -106,9 +106,7 @@ echo
 echo -e "${NEON_BLUE}>> SISTEMA LISTO PARA REINICIO.${NC}"
 echo -e "${NEON_BLUE}>> Logueate con tu usuario: ${WHITE}${BOLD}$USER_NAME${NC}${NEON_BLUE} (NO USAR ROOT).${NC}"
 echo -e "${NEON_BLUE}>> Ejecuta 'deploy_hyprland.sh' tras entrar a tu sesión.${NC}"
-echo -e "\n${YELLOW}${BOLD}[!] IMPORTANTE (GRUB LUKS Prompt):${NC}"
-echo -e "${YELLOW}El primer prompt de contraseña (el de pantalla negra de GRUB) utiliza teclado US.${NC}"
-echo -e "${YELLOW}Si tu clave tiene '-', usa la tecla a la derecha del '0' en esa pantalla.${NC}"
+log_success "Distribución de teclado '${KEYMAP:-us}' configurada para GRUB, initramfs (LUKS) y SDDM."
 echo -e "\nEscribe ${BOLD}reboot${NC} para reiniciar."
 
 # --- Guardar configuración para uso futuro con escapado seguro ---
@@ -119,7 +117,6 @@ CONFIG_FILE="$INSTALL_DIR/install.conf.auto"
     printf "KEYBOARD_LAYOUT=%q\n" "${KEYMAP:-us}"
     printf "TARGET_DISK=%q\n" "${DISK#/dev/}"
     printf "ENABLE_LUKS=%q\n" "$( [ "$ENCRYPT" == "true" ] && echo "yes" || echo "no" )"
-    printf "LUKS_PASSWORD=%q\n" "$LUKS_PASS"
     printf "FILESYSTEM=%q\n" "${FILESYSTEM:-ext4}"
     printf "KERNEL=%q\n" "${SELECTED_KERNEL:-linux}"
     printf "TIMEZONE=%q\n" "${TIMEZONE:-America/Santiago}"
@@ -131,5 +128,6 @@ CONFIG_FILE="$INSTALL_DIR/install.conf.auto"
     printf "USERNAME=%q\n" "${USER_NAME:-admin}"
     echo "#Nota: Las contraseñas de root y usuario no se guardan por seguridad en este archivo auto-generado"
 } > "$CONFIG_FILE"
+chmod 600 "$CONFIG_FILE"
 
 exit 0

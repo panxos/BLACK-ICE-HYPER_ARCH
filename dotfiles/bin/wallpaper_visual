@@ -17,8 +17,8 @@ if [ ! -d "$WALL_DIR" ]; then
     exit 1
 fi
 
-# Listar archivos y pasarlos a wofii
-selection=$(ls "$WALL_DIR" | grep -E "\.(png|jpg|jpeg|mp4)$" | wofi --dmenu --prompt "Selecciona Wallpaper:")
+# Listar archivos y pasarlos a wofi (usando find para manejar nombres con espacios)
+selection=$(find "$WALL_DIR" -maxdepth 1 -type f \( -name "*.png" -o -name "*.jpg" -o -name "*.jpeg" -o -name "*.mp4" \) -printf '%f\n' | sort | wofi --dmenu --prompt "Selecciona Wallpaper:")
 
 [ -z "$selection" ] && exit 0
 
@@ -35,18 +35,18 @@ echo "$FULL_PATH" > "$CACHE_FILE"
 # Aplicar según tipo
 if [[ "$selection" == *.mp4 ]]; then
     # Video Wallpaper
-    pkill swww-daemon 2>/dev/null
+    pkill awww-daemon 2>/dev/null
     pkill mpvpaper 2>/dev/null
     sleep 0.5
     mpvpaper -o "no-audio --loop" "*" "$FULL_PATH" &>/dev/null &
 else
     # Imagen Estática
     pkill mpvpaper 2>/dev/null
-    if ! pgrep -x "swww-daemon" > /dev/null; then
-        swww-daemon &
+    if ! pgrep -x "awww-daemon" > /dev/null; then
+        awww-daemon &
         sleep 0.5
     fi
-    swww img "$FULL_PATH" --transition-type wipe --transition-duration 2
+    awww img "$FULL_PATH" --transition-type wipe --transition-duration 2
 fi
 
 notify-send "BLACK-ICE" "Fondo aplicado: $selection"

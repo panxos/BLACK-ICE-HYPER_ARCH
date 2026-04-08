@@ -1,0 +1,120 @@
+#!/bin/bash
+# gh0stzk-walls — BLACK-ICE ARCH
+# Descarga wallpapers de gh0stzk/dotfiles para los temas inspirados en su rice.
+#
+# CRÉDITOS / CREDITS:
+#   Wallpapers y diseño original por gh0stzk
+#   Repositorio: https://github.com/gh0stzk/dotfiles
+#   Licencia original: GPL-3.0
+#   Este script solo descarga assets del autor original — no los redistribuye.
+#
+# USO: gh0stzk-walls [--theme THEME] [--all] [--list]
+
+set -uo pipefail
+
+WALL_DIR="$HOME/Pictures/wallpapers/gh0stzk"
+REPO_RAW="https://raw.githubusercontent.com/gh0stzk/dotfiles/master"
+REPO_API="https://api.github.com/repos/gh0stzk/dotfiles/contents"
+
+# Mapeo: nombre de tema BLACK-ICE → nombre de rice en gh0stzk
+declare -A RICE_MAP=(
+    ["Jan-CyberPunk"]="Jan"
+    ["Emilia-TokyoNight"]="Emilia"
+    ["Marisol-Dracula"]="Marisol"
+    ["Melissa-Nord"]="Melissa"
+)
+
+usage() {
+    echo "Uso: gh0stzk-walls [OPCIÓN]"
+    echo ""
+    echo "  --all              Descarga wallpapers de todos los temas gh0stzk"
+    echo "  --theme TEMA       Descarga wallpapers de un tema específico"
+    echo "  --list             Lista temas disponibles"
+    echo ""
+    echo "Temas disponibles: ${!RICE_MAP[*]}"
+    echo ""
+    echo "Créditos: gh0stzk — https://github.com/gh0stzk/dotfiles"
+}
+
+check_deps() {
+    for cmd in curl jq; do
+        if ! command -v "$cmd" &>/dev/null; then
+            echo "[ERROR] Dependencia faltante: $cmd"
+            exit 1
+        fi
+    done
+}
+
+download_theme_walls() {
+    local theme_name="$1"
+    local rice_name="${RICE_MAP[$theme_name]:-}"
+
+    if [ -z "$rice_name" ]; then
+        echo "[WARN] Tema '$theme_name' no tiene mapeo a gh0stzk rice. Saltar."
+        return
+    fi
+
+    local dest="$WALL_DIR/$theme_name"
+    mkdir -p "$dest"
+
+    echo "[INFO] Descargando wallpapers de rice '$rice_name' → $dest"
+
+    # Obtener lista de archivos en el directorio walls del rice
+    local api_url="$REPO_API/config/bspwm/rices/$rice_name/walls"
+    local files
+    files=$(curl -sf "$api_url" | jq -r '.[].download_url' 2>/dev/null) || {
+        echo "[WARN] No se pudo obtener lista de walls para '$rice_name'. Verificar conexión."
+        return
+    }
+
+    if [ -z "$files" ]; then
+        echo "[WARN] No se encontraron wallpapers para '$rice_name'"
+        return
+    fi
+
+    local count=0
+    while IFS= read -r url; do
+        [ -z "$url" ] && continue
+        filename=$(basename "$url" | cut -d'?' -f1)
+        if [ -f "$dest/$filename" ]; then
+            echo "  [SKIP] $filename ya existe"
+        else
+            echo "  [DOWN] $filename"
+            curl -sf -o "$dest/$filename" "$url" && ((count++)) || \
+                echo "  [ERROR] Falló descarga de $filename"
+        fi
+    done <<< "$files"
+
+    echo "[OK] $count wallpaper(s) descargados para '$theme_name'"
+}
+
+# --- Parse args ---
+check_deps
+
+case "${1:---help}" in
+    --all)
+        echo "Descargando wallpapers de todos los temas gh0stzk..."
+        echo "Créditos: gh0stzk — https://github.com/gh0stzk/dotfiles"
+        echo ""
+        for theme in "${!RICE_MAP[@]}"; do
+            download_theme_walls "$theme"
+        done
+        echo ""
+        echo "Wallpapers guardados en: $WALL_DIR"
+        echo "Actívalos con: theme_selector"
+        ;;
+    --theme)
+        theme="${2:-}"
+        [ -z "$theme" ] && { echo "[ERROR] Especifica un tema con --theme NOMBRE"; exit 1; }
+        download_theme_walls "$theme"
+        ;;
+    --list)
+        echo "Temas disponibles (BLACK-ICE → gh0stzk rice):"
+        for k in "${!RICE_MAP[@]}"; do
+            echo "  $k → ${RICE_MAP[$k]}"
+        done
+        ;;
+    --help|-h|*)
+        usage
+        ;;
+esac

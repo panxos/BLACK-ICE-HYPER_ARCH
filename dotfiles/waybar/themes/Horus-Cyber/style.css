@@ -31,7 +31,23 @@ window#waybar {
 #workspaces,
 #clock,
 #pulseaudio,
-#battery,
+#battery {
+    padding: 0 10px;
+    color: #00f3ff;
+}
+
+#battery.warning {
+    color: #ffff00; /* Amarillo (Warning) */
+}
+
+#battery.critical {
+    color: #ff5555; /* Rojo (Critical) */
+}
+
+#battery.charging, #battery.plugged {
+    color: #00f3ff; /* Cyan cuando carga (Protocolo Horus) */
+}
+
 #custom-power,
 #cpu,
 #memory,
@@ -92,4 +108,9 @@ window#waybar {
     font-size: 18px;
     color: #ff79c6;
     text-shadow: 0 0 5px #00f3ff;
+}
+#custom-hardware_temp {
+    color: #00ff00;
+    padding: 0 10px;
+    font-weight: bold;
 }

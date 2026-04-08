@@ -1,0 +1,100 @@
+* {
+    font-family: "JetBrainsMono Nerd Font", "Roboto", "Helvetica", "Arial", sans-serif;
+    font-size: 14px;
+    font-weight: bold;
+    border: none;
+    border-radius: 0;
+}
+
+window#waybar {
+    background-color: rgba(5, 5, 5, 0.95);
+    color: #39ff14;
+    transition-property: background-color;
+    transition-duration: .5s;
+}
+
+window#waybar.top {
+    border-bottom: 2px solid rgba(57, 255, 20, 0.6);
+}
+
+window#waybar.bottom {
+    border-top: 2px solid rgba(57, 255, 20, 0.6);
+}
+
+tooltip {
+    background: #050505;
+    border: 1px solid #39ff14;
+}
+
+tooltip label {
+    color: #39ff14;
+    font-weight: bold;
+}
+
+#custom-launcher {
+    color: #39ff14;
+    padding-left: 10px;
+    font-size: 18px;
+    text-shadow: 0 0 5px #39ff14;
+}
+
+#cpu { color: #00ff00; }
+#memory { color: #32cd32; }
+#disk { color: #7cfc00; }
+#custom-vpn { color: #00ff00; }
+#network { color: #00fa9a; }
+#pulseaudio { color: #32cd32; }
+#custom-updates { color: #7cfc00; }
+
+#custom-power {
+    color: #ff0000;
+    padding-right: 15px;
+    font-size: 16px;
+    text-shadow: 0 0 5px #ff0000;
+}
+
+#clock, #custom-settarget, #custom-kvm, #battery { color: #39ff14; padding: 0 10px; }
+
+#battery.warning {
+    color: #ffff00;
+}
+
+#battery.critical {
+    color: #ff5555;
+}
+#custom-docker { color: #32cd32; }
+#custom-local_ip { color: #7cfc00; }
+#custom-public_ip { color: #00fa9a; }
+
+#workspaces button {
+    padding: 0 5px;
+    color: #115511;
+    font-size: 18px;
+    transition: all 0.3s ease;
+}
+
+#workspaces button.active {
+    color: #39ff14;
+    text-shadow: 0 0 10px rgba(57, 255, 20, 0.9);
+}
+
+#workspaces button.occupied {
+    color: #228b22;
+}
+
+#workspaces button.urgent {
+    color: #ff0000;
+    text-shadow: 0 0 10px rgba(255, 0, 0, 0.8);
+}
+
+#memory:hover, #cpu:hover, #disk:hover, #network:hover, #pulseaudio:hover, #custom-vpn:hover, #custom-updates:hover, #clock:hover, #custom-settarget:hover {
+    background-color: rgba(57, 255, 20, 0.15);
+    border-radius: 4px;
+}
+
+#custom-hardware_temp {
+    color: #39ff14;
+    padding: 0 5px;
+    font-weight: bold;
+    text-shadow: 0 0 5px rgba(57, 255, 20, 0.8);
+}

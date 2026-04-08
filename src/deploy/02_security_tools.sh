@@ -1,40 +1,179 @@
 #!/bin/bash
 # deploy-modules/02_security_tools.sh
-# Interactive Cybersecurity Tools Installer with Categories
-# Author: Francisco Aravena (P4nX0Z)
-# Version: 2.0 - Interactive Edition
+# Cybersecurity Tools Installer — whiptail checklist UI
+# Author: Francisco Aravena (P4nX0Z) | v3.3.0
 
 banner "MÓDULO 3" "Herramientas de Seguridad"
 
-# Colors for menu
-readonly CYAN='\033[0;36m'
-readonly GREEN='\033[0;32m'
-readonly YELLOW='\033[1;33m'
-readonly RED='\033[0;31m'
-readonly BLUE='\033[0;34m'
-readonly MAGENTA='\033[0;35m'
-readonly NC='\033[0m'
-
-# Installation log
+# Installation counters
 INSTALL_LOG="/tmp/cybersec_install_$(date +%Y%m%d_%H%M%S).log"
 INSTALLED_COUNT=0
 FAILED_COUNT=0
 
-# Ensure valid working directory for git/yay operations
 cd "$USER_HOME" || { log_error "No se pudo acceder a $USER_HOME"; exit 1; }
 
-# Function to install a tool (delegates to safe_install for PGP resilience)
+# ═══════════════════════════════════════════════════════════════════════════
+# PAQUETES PESADOS — deshabilitados por defecto (compilación lenta)
+# bloodhound: neo4j-community = 165 módulos Maven/Scala (~60 min)
+# ghidra:     NSA RE tool, large Java download (~10-20 min)
+# autopsy:    Digital forensics suite, large Java (~10-20 min)
+# sliver:     Go C2 framework, compila desde fuente (~15 min)
+# ═══════════════════════════════════════════════════════════════════════════
+HEAVY_PKGS=("bloodhound" "ghidra" "autopsy" "sliver")
+
+is_heavy() {
+    local pkg="$1"
+    for h in "${HEAVY_PKGS[@]}"; do
+        [[ "$h" == "$pkg" ]] && return 0
+    done
+    return 1
+}
+
+# ═══════════════════════════════════════════════════════════════════════════
+# MASTER TOOLS LIST — formato: "pkg|display|categoria"
+# ═══════════════════════════════════════════════════════════════════════════
+ALL_TOOLS=(
+    # Reconocimiento
+    "nmap|Nmap - Network Scanner|Recon"
+    "masscan|Masscan - Fast Port Scanner|Recon"
+    "rustscan|RustScan - Modern Port Scanner|Recon"
+    "netdiscover|Netdiscover - ARP Scanner|Recon"
+    "arp-scan|ARP-Scan - Network Discovery|Recon"
+    "recon-ng|Recon-ng - Recon Framework|Recon"
+    "theharvester|TheHarvester - OSINT Tool|Recon"
+    "spiderfoot|SpiderFoot - OSINT Automation|Recon"
+    "amass|Amass - Subdomain Enumeration|Recon"
+    "sherlock|Sherlock - Username Hunter|Recon"
+    "dnsenum|DNSenum - DNS Enumeration|Recon"
+    "dnsrecon|DNSrecon - DNS Recon|Recon"
+    "fierce|Fierce - DNS Scanner|Recon"
+    "enum4linux|Enum4Linux - SMB Enumeration|Recon"
+    # Web
+    "burpsuite|Burp Suite - Web Proxy|Web"
+    "zaproxy|OWASP ZAP - Web Scanner|Web"
+    "sqlmap|SQLMap - SQL Injection|Web"
+    "nikto|Nikto - Web Server Scanner|Web"
+    "wpscan|WPScan - WordPress Scanner|Web"
+    "whatweb|WhatWeb - Web Fingerprinting|Web"
+    "gobuster|Gobuster - Directory Fuzzer|Web"
+    "ffuf|FFUF - Fast Web Fuzzer|Web"
+    "feroxbuster|Feroxbuster - Content Discovery|Web"
+    "nuclei|Nuclei - Vulnerability Scanner|Web"
+    "httpx|HTTPx - HTTP Toolkit|Web"
+    "commix|Commix - Command Injection|Web"
+    "xsser|XSSer - XSS Scanner|Web"
+    # Wireless
+    "aircrack-ng|Aircrack-ng - WiFi Security|Wireless"
+    "kismet|Kismet - Wireless Detector|Wireless"
+    "wifite|Wifite - Automated WiFi Attack|Wireless"
+    "reaver|Reaver - WPS Attack|Wireless"
+    "bully|Bully - WPS Bruteforce|Wireless"
+    "pixiewps|PixieWPS - WPS Pixie Dust|Wireless"
+    # Windows/AD
+    "impacket|Impacket - Python SMB/MSRPC|AD"
+    "netexec|NetExec - Modern CME (nxc)|AD"
+    "crackmapexec|CrackMapExec - Legacy CME|AD"
+    "evil-winrm|Evil-WinRM - WinRM Shell|AD"
+    "bloodhound|BloodHound - AD Mapper [~60min]|AD"
+    "bloodhound.py|BloodHound.py - AD Ingestor|AD"
+    "certipy|Certipy - AD CS Attack|AD"
+    "coercer|Coercer - Forced Auth|AD"
+    "kerbrute|Kerbrute - Kerberos Bruteforce|AD"
+    "ldapdomaindump|LDAPDomainDump - AD Dumper|AD"
+    "responder|Responder - LLMNR Poisoner|AD"
+    "smbmap|SMBMap - SMB Enumeration|AD"
+    "chntpw|Chntpw - Windows Password Reset|AD"
+    # Cracking
+    "john|John the Ripper - Password Cracker|Crack"
+    "hashcat|Hashcat - GPU Cracker|Crack"
+    "hydra|Hydra - Network Bruteforcer|Crack"
+    "medusa|Medusa - Parallel Bruteforcer|Crack"
+    "trufflehog|TruffleHog - Secret Scanner|Crack"
+    "gitleaks|Gitleaks - Git Secret Scanner|Crack"
+    "cewl|CeWL - Wordlist Generator|Crack"
+    "crunch|Crunch - Wordlist Creator|Crack"
+    "hashid|HashID - Hash Identifier|Crack"
+    "seclists|SecLists - Security Wordlists|Crack"
+    "wordlists|Wordlists - RockYou & More|Crack"
+    # Explotación
+    "metasploit|Metasploit Framework|Exploit"
+    "sliver|Sliver - C2 Framework (Go) [~15min]|Exploit"
+    "villain|Villain - Reverse Shell Manager|Exploit"
+    "armitage|Armitage - MSF GUI|Exploit"
+    "exploitdb|ExploitDB - Exploit Archive|Exploit"
+    "set|Social Engineer Toolkit|Exploit"
+    "routersploit|RouterSploit - Router Exploit|Exploit"
+    "beef|BeEF - Browser Exploitation|Exploit"
+    # Sniffing
+    "wireshark-qt|Wireshark - Network Analyzer|Sniff"
+    "tcpdump|TCPDump - Packet Sniffer|Sniff"
+    "ettercap|Ettercap - MITM Framework|Sniff"
+    "bettercap|Bettercap - Network Attack|Sniff"
+    "mitmproxy|MITMProxy - HTTP(S) Proxy|Sniff"
+    "macchanger|MACchanger - MAC Spoofer|Sniff"
+    "scapy|Scapy - Packet Manipulation|Sniff"
+    # Reversing
+    "gdb|GDB - GNU Debugger|RE"
+    "radare2|Radare2 - Reverse Framework|RE"
+    "ghidra|Ghidra - NSA RE Tool [~20min]|RE"
+    "nasm|NASM - Assembler|RE"
+    "apktool|APKTool - Android Decompiler|RE"
+    "jadx|JADX - Android Decompiler|RE"
+    "edb-debugger|EDB - Qt Debugger|RE"
+    # Forense
+    "autopsy|Autopsy - Digital Forensics [~20min]|Forense"
+    "sleuthkit|SleuthKit - Forensic Toolkit|Forense"
+    "volatility3|Volatility3 - Memory Forensics|Forense"
+    "binwalk|Binwalk - Firmware Analysis|Forense"
+    "foremost|Foremost - File Recovery|Forense"
+    "exiftool|ExifTool - Metadata Reader|Forense"
+    "steghide|Steghide - Steganography Tool|Forense"
+    "stegseek|Stegseek - Steg Cracker|Forense"
+    "hexedit|HexEdit - Hex Editor|Forense"
+    # Networking
+    "openbsd-netcat|Netcat - Network Swiss Army|Net"
+    "socat|Socat - Data Relay|Net"
+    "proxychains-ng|Proxychains - Proxy Forcer|Net"
+    "sshuttle|SSHuttle - VPN over SSH|Net"
+    "chisel|Chisel - TCP/UDP Tunnel|Net"
+    "traceroute|Traceroute - Path Trace|Net"
+    "wireshark-qt|Wireshark CLI|Net"
+    "bind|Bind-tools - dig/nslookup|Net"
+    "whois|Whois - Domain Lookup|Net"
+    "mtr|MTR - Ping+Traceroute|Net"
+    "iperf3|IPerf3 - Bandwidth Test|Net"
+    "nethogs|Nethogs - Bandwidth/Process|Net"
+    "iftop|Iftop - Bandwidth/Host|Net"
+    "iptraf-ng|IPTraf-ng - Net Monitor|Net"
+    "minicom|Minicom - Serial Terminal|Net"
+    "snmpcheck|SNMPCheck - SNMP Enum|Net"
+    "onesixtyone|Onesixtyone - SNMP Scanner|Net"
+    "ike-scan|IKE-Scan - VPN Scanner|Net"
+)
+
+# ═══════════════════════════════════════════════════════════════════════════
+# INSTALL FUNCTIONS
+# ═══════════════════════════════════════════════════════════════════════════
 install_tool() {
     local tool="$1"
     local display_name="${2:-$tool}"
-    
+
     if pacman -Q "$tool" &>/dev/null; then
         echo -e "  ${GREEN}✓${NC} $display_name (ya instalado)"
         return 0
     fi
-    
+
+    # Aviso especial para paquetes pesados
+    if is_heavy "$tool"; then
+        echo -e ""
+        echo -e "${YELLOW}╔══════════════════════════════════════════════════════════════╗${NC}"
+        echo -e "${YELLOW}║  ⚠️  COMPILACIÓN LENTA: $tool${NC}"
+        echo -e "${YELLOW}║  Este paquete puede tardar 15-60 min. NO canceles.          ║${NC}"
+        echo -e "${YELLOW}╚══════════════════════════════════════════════════════════════╝${NC}"
+        echo -e ""
+    fi
+
     echo -e "  ${CYAN}→${NC} Instalando $display_name..."
-    
     if safe_install "$tool"; then
         echo -e "  ${GREEN}✓${NC} $display_name instalado"
         ((INSTALLED_COUNT++))
@@ -47,457 +186,162 @@ install_tool() {
     fi
 }
 
-# Function to show category menu
-show_category_menu() {
-    local category="$1"
-    shift
-    local tools=("$@")
-    
-    clear
-    echo -e "${CYAN}╔════════════════════════════════════════════════════════════╗${NC}"
-    echo -e "${CYAN}║${NC}  ${MAGENTA}BLACK-ICE ARCH${NC} - Instalador de Herramientas        ${CYAN}║${NC}"
-    echo -e "${CYAN}║${NC}  Categoría: ${YELLOW}$category${NC}"
-    echo -e "${CYAN}╚════════════════════════════════════════════════════════════╝${NC}"
-    echo ""
-    echo -e "${GREEN}[1]${NC} Instalar todas las herramientas de esta categoría"
-    echo -e "${GREEN}[2]${NC} Seleccionar herramientas individuales"
-    echo -e "${RED}[0]${NC} Volver al menú principal"
-    echo ""
-    read -p "Selecciona una opción: " choice < /dev/tty
-    
-    case $choice in
-        1)
-            log_info "Instalando todas las herramientas de: $category"
-            for tool_entry in "${tools[@]}"; do
-                IFS='|' read -r package display_name <<< "$tool_entry"
-                install_tool "$package" "$display_name"
-            done
-            ;;
-        2)
-            select_individual_tools "$category" "${tools[@]}"
-            ;;
-        0)
-            return
-            ;;
-        *)
-            echo -e "${RED}Opción inválida${NC}"
-            sleep 1
-            ;;
+# Instala lista de paquetes evitando duplicados
+install_pkg_list() {
+    local -a pkgs=("$@")
+    local -A seen=()
+    for pkg in "${pkgs[@]}"; do
+        [[ -z "$pkg" ]] && continue
+        [[ -n "${seen[$pkg]:-}" ]] && continue
+        seen[$pkg]=1
+        install_tool "$pkg"
+    done
+}
+
+# Suite estándar: todo excepto HEAVY_PKGS
+install_standard() {
+    log_info "Instalando Suite Estándar (sin paquetes pesados)..."
+    local -a pkgs=()
+    for entry in "${ALL_TOOLS[@]}"; do
+        IFS='|' read -r pkg _ _ <<< "$entry"
+        is_heavy "$pkg" || pkgs+=("$pkg")
+    done
+    install_pkg_list "${pkgs[@]}"
+}
+
+# Suite completa incluyendo pesados
+install_full() {
+    log_info "Instalando Suite COMPLETA (incluyendo paquetes de compilación larga)..."
+    echo -e "${YELLOW}⚠️  bloodhound/ghidra/autopsy pueden tardar 20-60 min cada uno.${NC}"
+    sleep 2
+    local -a pkgs=()
+    for entry in "${ALL_TOOLS[@]}"; do
+        IFS='|' read -r pkg _ _ <<< "$entry"
+        pkgs+=("$pkg")
+    done
+    install_pkg_list "${pkgs[@]}"
+}
+
+# Instala selección personalizada desde whiptail
+install_whiptail_checklist() {
+    if ! command -v whiptail &>/dev/null; then
+        log_warn "whiptail no disponible. Usando suite estándar."
+        install_standard
+        return
+    fi
+
+    local -a wt_args=()
+    for entry in "${ALL_TOOLS[@]}"; do
+        IFS='|' read -r pkg display cat <<< "$entry"
+        local label="[$cat] $display"
+        local state="ON"
+        is_heavy "$pkg" && state="OFF"
+        # Marcar ya instalados
+        pacman -Q "$pkg" &>/dev/null && label="$label ✓"
+        wt_args+=("$pkg" "$label" "$state")
+    done
+
+    local CHOICES
+    CHOICES=$(whiptail \
+        --title "BLACK-ICE ARCH — Suite de Ciberseguridad" \
+        --checklist \
+        "ESPACIO = seleccionar/deseleccionar  |  ENTER = confirmar
+Los marcados con ⚠️ en el nombre tardan 15-60 min (compilación desde fuente).
+Recomendado: dejar bloodhound, ghidra y autopsy desmarcados en primera instalación." \
+        40 80 25 \
+        "${wt_args[@]}" \
+        3>&1 1>&2 2>&3) || return 0  # usuario canceló
+
+    # Instalar seleccionados
+    log_info "Instalando herramientas seleccionadas..."
+    local -a selected=()
+    # shellcheck disable=SC2206
+    IFS=' ' read -r -a selected <<< "$CHOICES"
+    for pkg in "${selected[@]}"; do
+        pkg="${pkg//\"/}"  # quitar comillas que whiptail añade
+        install_tool "$pkg"
+    done
+}
+
+# ═══════════════════════════════════════════════════════════════════════════
+# MENÚ PRINCIPAL
+# ═══════════════════════════════════════════════════════════════════════════
+main_menu() {
+    if ! command -v whiptail &>/dev/null; then
+        log_warn "whiptail no disponible — instalando suite estándar automáticamente."
+        install_standard
+        return
+    fi
+
+    local choice
+    choice=$(whiptail \
+        --title "BLACK-ICE ARCH — Instalador de Ciberseguridad" \
+        --menu \
+"Elige el modo de instalación:
+
+  ESTÁNDAR:   ~100 herramientas, excluye las de compilación larga.
+  PERSONALIZADO: Checklist completo — ESPACIO para marcar/desmarcar.
+  COMPLETO:   TODO incluyendo bloodhound (~60min), ghidra (~20min), autopsy (~20min).
+" \
+        20 72 4 \
+        "1" "Suite Estándar  (recomendado — sin pesadas)" \
+        "2" "Selección personalizada  (whiptail checklist)" \
+        "3" "Suite Completa  (incluye bloodhound / ghidra / autopsy)" \
+        "0" "Saltar — no instalar herramientas ahora" \
+        3>&1 1>&2 2>&3) || return 0
+
+    case "$choice" in
+        1) install_standard ;;
+        2) install_whiptail_checklist ;;
+        3) install_full ;;
+        0) log_info "Instalación de herramientas omitida por el usuario." ; return 0 ;;
     esac
 }
 
-# Function to select individual tools
-select_individual_tools() {
-    local category="$1"
-    shift
-    local tools=("$@")
-    local selected=()
-    
-    while true; do
-        clear
-        echo -e "${CYAN}╔════════════════════════════════════════════════════════════╗${NC}"
-        echo -e "${CYAN}║${NC}  Selección Individual - ${YELLOW}$category${NC}"
-        echo -e "${CYAN}╚════════════════════════════════════════════════════════════╝${NC}"
-        echo ""
-        
-        local idx=1
-        for tool_entry in "${tools[@]}"; do
-            IFS='|' read -r package display_name <<< "$tool_entry"
-            local status=""
-            if pacman -Q "$package" &>/dev/null; then
-                status="${GREEN}(ya instalado)${NC}"
-            elif [[ " ${selected[@]} " =~ " ${idx} " ]]; then
-                status="${YELLOW}[SELECCIONADO]${NC}"
-            fi
-            echo -e "[$idx] $display_name $status"
-            ((idx++))
-        done
-        
-        echo ""
-        echo -e "${GREEN}[A]${NC} Instalar herramientas seleccionadas"
-        echo -e "${RED}[0]${NC} Volver"
-        echo ""
-        read -p "Selecciona herramientas (ej: 1 3 5) o [A] para instalar: " input < /dev/tty
-        
-        if [[ "$input" == "0" ]]; then
-            return
-        elif [[ "$input" =~ ^[Aa]$ ]]; then
-            if [ ${#selected[@]} -gt 0 ]; then
-                log_info "Instalando herramientas seleccionadas..."
-                for idx in "${selected[@]}"; do
-                    tool_entry="${tools[$((idx-1))]}"
-                    IFS='|' read -r package display_name <<< "$tool_entry"
-                    install_tool "$package" "$display_name"
-                done
-                selected=()
-                read -p "Presiona Enter para continuar..." < /dev/tty
-            else
-                echo -e "${YELLOW}No hay herramientas seleccionadas${NC}"
-                sleep 1
-            fi
-        else
-            for num in $input; do
-                if [[ "$num" =~ ^[0-9]+$ ]] && [ "$num" -ge 1 ] && [ "$num" -le "${#tools[@]}" ]; then
-                    if [[ ! " ${selected[@]} " =~ " ${num} " ]]; then
-                        selected+=("$num")
-                    fi
-                fi
-            done
-        fi
-    done
-}
-
 # ═══════════════════════════════════════════════════════════════════════════
-# CATEGORÍAS DE HERRAMIENTAS
+# WORDLISTS
 # ═══════════════════════════════════════════════════════════════════════════
-
-# Categoría 1: Reconocimiento y Escaneo
-install_recon() {
-    local tools=(
-        "nmap|Nmap - Network Scanner"
-        "masscan|Masscan - Fast Port Scanner"
-        "rustscan|RustScan - Modern Port Scanner"
-        "netdiscover|Netdiscover - ARP Scanner"
-        "arp-scan|ARP-Scan - Network Discovery"
-        "recon-ng|Recon-ng - Reconnaissance Framework"
-        "theharvester|TheHarvester - OSINT Tool"
-        "spiderfoot|SpiderFoot - OSINT Automation"
-        "amass|Amass - Subdomain Enumeration"
-        "sherlock|Sherlock - Username Hunter"
-        "dnsenum|DNSenum - DNS Enumeration"
-        "dnsrecon|DNSrecon - DNS Reconnaissance"
-        "fierce|Fierce - DNS Scanner"
-        "enum4linux|Enum4Linux - SMB Enumeration"
-    )
-    show_category_menu "Reconocimiento y Escaneo" "${tools[@]}"
-}
-
-# Categoría 2: Hacking Web
-install_web() {
-    local tools=(
-        "burpsuite|Burp Suite - Web Proxy"
-        "zaproxy|OWASP ZAP - Web Scanner"
-        "sqlmap|SQLMap - SQL Injection"
-        "nikto|Nikto - Web Server Scanner"
-        "wpscan|WPScan - WordPress Scanner"
-        "joomscan|JoomScan - Joomla Scanner"
-        "whatweb|WhatWeb - Web Fingerprinting"
-        "gobuster|Gobuster - Directory Fuzzer"
-        "ffuf|FFUF - Fast Web Fuzzer"
-        "wfuzz|WFuzz - Web Fuzzer"
-        "feroxbuster|Feroxbuster - Content Discovery"
-        "dirb|DIRB - URL Bruteforcer"
-        "commix|Commix - Command Injection"
-        "xsser|XSSer - XSS Scanner"
-        "nuclei|Nuclei - Vulnerability Scanner"
-        "httpx|HTTPx - HTTP Toolkit"
-    )
-    show_category_menu "Hacking Web" "${tools[@]}"
-}
-
-# Categoría 3: Wireless y Bluetooth
-install_wireless() {
-    local tools=(
-        "aircrack-ng|Aircrack-ng - WiFi Security"
-        "kismet|Kismet - Wireless Detector"
-        "wifite|Wifite - Automated WiFi Attack"
-        "reaver|Reaver - WPS Attack"
-        "bully|Bully - WPS Bruteforce"
-        "pixiewps|PixieWPS - WPS Pixie Dust"
-        "bluez-tools|Bluez Tools - Bluetooth Utils"
-        "bluez-utils|Bluez Utils - Bluetooth Stack"
-    )
-    show_category_menu "Wireless y Bluetooth" "${tools[@]}"
-}
-
-# Categoría 4: Windows y Active Directory
-install_windows_ad() {
-    local tools=(
-        "impacket|Impacket - Python SMB/MSRPC"
-        "netexec|NetExec - Modern AD Swiss Army (CME successor)"
-        "crackmapexec|CrackMapExec - Legacy AD Swiss Army"
-        "evil-winrm|Evil-WinRM - WinRM Shell"
-        "bloodhound|BloodHound - AD Mapper (GUI)"
-        "bloodhound.py|BloodHound.py - AD Ingestor"
-        "certipy|Certipy - AD CS Enumeration & Attack"
-        "coercer|Coercer - Forced Authentication Tool"
-        "kerbrute|Kerbrute - Kerberos Bruteforce/Enum"
-        "ldapdomaindump|LDAPDomainDump - Active Directory Dumper"
-        "responder|Responder - LLMNR/NBT-NS Poisoner"
-        "smbmap|SMBMap - SMB Enumeration"
-        "chntpw|Chntpw - Windows Password Reset"
-    )
-    show_category_menu "Windows y Active Directory" "${tools[@]}"
-}
-
-# Categoría 5: Cracking y Wordlists
-install_cracking() {
-    local tools=(
-        "john|John the Ripper - Password Cracker"
-        "hashcat|Hashcat - Advanced Cracker"
-        "hydra|Hydra - Network Logon Cracker"
-        "medusa|Medusa - Parallel Bruteforcer"
-        "trufflehog|TruffleHog - Secret Scanner (Git/S3)"
-        "gitleaks|Gitleaks - Secret Scanner (Repo)"
-        "pcredz|PCredz - Credentials from PCAP"
-        "cewl|CeWL - Wordlist Generator"
-        "crunch|Crunch - Wordlist Creator"
-        "hashid|HashID - Hash Identifier"
-        "seclists|SecLists - Security Wordlists"
-        "wordlists|Wordlists - ROCKY-YOU & More"
-    )
-    show_category_menu "Cracking y Wordlists" "${tools[@]}"
-}
-
-# Categoría 6: Explotación y Frameworks
-install_exploitation() {
-    local tools=(
-        "metasploit|Metasploit Framework"
-        "sliver|Sliver - Advanced C2 Framework (Go)"
-        "villain|Villain - Reverse Shell Manager"
-        "armitage|Armitage - MSF GUI"
-        "exploitdb|ExploitDB - Exploit Archive"
-        "searchsploit|SearchSploit - Exploit Search"
-        "set|Social Engineer Toolkit"
-        "routersploit|RouterSploit - Router Exploitation"
-        "beef|BeEF - Browser Exploitation"
-    )
-    show_category_menu "Explotación y Frameworks" "${tools[@]}"
-}
-
-# Categoría 7: Sniffing y Spoofing
-install_sniffing() {
-    local tools=(
-        "wireshark-qt|Wireshark - Network Analyzer"
-        "tcpdump|TCPDump - Packet Sniffer"
-        "netsniff-ng|Netsniff-ng - Network Toolkit"
-        "ettercap|Ettercap - MITM Framework"
-        "bettercap|Bettercap - Network Attack"
-        "mitmproxy|MITMProxy - HTTP(S) Proxy"
-        "dsniff|DSniff - Network Auditing"
-        "macchanger|MACchanger - MAC Spoofer"
-        "scapy|Scapy - Packet Manipulation"
-    )
-    show_category_menu "Sniffing y Spoofing" "${tools[@]}"
-}
-
-# Categoría 8: Reverse Engineering
-install_reversing() {
-    local tools=(
-        "gdb|GDB - GNU Debugger"
-        "edb-debugger|EDB - Qt Debugger"
-        "radare2|Radare2 - Reverse Framework"
-        "ghidra|Ghidra - NSA RE Tool"
-        "nasm|NASM - Assembler"
-        "clang|Clang - C/C++ Compiler"
-        "apktool|APKTool - Android Decompiler"
-        "dex2jar|Dex2Jar - DEX to JAR"
-        "jadx|JADX - Android Decompiler"
-    )
-    show_category_menu "Reverse Engineering" "${tools[@]}"
-}
-
-# Categoría 9: Forense
-install_forensics() {
-    local tools=(
-        "autopsy|Autopsy - Digital Forensics"
-        "sleuthkit|SleuthKit - Forensic Toolkit"
-        "volatility3|Volatility - Memory Forensics"
-        "binwalk|Binwalk - Firmware Analysis"
-        "foremost|Foremost - File Recovery"
-        "scalpel|Scalpel - File Carver"
-        "exiftool|ExifTool - Metadata Reader"
-        "pdf-parser|PDF-Parser - PDF Analysis"
-        "stegseek|Stegseek - Steganography Cracker"
-        "steghide|Steghide - Steganography Tool"
-        "hexedit|HexEdit - Hex Editor"
-        "ghex|GHex - GNOME Hex Editor"
-    )
-    show_category_menu "Forense" "${tools[@]}"
-}
-
-# Categoría 10: Utilidades de Red y Tunneling
-install_networking() {
-    local tools=(
-        "openbsd-netcat|Netcat - Network Swiss Army"
-        "socat|Socat - Data Relay"
-        "curl|cURL - Transfer Tool"
-        "wget|Wget - File Downloader"
-        "git|Git - Version Control"
-        "proxychains-ng|Proxychains - Proxy Forcer"
-        "sshuttle|SSHuttle - VPN over SSH"
-        "chisel|Chisel - Fast TCP/UDP Tunnel"
-        "ptunnel|PTunnel - ICMP Tunnel"
-        "httptunnel|HTTPTunnel - HTTP Tunnel"
-        "traceroute|Traceroute - Network Path Trace"
-        "minicom|Minicom - Serial Terminal (Cisco/Console)"
-        "expect|Expect - Interactive Automation"
-        "tcl|Tcl - Tool Command Language"
-        "cisco-torch|Cisco-Torch - Cisco Scanner"
-        "snmpcheck|SNMPCheck - SNMP Enumerator"
-        "onesixtyone|Onesixtyone - SNMP Scanner"
-        "ike-scan|IKE-Scan - VPN Scanner"
-        "bind|Bind-tools - DNS Utils (dig, nslookup)"
-        "whois|Whois - Domain Lookup"
-        "mtr|MTR - Combined Ping/Traceroute"
-        "iperf3|IPerf3 - Network Performance"
-        "net-tools|Net-tools - Legacy Base (arp, ifconfig)"
-        "nethogs|Nethogs - Bandwidth per Process"
-        "iftop|Iftop - Bandwidth per Host"
-        "iptraf-ng|IPTraf-ng - Network Monitoring"
-        "ethtool|Ethtool - Interface Settings"
-    )
-    show_category_menu "Utilidades de Red y Tunneling" "${tools[@]}"
-}
-
-# Install all categories
-install_all() {
-    log_info "Instalando TODAS las herramientas de ciberseguridad..."
-    echo -e "${YELLOW}Esto puede tomar varios minutos...${NC}"
-    sleep 2
-    
-    # Install CLI tools first
-    log_info "Instalando utilidades CLI base..."
-    CLI_TOOLS=("lsd" "bat" "xclip" "fzf" "ripgrep" "fd" "htop" "btop" "reflector" "snapper" "yt-dlp" "mpv" "speedtest-cli" "jq" "curl" "wget" "net-tools")
-    for tool in "${CLI_TOOLS[@]}"; do
-        install_tool "$tool"
-    done
-    
-    # Install all categories (non-interactive)
-    local all_tools=(
-        # Recon
-        "nmap" "masscan" "rustscan" "netdiscover" "arp-scan" "recon-ng" "theharvester" 
-        "spiderfoot" "amass" "sherlock" "dnsenum" "dnsrecon" "fierce" "enum4linux"
-        # Web
-        "burpsuite" "zaproxy" "sqlmap" "nikto" "wpscan" "joomscan" "whatweb" 
-        "gobuster" "ffuf" "wfuzz" "feroxbuster" "dirb" "commix" "xsser" "nuclei" "httpx"
-        # Wireless
-        "aircrack-ng" "kismet" "wifite" "reaver" "bully" "pixiewps" "bluez-tools" "bluez-utils"
-        # Windows/AD
-        "impacket" "netexec" "evil-winrm" "bloodhound" "bloodhound.py" "certipy"
-        "coercer" "kerbrute" "ldapdomaindump" "responder" "smbmap" "chntpw"
-        # Cracking
-        "john" "hashcat" "hydra" "medusa" "trufflehog" "gitleaks" "pcredz" "cewl" "crunch" "hashid" "seclists" "wordlists"
-        # Exploitation
-        "metasploit" "sliver" "villain" "armitage" "exploitdb" "searchsploit" "set" "routersploit" "beef"
-        # Sniffing
-        "wireshark-qt" "tcpdump" "netsniff-ng" "ettercap" "bettercap" "mitmproxy" 
-        "dsniff" "macchanger" "scapy"
-        # Reversing
-        "gdb" "edb-debugger" "radare2" "ghidra" "nasm" "clang" "apktool" "dex2jar" "jadx"
-        # Forensics
-        "autopsy" "sleuthkit" "volatility3" "binwalk" "foremost" "scalpel" "exiftool" 
-        "pdf-parser" "stegseek" "steghide" "hexedit" "ghex"
-        # Networking
-        "openbsd-netcat" "socat" "curl" "wget" "git" "proxychains-ng" "sshuttle" 
-        "chisel" "ptunnel" "httptunnel" "traceroute" "minicom" "bind" "whois" "mtr"
-        "iperf3" "net-tools" "nethogs" "iftop" "iptraf-ng" "ethtool" "expect" "tcl"
-        "cisco-torch" "snmpcheck" "onesixtyone" "ike-scan"
-    )
-    
-    for tool in "${all_tools[@]}"; do
-        install_tool "$tool"
-    done
-}
-
-# ═══════════════════════════════════════════════════════════════════════════
-# MAIN MENU
-# ═══════════════════════════════════════════════════════════════════════════
-
-main_menu() {
-    while true; do
-        clear
-        echo -e "${CYAN}╔════════════════════════════════════════════════════════════╗${NC}"
-        echo -e "${CYAN}║${NC}                                                            ${CYAN}║${NC}"
-        echo -e "${CYAN}║${NC}     ${MAGENTA}██████╗ ██╗      █████╗  ██████╗██╗  ██╗${NC}           ${CYAN}║${NC}"
-        echo -e "${CYAN}║${NC}     ${MAGENTA}██╔══██╗██║     ██╔══██╗██╔════╝██║ ██╔╝${NC}           ${CYAN}║${NC}"
-        echo -e "${CYAN}║${NC}     ${MAGENTA}██████╔╝██║     ███████║██║     █████╔╝${NC}            ${CYAN}║${NC}"
-        echo -e "${CYAN}║${NC}     ${MAGENTA}██╔══██╗██║     ██╔══██║██║     ██╔═██╗${NC}            ${CYAN}║${NC}"
-        echo -e "${CYAN}║${NC}     ${MAGENTA}██████╔╝███████╗██║  ██║╚██████╗██║  ██╗${NC}           ${CYAN}║${NC}"
-        echo -e "${CYAN}║${NC}     ${MAGENTA}╚═════╝ ╚══════╝╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝${NC}           ${CYAN}║${NC}"
-        echo -e "${CYAN}║${NC}                                                            ${CYAN}║${NC}"
-        echo -e "${CYAN}║${NC}          ${BLUE}ICE ARCH - Cybersecurity Tools${NC}              ${CYAN}║${NC}"
-        echo -e "${CYAN}╚════════════════════════════════════════════════════════════╝${NC}"
-        echo ""
-        echo -e "${GREEN}[1]${NC}  Reconocimiento y Escaneo"
-        echo -e "${GREEN}[2]${NC}  Hacking Web"
-        echo -e "${GREEN}[3]${NC}  Wireless y Bluetooth"
-        echo -e "${GREEN}[4]${NC}  Windows y Active Directory"
-        echo -e "${GREEN}[5]${NC}  Cracking y Wordlists"
-        echo -e "${GREEN}[6]${NC}  Explotación y Frameworks"
-        echo -e "${GREEN}[7]${NC}  Sniffing y Spoofing"
-        echo -e "${GREEN}[8]${NC}  Reverse Engineering"
-        echo -e "${GREEN}[9]${NC}  Forense"
-        echo -e "${GREEN}[10]${NC} Utilidades de Red y Tunneling"
-        echo ""
-        echo -e "${YELLOW}[A]${NC}  Instalar TODO (todas las categorías)"
-        echo -e "${RED}[0]${NC}  Salir"
-        echo ""
-        echo -e "${CYAN}Instaladas: ${GREEN}$INSTALLED_COUNT${NC} | Fallidas: ${RED}$FAILED_COUNT${NC}"
-        echo ""
-        read -p "Selecciona una opción: " choice < /dev/tty
-        
-        case $choice in
-            1) install_recon ;;
-            2) install_web ;;
-            3) install_wireless ;;
-            4) install_windows_ad ;;
-            5) install_cracking ;;
-            6) install_exploitation ;;
-            7) install_sniffing ;;
-            8) install_reversing ;;
-            9) install_forensics ;;
-            10) install_networking ;;
-            [Aa]) install_all; read -p "Presiona Enter para continuar..." < /dev/tty ;;
-            0) 
-                log_success "Saliendo del menú de herramientas de seguridad..."
-                return 0
-                ;;
-            *)
-                echo -e "${RED}Opción inválida${NC}"
-                sleep 1
-                ;;
-        esac
-    done
-}
-
-# --- Wordlist Verification & Fix ---
 fix_wordlists() {
     log_info "Verificando disponibilidad de wordlists..."
-    
-    # Ensure wordlists base dir exists
     sudo -n mkdir -p /usr/share/wordlists
-    
-    # 1. SecLists
+
     if [ -d "/usr/share/seclists" ]; then
-        log_success "SecLists encontrada en /usr/share/seclists"
         ln -sf "/usr/share/seclists" "$USER_HOME/wordlists"
-    else
-        log_warn "SecLists no encontrada. Instala con 'yay -S seclists' si la necesitas."
+        log_success "SecLists enlazada en ~/wordlists"
     fi
-    
-    # 2. Rockyou (BlackArch / Standard)
+
     local rockyou_path=""
-    [ -f "/usr/share/wordlists/rockyou.txt" ] && rockyou_path="/usr/share/wordlists/rockyou.txt"
-    [ -f "/usr/share/seclists/Passwords/Leaked-Databases/rockyou.txt" ] && rockyou_path="/usr/share/seclists/Passwords/Leaked-Databases/rockyou.txt"
-    [ -f "/usr/share/wordlists/rockyou.txt.gz" ] && rockyou_path="/usr/share/wordlists/rockyou.txt.gz"
-    
+    [ -f "/usr/share/wordlists/rockyou.txt" ]      && rockyou_path="/usr/share/wordlists/rockyou.txt"
+    [ -f "/usr/share/seclists/Passwords/Leaked-Databases/rockyou.txt" ] && \
+        rockyou_path="/usr/share/seclists/Passwords/Leaked-Databases/rockyou.txt"
+    [ -f "/usr/share/wordlists/rockyou.txt.gz" ]   && rockyou_path="/usr/share/wordlists/rockyou.txt.gz"
+
     if [ -n "$rockyou_path" ]; then
-        log_success "RockYou wordlist localizada en $rockyou_path"
-        # Descomprimir si está comprimido
         if [[ "$rockyou_path" == *.gz ]]; then
-            log_info "Descomprimiendo rockyou.txt..."
-            sudo -n gunzip -c "$rockyou_path" | sudo  tee "/usr/share/wordlists/rockyou.txt" > /dev/null
+            sudo -n gunzip -c "$rockyou_path" | sudo tee "/usr/share/wordlists/rockyou.txt" > /dev/null
             rockyou_path="/usr/share/wordlists/rockyou.txt"
         fi
-        ln -sf "$rockyou_path" "$USER_HOME/rockyou.txt"
+        [ -e "$rockyou_path" ] && ln -sf "$rockyou_path" "$USER_HOME/rockyou.txt"
+        log_success "RockYou localizada en $rockyou_path"
     else
-        log_warn "RockYou.txt no encontrada. Intentando descargar..."
-        sudo -n curl -L -o /usr/share/wordlists/rockyou.txt https://github.com/brannondorsey/naive-hashcat/releases/download/data/rockyou.txt
-        ln -sf "/usr/share/wordlists/rockyou.txt" "$USER_HOME/rockyou.txt"
+        log_warn "RockYou no encontrada. Descargando..."
+        sudo -n curl -L -o /usr/share/wordlists/rockyou.txt \
+            https://github.com/brannondorsey/naive-hashcat/releases/download/data/rockyou.txt && \
+            ln -sf "/usr/share/wordlists/rockyou.txt" "$USER_HOME/rockyou.txt"
     fi
 }
 
-# Start interactive menu
-main_menu
+# ═══════════════════════════════════════════════════════════════════════════
+# ENTRY POINT
+# ═══════════════════════════════════════════════════════════════════════════
+if [ "${NON_INTERACTIVE:-false}" == "true" ] || [ "${AUTO_MODE:-false}" == "true" ]; then
+    log_info "Modo desatendido: instalando Suite Estándar (sin bloodhound/ghidra/autopsy)..."
+    install_standard
+else
+    main_menu
+fi
+
 fix_wordlists
+
+log_success "Herramientas instaladas: $INSTALLED_COUNT | Fallidas: $FAILED_COUNT"
+[ -s "$INSTALL_LOG" ] && log_warn "Ver fallos en: $INSTALL_LOG"

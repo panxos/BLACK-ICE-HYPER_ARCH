@@ -106,13 +106,15 @@
             "exec": "~/.config/bin/docker_status",
             "return-type": "json",
             "interval": 10,
-            "format": " {} "
+            "format": " {} ",
+            "on-click-right": "~/.config/bin/docker_menu"
         },
         "custom/kvm": {
             "exec": "~/.config/bin/kvm_status",
             "return-type": "json",
             "interval": 10,
-            "format": " {} "
+            "format": " {} ",
+            "on-click-right": "~/.config/bin/kvm_menu"
         },
         "custom/updates": {
             "exec": "~/.config/bin/updates_status",

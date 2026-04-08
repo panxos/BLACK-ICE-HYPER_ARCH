@@ -57,9 +57,9 @@ echo -e "\${GREEN}      REPORTE DE INTEGRIDAD DEL SISTEMA       \${NC}"
 echo -e "\${GREEN}==============================================\${NC}"
 
 # 1. Check Kernel & Initramfs
-if [ -f /boot/vmlinuz-linux ] && [ -f /boot/initramfs-linux.img ]; then
-    echo -e "\${GREEN}[PASS]\${NC} Kernel Stable (linux) detectado."
-    ls -lh /boot/initramfs-linux.img | awk '{print "[INFO] Initramfs Size: " \$5}'
+if [ -f "/boot/vmlinuz-${SELECTED_KERNEL:-linux}" ] && [ -f "/boot/initramfs-${SELECTED_KERNEL:-linux}.img" ]; then
+    echo -e "\${GREEN}[PASS]\${NC} Kernel (${SELECTED_KERNEL:-linux}) detectado."
+    ls -lh "/boot/initramfs-${SELECTED_KERNEL:-linux}.img" | awk '{print "[INFO] Initramfs Size: " \$5}'
 else
     echo -e "\${RED}[FAIL] CRITICAL: Faltan archivos de arranque en /boot\${NC}"
     ((FAIL_COUNT++))
@@ -97,7 +97,7 @@ if [ \$FAIL_COUNT -eq 0 ]; then
 else
     echo -e "\${RED}       !!! AUDITORÍA FINAL FALLIDA !!!        \${NC}"
     echo -e "\${RED}==============================================\${NC}"
-    echo -e "\${Red}Se detectaron \$FAIL_COUNT errores críticos.\${NC}"
+    echo -e "\${RED}Se detectaron \$FAIL_COUNT errores críticos.\${NC}"
     echo -e "\${YELLOW}NO REINICIES hasta corregirlos manualmente.\${NC}"
     exit 1
 fi

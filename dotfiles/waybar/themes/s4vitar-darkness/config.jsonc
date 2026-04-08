@@ -6,6 +6,7 @@
         "spacing": 4,
         "modules-left": [
             "custom/launcher",
+            "custom/hardware_temp",
             "cpu",
             "memory",
             "disk",
@@ -20,6 +21,12 @@
             "network",
             "custom/power"
         ],
+        "custom/hardware_temp": {
+            "exec": "~/.config/bin/hardware_temp.sh",
+            "return-type": "json",
+            "interval": 2,
+            "tooltip": true
+        },
         "custom/launcher": {
             "format": " 󰣇 ",
             "on-click": "wofi --show drun",
@@ -47,14 +54,9 @@
             "format": "{icon}",
             "on-click": "activate",
             "format-icons": {
-                "1": "󰚰",
-                "2": "󰚯",
-                "3": "󰚯",
-                "4": "󰚯",
-                "5": "󰚯",
                 "active": "󰚰",
                 "default": "󰚯",
-                "persistent": "○"
+                "urgent": "󰗖"
             },
             "persistent-workspaces": {
                 "*": 5
@@ -71,11 +73,7 @@
             "format": " {icon} {volume}% ",
             "format-muted": " 󰝟 Muted ",
             "format-icons": {
-                "default": [
-                    "󰕿",
-                    "󰖀",
-                    "󰕾"
-                ]
+                "default": ["󰕿", "󰖀", "󰕾"]
             },
             "on-click": "pavucontrol"
         },
@@ -107,20 +105,34 @@
         ],
         "modules-right": [
             "custom/player",
+            "battery",
             "clock",
             "tray"
         ],
+        "battery": {
+            "states": {
+                "good": 80,
+                "warning": 50,
+                "critical": 10
+            },
+            "format": "{icon} {capacity}%",
+            "format-charging": "󱐋 {capacity}%",
+            "format-plugged": " {capacity}%",
+            "format-icons": ["󰂎", "󰁺", "󰁻", "󰁼", "󰁽", "󰁾", "󰁿", "󰂀", "󰂁", "󰂂", "󰁹"]
+        },
         "custom/docker": {
             "exec": "~/.config/bin/docker_status",
             "return-type": "json",
             "interval": 10,
-            "format": " {} "
+            "format": " {} ",
+            "on-click-right": "~/.config/bin/docker_menu"
         },
         "custom/kvm": {
             "exec": "~/.config/bin/kvm_status",
             "return-type": "json",
             "interval": 10,
-            "format": " {} "
+            "format": " {} ",
+            "on-click-right": "~/.config/bin/kvm_menu"
         },
         "custom/updates": {
             "exec": "checkupdates | wc -l",

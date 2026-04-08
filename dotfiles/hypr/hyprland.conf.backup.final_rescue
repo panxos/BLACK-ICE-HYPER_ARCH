@@ -1,0 +1,172 @@
+# BLACK-ICE ARCH - Hyprland Configuration (Soporteinfo-Cyber Edition)
+
+# --- Monitor ---
+monitor=,preferred,auto,auto
+
+# --- Variables Principales ---
+$mainMod = SUPER
+$terminal = kitty
+$fileManager = dolphin
+$menu = wofi --show drun
+
+# --- Environment ---
+env = XCURSOR_SIZE,24
+env = BROWSER,brave
+env = XDG_CURRENT_DESKTOP,Hyprland
+env = DE,Hyprland
+env = QT_QPA_PLATFORMTHEME,qt6ct
+env = QT_STYLE_OVERRIDE,kvantum
+
+# --- Autostart ---
+exec-once = dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP
+exec-once = systemctl --user import-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP
+exec-once = ~/.config/hypr/scripts/startup.sh
+exec-once = /usr/lib/polkit-kde-authentication-agent-1
+exec-once = nm-applet --indicator
+exec-once = blueman-applet
+exec-once = wl-paste --type text --watch cliphist store
+exec-once = wl-paste --type image --watch cliphist store
+exec-once = swaync
+exec-once = swayosd-libinput-backend
+exec-once = udiskie --tray -n -A
+
+# --- Appearance ---
+exec-once = gsettings set org.gnome.desktop.interface gtk-theme 'Sweet-Dark'
+exec-once = gsettings set org.gnome.desktop.interface icon-theme 'candy-icons'
+exec-once = gsettings set org.gnome.desktop.interface font-name 'Roboto Medium 10'
+exec-once = gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
+
+# --- Input ---
+input {
+    kb_layout = es
+    follow_mouse = 1
+    touchpad {
+        natural_scroll = no
+    }
+    sensitivity = 0
+}
+
+# --- General ---
+general {
+    gaps_in = 3
+    gaps_out = 6
+    border_size = 2
+    col.active_border = rgba(33ccffee) rgba(00ff99ee) 45deg
+    col.inactive_border = rgba(595959aa)
+    layout = dwindle
+}
+
+# --- Decoration ---
+decoration {
+    rounding = 15
+    blur {
+        enabled = true
+        size = 8
+        passes = 4
+    }
+    shadow {
+        enabled = true
+        range = 4
+        render_power = 3
+        color = rgba(1a1a1aee)
+    }
+}
+
+# --- Animations ---
+animations {
+    enabled = yes
+    bezier = myBezier, 0.05, 0.9, 0.1, 1.05
+    animation = windows, 1, 7, myBezier
+    animation = windowsOut, 1, 7, default, popin 80%
+    animation = border, 1, 10, default
+    animation = fade, 1, 7, default
+    animation = workspaces, 1, 6, default
+}
+
+# --- Layouts ---
+dwindle {
+    pseudotile = yes
+    preserve_split = yes
+}
+
+# --- Window Rules ---
+# windowrule = tile, ^(Brave-browser)$
+# windowrule = float, ^(pavucontrol)$
+# windowrule = float, ^(blueman-manager)$
+# windowrule = float, ^(nm-connection-editor)$
+# windowrule = float, ^(org.kde.polkit-kde-authentication-agent-1)$
+# windowrule = tile, ^(ZAP)$
+# windowrule = tile, ^(burp-StartBurp)$
+# windowrule = float, ^(Antigravity)$
+# windowrule = center, ^(Antigravity)$
+
+# Reglas de Capa para Blur
+# layerrule = blur, swaync
+# layerrule = ignorezero, swaync
+
+# --- Keybindings Sistema ---
+bind = $mainMod, Return, exec, $terminal
+bind = $mainMod, D, exec, $menu
+bind = $mainMod, V, togglefloating,
+bind = $mainMod, Q, killactive,
+bind = $mainMod, M, exit,
+bind = $mainMod, H, exec, cliphist list | wofi --dmenu | cliphist decode | wl-copy
+bind = $mainMod, L, exec, hyprlock
+bind = $mainMod, F, fullscreen, 0
+bind = $mainMod, Space, fullscreen, 1
+bind = $mainMod, J, togglesplit,
+bind = $mainMod, P, pseudo,
+bind = $mainMod ALT, W, exec, ~/.config/bin/wallpaper_visual
+bind = $mainMod ALT, Y, exec, ~/.config/bin/theme_selector
+
+# --- Keybindings Aplicaciones ---
+bind = $mainMod SHIFT, B, exec, brave
+bind = $mainMod SHIFT, F, exec, firefox
+bind = $mainMod SHIFT, D, exec, dolphin
+bind = $mainMod, E, exec, kate
+bind = $mainMod SHIFT, T, exec, kate
+bind = $mainMod SHIFT, O, exec, obsidian
+bind = $mainMod SHIFT, E, exec, betterbird
+bind = $mainMod SHIFT, A, exec, antigravity
+bind = $mainMod SHIFT, C, exec, caido
+bind = $mainMod SHIFT, K, exec, keepassxc
+bind = $mainMod SHIFT, P, exec, ~/.config/bin/power_profile_menu.sh
+
+# --- Screenshot Keys ---
+bind = , Print, exec, grim -g "$(slurp)" - | swappy -f -
+bind = SHIFT, Print, exec, grim - | wl-copy
+bind = $mainMod, Print, exec, grim -g "$(slurp)" ~/Pictures/Screenshots/$(date +%Y%m%d_%H%M%S).png
+bind = CTRL, Print, exec, grim ~/Pictures/Screenshots/$(date +%Y%m%d_%H%M%S).png
+
+# --- Media & Fn Keys ---
+bind = , F10, exec, playerctl play-pause
+bind = , F11, exec, playerctl stop
+bind = , F12, exec, brave
+
+# SwayOSD Control
+bindel = , XF86AudioRaiseVolume, exec, swayosd-client --output-volume raise
+bindel = , XF86AudioLowerVolume, exec, swayosd-client --output-volume lower
+bindel = , XF86AudioMute, exec, swayosd-client --output-volume mute-toggle
+bindel = , XF86MonBrightnessUp, exec, swayosd-client --brightness raise
+bindel = , XF86MonBrightnessDown, exec, swayosd-client --brightness lower
+
+# --- Navigation ---
+bind = $mainMod, left, movefocus, l
+bind = $mainMod, right, movefocus, r
+bind = $mainMod, up, movefocus, u
+bind = $mainMod, down, movefocus, d
+
+bind = $mainMod, 1, workspace, 1
+bind = $mainMod, 2, workspace, 2
+bind = $mainMod, 3, workspace, 3
+bind = $mainMod, 4, workspace, 4
+bind = $mainMod, 5, workspace, 5
+
+bind = $mainMod ALT, 1, movetoworkspace, 1
+bind = $mainMod ALT, 2, movetoworkspace, 2
+bind = $mainMod ALT, 3, movetoworkspace, 3
+bind = $mainMod ALT, 4, movetoworkspace, 4
+bind = $mainMod ALT, 5, movetoworkspace, 5
+
+bindm = $mainMod, mouse:272, movewindow
+bindm = $mainMod, mouse:273, resizewindow

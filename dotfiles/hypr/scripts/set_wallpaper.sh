@@ -16,14 +16,14 @@ WALLPAPER_DIR="$PICTURES_DIR/wallpapers"
 if [ -f "$CACHE_FILE" ]; then
     CACHED_WALL=$(cat "$CACHE_FILE")
     if [ -f "$CACHED_WALL" ]; then
-        swww img "$CACHED_WALL" --transition-type none
+        awww img "$CACHED_WALL" --transition-type none
         exit 0
     fi
 fi
 
 # 2. Fallback: HORUS-CYBER default (Si existe explícitamente)
 if [ -f "$WALLPAPER_DIR/HORUS-CYBER.jpg" ]; then
-    swww img "$WALLPAPER_DIR/HORUS-CYBER.jpg" --transition-type none
+    awww img "$WALLPAPER_DIR/HORUS-CYBER.jpg" --transition-type none
     echo "$WALLPAPER_DIR/HORUS-CYBER.jpg" > "$CACHE_FILE"
     exit 0
 fi
@@ -36,7 +36,7 @@ if [ -f "$WALLPAPER" ]; then
     
     if [[ "$WALLPAPER" == *.mp4 ]]; then
         # Handle Video Wallpaper
-        pkill swww-daemon 2>/dev/null
+        pkill awww-daemon 2>/dev/null
         pkill mpvpaper 2>/dev/null
         # Give it a small moment to release the layer
         sleep 0.5
@@ -44,12 +44,12 @@ if [ -f "$WALLPAPER" ]; then
     else
         # Handle Static Image
         pkill mpvpaper 2>/dev/null
-        if ! pgrep -x "swww-daemon" > /dev/null; then
-            swww-daemon &
+        if ! pgrep -x "awww-daemon" > /dev/null; then
+            awww-daemon &
             sleep 0.5
         fi
-        swww img "$WALLPAPER" --transition-type grow
+        awww img "$WALLPAPER" --transition-type grow
     fi
 else
-    swww img <(convert -size 1920x1080 xc:'#0a0a0a' png:-) 2>/dev/null
+    awww img <(convert -size 1920x1080 xc:'#0a0a0a' png:-) 2>/dev/null
 fi

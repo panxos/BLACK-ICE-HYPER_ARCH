@@ -1,7 +1,6 @@
 #!/bin/bash
 # modules/03_config.sh ( Plymouth Hooks)
 
-banner "PASO 4" "Configuración del Sistema"
 
 if [ "${AUTO_MODE:-}" == "true" ]; then
     # Fallback for SYSTEM_LOCALE if not defined
@@ -24,7 +23,7 @@ else
     SYSTEM_LANG=$(ask_option "Elige el idioma del sistema:" "en_US" "es_CL" "es_ES")
     
     # Regional Formats (Defaulted by selected country)
-    local DEFAULT_LOCALE="es_CL"
+    DEFAULT_LOCALE="es_CL"
     case "${SELECTED_COUNTRY:-}" in
         "United States") DEFAULT_LOCALE="en_US" ;;
         "Spain")         DEFAULT_LOCALE="es_ES" ;;
@@ -52,7 +51,7 @@ set -e
 TIMEZONE=$(printf '%q' "${TIMEZONE:-America/Santiago}")
 SYSTEM_LANG=$(printf '%q' "${SYSTEM_LANG:-es_CL}")
 SYSTEM_LOCALE=$(printf '%q' "${SYSTEM_LOCALE:-es_CL}")
-KEYMAP=$(printf '%q' "${KEYMAP:-us}")
+KEYMAP=${SYSTEM_KBD:-es}
 HOSTNAME=$(printf '%q' "${HOSTNAME:-black-ice}")
 
 # Timezone
@@ -85,8 +84,8 @@ if [ "\$SYSTEM_LANG" != "\$SYSTEM_LOCALE" ]; then
     } >> /etc/locale.conf
 fi
 
-# Keymap
-echo "KEYMAP=\$KEYMAP" > /etc/vconsole.conf
+# vconsole.conf — teclado para consola, initramfs (LUKS) y SDDM
+echo "KEYMAP=${KEYMAP:-es}" > /etc/vconsole.conf
 
 # Verify vconsole creation
 if [ ! -f /etc/vconsole.conf ]; then
@@ -119,7 +118,7 @@ if [ -d /var/lib/iwd ]; then
     chmod 600 /mnt/var/lib/iwd/*.psk 2>/dev/null || true
     log_info "Credenciales IWD (iwctl) transferidas."
     
-    # SOTA: Migración Inteligente IWD -> NetworkManager
+    # : Migración Inteligente IWD -> NetworkManager
     # Convierte las credenciales activas del instalador a perfiles nativos de NM
     log_info "Migrando perfiles de IWD a NetworkManager (Auto-Connect)..."
     mkdir -p /mnt/etc/NetworkManager/system-connections
@@ -204,9 +203,9 @@ sed -i "s/^HOOKS=.*/HOOKS=($SED_HOOKS)/" /mnt/etc/mkinitcpio.conf
 
 # Generate Initramfs (with verification)
 # Step 1: Verify kernel presets exist (kernel package installed)
-if [ ! -f /mnt/etc/mkinitcpio.d/linux.preset ]; then
-    log_error "CRÍTICO: No se encontró preset de kernel. El paquete 'linux' no se instaló correctamente."
-    log_error "Verifica la conexión de red y ejecuta 'pacstrap /mnt linux linux-headers' manualmente."
+if [ ! -f /mnt/etc/mkinitcpio.d/${SELECTED_KERNEL:-linux}.preset ]; then
+    log_error "CRÍTICO: No se encontró preset de kernel. El paquete '${SELECTED_KERNEL:-linux}' no se instaló correctamente."
+    log_error "Verifica la conexión de red y ejecuta 'pacstrap /mnt ${SELECTED_KERNEL:-linux} ${SELECTED_KERNEL:-linux}-headers' manualmente."
     exit 1
 fi
 
@@ -219,7 +218,7 @@ if ! arch-chroot /mnt /bin/bash -c "mkinitcpio -P"; then
     log_info "Iniciando protocolo de auto-reparación: Re-sincronizando núcleo y herramientas..."
     
     # Reparación: Limpiar cache y forzar re-instalación de componentes de arranque
-    arch-chroot /mnt /bin/bash -c "pacman -Scc --noconfirm && pacman -Sy --noconfirm linux linux-firmware mkinitcpio"
+    arch-chroot /mnt /bin/bash -c "pacman -Scc --noconfirm && pacman -Sy --noconfirm ${SELECTED_KERNEL:-linux} ${SELECTED_KERNEL:-linux}-headers linux-firmware mkinitcpio"
     
     log_info "Reintentando generación de initramfs tras reparación..."
     if ! arch-chroot /mnt /bin/bash -c "mkinitcpio -P"; then

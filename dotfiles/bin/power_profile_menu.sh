@@ -23,7 +23,11 @@ fi
 OPTIONS="⚡ Performance\n⚖️ Balanced\n🔋 Power Saver"
 
 # Mostrar menú y capturar elección
-CHOICE=$(echo -e "$OPTIONS" | eval "$MENU_CMD" 2>/dev/null) || exit 0
+if command -v wofi &>/dev/null; then
+    CHOICE=$(echo -e "$OPTIONS" | wofi --dmenu --prompt 'Power Profile' -i 2>/dev/null) || exit 0
+else
+    CHOICE=$(echo -e "$OPTIONS" | rofi -dmenu -p 'Power Profile' -i 2>/dev/null) || exit 0
+fi
 
 # Aplicar perfil según herramienta disponible
 apply_profile() {

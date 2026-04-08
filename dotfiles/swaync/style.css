@@ -1,0 +1,58 @@
+/* Estilo Soporteinfo-Cyber para s3th */
+* {
+  font-family: "Roboto", "JetBrains Mono Nerd Font";
+  transition: 200ms;
+}
+
+.notification {
+  border-radius: 12px;
+  margin: 6px 12px;
+  box-shadow: 0 0 15px rgba(100, 255, 218, 0.2);
+  padding: 0;
+  background: rgba(10, 25, 47, 0.85); /* Azul profundo s3th */
+  border: 1px solid rgba(100, 255, 218, 0.3); /* Borde Cian */
+}
+
+.notification-content {
+  background: transparent;
+  padding: 15px;
+  border-radius: 12px;
+}
+
+.notification-content image {
+  margin-right: 15px;
+  border-radius: 8px;
+}
+
+.notification-default-action:hover,
+.notification-action:hover {
+  background: rgba(100, 255, 218, 0.1);
+}
+
+.summary {
+  font-size: 16px;
+  font-weight: bold;
+  color: #64ffda; /* Título Cian */
+  margin-bottom: 5px;
+}
+
+.body {
+  font-size: 14px;
+  color: #e6f1ff; /* Texto Blanco Cyber */
+}
+
+.control-center {
+  background: rgba(10, 25, 47, 0.9); /* Más opaco para control center */
+  border-radius: 12px;
+  border: 1px solid #64ffda;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+.widget-title > label {
+  color: #64ffda;
+  font-size: 20px;
+}
+
+.widget-label > label {
+  color: #8892b0;
+}

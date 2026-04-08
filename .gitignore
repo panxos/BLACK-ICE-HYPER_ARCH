@@ -1,5 +1,17 @@
-# SOTA Project GitIgnore
-config/install.conf
+node_modules/
+dist/
+build/
+.git/
+.cache/
+__pycache__/
+venv/
+env/
+.env
 *.log
 *.tmp
+*.bak
 .DS_Store
+.vscode/
+.antigravity/
+.opencode/
+

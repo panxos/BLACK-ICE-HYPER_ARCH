@@ -79,6 +79,8 @@
 - **kerbrute** - Fast Kerberos pre-authenticator for user enumeration and bruteforce.
 - **responder** - Poisoner for LLMNR, NBT-NS and MDNS.
 
+> ⚠️ **BloodHound (bloodhound)**: Requiere `neo4j-community` como dependencia AUR. Este paquete es un proyecto Maven/Scala de **165 módulos** que se compila desde fuente. La instalación puede tardar entre **20 y 60 minutos** dependiendo del hardware. El script avisa antes de comenzar — **no canceles el proceso**, es completamente normal.
+
 ---
 
 ## 🔐 Cracking & Secrets
@@ -113,4 +115,4 @@
 ---
 
 **Ubicación**: Todas las herramientas se gestionan desde `src/deploy/02_security_tools.sh`  
-**Actualización**: Ejecuta `yay -Syu` para mantener todo el arsenal al día.
+**Actualización**: Ejecuta `paru -Syu` para mantener todo el arsenal al día.
