@@ -1596,7 +1596,7 @@ alias packettracer='env QT_QPA_PLATFORM=xcb /usr/lib/packettracer/packettracer.A
 export LS_COLORS='di=1;38;5;141:ln=38;5;81:so=38;5;183:pi=38;5;226:ex=38;5;118:bd=38;5;208:cd=38;5;208:su=38;5;196:sg=38;5;196:tw=38;5;141:ow=38;5;141'
 
 # opencode
-export PATH=/home/faravena/.opencode/bin:$PATH
+export PATH="$HOME/.opencode/bin:$PATH"
 
 # tech_quotes PATH
 [[ ":$PATH:" != *":$HOME/bin:"* ]] && export PATH="$HOME/bin:$PATH"
@@ -1648,7 +1648,7 @@ alias copy="xclip -selection clipboard"
 alias copy="xclip -selection clipboard"
 
 # bun completions
-[ -s "/home/faravena/.bun/_bun" ] && source "/home/faravena/.bun/_bun"
+[ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
 
 # bun
 export BUN_INSTALL="$HOME/.bun"

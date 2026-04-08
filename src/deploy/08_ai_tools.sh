@@ -26,9 +26,23 @@ install_npm_cli() {
     fi
 }
 
+# --- Claude Code ---
 install_npm_cli "@anthropic-ai/claude-code" "Claude Code CLI"
-install_npm_cli "@google/gemini-cli"        "Gemini CLI"
-install_npm_cli "@qwen-ai/qwen-cli"         "Qwen CLI"
+
+# --- Gemini CLI ---
+install_npm_cli "@google/gemini-cli" "Gemini CLI"
+
+# --- Qwen Code ---
+if ! npm list -g --depth=0 "@qwen-code/qwen-code" &>/dev/null; then
+    log_info "Instalando Qwen Code CLI..."
+    if sudo npm install -g @qwen-code/qwen-code@latest >> "$LOG_FILE" 2>&1; then
+        log_success "Qwen Code instalado correctamente"
+    else
+        log_warn "Qwen Code: instalación falló (continúa)"
+    fi
+else
+    log_info "Qwen Code ya instalado"
+fi
 
 log_info "Configurando alias de actualización en ZSH..."
 
@@ -40,9 +54,9 @@ if ! grep -q "claudeupdate" "$ZSH_ALIASES" 2>/dev/null; then
     cat >> "$ZSH_ALIASES" << 'EOF'
 
 # --- IA Update Aliases (BLACK-ICE) ---
-alias claudeupdate='sudo npm install -g @anthropic-ai/claude-code'
+alias claudeupdate='curl -fsSL https://claude.ai/install.sh | bash'
 alias geminiupdate='sudo npm install -g @google/gemini-cli'
-alias qwenupdate='sudo npm install -g @qwen-ai/qwen-cli'
+alias qwenupdate='sudo npm install -g @qwen-code/qwen-code@latest'
 EOF
     log_info "Aliases de IA agregados a $ZSH_ALIASES"
 else

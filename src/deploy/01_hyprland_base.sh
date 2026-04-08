@@ -118,6 +118,11 @@ HYPRLAND_PKGS=(
     "libnewt"               # For whiptail (interactive menus)
     "chafa"                 # For terminal image display (Fastfetch fallback)
     "lm_sensors"            # For hardware_temp.sh Waybar module (CPU/GPU temps)
+    # CLI tools requeridos por .zshrc (aliases ls/cat/etc)
+    "lsd"                   # ls moderno (alias ls/ll/la en .zshrc)
+    "bat"                   # cat moderno (alias cat en .zshrc)
+    "fzf"                   # Fuzzy finder (sourced en .zshrc)
+    "xclip"                 # alias copy en .zshrc
 )
 
 # --- Detección de Hardware y Virtualización ( Smart-Detect) ---

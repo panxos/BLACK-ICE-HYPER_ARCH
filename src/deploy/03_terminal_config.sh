@@ -80,14 +80,18 @@ else
 fi
 
 if [ -f "$DOTFILES_DIR/zsh/.p10k.zsh" ]; then
-    # Copiar para usuario
     cp "$DOTFILES_DIR/zsh/.p10k.zsh" "$USER_HOME/.p10k.zsh"
     chown "$CURRENT_USER:$CURRENT_USER" "$USER_HOME/.p10k.zsh"
-    log_info ".p10k.zsh copiado para $CURRENT_USER (sobreescribe default)"
+    log_success ".p10k.zsh desplegado para $CURRENT_USER"
+fi
 
-    # Copiar para root
+# Root usa su propio .p10k.root.zsh si existe, sino el del usuario
+if [ -f "$DOTFILES_DIR/zsh/.p10k.root.zsh" ]; then
+    sudo cp "$DOTFILES_DIR/zsh/.p10k.root.zsh" "/root/.p10k.zsh"
+    log_success ".p10k.zsh de root desplegado (config propia)"
+elif [ -f "$DOTFILES_DIR/zsh/.p10k.zsh" ]; then
     sudo cp "$DOTFILES_DIR/zsh/.p10k.zsh" "/root/.p10k.zsh"
-    log_info ".p10k.zsh copiado para root (sobreescribe default)"
+    log_info ".p10k.zsh de root = copia del usuario (fallback)"
 fi
 
 # --- Copiar configuración de Fastfetch ---
@@ -117,21 +121,6 @@ if [ -d "$DOTFILES_DIR/fastfetch" ]; then
     log_info "Fastfetch configurado para root"
 fi
 
-# --- Customizar prompt de root: Fire Icon (Yellow) ---
-if [ -f "/root/.p10k.zsh" ] && ! sudo grep -q "BLACK-ICE ROOT CUSTOMIZATION" /root/.p10k.zsh 2>/dev/null; then
-    sudo tee -a "/root/.p10k.zsh" > /dev/null << 'EOF'
-
-# --- BLACK-ICE ROOT CUSTOMIZATION (FIRE) ---
-typeset -g POWERLEVEL9K_PROMPT_CHAR_OK_{VIINS,VICMD,VIVIS,VIOWR}_CONTENT_EXPANSION=''
-typeset -g POWERLEVEL9K_PROMPT_CHAR_ERROR_{VIINS,VICMD,VIVIS,VIOWR}_CONTENT_EXPANSION=''
-typeset -g POWERLEVEL9K_PROMPT_CHAR_OK_{VIINS,VICMD,VIVIS,VIOWR}_FOREGROUND=220
-typeset -g POWERLEVEL9K_HOME_ICON=''
-typeset -g POWERLEVEL9K_HOME_SUB_ICON=''
-EOF
-    log_info "Root .p10k.zsh configurado con Fire Icon (Yellow)"
-fi
-
-# Customization removed to preserve dotfiles .p10k.zsh
 
 # --- Configurar Nano Pro (Highlighter + RC) ---
 log_info "Configurando Nano Pro..."
