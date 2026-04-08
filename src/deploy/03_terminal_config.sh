@@ -6,11 +6,24 @@
 
 banner "MÓDULO 4" "Configuración de Terminal (Zsh)"
 # --- Configurar bin/ del usuario (Scripts Tácticos) ---
-log_info "Configurando scripts tácticos (~/bin/)..."
+log_info "Configurando scripts tácticos (~/bin/ y ~/.config/bin/)..."
 mkdir -p "$USER_HOME/bin"
 cp -rf "$SCRIPT_DIR/dotfiles/bin/"* "$USER_HOME/bin/"
-chmod +x "$USER_HOME/bin/"*.sh
+chmod +x "$USER_HOME/bin/"* 2>/dev/null || true
 chown -R "$CURRENT_USER:$CURRENT_USER" "$USER_HOME/bin"
+
+# Waybar referencia ~/.config/bin/ → symlink a ~/bin para que ambas rutas funcionen
+mkdir -p "$USER_HOME/.config"
+if [ ! -e "$USER_HOME/.config/bin" ]; then
+    ln -sf "$USER_HOME/bin" "$USER_HOME/.config/bin"
+    log_success "~/.config/bin → symlink a ~/bin (Waybar scripts OK)"
+elif [ -d "$USER_HOME/.config/bin" ] && [ ! -L "$USER_HOME/.config/bin" ]; then
+    # Directorio real: copiar contenido y reemplazar con symlink
+    cp -n "$USER_HOME/.config/bin/"* "$USER_HOME/bin/" 2>/dev/null || true
+    rm -rf "$USER_HOME/.config/bin"
+    ln -sf "$USER_HOME/bin" "$USER_HOME/.config/bin"
+    log_success "~/.config/bin convertido a symlink → ~/bin"
+fi
 
 # --- Instalar Zsh y plugins base ---
 log_info "Instalando Zsh, plugins, fastfetch y chafa..."
@@ -89,9 +102,10 @@ fi
 # --- Configurar Zsh para root (con configs y fastfetch) ---
 log_info "Configurando Zsh para root..."
 
-# Copiar .zshrc a root también
-if [ -f "$DOTFILES_DIR/zsh/.zshrc" ]; then
-    sudo cp "$DOTFILES_DIR/zsh/.zshrc" "/root/.zshrc"
+# .zshrc de root = symlink al del usuario (se mantienen sincronizados)
+if [ -f "$USER_HOME/.zshrc" ]; then
+    sudo ln -sf "$USER_HOME/.zshrc" /root/.zshrc
+    log_success ".zshrc de root → symlink a $USER_HOME/.zshrc"
 fi
 
 # Copiar Fastfetch a root
