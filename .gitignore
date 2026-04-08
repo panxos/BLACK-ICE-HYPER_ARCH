@@ -15,3 +15,17 @@ env/
 .antigravity/
 .opencode/
 
+# Archivos de IA (no publicar)
+CLAUDE.md
+GEMINI.md
+OPENAI.md
+.claudeignore
+.geminiignore
+.openaiignore
+.cursorignore
+.aider*
+
+# Configs sensibles (no publicar)
+config/install.conf
+*.conf.auto
+
