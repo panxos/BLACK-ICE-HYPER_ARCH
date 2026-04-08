@@ -100,13 +100,6 @@ curl -L http://is.gd/blackice | bash
 - **DedSec GRUB2 Theme** — Pantalla de arranque estilo Watch Dogs
 - Temas Waybar: `s4vitar-darkness`, `Matrix-Hacker`, `Jan-CyberPunk`, `Emilia-TokyoNight`, `Marisol-Dracula`, `Melissa-Nord`
 
-### 🤖 Integración IA
-
-Pre-instalados desde la primera ejecución:
-- **Claude Code** (`claude`) — CLI de Anthropic
-- **Gemini CLI** (`gemini`) — CLI de Google
-- **Qwen CLI** (`qwen`) — CLI de Alibaba
-
 ### 🆕 Novedades v3.3.1
 
 - **Fix crítico Plymouth**: instalado con `--noscriptlet`, evita crash del deploy por hook mkinitcpio prematuro

@@ -124,7 +124,6 @@ curl -L http://is.gd/blackice | bash
 - **paru from chaotic-aur**: Installed from chaotic-aur (compiled against the system's current pacman) — never breaks after libalpm upgrades.
 - **ABI-resilient AUR helper**: `safe_install` detects a broken paru and falls back to pacman automatically. No more silent mass-install failures after `pacman -Syu`.
 - **Correct keyboard at every stage**: LUKS prompt, GRUB menu, SDDM, and Hyprland all use the layout selected during install.
-- **AI Native Integration**: Pre-installed CLIs for **Claude Code**, **Gemini**, and **Qwen**.
 - **DedSec GRUB Theme**: Interactive theme selector via whiptail.
 - **4 gh0stzk-inspired Waybar themes**: Jan-CyberPunk, Emilia-TokyoNight, Marisol-Dracula, Melissa-Nord.
 - **s4vitar-darkness Theme**: Pro dual-bar theme with Pacman icons and ultra-dark aesthetic — tribute to s4vitar's iconic setup.
