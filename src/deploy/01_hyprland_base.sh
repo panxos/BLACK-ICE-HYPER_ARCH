@@ -760,20 +760,14 @@ if ! pacman -Q plymouth &>/dev/null; then
         log_warn "Fallo la instalación de Plymouth. El sistema arrancará sin splash dinámico."
     fi
 fi
-safe_install plymouth-theme-abstract-ring-git || log_warn "Tema Abstract Ring no disponible."
-
-# Validate Abstract Ring Installation (Fix Path with better discovery)
-PLYMOUTH_THEME_DIR=$(pacman -Ql plymouth-theme-abstract-ring-git 2>/dev/null | grep ".plymouth$" | head -n 1 | awk '{print $2}' | xargs dirname)
-if [ -z "$PLYMOUTH_THEME_DIR" ]; then 
-    PLYMOUTH_THEME_DIR=$(find /usr/share/plymouth/themes \( -name "abstract_ring" -o -name "abstract-ring" \) -type d | head -n 1)
-fi
-
-if [ -n "$PLYMOUTH_THEME_DIR" ] && [ -d "$PLYMOUTH_THEME_DIR" ]; then
-    THEME_NAME=$(basename "$PLYMOUTH_THEME_DIR")
-    log_info "Tema Plymouth detectado en: $PLYMOUTH_THEME_DIR (Nombre: $THEME_NAME)"
-    sudo -n plymouth-set-default-theme -R "$THEME_NAME"
+# bgrt: muestra el logo del fabricante desde la UEFI (Lenovo, Dell, HP, etc.)
+# Viene incluido en el paquete plymouth base — no necesita instalación extra.
+if [ -d /usr/share/plymouth/themes/bgrt ]; then
+    sudo -n plymouth-set-default-theme bgrt
+    log_success "Plymouth theme: bgrt (logo del fabricante desde UEFI)"
 else
-    log_warn "No se pudo detectar el volumen del tema Abstract Ring. Usando default..."
+    log_warn "Tema bgrt no encontrado — usando tema spinner por defecto"
+    sudo -n plymouth-set-default-theme spinner 2>/dev/null || true
 fi
 
 # Inyectar hook en mkinitcpio.conf y regenerar initramfs con manejo de error.
