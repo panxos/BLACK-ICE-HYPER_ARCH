@@ -86,7 +86,8 @@ echo "$SELECTION" > "$CACHE_THEME"
 # ---------------------------------------------------------------------------
 # Aplicar config + style via symlinks
 # ---------------------------------------------------------------------------
-rm -f "$W_DIR/config.jsonc" "$W_DIR/style.css"
+rm -f "$W_DIR/config" "$W_DIR/config.jsonc" "$W_DIR/style.css"
+ln -sf "$THEMES_DIR/$SELECTION/config.jsonc" "$W_DIR/config"
 ln -sf "$THEMES_DIR/$SELECTION/config.jsonc" "$W_DIR/config.jsonc"
 ln -sf "$THEMES_DIR/$SELECTION/style.css"    "$W_DIR/style.css"
 

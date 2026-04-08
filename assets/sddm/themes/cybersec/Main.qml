@@ -17,25 +17,6 @@ Rectangle {
         opacity: 0.6
     }
 
-    // Interactive tech grid
-    Grid {
-        anchors.fill: parent
-        columns: 48
-        rows: 27
-        spacing: 0
-        opacity: 0.1
-        Repeater {
-            model: 48 * 27
-            Rectangle {
-                width: parent.width / 48
-                height: parent.height / 27
-                color: "transparent"
-                border.color: "#00f3ff"
-                border.width: 1
-            }
-        }
-    }
-
     // --- TOP HEADER ---
     Rectangle {
         anchors.top: parent.top
@@ -161,7 +142,7 @@ Rectangle {
                 Layout.fillWidth: true
                 model: sessionModel
                 textRole: "name"
-                currentIndex: session.index
+                currentIndex: sessionModel.lastIndex !== undefined ? sessionModel.lastIndex : 0
             }
 
             Button {

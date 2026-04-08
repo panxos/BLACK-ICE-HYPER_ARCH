@@ -328,11 +328,11 @@ if [ -d "$DOTFILES_DIR/waybar" ]; then
     cp -r "$DOTFILES_DIR/waybar/"* "$USER_HOME/.config/waybar/"
     
     # Set s4vitar-darkness as default
-    # Solo config.jsonc — Waybar lo prioriza. Evitar 'config' legacy que genera conflictos.
-    rm -f "$USER_HOME/.config/waybar/config"
+    # Waybar puede buscar 'config' antes que 'config.jsonc' según versión — ambos apuntan al tema activo.
+    rm -f "$USER_HOME/.config/waybar/config" "$USER_HOME/.config/waybar/config.jsonc"
+    ln -sf "$USER_HOME/.config/waybar/themes/s4vitar-darkness/config.jsonc" "$USER_HOME/.config/waybar/config"
     ln -sf "$USER_HOME/.config/waybar/themes/s4vitar-darkness/config.jsonc" "$USER_HOME/.config/waybar/config.jsonc"
     ln -sf "$USER_HOME/.config/waybar/themes/s4vitar-darkness/style.css" "$USER_HOME/.config/waybar/style.css"
-    cp "$DOTFILES_DIR/waybar/themes/s4vitar-darkness/style.css" "$USER_HOME/.config/waybar/style.css"
     
     # Fix Permissions — directorios 755, archivos 644, scripts 755
     chown -R "$CURRENT_USER:$CURRENT_USER" "$USER_HOME/.config/waybar"
@@ -724,7 +724,12 @@ fi
 
 if [ -d "$DOTFILES_DIR/waybar" ]; then
     cp -r "$DOTFILES_DIR/waybar/"* "$USER_HOME/.config/waybar/"
-    log_info "Waybar dotfiles copiados"
+    # Re-crear symlinks después del cp (la copia puede sobrescribirlos si hay archivos raíz)
+    rm -f "$USER_HOME/.config/waybar/config" "$USER_HOME/.config/waybar/config.jsonc"
+    ln -sf "$USER_HOME/.config/waybar/themes/s4vitar-darkness/config.jsonc" "$USER_HOME/.config/waybar/config"
+    ln -sf "$USER_HOME/.config/waybar/themes/s4vitar-darkness/config.jsonc" "$USER_HOME/.config/waybar/config.jsonc"
+    ln -sf "$USER_HOME/.config/waybar/themes/s4vitar-darkness/style.css" "$USER_HOME/.config/waybar/style.css"
+    log_info "Waybar dotfiles copiados y symlinks de tema restaurados"
 fi
 
 if [ -d "$DOTFILES_DIR/kitty" ]; then

@@ -363,7 +363,6 @@ tooltip label {
     padding: 0 10px;
     border-radius: 10px;
     transition: all 200ms ease;
-    max-width: 280px;
 }
 
 #custom-player:hover {

@@ -135,10 +135,15 @@ if ! grep -q "^GRUB_GFXMODE=" "$GRUB_DEFAULT" 2>/dev/null; then
     log_info "GRUB_GFXMODE=1920x1080,auto configurado"
 fi
 
-# El tema requiere gfxterm para renderizar correctamente
-if ! grep -q "^GRUB_TERMINAL_OUTPUT=" "$GRUB_DEFAULT" 2>/dev/null; then
+# El tema requiere gfxterm — SIEMPRE forzar (console rompe el tema visual)
+if grep -q "^GRUB_TERMINAL_OUTPUT=" "$GRUB_DEFAULT" 2>/dev/null; then
+    sudo sed -i 's|^GRUB_TERMINAL_OUTPUT=.*|GRUB_TERMINAL_OUTPUT="gfxterm"|' "$GRUB_DEFAULT"
+elif grep -q "^#GRUB_TERMINAL_OUTPUT=" "$GRUB_DEFAULT" 2>/dev/null; then
+    sudo sed -i 's|^#GRUB_TERMINAL_OUTPUT=.*|GRUB_TERMINAL_OUTPUT="gfxterm"|' "$GRUB_DEFAULT"
+else
     echo 'GRUB_TERMINAL_OUTPUT="gfxterm"' | sudo tee -a "$GRUB_DEFAULT" > /dev/null
 fi
+log_info "GRUB_TERMINAL_OUTPUT=gfxterm configurado"
 
 # --- Regenerar grub.cfg ---
 log_info "Regenerando grub.cfg con el nuevo tema..."
