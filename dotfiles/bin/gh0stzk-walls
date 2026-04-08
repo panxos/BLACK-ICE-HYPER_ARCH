@@ -18,10 +18,10 @@ REPO_API="https://api.github.com/repos/gh0stzk/dotfiles/contents"
 
 # Mapeo: nombre de tema BLACK-ICE → nombre de rice en gh0stzk
 declare -A RICE_MAP=(
-    ["Jan-CyberPunk"]="Jan"
-    ["Emilia-TokyoNight"]="Emilia"
-    ["Marisol-Dracula"]="Marisol"
-    ["Melissa-Nord"]="Melissa"
+    ["Jan-CyberPunk"]="jan"
+    ["Emilia-TokyoNight"]="emilia"
+    ["Marisol-Dracula"]="marisol"
+    ["Melissa-Nord"]="melissa"
 )
 
 usage() {
@@ -60,7 +60,7 @@ download_theme_walls() {
     echo "[INFO] Descargando wallpapers de rice '$rice_name' → $dest"
 
     # Obtener lista de archivos en el directorio walls del rice
-    local api_url="$REPO_API/config/bspwm/rices/$rice_name/walls"
+    local api_url="$REPO_API/config/bspwm/rices/${rice_name,,}/walls"
     local files
     files=$(curl -sf "$api_url" | jq -r '.[].download_url' 2>/dev/null) || {
         echo "[WARN] No se pudo obtener lista de walls para '$rice_name'. Verificar conexión."

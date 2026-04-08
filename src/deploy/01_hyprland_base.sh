@@ -402,6 +402,35 @@ if [ -d "$DOTFILES_DIR/wallpapers" ]; then
     
     WALLPAPER_COUNT=$(ls -1 "$WALLPAPER_DEST/" 2>/dev/null | wc -l)
     success "$WALLPAPER_COUNT wallpapers copiados a: $WALLPAPER_DEST"
+
+    # --- Descargar wallpapers de gh0stzk (temas Jan, Emilia, Marisol, Melissa) ---
+    log_info "Descargando wallpapers de gh0stzk/dotfiles..."
+    if command -v curl &>/dev/null && command -v jq &>/dev/null; then
+        declare -A GH0STZK_RICES=(
+            ["Jan-CyberPunk"]="jan"
+            ["Emilia-TokyoNight"]="emilia"
+            ["Marisol-Dracula"]="marisol"
+            ["Melissa-Nord"]="melissa"
+        )
+        for theme in "${!GH0STZK_RICES[@]}"; do
+            rice="${GH0STZK_RICES[$theme]}"
+            dest="$WALLPAPER_DEST/gh0stzk/$theme"
+            mkdir -p "$dest"
+            api_url="https://api.github.com/repos/gh0stzk/dotfiles/contents/config/bspwm/rices/${rice}/walls"
+            files=$(curl -sf "$api_url" | jq -r '.[].download_url' 2>/dev/null) || continue
+            while IFS= read -r url; do
+                [ -z "$url" ] && continue
+                fname=$(basename "$url" | cut -d'?' -f1)
+                [ -f "$dest/$fname" ] && continue
+                curl -sf -o "$dest/$fname" "$url" 2>/dev/null && \
+                    log_info "  gh0stzk $theme: $fname" || true
+            done <<< "$files"
+        done
+        chown -R "$CURRENT_USER:$CURRENT_USER" "$WALLPAPER_DEST/gh0stzk" 2>/dev/null || true
+        log_success "Wallpapers gh0stzk descargados en $WALLPAPER_DEST/gh0stzk/"
+    else
+        log_warn "curl o jq no disponibles — wallpapers gh0stzk no descargados. Ejecuta: gh0stzk-walls --all"
+    fi
     
     # Update hyprland.conf and switcher logic to point to correct dir
     # First, fix switcher script in place before copying or after?
