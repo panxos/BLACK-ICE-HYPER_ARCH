@@ -117,6 +117,7 @@ HYPRLAND_PKGS=(
     "wireplumber"
     "libnewt"               # For whiptail (interactive menus)
     "chafa"                 # For terminal image display (Fastfetch fallback)
+    "lm_sensors"            # For hardware_temp.sh Waybar module (CPU/GPU temps)
 )
 
 # --- Detección de Hardware y Virtualización ( Smart-Detect) ---
@@ -300,13 +301,17 @@ fi
 
 # --- Instalar Scripts de Utilidad (EARLY for Waybar) ---
 log_info "Instalando scripts de utilidad (EARLY)..."
-mkdir -p "$USER_HOME/.config/bin"
+# Instalar scripts en ~/bin/ (ruta canónica); ~/.config/bin → symlink creado en 03_terminal_config.sh
+mkdir -p "$USER_HOME/bin"
 if [ -d "$DOTFILES_DIR/bin" ]; then
-    cp -r "$DOTFILES_DIR/bin/"* "$USER_HOME/.config/bin/"
-    if [ -d "$USER_HOME/.config/bin" ]; then
-        chmod +x "$USER_HOME/.config/bin/"* 2>/dev/null || true
+    cp -r "$DOTFILES_DIR/bin/"* "$USER_HOME/bin/"
+    chmod +x "$USER_HOME/bin/"* 2>/dev/null || true
+    chown -R "$CURRENT_USER:$CURRENT_USER" "$USER_HOME/bin"
+    # Crear symlink ~/.config/bin → ~/bin si no existe aún
+    if [ ! -e "$USER_HOME/.config/bin" ]; then
+        ln -sf "$USER_HOME/bin" "$USER_HOME/.config/bin"
     fi
-    log_info "Scripts de utilidad instalados en ~/.config/bin"
+    log_info "Scripts de utilidad instalados en ~/bin (accesibles también como ~/.config/bin)"
 fi
 
 # Scripts helper removed (using dotfiles/bin versions)
@@ -322,11 +327,13 @@ if [ -d "$DOTFILES_DIR/waybar" ]; then
     cp "$DOTFILES_DIR/waybar/themes/s4vitar-darkness/config.jsonc" "$USER_HOME/.config/waybar/config.jsonc"
     cp "$DOTFILES_DIR/waybar/themes/s4vitar-darkness/style.css" "$USER_HOME/.config/waybar/style.css"
     
-    # Fix Permissions
-    chown -R $CURRENT_USER:$CURRENT_USER "$USER_HOME/.config/waybar"
+    # Fix Permissions — directorios 755, archivos 644, scripts 755
+    chown -R "$CURRENT_USER:$CURRENT_USER" "$USER_HOME/.config/waybar"
     find "$USER_HOME/.config/waybar" -type d -exec chmod 755 {} \;
     find "$USER_HOME/.config/waybar" -type f -exec chmod 644 {} \;
-    log_info "Configuración de Waybar copiada (Horus-Cyber set as default)"
+    # Scripts en scripts/ necesitan execute bit (Waybar los invoca como comandos)
+    find "$USER_HOME/.config/waybar/scripts" -type f -exec chmod 755 {} \; 2>/dev/null || true
+    log_info "Configuración de Waybar copiada (s4vitar-darkness set as default)"
 fi
 
 if [ -d "$DOTFILES_DIR/kitty" ]; then

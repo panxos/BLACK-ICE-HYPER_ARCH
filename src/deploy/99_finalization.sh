@@ -15,8 +15,11 @@ chmod +x "$SCRIPT_DIR/src/deploy/"*.sh
 # --- BLACK-ICE  FIXES (Antigravity & Udiskie) ---
 log_info "Aplicando blindaje  para Antigravity y Udiskie..."
 
-# 1. Crear directorio de binarios de usuario si no existe
-mkdir -p "$USER_HOME/.config/bin"
+# 1. Asegurar que ~/.config/bin existe (puede ser symlink a ~/bin — no usar mkdir -p si es symlink)
+if [ ! -e "$USER_HOME/.config/bin" ]; then
+    mkdir -p "$USER_HOME/bin"
+    ln -sf "$USER_HOME/bin" "$USER_HOME/.config/bin"
+fi
 
 # 2. Wrapper para Antigravity (Mimetismo GNOME para OAuth)
 cat << 'EOF' > "$USER_HOME/.config/bin/antigravity-fix"
