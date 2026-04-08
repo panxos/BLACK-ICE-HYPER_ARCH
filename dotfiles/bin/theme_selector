@@ -15,17 +15,30 @@ FF_DIR="$HOME/.config/fastfetch"
 # formato: "0xeeACCENT1 0xeeACCENT2"
 # ---------------------------------------------------------------------------
 declare -A BORDER_COLORS=(
+    # --- Original Egyptian God Themes ---
     ["Horus-Cyber"]="0xee00f3ff 0xeebd93f9"
     ["Ra-Solar"]="0xeeffaa00 0xee552200"
     ["Isis-Magic"]="0xeeff00ff 0xee330033"
     ["Anubis-Death"]="0xee44ff00 0xee002200"
     ["s4vitar-darkness"]="0xee6a0dad 0xee0d0d0d"
     ["Matrix-Hacker"]="0xee00ff00 0xee001100"
-    # --- gh0stzk inspired ---
+    # --- gh0stzk inspired (original) ---
     ["Jan-CyberPunk"]="0xee27fbfe 0xeefb007a"
     ["Emilia-TokyoNight"]="0xee7aa2f7 0xeebb9af7"
     ["Marisol-Dracula"]="0xeebd93f9 0xeeff79c6"
     ["Melissa-Nord"]="0xee81a1c1 0xee88c0d0"
+    # --- gh0stzk inspired (new) ---
+    ["Karla-ZombieNight"]="0xee8897F4 0xeeadd7ff"
+    ["Pamela-Lovelace"]="0xeeb4dafe 0xeeff85cb"
+    ["Zombie-Decay"]="0xee89b4fa 0xeecba6f7"
+    ["Brenda-Everforest"]="0xeea7c080 0xee7fbbb3"
+    ["Daniela-Catppuccin"]="0xee89b4fa 0xeecba6f7"
+    ["H4k3r-HTB"]="0xee9fef00 0xee00ff7f"
+    ["Silvia-Gruvbox"]="0xeefe8019 0xeeb8bb26"
+    ["Varinka-Mono"]="0xeeadb5bd 0xee6c757d"
+    ["Yael-OxoCarbon"]="0xee42BE65 0xee78a9ff"
+    ["Janis-CyberMagenta"]="0xeeff007c 0xee00e5ff"
+    ["Isabel-Frappe"]="0xee8caaee 0xeeca9ee6"
 )
 
 # ---------------------------------------------------------------------------
@@ -33,17 +46,29 @@ declare -A BORDER_COLORS=(
 # Si no existe el archivo, awww mantiene el wallpaper actual
 # ---------------------------------------------------------------------------
 declare -A WALLPAPERS=(
+    # --- Original themes ---
     ["Horus-Cyber"]="HORUS-CYBER.jpg"
     ["Ra-Solar"]="RA-SOLAR.jpg"
     ["Isis-Magic"]="ISIS-MAGIC.jpg"
     ["Anubis-Death"]="ANUBIS-DEATH.jpg"
     ["s4vitar-darkness"]="ARCH-CYBERPUNK.jpg"
     ["Matrix-Hacker"]="cyber.jpg"
-    # gh0stzk-inspired: descargar con ~/.config/bin/gh0stzk-walls
+    # --- gh0stzk-inspired: descargar con ~/.config/bin/gh0stzk-walls ---
     ["Jan-CyberPunk"]="jan-cyberpunk-01.webp"
     ["Emilia-TokyoNight"]="emilia-tokyonight-01.webp"
     ["Marisol-Dracula"]="marisol-dracula-01.webp"
     ["Melissa-Nord"]="melissa-nord-01.webp"
+    ["Karla-ZombieNight"]="karla-01.webp"
+    ["Pamela-Lovelace"]="pamela-01.webp"
+    ["Zombie-Decay"]="zombie-01.webp"
+    ["Brenda-Everforest"]="brenda-01.webp"
+    ["Daniela-Catppuccin"]="daniela-01.webp"
+    ["H4k3r-HTB"]="h4k3r-01.webp"
+    ["Silvia-Gruvbox"]="silvia-01.webp"
+    ["Varinka-Mono"]="varinka-01.webp"
+    ["Yael-OxoCarbon"]="yael-01.webp"
+    ["Janis-CyberMagenta"]="janis-01.webp"
+    ["Isabel-Frappe"]="isabel-01.webp"
 )
 
 # ---------------------------------------------------------------------------

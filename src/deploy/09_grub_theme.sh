@@ -116,6 +116,22 @@ if [ ! -f "$THEME_DEST/theme.txt" ]; then
     return 0
 fi
 
+# Verificar background.png — muchas variantes lo requieren
+# Si no existe, copiar uno desde assets/backgrounds/
+if [ ! -f "$THEME_DEST/background.png" ] && grep -q 'desktop-image' "$THEME_DEST/theme.txt" 2>/dev/null; then
+    log_warn "background.png no encontrado — buscando en assets del repositorio..."
+    # Intentar hackerden (buen default para security workstation)
+    for fallback in hackerden compact legion reaper; do
+        BG_CANDIDATE=$(find "$TMP_REPO/assets/backgrounds" -name "${fallback}-1080p.png" 2>/dev/null | head -1)
+        if [ -n "$BG_CANDIDATE" ]; then
+            sudo cp "$BG_CANDIDATE" "$THEME_DEST/background.png"
+            log_success "background.png copiado desde: $BG_CANDIDATE"
+            break
+        fi
+    done
+    [ ! -f "$THEME_DEST/background.png" ] && log_warn "No se encontró background.png de fallback — el tema puede mostrar fondo negro."
+fi
+
 log_success "Tema DedSec ($VARIANT_NAME) copiado a $THEME_DEST"
 
 # --- Configurar /etc/default/grub ---

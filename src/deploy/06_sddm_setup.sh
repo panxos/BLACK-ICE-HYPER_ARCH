@@ -7,8 +7,18 @@ cd "$USER_HOME" || exit 1
 
 log_info "Instalando dependencias de SDDM..."
 
-# Instalar paquetes necesarios usando safe_install
-SDDM_DEPS=("sddm" "qt5-quickcontrols" "qt5-quickcontrols2" "qt5-graphicaleffects" "qt5-svg" "qt5-declarative" "qt6-5compat" "qt6-declarative" "qt6-svg" "ttf-jetbrains-mono" "imagemagick")
+# Detectar qué Qt usa el binario sddm-greeter para instalar las dependencias correctas
+# SDDM en Arch 0.21+ puede estar compilado con Qt5 o Qt6
+if ldd /usr/bin/sddm-greeter 2>/dev/null | grep -q 'libQt6'; then
+    SDDM_QT_VER=6
+    log_info "SDDM usa Qt6"
+    SDDM_DEPS=("sddm" "qt6-declarative" "qt6-svg" "qt6-5compat" "ttf-jetbrains-mono" "imagemagick")
+else
+    SDDM_QT_VER=5
+    log_info "SDDM usa Qt5"
+    SDDM_DEPS=("sddm" "qt5-quickcontrols" "qt5-quickcontrols2" "qt5-graphicaleffects" "qt5-svg" "qt5-declarative" "ttf-jetbrains-mono" "imagemagick")
+fi
+
 for dep in "${SDDM_DEPS[@]}"; do
     safe_install "$dep"
 done
@@ -39,6 +49,24 @@ if [ -d "$THEME_SOURCE" ]; then
     if [ ! -f "$THEME_DEST/Main.qml" ]; then
         log_warn "Main.qml no encontrado en el tema — SDDM usará tema por defecto."
         return 0
+    fi
+
+    # Fix QML imports según versión Qt del sddm-greeter
+    # Qt5 requiere versiones explícitas: "import QtQuick 2.15"
+    # Qt6 acepta sin versión: "import QtQuick"
+    if [ "$SDDM_QT_VER" -eq 5 ]; then
+        log_info "Aplicando QML imports compatibles con Qt5..."
+        for qml_file in "$THEME_DEST"/*.qml "$THEME_DEST"/components/*.qml; do
+            [ -f "$qml_file" ] || continue
+            sudo sed -i \
+                -e 's/^import QtQuick$/import QtQuick 2.15/' \
+                -e 's/^import QtQuick\.Layouts$/import QtQuick.Layouts 1.15/' \
+                -e 's/^import QtQuick\.Controls$/import QtQuick.Controls 2.15/' \
+                "$qml_file"
+        done
+        log_success "QML imports Qt5 aplicados"
+    else
+        log_info "Qt6 detectado — QML imports sin versión, OK"
     fi
 
     log_success "Tema cybersec verificado correctamente"

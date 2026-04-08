@@ -1,0 +1,69 @@
+/* Theme: Isabel-Frappe | Inspired by gh0stzk/dotfiles | Credits: https://github.com/gh0stzk/dotfiles */
+/* Catppuccin Frappe | bg: #303446 | acc: #8caaee blue + #e78284 red */
+
+* {{ border: none; border-radius: 0; font-family: "JetBrains Mono Nerd Font", "JetBrains Mono", monospace; font-size: 13px; font-weight: bold; min-height: 0; }}
+
+window#waybar {{ background: transparent; color: #c6d0f5; }}
+window#waybar.top, window#waybar.bottom {{ background: transparent; }}
+
+.modules-left, .modules-center, .modules-right {{
+    background: rgba(48, 52, 70, 0.93);
+    border-radius: 15px;
+    margin: 8px 10px;
+    padding: 2px 15px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.55);
+    border: 1px solid rgba(140, 170, 238, 0.20);
+}}
+
+tooltip {{ background: #414559; border-radius: 10px; border: 1px solid rgba(140, 170, 238, 0.25); }}
+tooltip label {{ color: #c6d0f5; padding: 4px 8px; }}
+
+#custom-launcher {{ color: #8caaee; font-size: 20px; padding: 0 14px; margin: 0 2px; border-radius: 12px; transition: all 200ms ease; }}
+#custom-launcher:hover {{ color: #babbf1; background: rgba(0,0,0,0.15); }}
+
+#workspaces {{ padding: 0 4px; }}
+#workspaces button {{ color: #626880; background: transparent; padding: 0 8px; margin: 2px; border-radius: 10px; font-size: 13px; transition: all 200ms ease; min-width: 28px; }}
+#workspaces button.active {{ color: #303446; background: #8caaee; border-radius: 10px; }}
+#workspaces button:hover {{ color: #c6d0f5; background: rgba(255,255,255,0.08); }}
+#workspaces button.urgent {{ color: #303446; background: #e78284; }}
+
+#cpu {{ color: #8caaee; padding: 0 10px; border-radius: 10px; transition: all 200ms ease; }}
+#memory {{ color: #ca9ee6; padding: 0 10px; border-radius: 10px; transition: all 200ms ease; }}
+#disk {{ color: #a6d189; padding: 0 10px; border-radius: 10px; transition: all 200ms ease; }}
+#temperature {{ color: #e5c890; padding: 0 10px; border-radius: 10px; transition: all 200ms ease; }}
+#temperature.critical {{ color: #e78284; }}
+#custom-hardware_temp {{ color: #e5c890; padding: 0 10px; border-radius: 10px; transition: all 200ms ease; }}
+
+#custom-vpn {{ padding: 0 10px; border-radius: 10px; transition: all 200ms ease; }}
+#custom-vpn.connected {{ color: #a6d189; }}
+#custom-vpn.disconnected {{ color: #e78284; }}
+
+#network {{ color: #8caaee; padding: 0 10px; border-radius: 10px; transition: all 200ms ease; }}
+#network.disconnected {{ color: #e78284; }}
+#pulseaudio {{ color: #85c1dc; padding: 0 10px; border-radius: 10px; transition: all 200ms ease; }}
+#pulseaudio.muted {{ color: #626880; }}
+
+#battery {{ color: #a6d189; padding: 0 10px; border-radius: 10px; transition: all 200ms ease; }}
+#battery.warning {{ color: #e5c890; }}
+#battery.critical {{ color: #e78284; }}
+#battery.charging {{ color: #8caaee; }}
+
+#clock {{ color: #85c1dc; font-size: 14px; padding: 0 14px; border-radius: 10px; transition: all 200ms ease; }}
+
+#custom-settarget {{ font-size: 13px; padding: 0 12px; border-radius: 10px; transition: all 200ms ease; }}
+#custom-settarget.active {{ color: #8caaee; border: 1px solid rgba(140, 170, 238, 0.25); }}
+#custom-settarget.inactive {{ color: #626880; }}
+
+#custom-docker {{ color: #8caaee; padding: 0 10px; border-radius: 10px; transition: all 200ms ease; }}
+#custom-kvm {{ color: #e5c890; padding: 0 10px; border-radius: 10px; transition: all 200ms ease; }}
+#custom-updates {{ color: #e5c890; padding: 0 10px; border-radius: 10px; transition: all 200ms ease; }}
+#custom-local_ip {{ color: #a6d189; padding: 0 10px; border-radius: 10px; transition: all 200ms ease; }}
+#custom-public_ip {{ color: #8caaee; padding: 0 10px; border-radius: 10px; transition: all 200ms ease; }}
+#custom-player {{ color: #ca9ee6; padding: 0 10px; border-radius: 10px; transition: all 200ms ease; }}
+
+#custom-power {{ color: #e78284; font-size: 16px; padding: 0 12px; margin: 0 2px; border-radius: 12px; transition: all 200ms ease; }}
+#custom-power:hover {{ color: #c6d0f5; background: rgba(255,0,0,0.15); }}
+
+#tray {{ padding: 0 8px; }}
+#tray > .passive {{ -gtk-icon-effect: dim; }}
+#tray > .needs-attention {{ -gtk-icon-effect: highlight; border-radius: 8px; }}

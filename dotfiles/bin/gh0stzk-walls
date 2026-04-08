@@ -22,6 +22,17 @@ declare -A RICE_MAP=(
     ["Emilia-TokyoNight"]="emilia"
     ["Marisol-Dracula"]="marisol"
     ["Melissa-Nord"]="melissa"
+    ["Karla-ZombieNight"]="karla"
+    ["Pamela-Lovelace"]="pamela"
+    ["Zombie-Decay"]="z0mbi3"
+    ["Brenda-Everforest"]="brenda"
+    ["Daniela-Catppuccin"]="daniela"
+    ["H4k3r-HTB"]="h4ck3r"
+    ["Silvia-Gruvbox"]="silvia"
+    ["Varinka-Mono"]="varinka"
+    ["Yael-OxoCarbon"]="yael"
+    ["Janis-CyberMagenta"]="jan"
+    ["Isabel-Frappe"]="isabel"
 )
 
 usage() {

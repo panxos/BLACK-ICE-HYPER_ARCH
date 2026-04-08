@@ -1,0 +1,178 @@
+/* Theme: Varinka-Mono | Inspired by gh0stzk/dotfiles | Credits: https://github.com/gh0stzk/dotfiles */
+/* Varinka-Mono | gh0stzk inspired | bg: #212529 | Monochromatic */
+
+/* ─── Global Reset ─────────────────────────────────────────────────────────── */
+* {
+    border: none;
+    border-radius: 0;
+    font-family: "JetBrains Mono Nerd Font", "JetBrains Mono", monospace;
+    font-size: 13px;
+    font-weight: bold;
+    min-height: 0;
+}
+
+/* ─── Window ────────────────────────────────────────────────────────────────── */
+window#waybar {
+    background: transparent;
+    color: #f8f9fa;
+}
+
+window#waybar.top, window#waybar.bottom {
+    background: transparent;
+}
+
+/* ─── Module Containers (Floating Pills) ────────────────────────────────────── */
+.modules-left,
+.modules-center,
+.modules-right {
+    background: rgba(33, 37, 41, 0.92);
+    border-radius: 15px;
+    margin: 8px 10px;
+    padding: 2px 15px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.55);
+    border: 1px solid rgba(173, 181, 189, 0.22);
+}
+
+/* ─── Tooltips ──────────────────────────────────────────────────────────────── */
+tooltip {
+    background: #343a40;
+    border-radius: 10px;
+    border: 1px solid rgba(173, 181, 189, 0.22);
+}
+
+tooltip label {
+    color: #f8f9fa;
+    padding: 4px 8px;
+}
+
+/* ─── Launcher ──────────────────────────────────────────────────────────────── */
+#custom-launcher {
+    color: #adb5bd;
+    font-size: 20px;
+    padding: 0 14px;
+    margin: 0 2px;
+    border-radius: 12px;
+    transition: all 200ms ease;
+}
+
+#custom-launcher:hover {
+    color: #6c757d;
+    background: rgba(0, 0, 0, 0.15);
+}
+
+/* ─── Workspaces ────────────────────────────────────────────────────────────── */
+#workspaces { padding: 0 4px; }
+
+#workspaces button {
+    color: #495057;
+    background: transparent;
+    padding: 0 8px;
+    margin: 2px;
+    border-radius: 10px;
+    font-size: 13px;
+    transition: all 200ms ease;
+    min-width: 28px;
+}
+
+#workspaces button.active {
+    color: #343a40;
+    background: #adb5bd;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.4);
+    border-radius: 10px;
+}
+
+#workspaces button:hover {
+    color: #f8f9fa;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+#workspaces button.urgent {
+    color: #343a40;
+    background: #e05c5c;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
+}
+
+/* ─── CPU ───────────────────────────────────────────────────────────────────── */
+#cpu { color: #adb5bd; padding: 0 10px; border-radius: 10px; transition: all 200ms ease; }
+#cpu:hover { background: rgba(0, 0, 0, 0.12); }
+
+/* ─── Memory ────────────────────────────────────────────────────────────────── */
+#memory { color: #7c6e8a; padding: 0 10px; border-radius: 10px; transition: all 200ms ease; }
+#memory:hover { background: rgba(0, 0, 0, 0.12); }
+
+/* ─── Disk ──────────────────────────────────────────────────────────────────── */
+#disk { color: #6ea046; padding: 0 10px; border-radius: 10px; transition: all 200ms ease; }
+#disk:hover { background: rgba(0, 0, 0, 0.12); }
+
+/* ─── Temperature ───────────────────────────────────────────────────────────── */
+#temperature { color: #d4a84b; padding: 0 10px; border-radius: 10px; transition: all 200ms ease; }
+#temperature:hover { background: rgba(0, 0, 0, 0.12); }
+#temperature.critical { color: #e05c5c; }
+
+/* ─── Hardware Temp ─────────────────────────────────────────────────────────── */
+#custom-hardware_temp { color: #d4a84b; padding: 0 10px; border-radius: 10px; transition: all 200ms ease; }
+#custom-hardware_temp:hover { background: rgba(0, 0, 0, 0.12); }
+
+/* ─── VPN ───────────────────────────────────────────────────────────────────── */
+#custom-vpn { padding: 0 10px; border-radius: 10px; transition: all 200ms ease; }
+#custom-vpn.connected { color: #6ea046; }
+#custom-vpn.disconnected { color: #e05c5c; }
+
+/* ─── Network ───────────────────────────────────────────────────────────────── */
+#network { color: #adb5bd; padding: 0 10px; border-radius: 10px; transition: all 200ms ease; }
+#network:hover { background: rgba(0, 0, 0, 0.12); }
+#network.disconnected { color: #e05c5c; }
+
+/* ─── Pulseaudio ────────────────────────────────────────────────────────────── */
+#pulseaudio { color: #6c757d; padding: 0 10px; border-radius: 10px; transition: all 200ms ease; }
+#pulseaudio:hover { background: rgba(0, 0, 0, 0.12); }
+#pulseaudio.muted { color: #495057; }
+
+/* ─── Battery ───────────────────────────────────────────────────────────────── */
+#battery { color: #6ea046; padding: 0 10px; border-radius: 10px; transition: all 200ms ease; }
+#battery.warning { color: #d4a84b; }
+#battery.critical { color: #e05c5c; }
+#battery.charging { color: #adb5bd; }
+
+/* ─── Clock ─────────────────────────────────────────────────────────────────── */
+#clock { color: #6c757d; font-size: 14px; padding: 0 14px; border-radius: 10px; transition: all 200ms ease; }
+#clock:hover { background: rgba(0, 0, 0, 0.12); }
+
+/* ─── Set Target ────────────────────────────────────────────────────────────── */
+#custom-settarget { font-size: 13px; padding: 0 12px; border-radius: 10px; transition: all 200ms ease; }
+#custom-settarget.active { color: #adb5bd; border: 1px solid rgba(173, 181, 189, 0.22); }
+#custom-settarget.inactive { color: #495057; }
+
+/* ─── Docker / KVM ──────────────────────────────────────────────────────────── */
+#custom-docker { color: #adb5bd; padding: 0 10px; border-radius: 10px; transition: all 200ms ease; }
+#custom-docker:hover { background: rgba(0, 0, 0, 0.12); }
+#custom-kvm { color: #d4a84b; padding: 0 10px; border-radius: 10px; transition: all 200ms ease; }
+#custom-kvm:hover { background: rgba(0, 0, 0, 0.12); }
+
+/* ─── Updates ───────────────────────────────────────────────────────────────── */
+#custom-updates { color: #d4a84b; padding: 0 10px; border-radius: 10px; transition: all 200ms ease; }
+#custom-updates:hover { background: rgba(0, 0, 0, 0.12); }
+
+/* ─── Local / Public IP ─────────────────────────────────────────────────────── */
+#custom-local_ip { color: #6ea046; padding: 0 10px; border-radius: 10px; transition: all 200ms ease; }
+#custom-public_ip { color: #adb5bd; padding: 0 10px; border-radius: 10px; transition: all 200ms ease; }
+
+/* ─── Player ────────────────────────────────────────────────────────────────── */
+#custom-player { color: #7c6e8a; padding: 0 10px; border-radius: 10px; transition: all 200ms ease; }
+#custom-player:hover { background: rgba(0, 0, 0, 0.12); }
+
+/* ─── Power ─────────────────────────────────────────────────────────────────── */
+#custom-power {
+    color: #e05c5c;
+    font-size: 16px;
+    padding: 0 12px;
+    margin: 0 2px;
+    border-radius: 12px;
+    transition: all 200ms ease;
+}
+#custom-power:hover { color: #f8f9fa; background: rgba(255, 0, 0, 0.15); }
+
+/* ─── System Tray ───────────────────────────────────────────────────────────── */
+#tray { padding: 0 8px; }
+#tray > .passive { -gtk-icon-effect: dim; }
+#tray > .needs-attention { -gtk-icon-effect: highlight; border-radius: 8px; }
