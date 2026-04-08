@@ -96,7 +96,6 @@ for choice in $CHOICES; do
         "\"AI_Tools\""|"AI_Tools")
             log_info "Instalando Ecosistema IA..."
             pkg_install "claude-desktop-bin"
-            pkg_install "geminidesk-bin"
             ;;
         "\"Productivity\""|"Productivity")
             log_info "Instalando Herramientas de Productividad..."
@@ -119,7 +118,6 @@ for choice in $CHOICES; do
             ;;
         "\"Cloud\""|"Cloud")
             log_info "Instalando Servicios Cloud..."
-            pkg_install "megasync-bin"
             pkg_install "filezilla"
             ;;
         "\"Office\""|"Office")

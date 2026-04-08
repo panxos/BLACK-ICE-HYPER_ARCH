@@ -328,8 +328,10 @@ if [ -d "$DOTFILES_DIR/waybar" ]; then
     cp -r "$DOTFILES_DIR/waybar/"* "$USER_HOME/.config/waybar/"
     
     # Set s4vitar-darkness as default
-    cp "$DOTFILES_DIR/waybar/themes/s4vitar-darkness/config.jsonc" "$USER_HOME/.config/waybar/config" 2>/dev/null || true
-    cp "$DOTFILES_DIR/waybar/themes/s4vitar-darkness/config.jsonc" "$USER_HOME/.config/waybar/config.jsonc"
+    # Solo config.jsonc — Waybar lo prioriza. Evitar 'config' legacy que genera conflictos.
+    rm -f "$USER_HOME/.config/waybar/config"
+    ln -sf "$USER_HOME/.config/waybar/themes/s4vitar-darkness/config.jsonc" "$USER_HOME/.config/waybar/config.jsonc"
+    ln -sf "$USER_HOME/.config/waybar/themes/s4vitar-darkness/style.css" "$USER_HOME/.config/waybar/style.css"
     cp "$DOTFILES_DIR/waybar/themes/s4vitar-darkness/style.css" "$USER_HOME/.config/waybar/style.css"
     
     # Fix Permissions — directorios 755, archivos 644, scripts 755
