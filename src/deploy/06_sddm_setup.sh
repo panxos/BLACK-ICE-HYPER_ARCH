@@ -37,15 +37,14 @@ if [ -d "$THEME_SOURCE" ]; then
     
     # Verificar que los archivos críticos existen
     if [ ! -f "$THEME_DEST/Main.qml" ]; then
-        log_error "Error: Main.qml no encontrado en el tema."
-        log_error "Verifica que el directorio $THEME_SOURCE contiene todos los archivos necesarios."
-        exit 1
+        log_warn "Main.qml no encontrado en el tema — SDDM usará tema por defecto."
+        return 0
     fi
-    
+
     log_success "Tema cybersec verificado correctamente"
 else
-    log_error "No se encontró el directorio del tema en: $THEME_SOURCE"
-    exit 1
+    log_warn "No se encontró el directorio del tema en: $THEME_SOURCE — SDDM usará tema por defecto."
+    return 0
 fi
 
 # Configurar SDDM

@@ -65,13 +65,10 @@ source "$SCRIPT_DIR/src/deploy/00_repositories.sh"
 # 2. Hyprland y componentes base
 source "$SCRIPT_DIR/src/deploy/01_hyprland_base.sh"
 
-# 3. Herramientas de seguridad
-source "$SCRIPT_DIR/src/deploy/02_security_tools.sh"
-
-# 4. Configuración de terminal (Zsh)
+# 3. Configuración de terminal (Zsh + p10k)
 source "$SCRIPT_DIR/src/deploy/03_terminal_config.sh"
 
-# 5. Tema y personalización
+# 4. Tema y personalización (GTK, Qt, Waybar temas)
 source "$SCRIPT_DIR/src/deploy/04_theme_setup.sh"
 
 # 5. Software Suite Premium (Checklist Interactivo)
@@ -89,8 +86,11 @@ source "$SCRIPT_DIR/src/deploy/08_ai_tools.sh"
 # 9. GRUB Theme (DedSec)
 source "$SCRIPT_DIR/src/deploy/09_grub_theme.sh"
 
-# 99. Finalización
+# 99. Finalización (dotfiles, symlinks, permisos)
 source "$SCRIPT_DIR/src/deploy/99_finalization.sh"
+
+# 10. Herramientas de Seguridad — AL FINAL (opcional, no bloquea el entorno)
+source "$SCRIPT_DIR/src/deploy/02_security_tools.sh"
 
 echo ""
 success "¡Despliegue de Hyprland completado!"
