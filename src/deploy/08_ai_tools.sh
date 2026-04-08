@@ -63,4 +63,30 @@ else
     log_info "Aliases de IA ya presentes en $ZSH_ALIASES"
 fi
 
+# --- Configurar browser por defecto para auth OAuth (Claude/Gemini/Qwen abren URLs) ---
+# En Wayland/Hyprland sin browser default configurado los CLIs no pueden autenticar.
+log_info "Configurando browser por defecto para autenticación de CLIs..."
+
+# Detectar browser disponible (brave > firefox > chromium)
+BROWSER_BIN=""
+for b in brave firefox chromium; do
+    if command -v "$b" &>/dev/null; then
+        BROWSER_BIN="$b"
+        break
+    fi
+done
+
+if [ -n "$BROWSER_BIN" ]; then
+    # Configurar xdg-settings (afecta a xdg-open que usan los CLIs)
+    xdg-settings set default-web-browser "${BROWSER_BIN}.desktop" 2>/dev/null || true
+
+    # Asegurar variable BROWSER en .zshrc del usuario
+    if ! grep -q "^export BROWSER=" "$USER_HOME/.zshrc" 2>/dev/null; then
+        echo "export BROWSER=$BROWSER_BIN" >> "$USER_HOME/.zshrc"
+    fi
+    log_success "Browser por defecto: $BROWSER_BIN (OAuth de CLIs habilitado)"
+else
+    log_warn "No se detectó browser. Instala brave o firefox para autenticar los CLIs de IA."
+fi
+
 log_success "Módulo de IA completado"
