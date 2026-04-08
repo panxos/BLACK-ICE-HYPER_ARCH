@@ -72,8 +72,8 @@ if grep -q "Current=$THEME_NAME" "$SDDM_CONF_DIR/theme.conf"; then
     # Fix permissions for the config file
     sudo chmod 644 "$SDDM_CONF_DIR/theme.conf"
 else
-    log_error "Error al configurar tema en sddm.conf"
-    exit 1
+    log_warn "Error al configurar tema en sddm.conf — SDDM arrancará con tema por defecto"
+    return 0
 fi
 
 # Deshabilitar otros display managers
