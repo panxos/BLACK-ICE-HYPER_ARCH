@@ -17,13 +17,14 @@ if ! pgrep -x "awww-daemon" > /dev/null; then
     sleep 1
 fi
 
-# Recoger todos los wallpapers PNG, JPG y MP4
-shopt -s nullglob
-wallpapers=("$WALL_DIR"/*.{png,jpg,jpeg,mp4})
+# Recoger todos los wallpapers recursivamente (incluyendo subdirectorios gh0stzk, etc.)
+mapfile -t wallpapers < <(find "$WALL_DIR" -type f \
+    \( -iname "*.png" -o -iname "*.jpg" -o -iname "*.jpeg" \
+       -o -iname "*.webp" -o -iname "*.mp4" \) 2>/dev/null | sort)
 num_walls=${#wallpapers[@]}
 
 if [ $num_walls -eq 0 ]; then
-    notify-send "Wallpaper System" "Error: No se encontraron archivos de imagen o video en $WALL_DIR"
+    notify-send "Wallpaper System" "Error: No se encontraron wallpapers en $WALL_DIR"
     exit 1
 fi
 

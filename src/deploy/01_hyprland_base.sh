@@ -761,6 +761,21 @@ if [ -d "$DOTFILES_DIR/fastfetch" ]; then
     log_info "Fastfetch dotfiles y script randomizer copiados"
 fi
 
+# --- Swappy (screenshot editor) config ---
+if [ -f "$DOTFILES_DIR/swappy/config" ]; then
+    mkdir -p "$USER_HOME/.config/swappy"
+    cp "$DOTFILES_DIR/swappy/config" "$USER_HOME/.config/swappy/config"
+    # Expandir $HOME literal en el config (swappy no interpola variables de shell)
+    sed -i "s|\$HOME|$USER_HOME|g" "$USER_HOME/.config/swappy/config"
+    chown "$CURRENT_USER:$CURRENT_USER" "$USER_HOME/.config/swappy/config"
+    log_info "Swappy config desplegado"
+fi
+
+# --- Directorio para capturas de pantalla ---
+mkdir -p "$USER_HOME/Pictures/Screenshots"
+chown "$CURRENT_USER:$CURRENT_USER" "$USER_HOME/Pictures/Screenshots"
+log_info "Directorio ~/Pictures/Screenshots creado"
+
 # Replication of manual "winning" configs (KWrite, Kate, Dolphin)
 log_info "Instalando configuraciones ganadoras (KWrite, Kate, Dolphin)..."
 cp "$DOTFILES_DIR/kwrite/kwriterc" "$USER_HOME/.config/kwriterc" 2>/dev/null || true
