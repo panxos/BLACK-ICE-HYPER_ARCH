@@ -37,6 +37,8 @@ chmod +x "$USER_HOME/.config/bin/antigravity-fix"
 
 # 2b. Fix xdg-open para OAuth en CLI tools (gemini-cli, qwen-cli, etc.)
 # Instala wrapper que garantiza apertura de browser en Wayland
+mkdir -p "$USER_HOME/.local/bin"
+chown "$CURRENT_USER:$CURRENT_USER" "$USER_HOME/.local/bin"
 if [ -f "$SCRIPT_DIR/dotfiles/bin/xdg-open-wayland" ]; then
     cp "$SCRIPT_DIR/dotfiles/bin/xdg-open-wayland" "$USER_HOME/.local/bin/xdg-open"
     chmod +x "$USER_HOME/.local/bin/xdg-open"
