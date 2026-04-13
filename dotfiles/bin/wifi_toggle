@@ -1,0 +1,13 @@
+#!/bin/bash
+# wifi_toggle — Toggle WiFi on/off via nmcli (genérico, sin hardcode)
+# BLACK-ICE ARCH | P4nx0z
+
+STATUS=$(nmcli radio wifi 2>/dev/null)
+
+if [ "$STATUS" = "enabled" ]; then
+    nmcli radio wifi off
+    notify-send "WiFi" " Desactivado" --icon=network-wireless-offline --urgency=low
+else
+    nmcli radio wifi on
+    notify-send "WiFi" "󰖩 Activado — conectando..." --icon=network-wireless --urgency=low
+fi

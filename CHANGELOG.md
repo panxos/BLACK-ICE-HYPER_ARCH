@@ -1,5 +1,27 @@
 # CHANGELOG - BLACK-ICE ARCH
 
+## [3.4.0] - 2026-04-13 (P4nx0z "Hyprland Port" Edition)
+
+### 🚀 Novedades
+
+- **Teclas multimedia completas**: swayosd (primario) + pamixer/brightnessctl (fallback). WiFi toggle via nmcli `XF86WLAN`/`XF86RFKill` + fallback `SUPER+ALT+F`. Playerctl para media keys.
+- **fzf-tab**: Instalado en deploy + integrado en `.zshrc` con previews ls/bat/kill. Colores BLACK-ICE.
+- **Music Player (MPD + ncmpcpp)**: Deploy automático con PipeWire/PulseAudio. Servicio systemd --user. Lanzador `SUPER+SHIFT+M`. Alimenta módulo Waybar via playerctl/mpris.
+- **Wofi múltiples estilos**: 4 estilos en `~/.config/wofi/styles/` (default, minimal, fullscreen, grid). Selector en `SUPER+ALT+R`.
+- **wifi_toggle**: Script genérico nmcli con notificación swaync.
+- **xdg-open-wayland wrapper**: Fix OAuth para gemini-cli, qwen-cli en Wayland — instalado como `~/.local/bin/xdg-open`.
+
+### 🛠️ Fixes
+
+- **wallpaper_visual**: Escaneo recursivo de subdirectorios. Soporte .webp. Indicador ★ del activo.
+- **Waybar layouts variety**: Varinka-Mono → módulos individuales en caja. Yael-OxoCarbon → fullwidth slim bar. H4k3r-HTB → compact pill-right con underline tabs.
+- **Kitty blur**: `background_opacity 0.92`. Blur reducido (size=4, passes=2). windowrulev2 para opacidad diferenciada. Fondo visible sin blur excesivo.
+- **BROWSER env Kitty**: `env BROWSER=xdg-open` en kitty.conf para CLI OAuth.
+- **Deploy 01_hyprland_base**: Agrega `swayosd` + `networkmanager` a paquetes base.
+- **Deploy 99_finalization**: Instala xdg-open wrapper + xdg-settings browser por defecto.
+
+---
+
 ## [3.3.1] - 2026-04-07 (P4nx0z "Hardened Deploy" Edition)
 
 ### 🐞 Correcciones Críticas

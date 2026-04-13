@@ -1,0 +1,23 @@
+#!/bin/bash
+# xdg-open-wayland — Wrapper para abrir URLs en Wayland correctamente
+# Usado por gemini-cli, qwen-cli, auth OAuth, etc.
+# BLACK-ICE ARCH | P4nx0z
+
+URL="$1"
+[ -z "$URL" ] && exit 1
+
+# Exportar variables de entorno Wayland si no están definidas
+export WAYLAND_DISPLAY="${WAYLAND_DISPLAY:-wayland-1}"
+export XDG_CURRENT_DESKTOP="${XDG_CURRENT_DESKTOP:-Hyprland}"
+export XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
+
+# Detectar browser disponible (en orden de preferencia)
+for browser in brave-browser brave chromium firefox; do
+    if command -v "$browser" &>/dev/null; then
+        exec "$browser" "$URL" &>/dev/null &
+        exit 0
+    fi
+done
+
+# Fallback: xdg-open del sistema
+exec /usr/bin/xdg-open "$URL"

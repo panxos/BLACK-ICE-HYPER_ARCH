@@ -77,6 +77,23 @@ zstyle ':completion:*' verbose true
 zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#)*=0=01;31'
 zstyle ':completion:*:kill:*' command 'ps -u $USER -o pid,%cpu,tty,cputime,cmd'
 
+# --- fzf-tab (tab completion con preview visual) ---
+# Instalar: git clone https://github.com/Aloxaf/fzf-tab ~/.local/share/fzf-tab
+if [ -f "$HOME/.local/share/fzf-tab/fzf-tab.zsh" ]; then
+    source "$HOME/.local/share/fzf-tab/fzf-tab.zsh"
+    # Previews: chafa para imágenes, ls para dirs, less para files
+    zstyle ':fzf-tab:complete:cd:*'       fzf-preview 'ls --color=always $realpath 2>/dev/null'
+    zstyle ':fzf-tab:complete:ls:*'       fzf-preview 'ls --color=always $realpath 2>/dev/null'
+    zstyle ':fzf-tab:complete:cat:*'      fzf-preview 'bat --color=always --line-range :50 $realpath 2>/dev/null || less $realpath'
+    zstyle ':fzf-tab:complete:nvim:*'     fzf-preview 'bat --color=always --line-range :50 $realpath 2>/dev/null || less $realpath'
+    zstyle ':fzf-tab:complete:kill:*'     fzf-preview 'ps --pid=$word -o pid,user,cmd --no-headers 2>/dev/null'
+    zstyle ':fzf-tab:*'                   fzf-flags --height 50% --border rounded --color='bg+:#1e1e2e,border:#00f3ff,hl:#00f3ff'
+    zstyle ':fzf-tab:*'                   switch-group ',' '.'
+fi
+
+# --- BROWSER para CLI tools OAuth (gemini-cli, qwen-cli, etc.) ---
+export BROWSER="${BROWSER:-xdg-open}"
+
 # Definición de colores
 RED='\033[0;31m'
 GREEN='\033[0;32m'

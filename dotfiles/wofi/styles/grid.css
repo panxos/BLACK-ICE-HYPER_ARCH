@@ -1,0 +1,71 @@
+/* Wofi Style: GRID — Layout tipo grid con iconos grandes */
+/* Wofi no soporta grid nativo, pero con column-count en GTK3 se emula */
+/* BLACK-ICE ARCH | P4nx0z */
+
+window {
+    margin: 0px;
+    border: 2px solid rgba(176, 38, 255, 0.50);
+    background-color: rgba(10, 5, 20, 0.97);
+    border-radius: 16px;
+    font-family: "JetBrains Mono Nerd Font", monospace;
+}
+
+#input {
+    margin: 12px 16px 8px 16px;
+    border: 1px solid rgba(176, 38, 255, 0.40);
+    color: #e0d0ff;
+    background-color: rgba(30, 10, 50, 0.80);
+    border-radius: 10px;
+    font-size: 14px;
+    padding: 8px 14px;
+}
+
+#input:focus { border-color: #b026ff; box-shadow: 0 0 8px rgba(176, 38, 255, 0.4); }
+
+#inner-box {
+    margin: 6px 10px;
+    border: none;
+    background-color: transparent;
+    color: #e0d0ff;
+    /* Emular grid con columnas — requiere --columns en el config */
+    column-count: 4;
+}
+
+#outer-box {
+    margin: 0;
+    border: none;
+    background-color: transparent;
+}
+
+#scroll { margin: 0; border: none; }
+
+#text {
+    margin: 2px;
+    border: none;
+    color: #c0a8e0;
+    font-size: 11px;
+}
+
+#entry {
+    border-radius: 10px;
+    padding: 10px 8px;
+    margin: 4px;
+    transition: all 150ms ease;
+    /* Cada entrada ocupa espacio fijo tipo grid */
+    min-width: 80px;
+    max-width: 100px;
+}
+
+#entry:selected {
+    background-color: rgba(176, 38, 255, 0.20);
+    color: #e0d0ff;
+    border: 1px solid rgba(176, 38, 255, 0.50);
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(176, 38, 255, 0.25);
+}
+
+#entry image {
+    margin: 0 auto 4px auto;
+    min-width: 36px;
+    min-height: 36px;
+}

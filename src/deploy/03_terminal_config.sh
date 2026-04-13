@@ -33,6 +33,20 @@ safe_install zsh-autosuggestions
 safe_install fastfetch
 safe_install chafa
 safe_install ttf-jetbrains-mono-nerd
+safe_install fzf
+safe_install bat        # Previews en fzf-tab
+
+# --- fzf-tab (tab completion con preview visual) ---
+log_info "Instalando fzf-tab..."
+FZF_TAB_DIR="$USER_HOME/.local/share/fzf-tab"
+if [ -d "$FZF_TAB_DIR" ]; then
+    git -C "$FZF_TAB_DIR" pull --depth=1 2>/dev/null || true
+    log_info "fzf-tab actualizado"
+else
+    git clone --depth=1 https://github.com/Aloxaf/fzf-tab.git "$FZF_TAB_DIR"
+    log_success "fzf-tab instalado en $FZF_TAB_DIR"
+fi
+chown -R "$CURRENT_USER:$CURRENT_USER" "$FZF_TAB_DIR"
 
 # Instalar zsh-sudo manualmente (no siempre disponible en repos oficiales)
 cd "$USER_HOME" || cd /tmp

@@ -1,0 +1,66 @@
+/* Wofi Style: FULLSCREEN — Lanzador pantalla completa cyberpunk */
+/* BLACK-ICE ARCH | P4nx0z */
+
+window {
+    margin: 0px;
+    border: none;
+    background-color: rgba(10, 10, 20, 0.96);
+    border-radius: 0px;
+    font-family: "JetBrains Mono Nerd Font", monospace;
+}
+
+#input {
+    margin: 20px 40px 10px 40px;
+    border: 2px solid #00f3ff;
+    color: #00f3ff;
+    background-color: rgba(0, 0, 0, 0.6);
+    border-radius: 8px;
+    font-size: 18px;
+    padding: 10px 16px;
+}
+
+#input:focus { border-color: #b026ff; }
+
+#inner-box {
+    margin: 10px 30px;
+    border: none;
+    background-color: transparent;
+    color: #e0e0e0;
+}
+
+#outer-box {
+    margin: 0;
+    border: none;
+    background-color: transparent;
+    color: #e0e0e0;
+}
+
+#scroll {
+    margin: 0;
+    border: none;
+}
+
+#text {
+    margin: 4px 8px;
+    border: none;
+    color: #c0c0c0;
+    font-size: 14px;
+}
+
+#entry {
+    border-radius: 6px;
+    padding: 6px 10px;
+    margin: 2px 6px;
+    transition: all 100ms ease;
+}
+
+#entry:selected {
+    background-color: rgba(0, 243, 255, 0.15);
+    color: #00f3ff;
+    border: 1px solid rgba(0, 243, 255, 0.40);
+    border-radius: 6px;
+}
+
+#entry image {
+    margin-right: 8px;
+}

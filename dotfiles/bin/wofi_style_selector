@@ -1,0 +1,51 @@
+#!/bin/bash
+# wofi_style_selector — Selector de estilos visuales de Wofi
+# BLACK-ICE ARCH | P4nx0z
+
+STYLES_DIR="$HOME/.config/wofi/styles"
+CACHE_STYLE="$HOME/.cache/wofi_current_style"
+WOFI_STYLE="$HOME/.config/wofi/style.css"
+
+# Configs por estilo (ancho x alto x location)
+declare -A STYLE_CONFIG=(
+    ["default"]="450x350xcenter"
+    ["minimal"]="400x280xcenter"
+    ["fullscreen"]="1920x1080xcenter"
+    ["grid"]="600x400xcenter"
+)
+
+if [ ! -d "$STYLES_DIR" ]; then
+    notify-send "Wofi" "No se encontró $STYLES_DIR" --urgency=critical
+    exit 1
+fi
+
+# Detectar estilo actual
+CURRENT=$(cat "$CACHE_STYLE" 2>/dev/null || echo "default")
+
+# Listar estilos disponibles
+mapfile -t styles < <(find "$STYLES_DIR" -name "*.css" -printf "%f\n" | sed 's/\.css$//' | sort)
+
+SELECTION=$(printf '%s\n' "${styles[@]}" | \
+    wofi --dmenu \
+         --prompt " Estilo Wofi:" \
+         --width 300 \
+         --height 250 \
+         --cache-file /dev/null \
+         --no-actions \
+         --insensitive)
+
+[ -z "$SELECTION" ] && exit 0
+[ "$SELECTION" = "$CURRENT" ] && {
+    notify-send "Wofi" "Estilo '$SELECTION' ya está activo"
+    exit 0
+}
+
+# Aplicar via symlink
+if [ -f "$STYLES_DIR/$SELECTION.css" ]; then
+    echo "$SELECTION" > "$CACHE_STYLE"
+    ln -sf "$STYLES_DIR/$SELECTION.css" "$WOFI_STYLE"
+    notify-send "Wofi" "Estilo cambiado: $SELECTION" --urgency=low
+else
+    notify-send "Wofi" "Estilo '$SELECTION' no encontrado" --urgency=critical
+    exit 1
+fi

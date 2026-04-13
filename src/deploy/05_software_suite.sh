@@ -109,6 +109,55 @@ for choice in $CHOICES; do
             pkg_install "vlc"
             pkg_install "gimp"
             pkg_install "spectacle"
+
+            # --- Music Player: MPD + ncmpcpp ---
+            log_info "Instalando MPD + ncmpcpp (music player)..."
+            pkg_install "mpd"
+            pkg_install "ncmpcpp"
+            pkg_install "mpc"        # CLI control para Waybar
+            pkg_install "playerctl"  # Control mpris universal
+
+            # Config MPD del usuario
+            MPD_CONF_DIR="$USER_HOME/.config/mpd"
+            MPD_MUSIC_DIR="$USER_HOME/Music"
+            mkdir -p "$MPD_CONF_DIR" "$MPD_MUSIC_DIR" "$MPD_CONF_DIR/playlists"
+
+            if [ ! -f "$MPD_CONF_DIR/mpd.conf" ]; then
+                cat > "$MPD_CONF_DIR/mpd.conf" << 'MPDEOF'
+# MPD Configuration - BLACK-ICE ARCH
+music_directory    "~/Music"
+playlist_directory "~/.config/mpd/playlists"
+db_file            "~/.config/mpd/mpd.db"
+log_file           "~/.config/mpd/mpd.log"
+pid_file           "~/.config/mpd/mpd.pid"
+state_file         "~/.config/mpd/mpdstate"
+sticker_database   "~/.config/mpd/sticker.sql"
+
+bind_to_address    "127.0.0.1"
+port               "6600"
+
+audio_output {
+    type    "pipewire"
+    name    "PipeWire Output"
+}
+
+audio_output {
+    type    "pulse"
+    name    "PulseAudio Output"
+}
+
+replaygain          "auto"
+MPDEOF
+                chown "$CURRENT_USER:$CURRENT_USER" "$MPD_CONF_DIR/mpd.conf"
+                log_success "MPD configurado en $MPD_CONF_DIR/mpd.conf"
+            fi
+
+            # Habilitar servicio MPD del usuario
+            sudo -u "$CURRENT_USER" systemctl --user enable --now mpd.service 2>/dev/null || \
+                log_warn "MPD service enable fallido — iniciar manualmente con: systemctl --user start mpd"
+
+            chown -R "$CURRENT_USER:$CURRENT_USER" "$MPD_CONF_DIR" "$MPD_MUSIC_DIR"
+            log_success "MPD + ncmpcpp instalados. Música en ~/Music"
             ;;
         "\"Remote\""|"Remote")
             log_info "Instalando Conectividad Remota..."

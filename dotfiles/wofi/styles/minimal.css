@@ -1,0 +1,61 @@
+/* Wofi Style: MINIMAL — Barra de búsqueda compacta, sin decoraciones */
+/* BLACK-ICE ARCH | P4nx0z */
+
+window {
+    margin: 0px;
+    border: 1px solid rgba(0, 243, 255, 0.30);
+    background-color: rgba(8, 8, 14, 0.97);
+    border-radius: 4px;
+    font-family: "JetBrains Mono Nerd Font", monospace;
+}
+
+#input {
+    margin: 4px 8px;
+    border: none;
+    border-bottom: 1px solid rgba(0, 243, 255, 0.30);
+    color: #00f3ff;
+    background-color: transparent;
+    border-radius: 0;
+    font-size: 13px;
+    padding: 4px 8px;
+}
+
+#input:focus { border-bottom-color: #b026ff; }
+
+#inner-box {
+    margin: 2px 4px;
+    border: none;
+    background-color: transparent;
+    color: #c0c0c0;
+}
+
+#outer-box {
+    margin: 0;
+    border: none;
+    background-color: transparent;
+}
+
+#scroll { margin: 0; border: none; }
+
+#text {
+    margin: 1px 4px;
+    border: none;
+    color: #a0a0a0;
+    font-size: 12px;
+}
+
+#entry {
+    border-radius: 2px;
+    padding: 3px 8px;
+    margin: 1px 2px;
+    transition: all 80ms ease;
+}
+
+#entry:selected {
+    background-color: rgba(0, 243, 255, 0.12);
+    color: #00f3ff;
+    border-left: 2px solid #00f3ff;
+    border-radius: 2px;
+}
+
+#entry image { margin-right: 6px; }

@@ -102,9 +102,11 @@ HYPRLAND_PKGS=(
     "pacman-contrib"        # For updates status script (checkupdates)
     "network-manager-applet"
     "pavucontrol"
-    "pamixer"               # Audio control for multimedia keys
+    "pamixer"               # Audio control para multimedia keys (fallback)
+    "swayosd"               # OSD visual para volumen/brillo/mic (primario)
     "brightnessctl"
     "playerctl"
+    "networkmanager"        # nmcli para wifi_toggle
     "awww"                  # Wallpaper daemon
     "hypridle"              # Idle daemon
     "grimblast-git"         # Screenshot helper

@@ -27,13 +27,26 @@ cat << 'EOF' > "$USER_HOME/.config/bin/antigravity-fix"
 # antigravity-fix - P4nx0z Edition
 export XDG_CURRENT_DESKTOP=GNOME
 export DE=gnome
-export WAYLAND_DISPLAY=wayland-1
+export WAYLAND_DISPLAY="${WAYLAND_DISPLAY:-wayland-1}"
 export XDG_SESSION_TYPE=wayland
 export BROWSER=brave
 export GTK_USE_PORTAL=1
 /usr/bin/antigravity --password-store=basic --disable-gpu-sandbox "$@"
 EOF
 chmod +x "$USER_HOME/.config/bin/antigravity-fix"
+
+# 2b. Fix xdg-open para OAuth en CLI tools (gemini-cli, qwen-cli, etc.)
+# Instala wrapper que garantiza apertura de browser en Wayland
+if [ -f "$SCRIPT_DIR/dotfiles/bin/xdg-open-wayland" ]; then
+    cp "$SCRIPT_DIR/dotfiles/bin/xdg-open-wayland" "$USER_HOME/.local/bin/xdg-open"
+    chmod +x "$USER_HOME/.local/bin/xdg-open"
+    chown "$CURRENT_USER:$CURRENT_USER" "$USER_HOME/.local/bin/xdg-open"
+    log_success "xdg-open → wrapper Wayland instalado en ~/.local/bin/"
+fi
+
+# Configurar browser por defecto
+sudo -u "$CURRENT_USER" xdg-settings set default-web-browser brave-browser.desktop 2>/dev/null || \
+    sudo -u "$CURRENT_USER" xdg-settings set default-web-browser brave.desktop 2>/dev/null || true
 
 # 3. Wrapper para Udiskie (XWayland para icono en la tray)
 cat << 'EOF' > "$USER_HOME/.config/bin/udiskie-fix"
@@ -99,8 +112,12 @@ echo -e "  ${GREEN}Win+Return${NC}     → Kitty (terminal)"
 echo -e "  ${GREEN}Win+D${NC}          → Wofi (launcher)"
 echo -e "  ${GREEN}Win+E${NC}          → Dolphin (file manager)"
 echo -e "  ${GREEN}Win+Shift+S${NC}    → Screenshot"
-echo -e "  ${GREEN}Win+Alt+W${NC}      → Cambiar wallpaper"
-echo -e "  ${GREEN}Win+Alt+T${NC}      → Cambiar tema"
+echo -e "  ${GREEN}Win+Alt+W${NC}      → Cambiar wallpaper (selector)"
+echo -e "  ${GREEN}Win+Alt+T${NC}      → Cambiar tema Waybar"
+echo -e "  ${GREEN}Win+Alt+R${NC}      → Cambiar estilo Wofi"
+echo -e "  ${GREEN}Win+Alt+F${NC}      → Toggle WiFi"
 echo -e "  ${GREEN}Win+Q${NC}          → Cerrar ventana"
+echo -e "  ${GREEN}XF86Audio*${NC}     → Volumen/Mute/Mic (teclas multimedia)"
+echo -e "  ${GREEN}XF86Brightness*${NC}→ Brillo pantalla"
 
 success "Finalización completada"

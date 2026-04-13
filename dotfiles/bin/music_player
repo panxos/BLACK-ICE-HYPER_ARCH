@@ -1,0 +1,12 @@
+#!/bin/bash
+# music_player — Lanzador de ncmpcpp con MPD auto-start
+# BLACK-ICE ARCH | P4nx0z
+
+# Asegurar MPD está corriendo (usuario)
+if ! pgrep -x mpd > /dev/null; then
+    systemctl --user start mpd 2>/dev/null || mpd ~/.config/mpd/mpd.conf 2>/dev/null
+    sleep 0.5
+fi
+
+# Abrir ncmpcpp en kitty
+exec kitty --class=ncmpcpp --title="Music Player — ncmpcpp" ncmpcpp
