@@ -67,6 +67,19 @@ if [ -f "$USER_HOME/.config/bin/gen_theme_previews" ]; then
     log_success "gen_theme_previews listo (se ejecuta en primer boot de Hyprland)"
 fi
 
+# --- Copiar previews pre-generadas al directorio de temas Waybar ---
+log_info "Instalando previews de temas Waybar..."
+for theme_dir in "$DOTFILES_DIR/waybar/themes"/*/; do
+    theme=$(basename "$theme_dir")
+    dest="$USER_HOME/.config/waybar/themes/$theme"
+    mkdir -p "$dest"
+    if [ -f "$theme_dir/preview.png" ]; then
+        cp "$theme_dir/preview.png" "$dest/preview.png"
+        chown "$CURRENT_USER:$CURRENT_USER" "$dest/preview.png"
+    fi
+done
+log_success "Previews de temas instaladas"
+
 # 3. Wrapper para Udiskie (XWayland para icono en la tray)
 cat << 'EOF' > "$USER_HOME/.config/bin/udiskie-fix"
 #!/bin/bash

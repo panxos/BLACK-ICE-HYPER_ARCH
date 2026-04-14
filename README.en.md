@@ -125,12 +125,33 @@ curl -L http://is.gd/blackice | bash
 - **ABI-resilient AUR helper**: `safe_install` detects a broken paru and falls back to pacman automatically. No more silent mass-install failures after `pacman -Syu`.
 - **Correct keyboard at every stage**: LUKS prompt, GRUB menu, SDDM, and Hyprland all use the layout selected during install.
 - **DedSec GRUB Theme**: Interactive theme selector via whiptail.
-- **4 gh0stzk-inspired Waybar themes**: Jan-CyberPunk, Emilia-TokyoNight, Marisol-Dracula, Melissa-Nord.
-- **s4vitar-darkness Theme**: Pro dual-bar theme with Pacman icons and ultra-dark aesthetic — tribute to s4vitar's iconic setup.
-- **Matrix-Hacker Theme**: Matrix-inspired theme with neon green accents and mono fonts.
+- **21 Waybar themes** — switch live with `Win+Alt+T` (GTK visual selector with thumbnails)
+- **s4vitar-darkness Theme**: Pro dual-bar theme — tribute to s4vitar's iconic setup.
 - **Hardware Temperature Module**: Built-in CPU/GPU monitoring in all themes.
-- **Visual Wallpaper Selector**: `wofi` interactive menu (`Win+Alt+W`).
-- **KDE/Qt Pro Integration**: Dolphin and Kate with Kvantum-Sweet and Kitty as default terminal.
+- **Visual Wallpaper Selector**: waypaper GUI (`Win+Alt+W`) with webp support.
+
+---
+
+## 🖼️ Desktop Gallery
+
+> Switch themes live with `Win+Alt+T` — visual thumbnail selector
+
+| | | |
+|:---:|:---:|:---:|
+| ![Horus-Cyber](dotfiles/waybar/themes/Horus-Cyber/preview.png) | ![H4k3r-HTB](dotfiles/waybar/themes/H4k3r-HTB/preview.png) | ![Matrix-Hacker](dotfiles/waybar/themes/Matrix-Hacker/preview.png) |
+| **Horus-Cyber** | **H4k3r-HTB** | **Matrix-Hacker** |
+| ![Jan-CyberPunk](dotfiles/waybar/themes/Jan-CyberPunk/preview.png) | ![Janis-CyberMagenta](dotfiles/waybar/themes/Janis-CyberMagenta/preview.png) | ![s4vitar-darkness](dotfiles/waybar/themes/s4vitar-darkness/preview.png) |
+| **Jan-CyberPunk** | **Janis-CyberMagenta** | **s4vitar-darkness** |
+| ![Emilia-TokyoNight](dotfiles/waybar/themes/Emilia-TokyoNight/preview.png) | ![Marisol-Dracula](dotfiles/waybar/themes/Marisol-Dracula/preview.png) | ![Isabel-Frappe](dotfiles/waybar/themes/Isabel-Frappe/preview.png) |
+| **Emilia-TokyoNight** | **Marisol-Dracula** | **Isabel-Frappe** |
+| ![Daniela-Catppuccin](dotfiles/waybar/themes/Daniela-Catppuccin/preview.png) | ![Melissa-Nord](dotfiles/waybar/themes/Melissa-Nord/preview.png) | ![Silvia-Gruvbox](dotfiles/waybar/themes/Silvia-Gruvbox/preview.png) |
+| **Daniela-Catppuccin** | **Melissa-Nord** | **Silvia-Gruvbox** |
+| ![Brenda-Everforest](dotfiles/waybar/themes/Brenda-Everforest/preview.png) | ![Karla-ZombieNight](dotfiles/waybar/themes/Karla-ZombieNight/preview.png) | ![Zombie-Decay](dotfiles/waybar/themes/Zombie-Decay/preview.png) |
+| **Brenda-Everforest** | **Karla-ZombieNight** | **Zombie-Decay** |
+| ![Pamela-Lovelace](dotfiles/waybar/themes/Pamela-Lovelace/preview.png) | ![Varinka-Mono](dotfiles/waybar/themes/Varinka-Mono/preview.png) | ![Yael-OxoCarbon](dotfiles/waybar/themes/Yael-OxoCarbon/preview.png) |
+| **Pamela-Lovelace** | **Varinka-Mono** | **Yael-OxoCarbon** |
+| ![Anubis-Death](dotfiles/waybar/themes/Anubis-Death/preview.png) | ![Isis-Magic](dotfiles/waybar/themes/Isis-Magic/preview.png) | ![Ra-Solar](dotfiles/waybar/themes/Ra-Solar/preview.png) |
+| **Anubis-Death** | **Isis-Magic** | **Ra-Solar** |
 
 ---
 

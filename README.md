@@ -98,7 +98,32 @@ curl -L http://is.gd/blackice | bash
 - **Kvantum** — Motor de temas Qt/KDE
 - **JetBrains Mono Nerd Font**
 - **DedSec GRUB2 Theme** — Pantalla de arranque estilo Watch Dogs
-- Temas Waybar: `s4vitar-darkness`, `Matrix-Hacker`, `Jan-CyberPunk`, `Emilia-TokyoNight`, `Marisol-Dracula`, `Melissa-Nord`
+- **21 temas Waybar** — seleccionables en vivo con `Win+Alt+T`
+
+---
+
+## 🖼️ Galería de Escritorios
+
+> Cambia entre temas en tiempo real con `Win+Alt+T` (selector visual con thumbnails)
+
+| | | |
+|:---:|:---:|:---:|
+| ![Horus-Cyber](dotfiles/waybar/themes/Horus-Cyber/preview.png) | ![H4k3r-HTB](dotfiles/waybar/themes/H4k3r-HTB/preview.png) | ![Matrix-Hacker](dotfiles/waybar/themes/Matrix-Hacker/preview.png) |
+| **Horus-Cyber** | **H4k3r-HTB** | **Matrix-Hacker** |
+| ![Jan-CyberPunk](dotfiles/waybar/themes/Jan-CyberPunk/preview.png) | ![Janis-CyberMagenta](dotfiles/waybar/themes/Janis-CyberMagenta/preview.png) | ![s4vitar-darkness](dotfiles/waybar/themes/s4vitar-darkness/preview.png) |
+| **Jan-CyberPunk** | **Janis-CyberMagenta** | **s4vitar-darkness** |
+| ![Emilia-TokyoNight](dotfiles/waybar/themes/Emilia-TokyoNight/preview.png) | ![Marisol-Dracula](dotfiles/waybar/themes/Marisol-Dracula/preview.png) | ![Isabel-Frappe](dotfiles/waybar/themes/Isabel-Frappe/preview.png) |
+| **Emilia-TokyoNight** | **Marisol-Dracula** | **Isabel-Frappe** |
+| ![Daniela-Catppuccin](dotfiles/waybar/themes/Daniela-Catppuccin/preview.png) | ![Melissa-Nord](dotfiles/waybar/themes/Melissa-Nord/preview.png) | ![Silvia-Gruvbox](dotfiles/waybar/themes/Silvia-Gruvbox/preview.png) |
+| **Daniela-Catppuccin** | **Melissa-Nord** | **Silvia-Gruvbox** |
+| ![Brenda-Everforest](dotfiles/waybar/themes/Brenda-Everforest/preview.png) | ![Karla-ZombieNight](dotfiles/waybar/themes/Karla-ZombieNight/preview.png) | ![Zombie-Decay](dotfiles/waybar/themes/Zombie-Decay/preview.png) |
+| **Brenda-Everforest** | **Karla-ZombieNight** | **Zombie-Decay** |
+| ![Pamela-Lovelace](dotfiles/waybar/themes/Pamela-Lovelace/preview.png) | ![Varinka-Mono](dotfiles/waybar/themes/Varinka-Mono/preview.png) | ![Yael-OxoCarbon](dotfiles/waybar/themes/Yael-OxoCarbon/preview.png) |
+| **Pamela-Lovelace** | **Varinka-Mono** | **Yael-OxoCarbon** |
+| ![Anubis-Death](dotfiles/waybar/themes/Anubis-Death/preview.png) | ![Isis-Magic](dotfiles/waybar/themes/Isis-Magic/preview.png) | ![Ra-Solar](dotfiles/waybar/themes/Ra-Solar/preview.png) |
+| **Anubis-Death** | **Isis-Magic** | **Ra-Solar** |
+
+---
 
 ### 🆕 Novedades v3.3.1
 
