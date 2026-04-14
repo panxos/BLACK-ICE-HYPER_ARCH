@@ -15,7 +15,7 @@ WALL_DIR="$PICTURES_DIR/wallpapers"
 
 # Preferir waypaper (thumbnails reales)
 if command -v waypaper &>/dev/null; then
-    waypaper --folder "$WALL_DIR" --backend awww --recursive
+    waypaper --folder "$WALL_DIR" --backend awww
     exit 0
 fi
 
