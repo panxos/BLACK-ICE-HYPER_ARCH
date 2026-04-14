@@ -1,5 +1,28 @@
 # CHANGELOG - BLACK-ICE ARCH
 
+## [3.5.0] - 2026-04-14 (P4nx0z "Power Tools" Edition)
+
+### 🚀 Novedades
+
+- **Cheat Sheet interactivo** (`Win+I`): Overlay GTK3 fullscreen, 3 columnas, headers con color por categoría. Cierra con Esc/Enter/Q/I/F1. Diseño inspirado en gh0stzk. `GDK_BACKEND=wayland` en exec para compatibilidad Hyprland.
+- **App Switcher** (`Win+Tab`): `hyprctl clients -j` → Wofi dmenu con íconos Nerd Font por clase. Foco directo via `hyprctl dispatch focuswindow address:`.
+- **Pass Menu** (`Win+Shift+X`): Integración KeePassXC CLI + Wofi. Copia contraseña/usuario/TOTP al portapapeles. Auto-limpia portapapeles en 30s. Lee `$KEEPASS_DB` del entorno o busca en rutas comunes.
+- **Terminal Manager** (`Win+Ctrl+Enter`): Sesiones Kitty multi-tab predefinidas. Perfiles: Pentesting (5 tabs), Dev (4 tabs), SOC (5 tabs). Tabs individuales: Shell, Monitor, Redes, Logs.
+- **Kitty colores dinámicos via pywal**: `theme_selector` corre `wal -i <wallpaper> -n` al cambiar tema. Paleta generada del wallpaper activo → aplicada a Kitty via socket (`kitty @ set-colors`) + SIGUSR1. Fallback a temas `.conf` manuales si pywal no disponible.
+- **21 temas Kitty manuales**: Archivo `.conf` por cada tema Waybar en `dotfiles/kitty/themes/`. Colores coordinados con el esquema del tema.
+- **SSH server indicator en p10k**: Segmento custom `ssh_server` — muestra `󰒋 HOSTNAME` con fondo rojo (color 196) solo cuando hay conexión SSH activa. Activado en `POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS`.
+- **Mic mute fix con wpctl**: `XF86AudioMicMute` / F4 usa `wpctl set-mute @DEFAULT_SOURCE@ toggle` (PipeWire nativo) en vez de `pamixer`. Soluciona fallo silencioso en sistemas con PipeWire 1.4+.
+
+### 🛠️ Fixes
+
+- **Cheat Sheet CSS**: Eliminado `text-transform: uppercase` (propiedad inválida en GTK3 CSS que impedía lanzar la ventana).
+- **Kitty `allow_remote_control`**: Habilitado `allow_remote_control yes` + `listen_on unix:/tmp/kitty-{kitty_pid}`. Necesario para socket-based color updates.
+- **Kitty include**: Cambiado `include themes/mocha.conf` → `include themes/current_theme.conf`. Pywal escribe en ese archivo.
+- **theme_selector**: Eliminado hardcode `background #1e1e2e`. El fondo ahora viene del tema kitty o pywal.
+- **deploy 99_finalization**: Copia `dotfiles/kitty/themes/*.conf` a `~/.config/kitty/themes/` y crea `current_theme.conf` inicial (Horus-Cyber default).
+
+---
+
 ## [3.4.0] - 2026-04-13 (P4nx0z "Hyprland Port" Edition)
 
 ### 🚀 Novedades

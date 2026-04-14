@@ -114,5 +114,38 @@
 
 ---
 
-**Ubicación**: Todas las herramientas se gestionan desde `src/deploy/02_security_tools.sh`  
+---
+
+## 🖥️ Scripts BLACK-ICE (`~/.config/bin/`)
+
+Utilidades del entorno instaladas automáticamente por `src/deploy/99_finalization.sh`:
+
+| Script | Keybind | Descripción |
+|--------|---------|-------------|
+| `cheatsheet` | `Win+I` | Overlay GTK3 fullscreen con todos los keybinds |
+| `app_switcher` | `Win+Tab` | Selector de ventanas abiertas via wofi + hyprctl |
+| `pass_menu` | `Win+Shift+X` | KeePassXC CLI + Wofi. Copia pass/user/TOTP |
+| `terminal_manager` | `Win+Ctrl+Enter` | Sesiones Kitty multi-tab (Pentesting/Dev/SOC) |
+| `theme_selector` | `Win+Alt+T` | Cambia tema Waybar + wallpaper + colores Kitty (pywal) |
+| `theme_visual` | — | Preview visual de temas con capturas de pantalla |
+| `wallpaper_switcher` | `Win+Alt+W` | Selector de wallpaper con preview |
+| `wallpaper_visual` | — | Browser visual de wallpapers |
+| `wofi_style_selector` | `Win+Alt+R` | Cambia estilo Wofi (4 opciones) |
+| `wifi_toggle` | `Win+Alt+F` | Toggle WiFi via nmcli + notificación |
+| `music_player` | `Win+Shift+M` | Lanzador ncmpcpp con MPD auto-start |
+| `power_profile_menu.sh` | `Win+Shift+P` | Selector perfil de energía (TLP) |
+| `power_menu.sh` | Waybar btn | Lock/Sleep/Reboot/Shutdown/Logout |
+| `vpn_status` | Waybar | Status de conexiones VPN activas |
+| `target_status` | Waybar | Target IP para HTB/CTF |
+| `updates_status` | Waybar | Paquetes disponibles para actualizar |
+| `kvm_menu` | — | Gestión de VMs KVM via wofi |
+| `docker_menu` | — | Gestión de contenedores Docker via wofi |
+| `htb-connect.sh` | — | Conectar VPN HackTheBox |
+| `tryhackme-connect.sh` | — | Conectar VPN TryHackMe |
+| `settarget` | — | Fijar target IP para HTB/CTF |
+| `tech_quotes.sh` | Waybar | Cita técnica aleatoria en la barra |
+
+---
+
+**Ubicación seguridad**: Todas las herramientas se gestionan desde `src/deploy/02_security_tools.sh`  
 **Actualización**: Ejecuta `paru -Syu` para mantener todo el arsenal al día.

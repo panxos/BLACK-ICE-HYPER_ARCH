@@ -1,192 +1,206 @@
 #!/usr/bin/env python3
 # cheatsheet — BLACK-ICE ARCH
-# Overlay GTK3 con todos los keybinds de Hyprland
-# Win+? para abrir | Esc/Enter/clic fuera para cerrar
-# Idioma: alterna ES/EN con botón
+# Overlay GTK3 — 3 columnas, estilo gh0stzk-inspired
+# Tecla: Win+I  |  Cierra: Esc / Enter / clic fuera
 
 import gi
-gi.require_version('Gtk', '3.0')
-gi.require_version('Gdk', '3.0')
-from gi.repository import Gtk, Gdk, Pango
-import os
+gi.require_version("Gtk", "3.0")
+from gi.repository import Gtk, Gdk
 
-# ---------------------------------------------------------------------------
-# Keybinds data — (keys_es, keys_en, action_es, action_en)
-# ---------------------------------------------------------------------------
-KEYBINDS = {
-    "es": "Español",
-    "en": "English",
-    "sections": [
+# ── Datos ─────────────────────────────────────────────────────────────────────
+# Cada sección: { title, color (hex fondo header), binds: [(accion, key), ...] }
+
+COLUMNS = [
+    # ── Columna 1: Ventanas / Workspaces / Navegación ─────────────────────────
+    [
         {
-            "title_es": "Sistema",
-            "title_en": "System",
-            "icon": "󰣇",
+            "title": "Ventanas",
+            "color": "#00f3ff",
+            "text": "#0d1017",
             "binds": [
-                ("Win + Return",     "Win + Return",     "Terminal (Kitty)",             "Terminal (Kitty)"),
-                ("Win + D",          "Win + D",          "Lanzador (Wofi)",              "Launcher (Wofi)"),
-                ("Win + Q",          "Win + Q",          "Cerrar ventana",               "Close window"),
-                ("Win + M",          "Win + M",          "Salir de Hyprland",            "Exit Hyprland"),
-                ("Win + L",          "Win + L",          "Bloquear pantalla",            "Lock screen"),
-                ("Win + V",          "Win + V",          "Toggle flotante",              "Toggle floating"),
-                ("Win + F",          "Win + F",          "Pantalla completa",            "Fullscreen"),
-                ("Win + Space",      "Win + Space",      "Pseudo-fullscreen",            "Pseudo-fullscreen"),
-                ("Win + J",          "Win + J",          "Toggle split layout",          "Toggle split layout"),
-                ("Win + H",          "Win + H",          "Historial portapapeles",       "Clipboard history"),
+                ("Terminal",         "Win + Enter"),
+                ("Menú apps",        "Win + D"),
+                ("Cerrar ventana",   "Win + Q"),
+                ("Flotante",         "Win + V"),
+                ("Fullscreen",       "Win + F"),
+                ("Pseudofull",       "Win + Space"),
+                ("Toggle split",     "Win + J"),
+                ("Pseudo tile",      "Win + P"),
+                ("Salir Hyprland",   "Win + M"),
             ],
         },
         {
-            "title_es": "Aplicaciones",
-            "title_en": "Applications",
-            "icon": "󰀻",
+            "title": "Workspaces",
+            "color": "#bd93f9",
+            "text": "#0d1017",
             "binds": [
-                ("Win + Shift + B",  "Win + Shift + B",  "Brave Browser",                "Brave Browser"),
-                ("Win + Shift + F",  "Win + Shift + F",  "Firefox",                      "Firefox"),
-                ("Win + E",          "Win + E",          "Kate (editor)",                "Kate (editor)"),
-                ("Win + Shift + D",  "Win + Shift + D",  "Dolphin (archivos)",           "Dolphin (files)"),
-                ("Win + Shift + O",  "Win + Shift + O",  "Obsidian",                     "Obsidian"),
-                ("Win + Shift + E",  "Win + Shift + E",  "Betterbird (email)",           "Betterbird (email)"),
-                ("Win + Shift + K",  "Win + Shift + K",  "KeePassXC",                    "KeePassXC"),
-                ("Win + Shift + M",  "Win + Shift + M",  "Music Player",                 "Music Player"),
-                ("Win + Shift + A",  "Win + Shift + A",  "Antigravity (editor)",         "Antigravity (editor)"),
-                ("Win + Shift + C",  "Win + Shift + C",  "Caido (web proxy)",            "Caido (web proxy)"),
+                ("Ir a WS 1–5",      "Win + 1…5"),
+                ("Mover a WS 1–5",   "Win+Alt + 1…5"),
+                ("Mover ventana",    "Win + ←↑↓→"),
+                ("Mover (mouse)",    "Win + Btn1"),
+                ("Redimensionar",    "Win + Btn2"),
             ],
         },
         {
-            "title_es": "Personalización",
-            "title_en": "Customization",
-            "icon": "󰉼",
+            "title": "Navegación",
+            "color": "#50fa7b",
+            "text": "#0d1017",
             "binds": [
-                ("Win + Alt + T",    "Win + Alt + T",    "Selector de tema Waybar",      "Waybar theme selector"),
-                ("Win + Alt + W",    "Win + Alt + W",    "Selector de wallpaper",        "Wallpaper selector"),
-                ("Win + Alt + R",    "Win + Alt + R",    "Estilo Wofi",                  "Wofi style"),
-                ("Win + Alt + F",    "Win + Alt + F",    "Toggle WiFi",                  "Toggle WiFi"),
-                ("Win + Shift + P",  "Win + Shift + P",  "Perfil de energía",            "Power profile"),
-                ("Win + ?",          "Win + ?",          "Este cheat sheet",             "This cheat sheet"),
-            ],
-        },
-        {
-            "title_es": "Capturas de pantalla",
-            "title_en": "Screenshots",
-            "icon": "󰹑",
-            "binds": [
-                ("PrtSc",            "PrtSc",            "Selección → swappy",           "Selection → swappy"),
-                ("Shift + PrtSc",    "Shift + PrtSc",    "Pantalla completa → clipboard","Full screen → clipboard"),
-                ("Win + PrtSc",      "Win + PrtSc",      "Selección → ~/Pictures/",      "Selection → ~/Pictures/"),
-                ("Ctrl + PrtSc",     "Ctrl + PrtSc",     "Pantalla completa → archivo",  "Full screen → file"),
-            ],
-        },
-        {
-            "title_es": "Multimedia",
-            "title_en": "Multimedia",
-            "icon": "󰝚",
-            "binds": [
-                ("XF86AudioRaise",   "XF86AudioRaise",   "Subir volumen",                "Volume up"),
-                ("XF86AudioLower",   "XF86AudioLower",   "Bajar volumen",                "Volume down"),
-                ("XF86AudioMute",    "XF86AudioMute",    "Silenciar audio",              "Mute audio"),
-                ("XF86AudioMicMute", "XF86AudioMicMute", "Silenciar micrófono",          "Mute mic"),
-                ("XF86BrightnessUp", "XF86BrightnessUp", "Subir brillo",                 "Brightness up"),
-                ("XF86BrightnessDn", "XF86BrightnessDn", "Bajar brillo",                "Brightness down"),
-                ("F10",              "F10",              "Play/Pause",                   "Play/Pause"),
-                ("F11",              "F11",              "Stop",                         "Stop"),
-            ],
-        },
-        {
-            "title_es": "Workspaces",
-            "title_en": "Workspaces",
-            "icon": "󱂬",
-            "binds": [
-                ("Win + 1-5",        "Win + 1-5",        "Ir a workspace 1-5",           "Go to workspace 1-5"),
-                ("Win + Alt + 1-5",  "Win + Alt + 1-5",  "Mover ventana a workspace",    "Move window to workspace"),
-                ("Win + ←↑↓→",      "Win + ←↑↓→",      "Mover foco entre ventanas",    "Move focus between windows"),
-                ("Win+Mouse1 drag",  "Win+Mouse1 drag",  "Mover ventana flotante",       "Move floating window"),
-                ("Win+Mouse2 drag",  "Win+Mouse2 drag",  "Redimensionar ventana",        "Resize window"),
+                ("Foco ←",           "Win + ←"),
+                ("Foco →",           "Win + →"),
+                ("Foco ↑",           "Win + ↑"),
+                ("Foco ↓",           "Win + ↓"),
+                ("App switcher",     "Win + Tab"),
             ],
         },
     ],
-}
+    # ── Columna 2: Aplicaciones / Herramientas / Capturas ─────────────────────
+    [
+        {
+            "title": "Aplicaciones",
+            "color": "#ffb86c",
+            "text": "#0d1017",
+            "binds": [
+                ("Brave",            "Win+Shift + B"),
+                ("Firefox",          "Win+Shift + F"),
+                ("Dolphin",          "Win+Shift + D"),
+                ("Kate (editor)",    "Win + E"),
+                ("Obsidian",         "Win+Shift + O"),
+                ("Betterbird",       "Win+Shift + E"),
+                ("KeePassXC",        "Win+Shift + K"),
+                ("Caido (proxy)",    "Win+Shift + C"),
+            ],
+        },
+        {
+            "title": "Herramientas",
+            "color": "#ff5555",
+            "text": "#ffffff",
+            "binds": [
+                ("Antigravity",      "Win+Shift + A"),
+                ("Portapapeles",     "Win + H"),
+                ("Contraseñas",      "Win+Shift + X"),
+                ("Terminal Mgr",     "Win+Ctrl + Enter"),
+                ("Music Player",     "Win+Shift + M"),
+                ("Perfil energía",   "Win+Shift + P"),
+                ("Bloquear",         "Win + L"),
+                ("Displays",         "XF86Display"),
+            ],
+        },
+        {
+            "title": "Capturas",
+            "color": "#8be9fd",
+            "text": "#0d1017",
+            "binds": [
+                ("Región → editar",  "Print"),
+                ("Pantalla → clip",  "Shift + Print"),
+                ("Región → arch",    "Win + Print"),
+                ("Pantalla → arch",  "Ctrl + Print"),
+            ],
+        },
+    ],
+    # ── Columna 3: Multimedia / Personalización / Sistema ─────────────────────
+    [
+        {
+            "title": "Multimedia",
+            "color": "#ff79c6",
+            "text": "#0d1017",
+            "binds": [
+                ("Play / Pause",     "F10 · XF86Play"),
+                ("Stop",             "F11 · XF86Stop"),
+                ("Siguiente",        "XF86AudioNext"),
+                ("Anterior",         "XF86AudioPrev"),
+                ("Vol +",            "XF86AudioRaiseVol"),
+                ("Vol -",            "XF86AudioLowerVol"),
+                ("Mute salida",      "XF86AudioMute"),
+                ("Mute micrófono",   "F4 · XF86MicMute"),
+            ],
+        },
+        {
+            "title": "Personalización",
+            "color": "#f1fa8c",
+            "text": "#0d1017",
+            "binds": [
+                ("Selector temas",   "Win+Alt + T"),
+                ("Estilo Wofi",      "Win+Alt + R"),
+                ("Wallpaper",        "Win+Alt + W"),
+                ("Toggle WiFi",      "Win+Alt + F"),
+            ],
+        },
+        {
+            "title": "Sistema",
+            "color": "#a6e3a1",
+            "text": "#0d1017",
+            "binds": [
+                ("Brillo +",         "XF86BrightUp"),
+                ("Brillo -",         "XF86BrightDown"),
+                ("Cheat Sheet",      "Win + I"),
+            ],
+        },
+    ],
+]
 
+# ── CSS ────────────────────────────────────────────────────────────────────────
 CSS = """
-* { font-family: "JetBrainsMono Nerd Font", "Noto Sans", monospace; }
+* {
+    font-family: "JetBrainsMono Nerd Font", "JetBrains Mono", monospace;
+}
 
 window {
-    background: rgba(10, 14, 20, 0.97);
-    border: 1px solid rgba(0, 243, 255, 0.25);
-    border-radius: 12px;
+    background-color: rgba(13, 17, 23, 0.97);
 }
 
-#header {
-    padding: 16px 24px 8px 24px;
-    border-bottom: 1px solid rgba(0, 243, 255, 0.15);
+#root {
+    background-color: transparent;
 }
 
 #title {
-    font-size: 18px;
+    font-size: 58px;
     font-weight: bold;
-    color: #00f3ff;
-    letter-spacing: 2px;
+    letter-spacing: 12px;
+    color: #bd93f9;
+    padding: 28px 0 0 0;
 }
 
 #subtitle {
-    font-size: 11px;
-    color: rgba(0, 243, 255, 0.5);
-    margin-top: 2px;
-}
-
-#lang-btn {
-    background: rgba(0, 243, 255, 0.08);
-    border: 1px solid rgba(0, 243, 255, 0.3);
-    border-radius: 6px;
-    color: #00f3ff;
-    font-size: 11px;
-    padding: 4px 12px;
-    min-width: 0;
-}
-
-#lang-btn:hover {
-    background: rgba(0, 243, 255, 0.18);
-}
-
-#scroll {
-    padding: 12px 8px;
-}
-
-.section-title {
     font-size: 12px;
-    font-weight: bold;
-    color: #bd93f9;
-    letter-spacing: 1px;
-    padding: 8px 16px 4px 16px;
+    color: #6272a4;
+    letter-spacing: 2px;
+    padding: 2px 0 22px 0;
 }
 
-.bind-row {
-    padding: 3px 16px;
-    border-radius: 4px;
+#divider {
+    background-color: rgba(98, 114, 164, 0.35);
+    min-height: 1px;
+    margin: 0 40px 18px 40px;
 }
 
-.bind-row:hover {
-    background: rgba(0, 243, 255, 0.06);
+#columns {
+    padding: 0 28px 28px 28px;
 }
 
-.key-label {
+.col {
+    padding: 0 10px;
+}
+
+.sec-header {
     font-size: 11px;
     font-weight: bold;
-    color: #00f3ff;
-    min-width: 180px;
+    letter-spacing: 2px;
+    padding: 3px 12px;
+    border-radius: 2px;
+    margin: 12px 0 5px 0;
 }
 
-.action-label {
+.bind-action {
     font-size: 11px;
-    color: #a0b8c8;
+    color: #cdd6f4;
+    padding: 1px 0;
 }
 
-#footer {
-    padding: 8px 24px 12px 24px;
-    border-top: 1px solid rgba(0, 243, 255, 0.1);
-}
-
-#footer-label {
+.bind-key {
     font-size: 10px;
-    color: rgba(160, 184, 200, 0.4);
+    color: #6272a4;
+    padding: 1px 0;
 }
 """
 
@@ -194,17 +208,15 @@ window {
 class CheatSheet(Gtk.Window):
     def __init__(self):
         super().__init__(type=Gtk.WindowType.TOPLEVEL)
-        self.lang = "es"
 
-        # Window setup
         self.set_title("BLACK-ICE Cheat Sheet")
         self.set_decorated(False)
         self.set_keep_above(True)
         self.set_position(Gtk.WindowPosition.CENTER)
-        self.set_default_size(620, 700)
         self.set_app_paintable(True)
+        self.fullscreen()
 
-        # Transparent background
+        # Transparencia RGBA
         screen = self.get_screen()
         visual = screen.get_rgba_visual()
         if visual:
@@ -217,113 +229,105 @@ class CheatSheet(Gtk.Window):
             screen, provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
         )
 
-        # Key handler — Esc closes
+        # Eventos de teclado
         self.connect("key-press-event", self._on_key)
-        self.connect("delete-event", Gtk.main_quit)
+        self.connect("button-press-event", self._on_click)
+        self.add_events(Gdk.EventMask.BUTTON_PRESS_MASK)
 
         self._build_ui()
         self.show_all()
 
+    # ── Cierre ────────────────────────────────────────────────────────────────
+    def _on_key(self, _w, event):
+        if event.keyval in (Gdk.KEY_Escape, Gdk.KEY_Return, Gdk.KEY_i,
+                            Gdk.KEY_q, Gdk.KEY_F1):
+            Gtk.main_quit()
+
+    def _on_click(self, _w, _e):
+        Gtk.main_quit()
+
+    # ── Construcción UI ───────────────────────────────────────────────────────
     def _build_ui(self):
-        root = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
+        root = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         root.set_name("root")
         self.add(root)
 
-        # --- Header ---
-        header = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=0)
-        header.set_name("header")
+        # ── Título ────────────────────────────────────────────────────────────
+        title = Gtk.Label()
+        title.set_name("title")
+        title.set_markup('<span foreground="#bd93f9">CHEAT SHEET</span>')
+        title.set_halign(Gtk.Align.CENTER)
+        root.pack_start(title, False, False, 0)
 
-        title_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
-        self.title_label = Gtk.Label(label="󰒋  BLACK-ICE CHEAT SHEET")
-        self.title_label.set_name("title")
-        self.title_label.set_halign(Gtk.Align.START)
-        self.subtitle_label = Gtk.Label(label="BLACK-ICE ARCH — Hyprland Keybindings")
-        self.subtitle_label.set_name("subtitle")
-        self.subtitle_label.set_halign(Gtk.Align.START)
-        title_box.pack_start(self.title_label, False, False, 0)
-        title_box.pack_start(self.subtitle_label, False, False, 0)
+        subtitle = Gtk.Label(label="( Presiona Esc · Enter · I · Q · F1 para cerrar )")
+        subtitle.set_name("subtitle")
+        subtitle.set_halign(Gtk.Align.CENTER)
+        root.pack_start(subtitle, False, False, 0)
 
-        self.lang_btn = Gtk.Button(label="EN")
-        self.lang_btn.set_name("lang-btn")
-        self.lang_btn.set_valign(Gtk.Align.CENTER)
-        self.lang_btn.connect("clicked", self._toggle_lang)
+        # Divisor
+        sep = Gtk.Box()
+        sep.set_name("divider")
+        sep.set_size_request(-1, 1)
+        root.pack_start(sep, False, False, 0)
 
-        header.pack_start(title_box, True, True, 0)
-        header.pack_end(self.lang_btn, False, False, 0)
-        root.pack_start(header, False, False, 0)
+        # ── Columnas ──────────────────────────────────────────────────────────
+        cols_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL,
+                           spacing=0, homogeneous=True)
+        cols_box.set_name("columns")
+        root.pack_start(cols_box, True, True, 0)
 
-        # --- Scrollable content ---
-        scroll = Gtk.ScrolledWindow()
-        scroll.set_name("scroll")
-        scroll.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
-        scroll.set_vexpand(True)
+        for col_data in COLUMNS:
+            col = self._build_column(col_data)
+            cols_box.pack_start(col, True, True, 0)
 
-        self.content_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
-        self._populate_content()
-        scroll.add(self.content_box)
-        root.pack_start(scroll, True, True, 0)
+    def _build_column(self, sections):
+        col = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        col.get_style_context().add_class("col")
 
-        # --- Footer ---
-        footer = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=0)
-        footer.set_name("footer")
-        footer_label = Gtk.Label(label="Esc · Enter · clic afuera → cerrar  |  BLACK-ICE ARCH by P4nx0z")
-        footer_label.set_name("footer-label")
-        footer.pack_start(footer_label, True, True, 0)
-        root.pack_start(footer, False, False, 0)
+        for sec in sections:
+            # Header con color de fondo
+            header = Gtk.Label(label=sec["title"].upper())
+            header.get_style_context().add_class("sec-header")
+            header.set_halign(Gtk.Align.START)
 
-    def _populate_content(self):
-        # Clear
-        for child in self.content_box.get_children():
-            self.content_box.remove(child)
+            # Color inline vía markup (GTK3 no permite background en label directo,
+            # lo envolvemos en un EventBox coloreado)
+            ebox = Gtk.EventBox()
+            ebox.get_style_context().add_class("sec-header")
+            # Pintar fondo via override_background_color
+            rgba = Gdk.RGBA()
+            rgba.parse(sec["color"])
+            ebox.override_background_color(Gtk.StateFlags.NORMAL, rgba)
 
-        lang = self.lang
-        for section in KEYBINDS["sections"]:
-            icon = section["icon"]
-            title = section[f"title_{lang}"]
+            text_rgba = Gdk.RGBA()
+            text_rgba.parse(sec["text"])
 
-            # Section header
-            sec_label = Gtk.Label(label=f"{icon}  {title.upper()}")
-            sec_label.get_style_context().add_class("section-title")
-            sec_label.set_halign(Gtk.Align.START)
-            self.content_box.pack_start(sec_label, False, False, 0)
+            lbl = Gtk.Label(label=sec["title"].upper())
+            lbl.get_style_context().add_class("sec-header")
+            lbl.set_halign(Gtk.Align.START)
+            lbl.override_color(Gtk.StateFlags.NORMAL, text_rgba)
+            ebox.add(lbl)
+            col.pack_start(ebox, False, False, 0)
 
-            # Bind rows
-            for bind in section["binds"]:
-                key = bind[0] if lang == "es" else bind[1]
-                action = bind[2] if lang == "es" else bind[3]
+            # Filas de keybinds
+            for action, key in sec["binds"]:
+                row = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
 
-                row = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=12)
-                row.get_style_context().add_class("bind-row")
-
-                key_lbl = Gtk.Label(label=key)
-                key_lbl.get_style_context().add_class("key-label")
-                key_lbl.set_halign(Gtk.Align.START)
-                key_lbl.set_xalign(0)
-
-                sep = Gtk.Label(label="→")
-                sep.get_style_context().add_class("action-label")
-
-                act_lbl = Gtk.Label(label=action)
-                act_lbl.get_style_context().add_class("action-label")
+                act_lbl = Gtk.Label(label=action.upper())
+                act_lbl.get_style_context().add_class("bind-action")
                 act_lbl.set_halign(Gtk.Align.START)
                 act_lbl.set_xalign(0)
 
-                row.pack_start(key_lbl, False, False, 0)
-                row.pack_start(sep, False, False, 0)
+                key_lbl = Gtk.Label(label=key)
+                key_lbl.get_style_context().add_class("bind-key")
+                key_lbl.set_halign(Gtk.Align.END)
+                key_lbl.set_xalign(1)
+
                 row.pack_start(act_lbl, True, True, 0)
-                self.content_box.pack_start(row, False, False, 0)
+                row.pack_start(key_lbl, False, False, 0)
+                col.pack_start(row, False, False, 0)
 
-        self.content_box.show_all()
-
-    def _toggle_lang(self, _btn):
-        self.lang = "en" if self.lang == "es" else "es"
-        self.lang_btn.set_label("ES" if self.lang == "en" else "EN")
-        self._populate_content()
-
-    def _on_key(self, _widget, event):
-        key = event.keyval
-        if key in (Gdk.KEY_Escape, Gdk.KEY_Return, Gdk.KEY_KP_Enter):
-            Gtk.main_quit()
+        return col
 
 
 if __name__ == "__main__":
