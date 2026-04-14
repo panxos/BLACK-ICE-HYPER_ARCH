@@ -102,7 +102,8 @@ tooltip label {
 }
 
 @keyframes urgent-pulse {
-    0%, 100% { box-shadow: 0 0 10px rgba(255, 85, 85, 0.7); }
+    0%   { box-shadow: 0 0 10px rgba(255, 85, 85, 0.7); }
+    100% { box-shadow: 0 0 10px rgba(255, 85, 85, 0.7); }
     50%       { box-shadow: 0 0 18px rgba(255, 85, 85, 1.0); }
 }
 
@@ -162,7 +163,8 @@ tooltip label {
 }
 
 @keyframes critical-flash {
-    0%, 100% { color: #ff5555; }
+    0%   { color: #ff5555; }
+    100% { color: #ff5555; }
     50%       { color: #f1fa8c; }
 }
 

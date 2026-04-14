@@ -107,6 +107,8 @@ HYPRLAND_PKGS=(
     "brightnessctl"
     "playerctl"
     "networkmanager"        # nmcli para wifi_toggle
+    "waypaper"              # Selector visual de wallpapers con thumbnails
+    "python-gobject"        # PyGObject — requerido por theme_visual (GTK3 Python)
     "awww"                  # Wallpaper daemon
     "hypridle"              # Idle daemon
     "grimblast-git"         # Screenshot helper

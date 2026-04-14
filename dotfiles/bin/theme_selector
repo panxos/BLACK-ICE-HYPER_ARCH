@@ -87,18 +87,28 @@ if [ ${#AVAILABLE_THEMES[@]} -eq 0 ]; then
 fi
 
 # ---------------------------------------------------------------------------
-# Mostrar selector (wofi)
+# Selección: argumento CLI o selector wofi
 # ---------------------------------------------------------------------------
 CURRENT_THEME=$(cat "$CACHE_THEME" 2>/dev/null || echo "")
 
-SELECTION=$(printf '%s\n' "${AVAILABLE_THEMES[@]}" | \
-    wofi --dmenu \
-         --prompt "󰉼  Theme:" \
-         --width 300 \
-         --height 400 \
-         --cache-file /dev/null \
-         --no-actions \
-         --insensitive)
+if [ -n "${1:-}" ]; then
+    # Llamado desde theme_visual con nombre de tema directo
+    SELECTION="$1"
+    # Validar que el tema existe
+    if [ ! -d "$THEMES_DIR/$SELECTION" ]; then
+        notify-send "BLACK-ICE" "Tema '$SELECTION' no encontrado" --urgency=critical
+        exit 1
+    fi
+else
+    SELECTION=$(printf '%s\n' "${AVAILABLE_THEMES[@]}" | \
+        wofi --dmenu \
+             --prompt "󰉼  Theme:" \
+             --width 300 \
+             --height 400 \
+             --cache-file /dev/null \
+             --no-actions \
+             --insensitive)
+fi
 
 [ -z "$SELECTION" ] && exit 0
 [ "$SELECTION" == "$CURRENT_THEME" ] && {
@@ -107,6 +117,8 @@ SELECTION=$(printf '%s\n' "${AVAILABLE_THEMES[@]}" | \
 }
 
 echo "$SELECTION" > "$CACHE_THEME"
+# Persistir como default_theme para waybar_start.sh
+echo "$SELECTION" > "$HOME/.config/waybar/default_theme"
 
 # ---------------------------------------------------------------------------
 # Aplicar config + style via symlinks
@@ -169,3 +181,12 @@ waybar &>/dev/null &
 disown
 
 notify-send "BLACK-ICE" "Theme Active: $SELECTION"
+
+# ---------------------------------------------------------------------------
+# Auto-captura de preview.png para theme_visual (fondo en 4 seg)
+# ---------------------------------------------------------------------------
+PREVIEW_OUT="$THEMES_DIR/$SELECTION/preview.png"
+if command -v grim &>/dev/null && [ ! -f "$PREVIEW_OUT" ]; then
+    (sleep 4 && grim "$PREVIEW_OUT") &
+    disown
+fi

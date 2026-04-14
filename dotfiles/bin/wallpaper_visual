@@ -1,6 +1,6 @@
 #!/bin/bash
-# wallpaper_visual: Selector visual de wallpapers para BLACK-ICE
-# Soporta: .png .jpg .jpeg .webp — escaneo recursivo en subdirectorios
+# wallpaper_visual: Selector visual de wallpapers con thumbnails (waypaper)
+# Fallback a selector de texto si waypaper no está instalado
 # BLACK-ICE ARCH | P4nx0z
 
 # Detectar directorio de wallpapers
@@ -12,6 +12,14 @@ else
 fi
 
 WALL_DIR="$PICTURES_DIR/wallpapers"
+
+# Preferir waypaper (thumbnails reales)
+if command -v waypaper &>/dev/null; then
+    waypaper --folder "$WALL_DIR" --backend awww --recursive
+    exit 0
+fi
+
+# Fallback: selector wofi con texto (sin thumbnails)
 CACHE_FILE="$HOME/.cache/current_wallpaper"
 
 if [ ! -d "$WALL_DIR" ]; then
@@ -19,66 +27,35 @@ if [ ! -d "$WALL_DIR" ]; then
     exit 1
 fi
 
-# Buscar recursivamente: .png .jpg .jpeg .webp .mp4 (incluye subdirs gh0stzk, etc.)
 mapfile -t walls < <(find "$WALL_DIR" -type f \
     \( -iname "*.png" -o -iname "*.jpg" -o -iname "*.jpeg" \
-       -o -iname "*.webp" -o -iname "*.mp4" \) 2>/dev/null | sort)
+       -o -iname "*.webp" \) 2>/dev/null | sort)
 
 if [ ${#walls[@]} -eq 0 ]; then
     notify-send "Wallpaper" "No hay wallpapers en $WALL_DIR" --urgency=critical
     exit 1
 fi
 
-# Generar lista con ruta relativa + marcar el activo
 CURRENT=$(cat "$CACHE_FILE" 2>/dev/null)
 mapfile -t display_list < <(
     for w in "${walls[@]}"; do
         rel="${w#$WALL_DIR/}"
-        if [ "$w" = "$CURRENT" ]; then
-            echo "★ $rel"
-        else
-            echo "  $rel"
-        fi
+        [ "$w" = "$CURRENT" ] && echo "★ $rel" || echo "  $rel"
     done
 )
 
-# Selector wofi con ancho suficiente para rutas largas
 SELECTION=$(printf '%s\n' "${display_list[@]}" | \
-    wofi --dmenu \
-         --prompt "󰋩  Wallpaper:" \
-         --width 500 \
-         --height 400 \
-         --cache-file /dev/null \
-         --insensitive \
-         --no-actions)
+    wofi --dmenu --prompt "󰋩  Wallpaper:" \
+         --width 500 --height 400 --cache-file /dev/null --insensitive --no-actions)
 
 [ -z "$SELECTION" ] && exit 0
 
-# Reconstruir ruta completa (quitar prefijo de estado ★/espacio)
-rel_path="${SELECTION#★ }"
-rel_path="${rel_path#  }"
+rel_path="${SELECTION#★ }"; rel_path="${rel_path#  }"
 FULL_PATH="$WALL_DIR/$rel_path"
-
-if [ ! -f "$FULL_PATH" ]; then
-    notify-send "Wallpaper" "Archivo no encontrado: $rel_path" --urgency=critical
-    exit 1
-fi
+[ ! -f "$FULL_PATH" ] && { notify-send "Wallpaper" "No encontrado: $rel_path" --urgency=critical; exit 1; }
 
 echo "$FULL_PATH" > "$CACHE_FILE"
-
-# Aplicar según tipo
-if [[ "$FULL_PATH" == *.mp4 ]]; then
-    pkill awww-daemon 2>/dev/null
-    pkill mpvpaper 2>/dev/null
-    sleep 0.3
-    mpvpaper -o "no-audio --loop" "*" "$FULL_PATH" &>/dev/null &
-else
-    pkill mpvpaper 2>/dev/null
-    if ! pgrep -x "awww-daemon" > /dev/null; then
-        awww-daemon &
-        sleep 0.5
-    fi
-    awww img "$FULL_PATH" --transition-type grow --transition-duration 1
-fi
-
+pkill mpvpaper 2>/dev/null
+pgrep -x awww-daemon > /dev/null || { awww-daemon &; sleep 0.5; }
+awww img "$FULL_PATH" --transition-type grow --transition-duration 1
 notify-send "BLACK-ICE" "Fondo: $(basename "$FULL_PATH")" --urgency=low

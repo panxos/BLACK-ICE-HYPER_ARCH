@@ -1,0 +1,203 @@
+#!/usr/bin/env python3
+# theme_visual — Visual theme selector for BLACK-ICE ARCH
+# GTK3 grid with preview screenshots (like gh0stzk/dotfiles)
+# P4nx0z Edition
+
+import gi
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk, GdkPixbuf, Pango, GLib
+import os
+import subprocess
+
+THEMES_DIR  = os.path.expanduser('~/.config/waybar/themes')
+CACHE_THEME = os.path.expanduser('~/.cache/current_theme')
+THEME_BIN   = os.path.expanduser('~/.config/bin/theme_selector')
+CARD_W, CARD_H = 180, 110
+
+CSS = b"""
+window {
+    background-color: #0d0d0d;
+}
+* {
+    font-family: "JetBrainsMono Nerd Font", "JetBrains Mono", monospace;
+    color: #e0e0e0;
+}
+.header {
+    font-size: 16px;
+    font-weight: bold;
+    color: #00f3ff;
+    padding: 10px 0 6px 0;
+}
+.card {
+    background-color: #1a1a1a;
+    border-radius: 12px;
+    border: 2px solid #2a2a2a;
+    margin: 5px;
+    padding: 4px;
+    transition: border-color 150ms ease;
+}
+.card:hover {
+    border-color: #00f3ff;
+    background-color: #1e1e1e;
+}
+.card.active {
+    border-color: #bd00ff;
+    background-color: #120020;
+}
+.theme-name {
+    font-size: 11px;
+    color: #aaaaaa;
+    padding: 3px 2px 1px 2px;
+}
+.theme-name.active {
+    color: #bd00ff;
+    font-weight: bold;
+}
+button {
+    background-color: transparent;
+    border: none;
+    padding: 0;
+}
+scrolledwindow {
+    background-color: transparent;
+}
+"""
+
+
+def get_themes():
+    themes = []
+    if not os.path.isdir(THEMES_DIR):
+        return themes
+    for d in sorted(os.listdir(THEMES_DIR)):
+        full = os.path.join(THEMES_DIR, d)
+        if (os.path.isdir(full)
+                and os.path.isfile(f'{full}/config.jsonc')
+                and os.path.isfile(f'{full}/style.css')):
+            themes.append(d)
+    return themes
+
+
+def get_current():
+    try:
+        return open(CACHE_THEME).read().strip()
+    except Exception:
+        return ''
+
+
+class ThemeSelector(Gtk.Window):
+    def __init__(self):
+        super().__init__(title='  BLACK-ICE Theme Selector')
+        self.set_default_size(1000, 620)
+        self.set_resizable(True)
+        self.connect('destroy', Gtk.main_quit)
+        self.connect('key-press-event', self._on_key)
+
+        provider = Gtk.CssProvider()
+        provider.load_from_data(CSS)
+        Gtk.StyleContext.add_provider_for_screen(
+            self.get_screen(), provider,
+            Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
+
+        self.themes  = get_themes()
+        self.current = get_current()
+
+        outer = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
+        self.add(outer)
+
+        # --- Header ---
+        hdr = Gtk.Label(label='  BLACK-ICE Theme Selector')
+        hdr.get_style_context().add_class('header')
+        hdr.set_halign(Gtk.Align.CENTER)
+        outer.pack_start(hdr, False, False, 0)
+
+        sep = Gtk.Separator(orientation=Gtk.Orientation.HORIZONTAL)
+        outer.pack_start(sep, False, False, 0)
+
+        # --- Scrolled FlowBox ---
+        scroll = Gtk.ScrolledWindow()
+        scroll.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
+        scroll.set_vexpand(True)
+        outer.pack_start(scroll, True, True, 0)
+
+        flow = Gtk.FlowBox()
+        flow.set_max_children_per_line(6)
+        flow.set_min_children_per_line(3)
+        flow.set_homogeneous(True)
+        flow.set_selection_mode(Gtk.SelectionMode.NONE)
+        flow.set_margin_start(10)
+        flow.set_margin_end(10)
+        flow.set_margin_top(10)
+        flow.set_margin_bottom(10)
+        scroll.add(flow)
+
+        for theme in self.themes:
+            flow.add(self._make_card(theme))
+
+        self.show_all()
+
+    def _load_preview(self, theme):
+        """Load preview.png if available, else generate placeholder."""
+        preview = os.path.join(THEMES_DIR, theme, 'preview.png')
+        if os.path.isfile(preview):
+            try:
+                return GdkPixbuf.Pixbuf.new_from_file_at_scale(
+                    preview, CARD_W, CARD_H, False)
+            except Exception:
+                pass
+        # Fallback: plain dark rectangle (no preview yet)
+        pb = GdkPixbuf.Pixbuf.new(GdkPixbuf.Colorspace.RGB, False, 8, CARD_W, CARD_H)
+        pb.fill(0x111111ff)
+        return pb
+
+    def _make_card(self, theme):
+        is_active = (theme == self.current)
+
+        card = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
+        card.get_style_context().add_class('card')
+        if is_active:
+            card.get_style_context().add_class('active')
+
+        # Preview button
+        btn = Gtk.Button()
+        btn.get_style_context().add_class('card-btn')
+        btn.set_relief(Gtk.ReliefStyle.NONE)
+        btn.connect('clicked', self._select_theme, theme)
+
+        pb  = self._load_preview(theme)
+        img = Gtk.Image.new_from_pixbuf(pb)
+        img.set_size_request(CARD_W, CARD_H)
+        btn.add(img)
+        card.pack_start(btn, True, True, 0)
+
+        # Theme name
+        lbl = Gtk.Label(label=theme)
+        lbl.get_style_context().add_class('theme-name')
+        if is_active:
+            lbl.get_style_context().add_class('active')
+        lbl.set_ellipsize(Pango.EllipsizeMode.END)
+        lbl.set_max_width_chars(20)
+        lbl.set_halign(Gtk.Align.CENTER)
+        card.pack_start(lbl, False, False, 0)
+
+        return card
+
+    def _select_theme(self, _btn, theme):
+        self.hide()
+        subprocess.Popen(
+            ['bash', THEME_BIN, theme],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL)
+        GLib.timeout_add(200, Gtk.main_quit)
+
+    def _on_key(self, _win, event):
+        from gi.repository import Gdk
+        if event.keyval == Gdk.KEY_Escape:
+            Gtk.main_quit()
+
+
+if __name__ == '__main__':
+    if not get_themes():
+        print('No themes found in', THEMES_DIR)
+        raise SystemExit(1)
+    ThemeSelector()
+    Gtk.main()
