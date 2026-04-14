@@ -1,0 +1,89 @@
+#!/bin/bash
+# app_switcher — BLACK-ICE ARCH
+# Tab switcher via hyprctl clients + wofi
+# Muestra: [WS] AppName — Title
+# Selección → enfoca la ventana
+
+set -uo pipefail
+
+# Obtener lista de ventanas desde hyprctl
+CLIENTS=$(hyprctl clients -j 2>/dev/null)
+
+if [ -z "$CLIENTS" ] || [ "$CLIENTS" = "[]" ]; then
+    notify-send "App Switcher" "No hay ventanas abiertas" --urgency=low
+    exit 0
+fi
+
+# Construir lista: "ADDRESS|WS CLASS TITLE"
+LIST=$(echo "$CLIENTS" | python3 - << 'PYEOF'
+import json, sys
+
+data = json.load(sys.stdin)
+lines = []
+for w in data:
+    addr    = w.get("address", "")
+    ws      = w.get("workspace", {}).get("id", "?")
+    cls     = w.get("class", "?") or "?"
+    title   = w.get("title", "") or ""
+    # Truncar título largo
+    if len(title) > 55:
+        title = title[:52] + "..."
+    icon = ""
+    cls_low = cls.lower()
+    if "kitty" in cls_low or "terminal" in cls_low:
+        icon = ""
+    elif "brave" in cls_low or "chromium" in cls_low:
+        icon = "󰊯"
+    elif "firefox" in cls_low:
+        icon = "󰈹"
+    elif "dolphin" in cls_low or "nautilus" in cls_low:
+        icon = ""
+    elif "kate" in cls_low or "code" in cls_low or "nvim" in cls_low:
+        icon = "󰈮"
+    elif "obsidian" in cls_low:
+        icon = "󱞧"
+    elif "keepassxc" in cls_low:
+        icon = "󰌾"
+    elif "discord" in cls_low or "ferdium" in cls_low:
+        icon = "󰙯"
+    elif "vlc" in cls_low or "mpv" in cls_low:
+        icon = "󰕧"
+    elif "gimp" in cls_low:
+        icon = "󰋙"
+    elif "wireshark" in cls_low:
+        icon = "󰡰"
+    else:
+        icon = "󰖯"
+    label = f"[{ws}] {icon} {cls}  —  {title}"
+    lines.append(f"{addr}|{label}")
+
+for l in lines:
+    print(l)
+PYEOF
+)
+
+if [ -z "$LIST" ]; then
+    notify-send "App Switcher" "No hay ventanas disponibles" --urgency=low
+    exit 0
+fi
+
+# Mostrar en wofi (solo la parte después del pipe como label)
+SELECTION=$(echo "$LIST" | cut -d'|' -f2 | \
+    wofi --dmenu \
+         --prompt "󰖯  Ventanas:" \
+         --width 600 \
+         --height 400 \
+         --cache-file /dev/null \
+         --no-actions \
+         --insensitive \
+         --style ~/.config/wofi/style.css 2>/dev/null)
+
+[ -z "$SELECTION" ] && exit 0
+
+# Recuperar address del label seleccionado
+ADDRESS=$(echo "$LIST" | grep -F "|${SELECTION}" | cut -d'|' -f1 | head -1)
+
+[ -z "$ADDRESS" ] && exit 0
+
+# Enfocar ventana
+hyprctl dispatch focuswindow "address:${ADDRESS}" 2>/dev/null

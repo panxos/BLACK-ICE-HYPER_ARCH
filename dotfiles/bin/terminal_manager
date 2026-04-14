@@ -1,0 +1,158 @@
+#!/bin/bash
+# terminal_manager — BLACK-ICE ARCH
+# Gestiona sesiones Kitty con tabs predefinidas para pentesting
+# Abre Kitty con layout de tabs, o agrega tabs a una sesión existente
+
+set -uo pipefail
+
+SESSION_SCRIPT="/tmp/black-ice-kitty-session.conf"
+
+# Detectar si hay kitty corriendo
+KITTY_PID=$(pgrep -x kitty | head -1 || true)
+
+# Menú principal
+ACTION=$(printf \
+    "  Nueva sesión Pentesting\n  Nueva sesión Dev\n  Nueva sesión SOC\n󰙵  Tab → Terminal\n󰙵  Tab → Monitor\n󰙵  Tab → Redes\n󰙵  Tab → Logs\n  Kitty nueva ventana" | \
+    wofi --dmenu \
+         --prompt "󱃬  Terminal Manager:" \
+         --width 380 \
+         --height 320 \
+         --cache-file /dev/null \
+         --no-actions 2>/dev/null)
+
+[ -z "$ACTION" ] && exit 0
+
+# ---------------------------------------------------------------------------
+# Función: abrir kitty con sesión multi-tab
+# ---------------------------------------------------------------------------
+open_session() {
+    local session_file="$1"
+    kitty --session "$session_file" --title "BLACK-ICE Terminal" &
+    disown
+}
+
+case "$ACTION" in
+    *"Nueva sesión Pentesting"*)
+        cat > "$SESSION_SCRIPT" << 'EOF'
+# BLACK-ICE Pentesting Session
+new_tab 󰙵 Shell
+cd ~
+launch zsh
+
+new_tab  Recon
+cd ~
+launch zsh -c 'echo "# nmap / rustscan / theHarvester"; zsh'
+
+new_tab 󰯯 Exploit
+cd ~
+launch zsh -c 'echo "# metasploit / searchsploit"; zsh'
+
+new_tab 󰛎 Monitor
+cd ~
+launch zsh -c 'htop; zsh'
+
+new_tab 󱃬 Notas
+cd ~/Documents
+launch zsh -c 'echo "# Notas de la sesión"; zsh'
+EOF
+        open_session "$SESSION_SCRIPT"
+        notify-send "Terminal Manager" "Sesión Pentesting abierta (5 tabs)" --urgency=low
+        ;;
+
+    *"Nueva sesión Dev"*)
+        cat > "$SESSION_SCRIPT" << 'EOF'
+# BLACK-ICE Dev Session
+new_tab 󰈮 Editor
+cd ~
+launch zsh -c 'nvim'
+
+new_tab  Shell
+cd ~
+launch zsh
+
+new_tab 󰙵 Git
+cd ~
+launch zsh -c 'echo "# git status / log / diff"; zsh'
+
+new_tab 󰡨 Docker
+cd ~
+launch zsh -c 'echo "# docker ps / logs"; zsh'
+EOF
+        open_session "$SESSION_SCRIPT"
+        notify-send "Terminal Manager" "Sesión Dev abierta (4 tabs)" --urgency=low
+        ;;
+
+    *"Nueva sesión SOC"*)
+        cat > "$SESSION_SCRIPT" << 'EOF'
+# BLACK-ICE SOC Session
+new_tab 󰛖 Logs
+cd /var/log
+launch zsh -c 'echo "# journalctl -f / tail -f syslog"; zsh'
+
+new_tab 󰢭 Network
+cd ~
+launch zsh -c 'echo "# ss -tulnp / netstat / tcpdump"; zsh'
+
+new_tab  Procesos
+cd ~
+launch zsh -c 'htop; zsh'
+
+new_tab 󱒒 Forensics
+cd ~
+launch zsh -c 'echo "# volatility3 / autopsy / binwalk"; zsh'
+
+new_tab 󰙵 Shell
+cd ~
+launch zsh
+EOF
+        open_session "$SESSION_SCRIPT"
+        notify-send "Terminal Manager" "Sesión SOC abierta (5 tabs)" --urgency=low
+        ;;
+
+    *"Tab → Terminal"*)
+        if [ -n "$KITTY_PID" ]; then
+            kitty @ new-window --new-tab --tab-title "Shell" 2>/dev/null || \
+                kitty --title "Terminal" &
+        else
+            kitty --title "Terminal" &
+        fi
+        disown
+        ;;
+
+    *"Tab → Monitor"*)
+        if [ -n "$KITTY_PID" ]; then
+            kitty @ new-window --new-tab --tab-title "Monitor" -- htop 2>/dev/null || \
+                kitty --title "Monitor" -- htop &
+        else
+            kitty --title "Monitor" -- htop &
+        fi
+        disown
+        ;;
+
+    *"Tab → Redes"*)
+        CMD="echo '# ip a | ss -tulnp | tcpdump | nmap'; zsh"
+        if [ -n "$KITTY_PID" ]; then
+            kitty @ new-window --new-tab --tab-title "Redes" -- bash -c "$CMD" 2>/dev/null || \
+                kitty --title "Redes" -- bash -c "$CMD" &
+        else
+            kitty --title "Redes" -- bash -c "$CMD" &
+        fi
+        disown
+        ;;
+
+    *"Tab → Logs"*)
+        CMD="sudo journalctl -f --no-pager"
+        if [ -n "$KITTY_PID" ]; then
+            kitty @ new-window --new-tab --tab-title "Logs" -- bash -c "$CMD" 2>/dev/null || \
+                kitty --title "Logs" -- bash -c "$CMD" &
+        else
+            kitty --title "Logs" -- bash -c "$CMD" &
+        fi
+        disown
+        ;;
+
+    *"Kitty nueva ventana"*)
+        kitty &
+        disown
+        ;;
+esac

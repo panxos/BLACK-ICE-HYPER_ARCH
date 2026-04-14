@@ -1,0 +1,123 @@
+#!/bin/bash
+# pass_menu — BLACK-ICE ARCH
+# KeePassXC CLI + Wofi: busca entradas y copia usuario/contraseña al portapapeles
+# Requiere: keepassxc-cli, wofi, wl-copy, notify-send
+#
+# Configurar: exportar KEEPASS_DB y KEEPASS_KEY (opcional) en ~/.zshrc:
+#   export KEEPASS_DB="$HOME/Documents/passwords.kdbx"
+#   export KEEPASS_KEY="$HOME/Documents/passwords.keyx"  # opcional
+
+set -uo pipefail
+
+DB="${KEEPASS_DB:-}"
+KEY_FILE="${KEEPASS_KEY:-}"
+
+# --- Buscar base de datos si no está configurada ---
+if [ -z "$DB" ]; then
+    # Intentar encontrar una .kdbx en ubicaciones comunes
+    for candidate in \
+        "$HOME/Documents/passwords.kdbx" \
+        "$HOME/Documents/Passwords.kdbx" \
+        "$HOME/.keepass/passwords.kdbx" \
+        "$HOME/Passwords.kdbx"; do
+        if [ -f "$candidate" ]; then
+            DB="$candidate"
+            break
+        fi
+    done
+fi
+
+if [ -z "$DB" ] || [ ! -f "$DB" ]; then
+    notify-send "Pass Menu" \
+        "No se encontró base de datos KeePass.\nConfigura KEEPASS_DB en ~/.zshrc" \
+        --urgency=critical --icon=dialog-error
+    exit 1
+fi
+
+# --- Pedir contraseña master ---
+PASS=$(wofi \
+    --dmenu \
+    --prompt "󰌾  Master password:" \
+    --width 400 \
+    --height 60 \
+    --cache-file /dev/null \
+    --password \
+    --no-actions 2>/dev/null)
+
+[ -z "$PASS" ] && exit 0
+
+# Construir argumentos keepassxc-cli
+KP_ARGS=(--no-password)
+if [ -n "$KEY_FILE" ] && [ -f "$KEY_FILE" ]; then
+    KP_ARGS+=(--key-file "$KEY_FILE")
+fi
+
+# Verificar contraseña abriendo la db
+if ! echo "$PASS" | keepassxc-cli ls "${KP_ARGS[@]}" "$DB" / &>/dev/null; then
+    notify-send "Pass Menu" "Contraseña incorrecta" --urgency=critical --icon=dialog-error
+    exit 1
+fi
+
+# --- Listar todas las entradas ---
+ENTRIES=$(echo "$PASS" | keepassxc-cli ls "${KP_ARGS[@]}" -R -f "$DB" / 2>/dev/null \
+    | grep -v "/$" | grep -v "^\[" | sort)
+
+if [ -z "$ENTRIES" ]; then
+    notify-send "Pass Menu" "No hay entradas en la base de datos" --urgency=low
+    exit 0
+fi
+
+# --- Seleccionar entrada ---
+ENTRY=$(echo "$ENTRIES" | \
+    wofi --dmenu \
+         --prompt "󰌿  Selecciona entrada:" \
+         --width 560 \
+         --height 450 \
+         --cache-file /dev/null \
+         --no-actions \
+         --insensitive 2>/dev/null)
+
+[ -z "$ENTRY" ] && exit 0
+
+# --- Qué copiar: usuario o contraseña ---
+ACTION=$(printf "󰁅  Copiar contraseña\n  Copiar usuario\n󰌎  Copiar OTP (TOTP)\n󰈈  Mostrar detalles" | \
+    wofi --dmenu \
+         --prompt "󰒘  Acción:" \
+         --width 320 \
+         --height 200 \
+         --cache-file /dev/null \
+         --no-actions 2>/dev/null)
+
+[ -z "$ACTION" ] && exit 0
+
+case "$ACTION" in
+    *"Copiar contraseña"*)
+        VALUE=$(echo "$PASS" | keepassxc-cli show "${KP_ARGS[@]}" -s -a Password "$DB" "$ENTRY" 2>/dev/null)
+        echo -n "$VALUE" | wl-copy
+        notify-send "Pass Menu" "Contraseña copiada: $ENTRY" --urgency=low --icon=dialog-password
+        # Limpiar portapapeles en 30s
+        (sleep 30 && echo -n "" | wl-copy) &
+        disown
+        ;;
+    *"Copiar usuario"*)
+        VALUE=$(echo "$PASS" | keepassxc-cli show "${KP_ARGS[@]}" -s -a UserName "$DB" "$ENTRY" 2>/dev/null)
+        echo -n "$VALUE" | wl-copy
+        notify-send "Pass Menu" "Usuario copiado: $ENTRY" --urgency=low --icon=dialog-information
+        ;;
+    *"Copiar OTP"*)
+        VALUE=$(echo "$PASS" | keepassxc-cli totp "${KP_ARGS[@]}" "$DB" "$ENTRY" 2>/dev/null)
+        if [ -n "$VALUE" ]; then
+            echo -n "$VALUE" | wl-copy
+            notify-send "Pass Menu" "TOTP copiado: $ENTRY (válido ~30s)" --urgency=low
+            (sleep 30 && echo -n "" | wl-copy) &
+            disown
+        else
+            notify-send "Pass Menu" "Esta entrada no tiene TOTP configurado" --urgency=low
+        fi
+        ;;
+    *"Mostrar detalles"*)
+        DETAILS=$(echo "$PASS" | keepassxc-cli show "${KP_ARGS[@]}" "$DB" "$ENTRY" 2>/dev/null \
+            | grep -v "^Password:" )
+        notify-send "Pass Menu — $ENTRY" "$DETAILS" --urgency=low --icon=dialog-information
+        ;;
+esac
