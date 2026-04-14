@@ -1,9 +1,12 @@
 # CHANGELOG - BLACK-ICE ARCH
 
-## [3.5.0] - 2026-04-14 (P4nx0z "Power Tools" Edition)
+## [3.5.0] - 2026-04-14 (P4nx0z "Black Ops" Edition)
 
 ### 🚀 Novedades
 
+- **Eww Music Widget** (`Win+Shift+N`): Widget flotante 380x115px top-right. Playerctl/MPRIS — álbum art, título, artista, álbum, barra de progreso interactiva, prev/play-pause/next, shuffle, loop. CSS cyberpunk completo. Toggle script con detección de player activo. `eww` añadido al deploy `01_hyprland_base.sh`. Fix: artUrl usa `sed 's|file://||'` (el `#` es token inválido en yuck).
+- **Hyprlock per-theme**: `theme_selector` convierte `BORDER_COLORS` (`0xeeRRGGBB`) a `rgba()` y actualiza `outer_color`/`font_color` del input field en `hyprlock.conf` live al cambiar tema.
+- **Wlogout animations**: `fadeIn 0.2s` al abrir, hover glow cyan (`box-shadow`), `transform: scale(1.05)` en hover, `scale(0.97)` en active press.
 - **Cheat Sheet interactivo** (`Win+I`): Overlay GTK3 fullscreen, 3 columnas, headers con color por categoría. Cierra con Esc/Enter/Q/I/F1. Diseño inspirado en gh0stzk. `GDK_BACKEND=wayland` en exec para compatibilidad Hyprland.
 - **App Switcher** (`Win+Tab`): `hyprctl clients -j` → Wofi dmenu con íconos Nerd Font por clase. Foco directo via `hyprctl dispatch focuswindow address:`.
 - **Pass Menu** (`Win+Shift+X`): Integración KeePassXC CLI + Wofi. Copia contraseña/usuario/TOTP al portapapeles. Auto-limpia portapapeles en 30s. Lee `$KEEPASS_DB` del entorno o busca en rutas comunes.
