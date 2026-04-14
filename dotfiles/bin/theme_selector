@@ -181,7 +181,7 @@ waybar &>/dev/null &
 disown
 
 # ---------------------------------------------------------------------------
-# Kitty color scheme — kitty @ set-colors (aplica en vivo a todas las ventanas)
+# Kitty color scheme — set-colors via socket + SIGUSR1 fallback
 # ---------------------------------------------------------------------------
 KITTY_THEME_DIR="$HOME/.config/kitty/themes"
 KITTY_CURRENT="$KITTY_THEME_DIR/current_theme.conf"
@@ -190,12 +190,15 @@ KITTY_CONF="$KITTY_THEME_DIR/$SELECTION.conf"
 
 if [ -f "$KITTY_CONF" ]; then
     cp "$KITTY_CONF" "$KITTY_CURRENT"
-    # Aplicar colores en vivo a todas las instancias kitty abiertas
-    for sock in /tmp/kitty-*/; do
-        kitty @ --to "unix:${sock%/}" set-colors --all "$KITTY_CONF" 2>/dev/null || true
+    # Aplicar a cada instancia kitty via su socket individual
+    for pid in $(pgrep -x kitty); do
+        sock="/tmp/kitty-${pid}"
+        if [ -S "$sock" ]; then
+            kitty @ --to "unix:${sock}" set-colors --all "$KITTY_CONF" 2>/dev/null || true
+        fi
     done
-    # Fallback: set-colors sin socket (kitty detecta la instancia activa)
-    kitty @ set-colors --all "$KITTY_CONF" 2>/dev/null || true
+    # SIGUSR1 recarga el kitty.conf completo (fondo + todo) — necesita reinicio previo
+    pkill -SIGUSR1 kitty 2>/dev/null || true
 fi
 
 notify-send "BLACK-ICE" "Theme Active: $SELECTION"
