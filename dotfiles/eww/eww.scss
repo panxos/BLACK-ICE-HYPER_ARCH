@@ -1,0 +1,166 @@
+// ============================================================
+// eww.scss — BLACK-ICE ARCH | Music Widget
+// Dark cyberpunk palette
+// ============================================================
+
+$bg-deep:    rgba(13, 17, 23, 0.97);
+$bg-mid:     rgba(22, 28, 40, 0.95);
+$cyan:       #00f3ff;
+$purple:     #bd93f9;
+$pink:       #ff79c6;
+$green:      #50fa7b;
+$red:        #ff5555;
+$text-main:  #cdd6f4;
+$text-muted: #6272a4;
+$border:     rgba(0, 243, 255, 0.2);
+
+// --- Root container ---
+.music-player {
+  background: $bg-deep;
+  border-radius: 12px;
+  border: 1px solid $border;
+  padding: 10px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.7), 0 0 12px rgba(0, 243, 255, 0.08);
+}
+
+// --- Album art ---
+.art-box {
+  min-width: 90px;
+  min-height: 90px;
+
+  image {
+    border-radius: 8px;
+    border: 1px solid rgba(189, 147, 249, 0.3);
+  }
+}
+
+// --- Track info ---
+.track-info {
+  margin-top: 2px;
+}
+
+.song-title {
+  color: $text-main;
+  font-family: "JetBrainsMono Nerd Font";
+  font-weight: bold;
+  font-size: 13px;
+}
+
+.song-artist {
+  color: $cyan;
+  font-family: "JetBrainsMono Nerd Font";
+  font-size: 11px;
+}
+
+.song-album {
+  color: $text-muted;
+  font-family: "JetBrainsMono Nerd Font";
+  font-size: 10px;
+  font-style: italic;
+}
+
+// --- Progress bar ---
+.progress-box {
+  margin-top: 2px;
+}
+
+.time-label {
+  color: $text-muted;
+  font-family: "JetBrainsMono Nerd Font";
+  font-size: 10px;
+  min-width: 32px;
+}
+
+.progress-scale {
+  trough {
+    background: rgba(98, 114, 164, 0.3);
+    border-radius: 2px;
+    min-height: 3px;
+  }
+
+  highlight {
+    background: $cyan;
+    border-radius: 2px;
+  }
+
+  slider {
+    background: $cyan;
+    border-radius: 50%;
+    min-width: 8px;
+    min-height: 8px;
+    margin: -3px 0;
+    box-shadow: 0 0 4px rgba(0, 243, 255, 0.6);
+  }
+}
+
+// --- Controls ---
+.controls {
+  margin-top: 2px;
+}
+
+.btn-play {
+  color: $cyan;
+  font-size: 22px;
+  background: none;
+  border: none;
+  padding: 0 4px;
+  border-radius: 50%;
+  transition: all 0.15s ease;
+
+  &:hover {
+    color: #ffffff;
+    text-shadow: 0 0 8px $cyan;
+    background: rgba(0, 243, 255, 0.12);
+  }
+}
+
+.btn-ctrl {
+  color: $purple;
+  font-size: 16px;
+  background: none;
+  border: none;
+  padding: 0 4px;
+  border-radius: 6px;
+  transition: all 0.15s ease;
+
+  &:hover {
+    color: #ffffff;
+    background: rgba(189, 147, 249, 0.15);
+  }
+}
+
+// --- Top-row toggles ---
+.btn-toggle {
+  color: $text-muted;
+  font-size: 12px;
+  background: none;
+  border: none;
+  padding: 0 2px;
+  border-radius: 4px;
+  transition: color 0.15s ease;
+
+  &.active {
+    color: $green;
+    text-shadow: 0 0 6px rgba(80, 250, 123, 0.5);
+  }
+
+  &:hover {
+    color: $text-main;
+  }
+}
+
+// --- Close button ---
+.btn-close {
+  color: $red;
+  font-size: 12px;
+  background: none;
+  border: none;
+  padding: 0 2px;
+  border-radius: 4px;
+  transition: all 0.15s ease;
+
+  &:hover {
+    background: rgba(255, 85, 85, 0.2);
+    color: #ffffff;
+  }
+}

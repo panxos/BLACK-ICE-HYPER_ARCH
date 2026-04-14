@@ -1,0 +1,167 @@
+; ============================================================
+; eww.yuck — BLACK-ICE ARCH | Music Widget
+; Playerctl/MPRIS — ncspot, mpd, spotify, etc.
+; Toggle: Win+Shift+N | Pos: top-right corner
+; ============================================================
+
+; --- Polls ---
+(defpoll music_status  :interval "2s"
+  `playerctl status 2>/dev/null || echo "Stopped"`)
+
+(defpoll music_title   :interval "2s"
+  `playerctl metadata title 2>/dev/null || echo "Sin media"`)
+
+(defpoll music_artist  :interval "2s"
+  `playerctl metadata artist 2>/dev/null || echo "—"`)
+
+(defpoll music_album   :interval "2s"
+  `playerctl metadata album 2>/dev/null || echo "—"`)
+
+(defpoll music_art     :interval "3s"
+  `url=$(playerctl metadata mpris:artUrl 2>/dev/null); echo "${url#file://}"`)
+
+(defpoll music_pos     :interval "1s"
+  `playerctl position 2>/dev/null | awk '{printf "%d", $1}' || echo "0"`)
+
+(defpoll music_len     :interval "5s"
+  `playerctl metadata mpris:length 2>/dev/null | awk '{printf "%d", $1/1000000}' || echo "0"`)
+
+(defpoll music_pos_fmt :interval "1s"
+  `playerctl position 2>/dev/null | awk '{m=int($1/60); s=int($1)%60; printf "%d:%02d", m, s}' || echo "0:00"`)
+
+(defpoll music_len_fmt :interval "5s"
+  `playerctl metadata mpris:length 2>/dev/null | awk '{t=int($1/1000000); m=int(t/60); s=t%60; printf "%d:%02d", m, s}' || echo "0:00"`)
+
+(defpoll music_shuffle :interval "3s"
+  `playerctl shuffle 2>/dev/null || echo "Off"`)
+
+(defpoll music_loop    :interval "3s"
+  `playerctl loop 2>/dev/null || echo "None"`)
+
+; --- Variables ---
+(defvar art_fallback "/home/$USER/.config/eww/no_art.png")
+
+; --- Helpers ---
+(defwidget btn_close []
+  (button
+    :class "btn-close"
+    :onclick "eww close music"
+    " "))
+
+(defwidget btn_shuffle []
+  (button
+    :class {music_shuffle == "On" ? "btn-toggle active" : "btn-toggle"}
+    :onclick "playerctl shuffle toggle"
+    "󰒟"))
+
+(defwidget btn_loop []
+  (button
+    :class {music_loop != "None" ? "btn-toggle active" : "btn-toggle"}
+    :onclick `playerctl loop $([ "$(playerctl loop 2>/dev/null)" = "None" ] && echo Track || echo None)`
+    "󰑖"))
+
+(defwidget album_art []
+  (box
+    :class "art-box"
+    :width 90
+    :height 90
+    (image
+      :path {music_art != "" ? music_art : art_fallback}
+      :image-width 90
+      :image-height 90)))
+
+(defwidget track_info []
+  (box
+    :class "track-info"
+    :orientation "v"
+    :valign "start"
+    :spacing 2
+    (label
+      :class "song-title"
+      :text {music_title}
+      :limit-width 26
+      :truncate true)
+    (label
+      :class "song-artist"
+      :text {music_artist}
+      :limit-width 28
+      :truncate true)
+    (label
+      :class "song-album"
+      :text {music_album}
+      :limit-width 28
+      :truncate true)))
+
+(defwidget progress_bar []
+  (box
+    :class "progress-box"
+    :orientation "h"
+    :spacing 6
+    :halign "fill"
+    (label :class "time-label" :text {music_pos_fmt})
+    (scale
+      :class "progress-scale"
+      :hexpand true
+      :min 0
+      :max {music_len > 0 ? music_len : 1}
+      :value {music_pos}
+      :onchange "playerctl position {}")
+    (label :class "time-label" :text {music_len_fmt})))
+
+(defwidget controls []
+  (box
+    :class "controls"
+    :orientation "h"
+    :spacing 12
+    :halign "center"
+    (button
+      :class "btn-ctrl"
+      :onclick "playerctl previous"
+      "󰒮")
+    (button
+      :class "btn-play"
+      :onclick "playerctl play-pause"
+      {music_status == "Playing" ? "󰏤" : "󰐊"})
+    (button
+      :class "btn-ctrl"
+      :onclick "playerctl next"
+      "󰒭")))
+
+; --- Main widget ---
+(defwidget music_player []
+  (box
+    :class "music-player"
+    :orientation "h"
+    :spacing 10
+    (album_art)
+    (box
+      :orientation "v"
+      :hexpand true
+      :spacing 4
+      ; Top row: shuffle + loop + spacer + close
+      (box
+        :orientation "h"
+        :spacing 6
+        (btn_shuffle)
+        (btn_loop)
+        (box :hexpand true)
+        (btn_close))
+      ; Track info
+      (track_info)
+      ; Progress
+      (progress_bar)
+      ; Controls
+      (controls))))
+
+; --- Window ---
+(defwindow music
+  :monitor 0
+  :geometry (geometry
+    :x "-20px"
+    :y "50px"
+    :width "380px"
+    :height "115px"
+    :anchor "top right")
+  :stacking "overlay"
+  :exclusive false
+  (music_player))

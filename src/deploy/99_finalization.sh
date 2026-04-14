@@ -147,6 +147,20 @@ if [ -f "$HYPR_CONF" ] && [ -n "${KEYBOARD_LAYOUT:-}" ]; then
     log_success "Teclado '${KEYBOARD_LAYOUT}' aplicado en Hyprland (kb_layout)."
 fi
 
+# --- eww music widget ---
+log_info "Instalando eww music widget..."
+mkdir -p "$USER_HOME/.config/eww"
+ln -sf "$DOTFILES_DIR/eww/eww.yuck" "$USER_HOME/.config/eww/eww.yuck"
+ln -sf "$DOTFILES_DIR/eww/eww.scss" "$USER_HOME/.config/eww/eww.scss"
+# music_widget toggle script
+ln -sf "$DOTFILES_DIR/bin/music_widget" "$USER_HOME/.config/bin/music_widget"
+chmod +x "$USER_HOME/.config/bin/music_widget"
+chown -h "$CURRENT_USER:$CURRENT_USER" \
+    "$USER_HOME/.config/eww/eww.yuck" \
+    "$USER_HOME/.config/eww/eww.scss" \
+    "$USER_HOME/.config/bin/music_widget"
+log_success "eww music widget instalado (Win+Shift+N para toggle)"
+
 # --- Generar resumen de instalación ---
 log_info "Generando resumen..."
 
@@ -169,7 +183,8 @@ echo -e "  ${GREEN}Win+Alt+W${NC}      → Cambiar wallpaper (selector)"
 echo -e "  ${GREEN}Win+Alt+T${NC}      → Cambiar tema Waybar"
 echo -e "  ${GREEN}Win+Alt+R${NC}      → Cambiar estilo Wofi"
 echo -e "  ${GREEN}Win+Alt+F${NC}      → Toggle WiFi"
-echo -e "  ${GREEN}Win+Q${NC}          → Cerrar ventana"
+echo -e "  ${GREEN}Win+Q${NC}          → Cerrar ventana
+  ${GREEN}Win+Shift+N${NC}    → Toggle widget de música (eww)"
 echo -e "  ${GREEN}XF86Audio*${NC}     → Volumen/Mute/Mic (teclas multimedia)"
 echo -e "  ${GREEN}XF86Brightness*${NC}→ Brillo pantalla"
 

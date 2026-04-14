@@ -220,6 +220,25 @@ else
     fi
 fi
 
+# ---------------------------------------------------------------------------
+# Hyprlock accent color — sigue el tema activo
+# ---------------------------------------------------------------------------
+HYPRLOCK_CONF="$HOME/.config/hypr/hyprlock.conf"
+if [ -f "$HYPRLOCK_CONF" ]; then
+    # Extraer colores del tema activo (0xeeRRGGBB → RRGGBB)
+    RAW_COLOR="${BORDER_COLORS[$SELECTION]:-"0xee00f3ff 0xee6800d2"}"
+    HEX1=$(echo "$RAW_COLOR" | awk '{print $1}' | sed 's/0xee//')
+    HEX2=$(echo "$RAW_COLOR" | awk '{print $2}' | sed 's/0xee//')
+    # Convertir hex → decimal para rgba()
+    R1=$((16#${HEX1:0:2})); G1=$((16#${HEX1:2:2})); B1=$((16#${HEX1:4:2}))
+    R2=$((16#${HEX2:0:2})); G2=$((16#${HEX2:2:2})); B2=$((16#${HEX2:4:2}))
+    RGBA1="rgba(${R1}, ${G1}, ${B1}, 0.8)"  # outer_color del input field
+    RGBA2="rgba(${R2}, ${G2}, ${B2}, 1.0)"  # font_color del input field
+    # Actualizar colores en hyprlock.conf del usuario (live, no el dotfile fuente)
+    sed -i "s/outer_color = rgba([^)]*)/outer_color = ${RGBA1}/" "$HYPRLOCK_CONF" 2>/dev/null || true
+    sed -i "s/font_color = rgba([^)]*)/font_color = ${RGBA2}/" "$HYPRLOCK_CONF" 2>/dev/null || true
+fi
+
 notify-send "BLACK-ICE" "Theme Active: $SELECTION"
 
 # ---------------------------------------------------------------------------

@@ -114,6 +114,7 @@ HYPRLAND_PKGS=(
     "grimblast-git"         # Screenshot helper
     "cliphist"              # Clipboard manager
     "wev"                   # Wayland event viewer
+    "eww"                   # Widget system (music widget, etc.)
     "pipewire"
     "pipewire-pulse"
     "pipewire-alsa"

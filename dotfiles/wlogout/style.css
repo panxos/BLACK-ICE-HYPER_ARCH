@@ -5,6 +5,12 @@
 
 window {
     background-color: rgba(12, 12, 12, 0.9);
+    animation: fadeIn 0.2s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to   { opacity: 1; transform: scale(1); }
 }
 
 button {
@@ -18,14 +24,30 @@ button {
     background-repeat: no-repeat;
     background-position: center;
     background-size: 25%;
+    transition: all 0.15s ease;
 }
 
-button:focus,
-button:active,
+button:focus {
+    background-color: #00ffff;
+    color: #1e1e2e;
+    outline-style: none;
+}
+
 button:hover {
     background-color: #00ffff;
     color: #1e1e2e;
     outline-style: none;
+    box-shadow: 0 0 20px rgba(0, 243, 255, 0.4);
+    transform: scale(1.05);
+    transition: all 0.15s ease;
+}
+
+button:active {
+    background-color: #00ffff;
+    color: #1e1e2e;
+    outline-style: none;
+    transform: scale(0.97);
+    transition: all 0.08s ease;
 }
 
 #lock {

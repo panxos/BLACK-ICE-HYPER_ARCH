@@ -1,0 +1,29 @@
+#!/bin/bash
+# music_widget — Toggle del widget eww de música
+# BLACK-ICE ARCH | P4nx0z Edition
+# Keybind: Win+Shift+N (hyprland.conf)
+# Instala: ln -sf $DOTFILES_DIR/bin/music_widget ~/.config/bin/music_widget
+
+set -uo pipefail
+
+EWW_WINDOW="music"
+EWW_CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/eww"
+
+# Verifica que eww esté instalado
+if ! command -v eww &>/dev/null; then
+    notify-send "BLACK-ICE" "eww no encontrado. Instala el paquete eww." \
+        --urgency=critical --icon=dialog-error 2>/dev/null || true
+    exit 1
+fi
+
+# Toggle
+if eww active-windows 2>/dev/null | grep -q "^${EWW_WINDOW}$"; then
+    eww close "$EWW_WINDOW" --config "$EWW_CONFIG"
+else
+    # Verifica que haya un player activo
+    if ! playerctl status &>/dev/null; then
+        notify-send "BLACK-ICE Music" "No hay reproductor MPRIS activo." \
+            --urgency=low --icon=audio-x-generic 2>/dev/null || true
+    fi
+    eww open "$EWW_WINDOW" --config "$EWW_CONFIG"
+fi
