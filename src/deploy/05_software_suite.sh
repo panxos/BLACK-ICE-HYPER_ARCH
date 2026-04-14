@@ -169,6 +169,38 @@ MPDEOF
         "\"Cloud\""|"Cloud")
             log_info "Instalando Servicios Cloud..."
             pkg_install "filezilla"
+
+            # --- MEGAsync con fix Hyprland (tray en Wayland) ---
+            log_info "Instalando MEGAsync..."
+            pkg_install "megasync-bin"
+
+            # Wrapper para MEGAsync — fuerza systray visible en Hyprland/Wayland
+            mkdir -p "$USER_HOME/.local/bin"
+            cat > "$USER_HOME/.local/bin/megasync-hypr" << 'MEGAEOF'
+#!/bin/bash
+# megasync-hypr — wrapper Hyprland/Wayland para systray
+export XDG_CURRENT_DESKTOP=Unity
+export QT_QPA_PLATFORM=xcb
+export GDK_BACKEND=x11
+exec /usr/bin/megasync "$@"
+MEGAEOF
+            chmod +x "$USER_HOME/.local/bin/megasync-hypr"
+            chown "$CURRENT_USER:$CURRENT_USER" "$USER_HOME/.local/bin/megasync-hypr"
+
+            # .desktop override para abrir con wrapper
+            mkdir -p "$USER_HOME/.local/share/applications"
+            cat > "$USER_HOME/.local/share/applications/megasync.desktop" << MEGADEOF
+[Desktop Entry]
+Name=MEGAsync
+Comment=Easy automated syncing with MEGA (Hyprland fix)
+Exec=$USER_HOME/.local/bin/megasync-hypr %U
+Icon=mega
+Type=Application
+Categories=Network;FileTransfer;
+StartupNotify=false
+MEGADEOF
+            chown "$CURRENT_USER:$CURRENT_USER" "$USER_HOME/.local/share/applications/megasync.desktop"
+            log_success "MEGAsync instalado con fix Hyprland (wrapper megasync-hypr)"
             ;;
         "\"Office\""|"Office")
             log_info "Instalando Suite de Oficina y PDF..."

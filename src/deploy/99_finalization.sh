@@ -67,6 +67,27 @@ if [ -f "$USER_HOME/.config/bin/gen_theme_previews" ]; then
     log_success "gen_theme_previews listo (se ejecuta en primer boot de Hyprland)"
 fi
 
+# --- Kitty color themes — instalar los 21 esquemas de color ---
+log_info "Instalando esquemas de color Kitty para los 21 temas Waybar..."
+KITTY_THEMES_SRC="$DOTFILES_DIR/kitty/themes"
+KITTY_THEMES_DST="$USER_HOME/.config/kitty/themes"
+mkdir -p "$KITTY_THEMES_DST"
+
+if [ -d "$KITTY_THEMES_SRC" ]; then
+    cp "$KITTY_THEMES_SRC"/*.conf "$KITTY_THEMES_DST/" 2>/dev/null || true
+    chown -R "$CURRENT_USER:$CURRENT_USER" "$KITTY_THEMES_DST"
+
+    # Crear current_theme.conf inicial (default: Horus-Cyber)
+    DEFAULT_KITTY="$KITTY_THEMES_DST/current_theme.conf"
+    if [ ! -f "$DEFAULT_KITTY" ]; then
+        cp "$KITTY_THEMES_SRC/Horus-Cyber.conf" "$DEFAULT_KITTY" 2>/dev/null || true
+        chown "$CURRENT_USER:$CURRENT_USER" "$DEFAULT_KITTY"
+    fi
+    log_success "Kitty themes instalados ($(ls "$KITTY_THEMES_DST"/*.conf 2>/dev/null | wc -l) archivos)"
+else
+    log_warn "No se encontró directorio kitty/themes — saltando"
+fi
+
 # --- Copiar previews pre-generadas al directorio de temas Waybar ---
 log_info "Instalando previews de temas Waybar..."
 for theme_dir in "$DOTFILES_DIR/waybar/themes"/*/; do

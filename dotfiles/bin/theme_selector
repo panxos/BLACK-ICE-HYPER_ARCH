@@ -180,6 +180,20 @@ done
 waybar &>/dev/null &
 disown
 
+# ---------------------------------------------------------------------------
+# Kitty color scheme — hot-reload via SIGUSR1
+# ---------------------------------------------------------------------------
+KITTY_THEME_DIR="$HOME/.config/kitty/themes"
+KITTY_CURRENT="$KITTY_THEME_DIR/current_theme.conf"
+if [ -f "$KITTY_THEME_DIR/$SELECTION.conf" ]; then
+    cp "$KITTY_THEME_DIR/$SELECTION.conf" "$KITTY_CURRENT"
+else
+    # Fallback: Horus-Cyber (default)
+    cp "$KITTY_THEME_DIR/Horus-Cyber.conf" "$KITTY_CURRENT" 2>/dev/null || true
+fi
+# Signal all running kitty instances to reload config
+pkill -SIGUSR1 kitty 2>/dev/null || true
+
 notify-send "BLACK-ICE" "Theme Active: $SELECTION"
 
 # ---------------------------------------------------------------------------

@@ -32,6 +32,7 @@
   # The list of segments shown on the left. Fill it with the most important segments.
   # Cyberpunk Style: compacto con _joined para unir segmentos
   typeset -g POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(
+    ssh_server              # 󰒋 SERVER (solo visible en sesiones SSH)
     my_lambda               # Cyberpunk Icon
     user_joined             # username (unido al anterior)
     dir_joined              # current directory (unido)
@@ -1671,6 +1672,19 @@
   # User-defined prompt segments can be customized the same way as built-in segments.
   # typeset -g POWERLEVEL9K_EXAMPLE_FOREGROUND=208
   # typeset -g POWERLEVEL9K_EXAMPLE_VISUAL_IDENTIFIER_EXPANSION='⭐'
+
+  ##################################[ ssh_server: Indicador sesión SSH ]##################################
+  # Muestra 󰒋 HOSTNAME con fondo rojo cuando estás en una sesión SSH remota.
+  # Cuando estás en local NO aparece nada — diseñado para evitar confusiones.
+  function prompt_ssh_server() {
+    [[ -n "${SSH_CONNECTION:-}${SSH_CLIENT:-}${SSH_TTY:-}" ]] || return
+    local host="${HOST%%.*}"   # solo el primer label (sin dominio)
+    p10k segment -b 196 -f 015 -t "󰒋 ${host}"
+  }
+
+  function instant_prompt_ssh_server() {
+    prompt_ssh_server
+  }
 
   ##################################[ my_lambda: Cyberpunk Prompt Icon ]##################################
   # Segmento personalizado - Dinámico (Arch / Root)
