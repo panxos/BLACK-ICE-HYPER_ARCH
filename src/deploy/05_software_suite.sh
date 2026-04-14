@@ -116,6 +116,7 @@ for choice in $CHOICES; do
             pkg_install "ncmpcpp"
             pkg_install "mpc"        # CLI control para Waybar
             pkg_install "playerctl"  # Control mpris universal
+            pkg_install "mpd-mpris"  # Expone MPD como MPRIS2 (eww widget + playerctl)
 
             # Config MPD del usuario
             MPD_CONF_DIR="$USER_HOME/.config/mpd"
@@ -131,7 +132,6 @@ db_file            "~/.config/mpd/mpd.db"
 log_file           "~/.config/mpd/mpd.log"
 pid_file           "~/.config/mpd/mpd.pid"
 state_file         "~/.config/mpd/mpdstate"
-sticker_database   "~/.config/mpd/sticker.sql"
 
 bind_to_address    "127.0.0.1"
 port               "6600"
@@ -152,9 +152,11 @@ MPDEOF
                 log_success "MPD configurado en $MPD_CONF_DIR/mpd.conf"
             fi
 
-            # Habilitar servicio MPD del usuario
+            # Habilitar servicios del usuario
             sudo -u "$CURRENT_USER" systemctl --user enable --now mpd.service 2>/dev/null || \
                 log_warn "MPD service enable fallido — iniciar manualmente con: systemctl --user start mpd"
+            sudo -u "$CURRENT_USER" systemctl --user enable --now mpd-mpris.service 2>/dev/null || \
+                log_warn "mpd-mpris service enable fallido — iniciar manualmente con: systemctl --user start mpd-mpris"
 
             chown -R "$CURRENT_USER:$CURRENT_USER" "$MPD_CONF_DIR" "$MPD_MUSIC_DIR"
             log_success "MPD + ncmpcpp instalados. Música en ~/Music"
