@@ -38,3 +38,11 @@ dotfiles/bin/install-sync-*.sh
 dotfiles/bin/sync-all-*.sh
 dotfiles/bin/SYNC-README.md
 
+# Temporary/internal files
+xauth_*
+AUDIT_*.md
+docs/RESUME_CONTEXT.md
+docs/SOTA_EXECUTIVE_REPORT.md
+docs/_EXECUTIVE_REPORT.md
+*.log
+logs/

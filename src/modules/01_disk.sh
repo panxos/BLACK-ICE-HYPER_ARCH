@@ -175,8 +175,14 @@ fi
 
 if [ "$ENCRYPT" == "true" ]; then
     log_info "Iniciando despliegue de contenedor LUKS..."
-    cryptsetup -q luksFormat "$PART_ROOT" --type luks2 --pbkdf pbkdf2 <<< "$LUKS_PASS"
-    cryptsetup open "$PART_ROOT" cryptroot <<< "$LUKS_PASS"
+    if ! cryptsetup -q luksFormat "$PART_ROOT" --type luks2 --pbkdf pbkdf2 <<< "$LUKS_PASS"; then
+        log_error "LUKS encryption failed — luksFormat returned non-zero"
+        exit 1
+    fi
+    if ! cryptsetup open "$PART_ROOT" cryptroot <<< "$LUKS_PASS"; then
+        log_error "LUKS encryption failed — could not open cryptroot"
+        exit 1
+    fi
     ROOT_DEV="/dev/mapper/cryptroot"
 else
     ROOT_DEV="$PART_ROOT"

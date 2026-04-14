@@ -87,7 +87,7 @@ check_root() {
 # Check internet connection
 check_internet() {
     log_info "Verificando conexión a Internet..."
-    if ping -c 1 8.8.8.8 &> /dev/null || ping -c 1 1.1.1.1 &> /dev/null; then
+    if ping -c 1 -W 3 8.8.8.8 &> /dev/null || ping -c 1 -W 3 1.1.1.1 &> /dev/null; then
         log_success "Conexión a Internet OK"
         return 0
     else

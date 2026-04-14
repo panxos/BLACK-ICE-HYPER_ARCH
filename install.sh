@@ -28,10 +28,16 @@ CONFIG_FILE="$INSTALL_DIR/config/install.conf"
 
 # --- STRICT MODE ---
 set -uo pipefail
-# Note: We don't use 'set -e' globally yet to handle custom error traps, 
+# Note: We don't use 'set -e' globally yet to handle custom error traps,
 # but individual modules should be strict.
 
-# ... (Error handling and cleanup code remains, updated with log_error)
+# --- CLEANUP TRAP (safety net for unexpected errors) ---
+cleanup_on_error() {
+    log_error "Installation failed at line $LINENO — cleaning up"
+    umount -R /mnt 2>/dev/null || true
+    exit 1
+}
+trap cleanup_on_error ERR
 
 # --- Detectar Configuración ---
 if [ -f "$CONFIG_FILE" ]; then
