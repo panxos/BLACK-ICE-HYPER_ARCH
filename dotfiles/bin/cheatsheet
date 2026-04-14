@@ -156,7 +156,6 @@ window {
     color: #bd93f9;
     letter-spacing: 1px;
     padding: 8px 16px 4px 16px;
-    text-transform: uppercase;
 }
 
 .bind-row {

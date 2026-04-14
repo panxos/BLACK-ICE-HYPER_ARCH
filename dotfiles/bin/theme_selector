@@ -181,24 +181,43 @@ waybar &>/dev/null &
 disown
 
 # ---------------------------------------------------------------------------
-# Kitty color scheme — set-colors via socket + SIGUSR1 fallback
+# Kitty color scheme — pywal genera paleta desde el wallpaper activo
 # ---------------------------------------------------------------------------
-KITTY_THEME_DIR="$HOME/.config/kitty/themes"
-KITTY_CURRENT="$KITTY_THEME_DIR/current_theme.conf"
-KITTY_CONF="$KITTY_THEME_DIR/$SELECTION.conf"
-[ -f "$KITTY_CONF" ] || KITTY_CONF="$KITTY_THEME_DIR/Horus-Cyber.conf"
+WALL_ACTUAL=$(cat "$CACHE_WALL" 2>/dev/null || true)
 
-if [ -f "$KITTY_CONF" ]; then
-    cp "$KITTY_CONF" "$KITTY_CURRENT"
-    # Aplicar a cada instancia kitty via su socket individual
-    for pid in $(pgrep -x kitty); do
-        sock="/tmp/kitty-${pid}"
-        if [ -S "$sock" ]; then
-            kitty @ --to "unix:${sock}" set-colors --all "$KITTY_CONF" 2>/dev/null || true
-        fi
-    done
-    # SIGUSR1 recarga el kitty.conf completo (fondo + todo) — necesita reinicio previo
-    pkill -SIGUSR1 kitty 2>/dev/null || true
+if command -v wal &>/dev/null && [ -f "$WALL_ACTUAL" ]; then
+    # Generar paleta sin cambiar el fondo (awww ya lo hizo)
+    wal -i "$WALL_ACTUAL" -n --backend haishoku 2>/dev/null || \
+    wal -i "$WALL_ACTUAL" -n 2>/dev/null || true
+
+    WAL_KITTY="$HOME/.cache/wal/colors-kitty.conf"
+    KITTY_CURRENT="$HOME/.config/kitty/themes/current_theme.conf"
+
+    if [ -f "$WAL_KITTY" ]; then
+        cp "$WAL_KITTY" "$KITTY_CURRENT"
+        # Aplicar a cada instancia kitty via su socket individual
+        for pid in $(pgrep -x kitty); do
+            sock="/tmp/kitty-${pid}"
+            if [ -S "$sock" ]; then
+                kitty @ --to "unix:${sock}" set-colors --all "$KITTY_CURRENT" 2>/dev/null || true
+            fi
+        done
+        pkill -SIGUSR1 kitty 2>/dev/null || true
+    fi
+else
+    # Fallback: tema manual si pywal no está o no hay wallpaper
+    KITTY_THEME_DIR="$HOME/.config/kitty/themes"
+    KITTY_CURRENT="$KITTY_THEME_DIR/current_theme.conf"
+    KITTY_CONF="$KITTY_THEME_DIR/$SELECTION.conf"
+    [ -f "$KITTY_CONF" ] || KITTY_CONF="$KITTY_THEME_DIR/Horus-Cyber.conf"
+    if [ -f "$KITTY_CONF" ]; then
+        cp "$KITTY_CONF" "$KITTY_CURRENT"
+        for pid in $(pgrep -x kitty); do
+            sock="/tmp/kitty-${pid}"
+            [ -S "$sock" ] && kitty @ --to "unix:${sock}" set-colors --all "$KITTY_CONF" 2>/dev/null || true
+        done
+        pkill -SIGUSR1 kitty 2>/dev/null || true
+    fi
 fi
 
 notify-send "BLACK-ICE" "Theme Active: $SELECTION"
