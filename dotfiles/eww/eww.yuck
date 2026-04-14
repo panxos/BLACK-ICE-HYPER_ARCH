@@ -18,7 +18,7 @@
   `playerctl metadata album 2>/dev/null || echo "—"`)
 
 (defpoll music_art     :interval "3s"
-  `url=$(playerctl metadata mpris:artUrl 2>/dev/null); echo "${url#file://}"`)
+  `playerctl metadata mpris:artUrl 2>/dev/null | sed 's|file://||'`)
 
 (defpoll music_pos     :interval "1s"
   `playerctl position 2>/dev/null | awk '{printf "%d", $1}' || echo "0"`)
