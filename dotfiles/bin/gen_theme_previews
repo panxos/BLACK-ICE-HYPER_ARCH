@@ -1,0 +1,89 @@
+#!/bin/bash
+# gen_theme_previews — Genera preview.png para cada tema Waybar
+# Aplica cada tema, espera que cargue, captura screenshot, escala a 800x500
+# Se ejecuta autónomamente desde Hyprland (requiere display activo)
+# P4nx0z Edition — BLACK-ICE ARCH
+
+set -uo pipefail
+
+THEMES_DIR="$HOME/.config/waybar/themes"
+SELECTOR="$HOME/.config/bin/theme_selector"
+PREVIEW_W=800
+PREVIEW_H=500
+WAIT_SECS=4        # Segundos a esperar por tema (waybar + wallpaper)
+FORCE="${1:-}"     # --force para regenerar aunque existan
+
+# ── Validaciones ────────────────────────────────────────────────────────────
+if ! command -v grim &>/dev/null; then
+    notify-send "gen_theme_previews" "grim no está instalado" --urgency=critical
+    exit 1
+fi
+
+if ! command -v convert &>/dev/null; then
+    notify-send "gen_theme_previews" "imagemagick no está instalado" --urgency=critical
+    exit 1
+fi
+
+mapfile -t THEMES < <(
+    find "$THEMES_DIR" -maxdepth 1 -mindepth 1 -type d \
+        -exec sh -c 'test -f "$1/config.jsonc" && test -f "$1/style.css"' _ {} \; \
+        -print | xargs -I{} basename {} | sort
+)
+
+if [ ${#THEMES[@]} -eq 0 ]; then
+    notify-send "gen_theme_previews" "No hay temas en $THEMES_DIR" --urgency=critical
+    exit 1
+fi
+
+# Guardar tema actual para restaurar al final
+ORIGINAL_THEME=$(cat "$HOME/.cache/current_theme" 2>/dev/null || echo "${THEMES[0]}")
+
+# Borrar previews existentes si --force
+if [ "$FORCE" = "--force" ]; then
+    find "$THEMES_DIR" -name "preview.png" -delete
+    notify-send "BLACK-ICE" "Regenerando TODAS las previews..." --urgency=low
+fi
+
+TOTAL=${#THEMES[@]}
+DONE=0
+SKIPPED=0
+
+notify-send "BLACK-ICE" "Generando previews: $TOTAL temas\nEspera ~$((TOTAL * WAIT_SECS)) seg" \
+    --urgency=low --expire-time=5000
+
+for THEME in "${THEMES[@]}"; do
+    PREVIEW_OUT="$THEMES_DIR/$THEME/preview.png"
+
+    # Saltar si ya existe (a menos que --force)
+    if [ -f "$PREVIEW_OUT" ] && [ "$FORCE" != "--force" ]; then
+        SKIPPED=$((SKIPPED + 1))
+        continue
+    fi
+
+    DONE=$((DONE + 1))
+
+    # Aplicar tema (sin notificación propia para no saturar)
+    bash "$SELECTOR" "$THEME" &>/dev/null
+
+    # Esperar que waybar y el wallpaper carguen
+    sleep "$WAIT_SECS"
+
+    # Capturar pantalla completa y escalar
+    TMP_RAW="/tmp/preview_raw_${THEME}.png"
+    if grim "$TMP_RAW" 2>/dev/null; then
+        convert "$TMP_RAW" -resize "${PREVIEW_W}x${PREVIEW_H}^" \
+            -gravity Center -extent "${PREVIEW_W}x${PREVIEW_H}" \
+            "$PREVIEW_OUT" 2>/dev/null
+        rm -f "$TMP_RAW"
+    fi
+
+    notify-send "BLACK-ICE" "[$DONE/$TOTAL] Preview: $THEME" \
+        --urgency=low --expire-time=2000
+done
+
+# Restaurar tema original
+bash "$SELECTOR" "$ORIGINAL_THEME" &>/dev/null
+
+GENERATED=$((TOTAL - SKIPPED))
+notify-send "BLACK-ICE" "✓ Previews listas: $GENERATED generadas, $SKIPPED ya existían\nTema restaurado: $ORIGINAL_THEME" \
+    --urgency=normal --expire-time=6000

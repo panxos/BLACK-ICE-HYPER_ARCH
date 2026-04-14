@@ -53,6 +53,20 @@ fi
 sudo -u "$CURRENT_USER" xdg-settings set default-web-browser brave-browser.desktop 2>/dev/null || \
     sudo -u "$CURRENT_USER" xdg-settings set default-web-browser brave.desktop 2>/dev/null || true
 
+# --- Waypaper config (subfolders habilitados para .webp en subdirectorios) ---
+mkdir -p "$USER_HOME/.config/waypaper"
+if [ -f "$SCRIPT_DIR/dotfiles/waypaper/config.ini" ]; then
+    cp "$SCRIPT_DIR/dotfiles/waypaper/config.ini" "$USER_HOME/.config/waypaper/config.ini"
+    chown "$CURRENT_USER:$CURRENT_USER" "$USER_HOME/.config/waypaper/config.ini"
+    log_success "waypaper config instalada (subfolders=True)"
+fi
+
+# --- gen_theme_previews — hacer ejecutable ---
+if [ -f "$USER_HOME/.config/bin/gen_theme_previews" ]; then
+    chmod +x "$USER_HOME/.config/bin/gen_theme_previews"
+    log_success "gen_theme_previews listo (se ejecuta en primer boot de Hyprland)"
+fi
+
 # 3. Wrapper para Udiskie (XWayland para icono en la tray)
 cat << 'EOF' > "$USER_HOME/.config/bin/udiskie-fix"
 #!/bin/bash
