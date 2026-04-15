@@ -74,6 +74,7 @@ HYPRLAND_PKGS=(
     "ttf-nerd-fonts-symbols"
     "otf-commit-mono-nerd"   # Mandatory Mecha font
     "ttf-roboto"
+    "ttf-dseg"               # DSEG7 LCD 7-segment font for hyprlock clock
     "papirus-icon-theme"
     
     # Temas y Estética
