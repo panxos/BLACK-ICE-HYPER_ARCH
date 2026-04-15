@@ -101,9 +101,9 @@ if [ "$_PARU_OK" = false ]; then
         cd /tmp || { log_error "No se pudo acceder a /tmp"; return 1; }
         rm -rf paru
         retry_command git clone https://aur.archlinux.org/paru.git || { log_error "No se pudo clonar paru"; exit 1; }
-        cd paru
+        cd paru || { log_error "No se pudo entrar al directorio paru"; exit 1; }
         makepkg -si --noconfirm --needed || { log_error "makepkg falló para paru"; exit 1; }
-        cd "$SCRIPT_DIR"
+        cd "$SCRIPT_DIR" || { log_error "No se pudo volver a SCRIPT_DIR"; exit 1; }
         log_success "paru compilado e instalado ($(paru --version | head -1))"
     fi
 else

@@ -494,7 +494,7 @@ if [ -d "/usr/share/themes/Sweet-Dark" ]; then
             && { sudo git checkout Ambar-Blue-Dark 2>/dev/null \
                  || sudo git checkout -b Ambar-Blue-Dark origin/Ambar-Blue-Dark 2>/dev/null \
                  || log_warn "No se pudo cambiar rama Sweet-Dark"; }
-        cd "$HOME"
+        cd "$HOME" || cd /tmp || true
     fi
     [ -f "/usr/share/themes/Sweet-Dark/index.theme" ] && \
         sudo sed -i 's/GtkTheme=Sweet/GtkTheme=Sweet-Dark/' /usr/share/themes/Sweet-Dark/index.theme

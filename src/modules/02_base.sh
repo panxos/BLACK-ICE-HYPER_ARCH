@@ -39,8 +39,10 @@ VIRT_TYPE=$(systemd-detect-virt)
 IS_LAPTOP=false
 
 # Detectar si es laptop (presencia de batería)
-if [ -d /sys/class/power_supply/BAT* ] || [ -d /sys/class/power_supply/battery ]; then
-    IS_LAPTOP=true
+for _bat_path in /sys/class/power_supply/BAT0 /sys/class/power_supply/BAT1 /sys/class/power_supply/battery; do
+    if [ -d "$_bat_path" ]; then IS_LAPTOP=true; break; fi
+done
+if [ "$IS_LAPTOP" = true ]; then
     log_info "Laptop detectado: Activando gestión de energía adaptativa"
 fi
 

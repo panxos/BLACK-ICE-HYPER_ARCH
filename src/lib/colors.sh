@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 # Colors (Imported or Defined)
 # Redefining for safety if other libs don't load
 RED='\033[0;31m'
