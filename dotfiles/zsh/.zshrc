@@ -131,17 +131,9 @@ alias clauderemoto='claude --channels plugin:telegram@claude-plugins-official --
 # Alias especiales
 alias HOME='cd $HOME'
 alias snapshot="sudo snapper -c root list"
-alias s3th="ssh user@remote-host"
-alias ENACOM='~/bin/enacom-connect.sh'
-alias ENACOMOFF='~/bin/enacom-disconnect.sh'
-alias PROTON='~/bin/proton-connect.sh'
-alias PROTONOFF='~/bin/proton-disconnect.sh'
-alias THM='~/bin/tryhackme-connect.sh'
-alias THMOFF='~/bin/tryhackme-disconnect.sh'
-alias HTB='~/bin/htb-connect.sh'
-alias HTBOFF='~/bin/htb-disconnect.sh'
-alias megaup='WG_QUICK_USERSPACE_IMPLEMENTATION=wireguard-go sudo wg-quick up megavpn && curl ifconfig.me'
-alias megadown='sudo wg-quick down megavpn'
+# VPN aliases — define en ~/.zshenv o ~/.zshrc.local según tu setup
+# alias HTB='~/bin/htb-connect.sh'
+# alias HTBOFF='~/bin/htb-disconnect.sh'
 
 # Alias útiles
 alias show_rules='sudo nft list ruleset'
@@ -156,7 +148,7 @@ alias check_auth_log='sudo tail -f /var/log/auth.log'
 alias ytb="mpv --ytdl-format='bestvideo+bestaudio/best' --fs"
 alias cvpn='check_vpn'
 alias kvpn='kill_vpn'
-alias SHARED='sudo smbserver.py -smb2 -username faravena -password REDACTED SHARED "$PWD"'
+alias SHARED='sudo smbserver.py -smb2support SHARED "$PWD"'
 
 
 
@@ -179,7 +171,7 @@ alias nanoc='nano --colors=always'    # Nano con colores forzados
 
 alias burpsuite='/opt/Burpsuite-Professional/burpsuitepro'
 
-alias genpass='/usr/bin/env python3 /home/faravena/MEGA/Scripts/Genpass/genpass.py'
+alias genpass='python3 "$HOME/.local/bin/genpass.py"'
 
 # Alias para la tabla de IPs (optimizado)
 alias IPS='echo -e "\n\033[1;34m╔════════════════════╦════════════════════╗\033[0m";
@@ -201,7 +193,7 @@ function proyect() {
         return 1
     fi
 
-    local BASE_DIR="/home/faravena/MEGA/Scripts"
+    local BASE_DIR="${PROJECTS_DIR:-$HOME/Projects}"
     local TARGET_DIR="$BASE_DIR/$NAME"
 
     if [ -d "$TARGET_DIR" ]; then

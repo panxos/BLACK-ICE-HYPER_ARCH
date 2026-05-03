@@ -1,58 +1,570 @@
-/* Estilo Soporteinfo-Cyber para s3th */
-* {
-  font-family: "Roboto", "JetBrains Mono Nerd Font";
-  transition: 200ms;
+/* swaync — Pamela-Lovelace / BLACK-ICE coherence */
+/* bg: #1D1F28 | acc: #b4dafe | font: JetBrains Mono */
+
+:root {
+  --bg:             rgba(25, 27, 36, 0.97);
+  --bg-hover:       rgba(36, 38, 50, 0.99);
+  --bg-focus:       rgba(44, 46, 58, 0.6);
+  --bg-cc:          rgba(20, 22, 30, 0.98);
+  --border:         rgba(180, 218, 254, 0.2);
+  --border-crit:    rgba(255, 143, 128, 0.5);
+  --acc:            #b4dafe;
+  --acc-purple:     #c792ea;
+  --acc-green:      #10b981;
+  --acc-red:        #ff8f80;
+  --text:           rgba(253, 253, 253, 0.92);
+  --text-dim:       rgba(253, 253, 253, 0.52);
+  --text-acc:       rgba(180, 218, 254, 0.75);
+  --shadow:         0 4px 20px rgba(0,0,0,0.65), 0 0 6px rgba(180,218,254,0.06);
+  --shadow-crit:    0 4px 20px rgba(0,0,0,0.65), 0 0 8px rgba(255,143,128,0.15);
+  --radius:         11px;
+  --font:           "Poppins", "JetBrains Mono Nerd Font", sans-serif;
+  --sz-title:       12px;
+  --sz-body:        11px;
+  --sz-time:        10px;
+  --icon-size:      31px;
+  --icon-app-size:  13px;
+  --group-icon-sz:  22px;
+  /* swaync compat */
+  --noti-border-color: rgba(180, 218, 254, 0.2);
+  --noti-bg:        29, 31, 40;
+  --noti-bg-alpha:  0.96;
+  --noti-bg-darker: rgb(18, 20, 28);
+  --noti-bg-hover:  rgba(38, 40, 52, 0.98);
+  --noti-bg-focus:  rgba(44, 46, 58, 0.6);
+  --noti-close-bg:  rgba(255, 255, 255, 0.08);
+  --noti-close-bg-hover: rgba(255, 143, 128, 0.8);
+  --text-color:     rgba(253, 253, 253, 0.92);
+  --text-color-disabled: rgba(253, 253, 253, 0.32);
+  --bg-selected:    rgba(180, 218, 254, 0.85);
+  --notification-icon-size: 31px;
+  --notification-app-icon-size: 13px;
+  --notification-group-icon-size: 22px;
+  --notification-shadow: var(--shadow);
+  --font-size-body: 9px;
+  --font-size-summary: 10px;
+  --hover-tranistion: background 0.14s ease;
+  --group-collapse-tranistion: opacity 300ms ease;
+  --hover-transition: var(--hover-tranistion);
+  --group-collapse-transition: var(--group-collapse-tranistion);
+  --border-radius: var(--radius);
+  --cc-bg: var(--bg-cc);
 }
 
-.notification {
-  border-radius: 12px;
-  margin: 6px 12px;
-  box-shadow: 0 0 15px rgba(100, 255, 218, 0.2);
-  padding: 0;
-  background: rgba(10, 25, 47, 0.85); /* Azul profundo s3th */
-  border: 1px solid rgba(100, 255, 218, 0.3); /* Borde Cian */
-}
+@define-color cc-bg rgba(22, 24, 32, 0.97);
+@define-color noti-border-color rgba(180, 218, 254, 0.2);
+@define-color noti-bg rgba(29, 31, 40, 0.96);
+@define-color noti-bg-opaque rgb(29, 31, 40);
+@define-color noti-bg-darker rgb(18, 20, 28);
+@define-color noti-bg-hover rgba(38, 40, 52, 0.98);
+@define-color noti-bg-hover-opaque rgb(38, 40, 52);
+@define-color noti-bg-focus rgba(44, 46, 58, 0.6);
+@define-color noti-close-bg rgba(255, 255, 255, 0.08);
+@define-color noti-close-bg-hover rgba(255, 143, 128, 0.8);
+@define-color text-color rgba(253, 253, 253, 0.92);
+@define-color text-color-disabled rgba(253, 253, 253, 0.32);
+@define-color bg-selected rgba(180, 218, 254, 0.85);
 
-.notification-content {
+notificationwindow, blankwindow {
   background: transparent;
-  padding: 15px;
-  border-radius: 12px;
 }
 
-.notification-content image {
-  margin-right: 15px;
-  border-radius: 8px;
+/* ── Close dot ── */
+.close-button {
+  background: var(--noti-close-bg);
+  color: transparent;
+  text-shadow: none;
+  padding: 0;
+  border-radius: 100%;
+  margin-top: 7px;
+  margin-right: 7px;
+  box-shadow: none;
+  border: none;
+  min-width: 13px;
+  min-height: 13px;
+  transition: background 0.12s ease;
 }
 
-.notification-default-action:hover,
-.notification-action:hover {
-  background: rgba(100, 255, 218, 0.1);
+.close-button:hover {
+  background: var(--noti-close-bg-hover);
+  color: rgba(255, 255, 255, 0.9);
+  border: none;
+  box-shadow: none;
 }
 
-.summary {
-  font-size: 16px;
+/* ── Rows ── */
+.notification-row {
+  background: none;
+  outline: none;
+}
+
+.notification-row:focus {
+  background: var(--noti-bg-focus);
+}
+
+.notification-row .notification-background {
+  padding: 3px 6px;
+}
+
+.notification-row .notification-background .notification {
+  font-family: var(--font);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  padding: 0;
+  transition: var(--hover-tranistion);
+  background: rgba(var(--noti-bg), var(--noti-bg-alpha));
+  box-shadow: var(--shadow);
+}
+
+.notification-row .notification-background .notification.critical {
+  border: 1px solid var(--border-crit);
+  box-shadow: var(--shadow-crit);
+}
+
+/* ── Content area ── */
+.notification-row .notification-background .notification .notification-default-action {
+  padding: 6px 8px;
+  margin: 0;
+  box-shadow: none;
+  background: transparent;
+  border: none;
+  color: var(--text);
+  transition: var(--hover-tranistion);
+  border-radius: var(--radius);
+}
+
+.notification-row .notification-background .notification .notification-default-action:hover {
+  -gtk-icon-filter: none;
+  background: var(--noti-bg-hover);
+}
+
+.notification-row .notification-background .notification .notification-default-action:not(:only-child) {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.notification-row .notification-background .notification .notification-default-action .notification-content {
+  background: transparent;
+  border-radius: var(--radius);
+  padding: 0;
+}
+
+/* Icon — macOS rounded square */
+.notification-row .notification-background .notification .notification-default-action .notification-content .image {
+  -gtk-icon-filter: none;
+  -gtk-icon-size: 31px;
+  border-radius: 7px;
+  margin: 0 9px 0 0;
+}
+
+.notification-row .notification-background .notification .notification-default-action .notification-content .app-icon {
+  -gtk-icon-filter: none;
+  -gtk-icon-size: 12px;
+  margin: 2px;
+}
+
+.notification-row .notification-background .notification .notification-default-action .notification-content .text-box label {
+  filter: none;
+}
+
+/* Title */
+.notification-row .notification-background .notification .notification-default-action .notification-content .text-box .summary {
+  font-family: var(--font);
+  font-size: var(--sz-title);
   font-weight: bold;
-  color: #64ffda; /* Título Cian */
-  margin-bottom: 5px;
+  background: transparent;
+  color: var(--acc);
+  text-shadow: none;
 }
 
-.body {
-  font-size: 14px;
-  color: #e6f1ff; /* Texto Blanco Cyber */
+/* Timestamp */
+.notification-row .notification-background .notification .notification-default-action .notification-content .text-box .time {
+  font-family: var(--font);
+  font-size: var(--sz-time);
+  font-weight: normal;
+  background: transparent;
+  color: var(--text-acc);
+  text-shadow: none;
+  margin-right: 22px;
 }
 
+/* Body */
+.notification-row .notification-background .notification .notification-default-action .notification-content .text-box .body {
+  font-family: var(--font);
+  font-size: var(--sz-body);
+  font-weight: normal;
+  background: transparent;
+  color: var(--text-dim);
+  text-shadow: none;
+  margin-top: 1px;
+}
+
+/* Progress */
+.notification-row .notification-background .notification .notification-default-action .notification-content progressbar {
+  margin-top: 5px;
+}
+
+.notification-row .notification-background .notification .notification-default-action .notification-content progressbar trough {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 3px;
+  border: none;
+  min-height: 2px;
+}
+
+.notification-row .notification-background .notification .notification-default-action .notification-content progressbar progress {
+  background: var(--acc);
+  border-radius: 3px;
+  border: none;
+  min-height: 2px;
+}
+
+.notification-row .notification-background .notification .notification-default-action .notification-content .body-image {
+  margin-top: 5px;
+  background-color: transparent;
+  border-radius: 6px;
+  -gtk-icon-filter: none;
+}
+
+.notification-row .notification-background .notification .notification-default-action .notification-content .inline-reply {
+  margin-top: 5px;
+}
+
+.notification-row .notification-background .notification .notification-default-action .notification-content .inline-reply .inline-reply-entry {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text);
+  caret-color: var(--acc);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-family: var(--font);
+  font-size: var(--sz-body);
+  padding: 4px 8px;
+}
+
+.notification-row .notification-background .notification .notification-default-action .notification-content .inline-reply .inline-reply-button {
+  margin-left: 3px;
+  background: rgba(180, 218, 254, 0.1);
+  border: 1px solid rgba(180, 218, 254, 0.25);
+  border-radius: 6px;
+  color: var(--acc);
+  font-family: var(--font);
+  font-size: var(--sz-body);
+  font-weight: bold;
+  padding: 3px 10px;
+}
+
+.notification-row .notification-background .notification .notification-default-action .notification-content .inline-reply .inline-reply-button:disabled {
+  background: transparent;
+  color: var(--text-color-disabled);
+  border: 1px solid transparent;
+}
+
+.notification-row .notification-background .notification .notification-default-action .notification-content .inline-reply .inline-reply-button:hover {
+  background: rgba(180, 218, 254, 0.2);
+}
+
+/* Alt actions */
+.notification-row .notification-background .notification .notification-alt-actions {
+  background: rgba(255, 255, 255, 0.03);
+  border-bottom-left-radius: var(--radius);
+  border-bottom-right-radius: var(--radius);
+  padding: 4px;
+  border-top: 1px solid rgba(180, 218, 254, 0.1);
+}
+
+.notification-row .notification-background .notification .notification-action {
+  margin: 2px;
+  padding: 0;
+}
+
+.notification-row .notification-background .notification .notification-action > button {
+  border-radius: 6px;
+  color: var(--acc);
+  background: rgba(180, 218, 254, 0.08);
+  border: 1px solid rgba(180, 218, 254, 0.18);
+  font-family: var(--font);
+  font-size: var(--sz-body);
+  font-weight: bold;
+  padding: 4px 12px;
+  transition: background 0.12s ease;
+}
+
+.notification-row .notification-background .notification .notification-action > button:hover {
+  background: rgba(180, 218, 254, 0.18);
+}
+
+/* ── Groups ── */
+.notification-group {
+  transition: opacity 200ms ease-in-out;
+}
+
+.notification-group:focus {
+  background: var(--noti-bg-focus);
+}
+
+.notification-group .notification-group-close-button .close-button {
+  margin: 8px 14px;
+}
+
+.notification-group .notification-group-buttons,
+.notification-group .notification-group-headers {
+  margin: 0 12px;
+  color: var(--text);
+  font-family: var(--font);
+}
+
+.notification-group .notification-group-headers .notification-group-icon {
+  color: var(--acc);
+  -gtk-icon-size: var(--group-icon-sz);
+}
+
+.notification-group .notification-group-headers .notification-group-header {
+  color: var(--acc);
+  font-family: var(--font);
+  font-size: var(--sz-title);
+  font-weight: bold;
+}
+
+.notification-group.collapsed.not-expanded { opacity: 0.4; }
+
+.notification-group.collapsed .notification-row .notification {
+  background-color: rgba(var(--noti-bg), 1);
+}
+
+.notification-group.collapsed .notification-row:not(:last-child) .notification-action,
+.notification-group.collapsed .notification-row:not(:last-child) .notification-default-action {
+  opacity: 0;
+}
+
+.notification-group.collapsed:hover .notification-row:not(:only-child) .notification {
+  background-color: var(--noti-bg-hover);
+}
+
+/* ── Control Center ── */
 .control-center {
-  background: rgba(10, 25, 47, 0.9); /* Más opaco para control center */
-  border-radius: 12px;
-  border: 1px solid #64ffda;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+  background: var(--bg-cc);
+  color: var(--text);
+  border-radius: 10px;
+  border: 1px solid rgba(180, 218, 254, 0.18);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.7), 0 0 8px rgba(180,218,254,0.05);
+  margin: 6px;
+}
+
+.control-center .control-center-list-placeholder {
+  opacity: 0.35;
+  font-family: var(--font);
+  font-size: var(--sz-body);
+  color: var(--text-acc);
+}
+
+.control-center .control-center-list { background: transparent; }
+
+.control-center .control-center-list .notification {
+  box-shadow: var(--shadow);
+}
+
+.control-center .control-center-list .notification .notification-default-action,
+.control-center .control-center-list .notification .notification-action {
+  transition: var(--group-collapse-tranistion), var(--hover-tranistion);
+}
+
+.control-center .control-center-list .notification .notification-default-action:hover,
+.control-center .control-center-list .notification .notification-action:hover {
+  background-color: var(--noti-bg-hover);
+}
+
+.blank-window { background: transparent; }
+.floating-notifications { background: transparent; }
+.floating-notifications .notification { box-shadow: none; }
+
+/* ── Widgets ── */
+.widget {
+  margin: 5px;
+  padding: 5px 8px;
+  border-radius: var(--radius);
+  font-family: var(--font);
 }
 
 .widget-title > label {
-  color: #64ffda;
-  font-size: 20px;
+  margin-right: 5px;
+  font-size: 11px;
+  font-weight: bold;
+  font-family: var(--font);
+  color: var(--acc);
+}
+
+.widget-title > button {
+  margin-left: 5px;
+  border-radius: 6px;
+  background: rgba(180, 218, 254, 0.08);
+  color: rgba(180, 218, 254, 0.6);
+  border: 1px solid rgba(180, 218, 254, 0.16);
+  font-family: var(--font);
+  font-size: 8px;
+  font-weight: bold;
+  padding: 2px 8px;
+  transition: background 0.12s ease;
+}
+
+.widget-title > button:hover {
+  background: rgba(180, 218, 254, 0.16);
+  color: var(--acc);
+}
+
+.widget-dnd label {
+  color: var(--text);
+  margin-right: 5px;
+  font-size: 10px;
+  font-family: var(--font);
+  font-weight: bold;
+}
+
+.widget-dnd switch {
+  border-radius: 10px;
+  margin-left: 5px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.widget-dnd switch:checked { background: rgba(16, 185, 129, 0.8); }
+
+.widget-dnd switch slider {
+  border-radius: 10px;
+  background: white;
+  border: none;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+  min-width: 18px;
+  min-height: 18px;
 }
 
 .widget-label > label {
-  color: #8892b0;
+  font-size: var(--sz-body);
+  font-family: var(--font);
+  color: var(--text-dim);
+}
+
+/* Mpris */
+:root {
+  --mpris-album-art-overlay: rgba(0, 0, 0, 0.6);
+  --mpris-button-hover: rgba(255, 255, 255, 0.1);
+  --mpris-album-art-icon-size: 72px;
+  --mpris-album-art-shadow: 0 4px 14px rgba(0,0,0,0.65);
+}
+
+.widget-mpris { padding: 0; }
+
+.widget-mpris .widget-mpris-player {
+  margin: 8px 12px;
+  border-radius: var(--radius);
+  box-shadow: var(--mpris-album-art-shadow);
+}
+
+.widget-mpris .widget-mpris-player .mpris-background { filter: blur(12px); }
+
+.widget-mpris .widget-mpris-player .mpris-overlay {
+  padding: 12px;
+  background-color: var(--mpris-album-art-overlay);
+}
+
+.widget-mpris .widget-mpris-player .mpris-overlay button:hover {
+  background: var(--mpris-button-hover);
+  border-radius: 50%;
+}
+
+.widget-mpris .widget-mpris-player .mpris-overlay .widget-mpris-album-art {
+  border-radius: 8px;
+  box-shadow: var(--mpris-album-art-shadow);
+  -gtk-icon-size: var(--mpris-album-art-icon-size);
+}
+
+.widget-mpris .widget-mpris-player .mpris-overlay .widget-mpris-title {
+  font-family: var(--font);
+  font-weight: bold;
+  font-size: 10px;
+  color: var(--acc);
+}
+
+.widget-mpris .widget-mpris-player .mpris-overlay .widget-mpris-subtitle {
+  font-family: var(--font);
+  font-size: var(--sz-body);
+  color: var(--text-dim);
+}
+
+.widget-mpris .widget-mpris-player .mpris-overlay > box > button:hover {
+  background-color: var(--mpris-button-hover);
+}
+
+/* Buttons grid */
+.widget-buttons-grid flowboxchild > button {
+  border-radius: 6px;
+  background: rgba(180, 218, 254, 0.06);
+  border: 1px solid rgba(180, 218, 254, 0.14);
+  color: var(--text);
+  transition: background 0.12s ease;
+  padding: 6px;
+}
+
+.widget-buttons-grid flowboxchild > button:hover {
+  background: rgba(180, 218, 254, 0.14);
+}
+
+.widget-buttons-grid flowboxchild > button.toggle:checked {
+  background: rgba(180, 218, 254, 0.18);
+  border-color: rgba(180, 218, 254, 0.4);
+  color: var(--acc);
+}
+
+/* Menubar */
+.widget-menubar > .menu-button-bar > .start { margin-left: 5px; }
+.widget-menubar > .menu-button-bar > .end { margin-right: 5px; }
+
+.widget-menubar > .menu-button-bar > .widget-menubar-container button {
+  border-radius: var(--radius);
+  margin: 0 2px;
+}
+
+.widget-menubar > revealer * { margin-top: 5px; }
+
+.widget-menubar > revealer * button {
+  border-radius: var(--radius);
+  margin: 5px;
+  margin-top: 0;
+}
+
+.widget-menubar > revealer * button:last-child { margin-bottom: 0; }
+
+/* Volume */
+:root { --widget-volume-row-icon-size: 18px; }
+
+.widget-volume row image { -gtk-icon-size: var(--widget-volume-row-icon-size); }
+
+.per-app-volume {
+  background-color: rgba(180, 218, 254, 0.04);
+  margin: 5px;
+  margin-bottom: 0;
+  border-radius: var(--radius);
+}
+
+.widget-slider label {
+  font-size: inherit;
+  font-family: var(--font);
+}
+
+.widget-inhibitors > label {
+  margin-right: 5px;
+  font-size: 11px;
+  font-weight: bold;
+  font-family: var(--font);
+  color: var(--acc);
+}
+
+.widget-inhibitors > button {
+  margin-left: 5px;
+  border-radius: 6px;
+  background: rgba(180, 218, 254, 0.08);
+  color: rgba(180, 218, 254, 0.6);
+  border: 1px solid rgba(180, 218, 254, 0.14);
+  font-family: var(--font);
+  font-size: 8px;
+  font-weight: bold;
+  padding: 2px 8px;
 }
