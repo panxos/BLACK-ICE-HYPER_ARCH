@@ -6,7 +6,7 @@
 
 SCRIPT="$1"
 [ -z "$SCRIPT" ] && exit 1
-[ ! -x "$SCRIPT" ] && SCRIPT="$(bash -c "echo $SCRIPT")"
+[ ! -x "$SCRIPT" ] && SCRIPT="$(command -v "$SCRIPT" 2>/dev/null || printf '%s' "$SCRIPT")"
 
 # Ejecutar el script, parsear el campo "text", extraer solo la IP/valor
 RAW=$("$SCRIPT" 2>/dev/null)

@@ -54,7 +54,7 @@ if ! grep -q "claudeupdate" "$ZSH_ALIASES" 2>/dev/null; then
     cat >> "$ZSH_ALIASES" << 'EOF'
 
 # --- IA Update Aliases (BLACK-ICE) ---
-alias claudeupdate='curl -fsSL https://claude.ai/install.sh | bash'
+alias claudeupdate='tmp=$(mktemp /tmp/claude-install-XXXXXX.sh) && curl -fsSL https://claude.ai/install.sh -o "$tmp" && bash "$tmp"; rm -f "$tmp"'
 alias geminiupdate='sudo npm install -g @google/gemini-cli'
 alias qwenupdate='sudo npm install -g @qwen-code/qwen-code@latest'
 EOF

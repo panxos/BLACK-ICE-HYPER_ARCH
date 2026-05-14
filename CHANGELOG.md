@@ -1,5 +1,31 @@
 # CHANGELOG - BLACK-ICE ARCH
 
+## [3.6.1] - 2026-05-14 (P4nx0z "Security Audit" Edition)
+
+### 🛡️ Seguridad
+
+- **Eliminados archivos con datos sensibles**: `.claude/settings.local.json` (contenía IP privada + contraseña) removido del disco y añadido a `.gitignore`. Nunca fue commiteado — repo en GitHub estaba limpio.
+- **Backups versionados eliminados**: `hyprland.conf.bak.emergency` y `hyprland.conf.backup.final_rescue` removidos del repo vía `git rm`.
+- **`set_target.sh`**: Añadida validación de formato antes de escribir al target file — previene escritura de caracteres de shell en `~/.config/bin/target`.
+- **`copy_ip.sh` línea 9**: Reemplazado `bash -c "echo $SCRIPT"` (command injection) por `command -v "$SCRIPT"` — elimina vector de inyección con $SCRIPT sin comillas.
+- **`08_ai_tools.sh`**: Alias `claudeupdate` — reemplazado `curl | bash` por descarga a tmpfile + ejecución separada — elimina riesgo de ejecución directa de pipe.
+- **`bootstrap.sh`**: Guard `[[ "$INSTALL_DIR" == /tmp/black-ice* ]]` antes de `rm -rf` — previene borrado accidental si `INSTALL_DIR` se modifica.
+
+### 🛠️ Fixes
+
+- **`99_finalization.sh` línea 9**: `sudo -u $CURRENT_USER` → `sudo -u "$CURRENT_USER"` (SC2086 — variable sin comillas puede causar split de palabra).
+- **`02_security_tools.sh`**: Entrada duplicada `responder` eliminada del array `ALL_TOOLS` — causaba ítem duplicado en menú whiptail.
+- **`hardware_temp.sh`**: `printf "%.0f"` ahora solo se ejecuta si `cpu_temp` es numérico — previene error fatal si `sensors` devuelve valor no-numérico.
+- **`startup.sh`**: `pkill waybar/awww-daemon/swaync` → `pkill -x` — exact match previene matar procesos con nombre similar.
+- **`hyprland.conf`**: Sincronizado con versión live de s3th (rofi, Intel GPU env vars, HYPRLAND_INSTANCE_SIGNATURE, touchpad settings, gaps_out=3).
+
+### 🧹 Limpieza
+
+- **Archivos vacíos eliminados**: `dotfiles/hypr/workspaces.conf` (0 bytes) y `tools/_Sidebar.md` (0 bytes).
+- **`.gitignore`**: Añadidas entradas `.claude/`, `.cursor/`, `*.bak.*`, `*.backup.*`, `*.emergency`, `*.final_rescue`, `*.rescue`, `*.orig`.
+
+---
+
 ## [3.6.0] - 2026-05-14 (P4nx0z "Performance & AUR" Edition)
 
 ### 🛠️ Fixes

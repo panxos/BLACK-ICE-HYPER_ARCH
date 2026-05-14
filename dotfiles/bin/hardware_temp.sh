@@ -11,10 +11,9 @@ if command -v sensors &> /dev/null; then
 fi
 
 # Si no encuentra ninguna métrica obvia de CPU, pone un fallback de 0
-if [ -z "$cpu_temp" ]; then
+if [[ -z "$cpu_temp" || ! "$cpu_temp" =~ ^[0-9]+(\.[0-9]+)?$ ]]; then
     cpu_temp="--"
 else
-    # Redondea a entero
     cpu_temp=$(printf "%.0f" "$cpu_temp")
 fi
 
