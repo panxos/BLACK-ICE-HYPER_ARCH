@@ -77,7 +77,6 @@ ALL_TOOLS=(
     "coercer|Coercer - Forced Auth|AD"
     "kerbrute-bin|Kerbrute - Kerberos Bruteforce|AD"
     "responder|Responder - LLMNR Poisoner|AD"
-    "responder|Responder - LLMNR Poisoner|AD"
     "smbmap|SMBMap - SMB Enumeration|AD"
     "chntpw|Chntpw - Windows Password Reset|AD"
     # Cracking

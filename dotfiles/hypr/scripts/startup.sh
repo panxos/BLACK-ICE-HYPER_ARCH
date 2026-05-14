@@ -2,9 +2,9 @@
 # startup.sh - Orquestador de Inicio BLACK-ICE (P4nx0z Final Fix v4)
 
 # 1. Limpieza Nuclear (Matamos todo lo que maneje notificaciones y bus)
-pkill waybar
-pkill awww-daemon
-pkill swaync
+pkill -x waybar
+pkill -x awww-daemon
+pkill -x swaync
 pkill -f xdg-desktop-portal
 pkill -f udiskie
 pkill -f notification-daemon 2>/dev/null

@@ -157,10 +157,10 @@ install_dependencies() {
 clone_repository() {
     log_info "Clonando repositorio BLACK-ICE ARCH..."
     
-    # Remove existing directory if present
+    # Remove existing directory if present (guard: solo eliminar si es ruta esperada)
     if [ -d "$INSTALL_DIR" ]; then
         log_warn "Directorio existente encontrado, eliminando..."
-        rm -rf "$INSTALL_DIR"
+        [[ "$INSTALL_DIR" == /tmp/black-ice* ]] && rm -rf "$INSTALL_DIR"
     fi
     
     # Clone repository

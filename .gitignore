@@ -15,7 +15,7 @@ env/
 .antigravity/
 .opencode/
 
-# Archivos de IA (no publicar)
+# Archivos de IA y settings personales (no publicar)
 CLAUDE.md
 GEMINI.md
 OPENAI.md
@@ -24,6 +24,16 @@ OPENAI.md
 .openaiignore
 .cursorignore
 .aider*
+.claude/
+.cursor/
+
+# Backups de emergencia y rescate
+*.bak.*
+*.backup.*
+*.emergency
+*.final_rescue
+*.rescue
+*.orig
 
 # Configs sensibles (no publicar)
 config/install.conf

@@ -6,7 +6,7 @@ banner "FINALIZACIÓN" "Últimos ajustes"
 
 # --- Crear directorios XDG del usuario ---
 log_info "Creando directorios XDG (Desktop, Downloads, etc.)..."
-sudo -u $CURRENT_USER xdg-user-dirs-update
+sudo -u "$CURRENT_USER" xdg-user-dirs-update
 # Crear directorio Screenshots explícitamente (grim lo necesita)
 mkdir -p "$USER_HOME/Pictures/Screenshots"
 chown -R "$CURRENT_USER:$CURRENT_USER" "$USER_HOME/Pictures"
