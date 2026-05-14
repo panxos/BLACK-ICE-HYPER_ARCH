@@ -80,7 +80,7 @@ source "$SCRIPT_DIR/src/deploy/06_sddm_setup.sh"
 # 7. Setup Neovim Pro (NvChad)
 source "$SCRIPT_DIR/src/deploy/07_neovim_setup.sh"
 
-# 8. AI CLIs (Claude Code, Gemini, Qwen)
+# 8. AI CLIs (Claude Code, Gemini)
 source "$SCRIPT_DIR/src/deploy/08_ai_tools.sh"
 
 # 9. GRUB Theme (DedSec)

@@ -59,7 +59,7 @@ curl -L http://is.gd/blackice | bash
 - 🛡️ **100+ security tools** organized in 10 categories
 - 🔒 **Full LUKS2 encryption** supported from the base install
 - 🚀 **Automatic hardware detection** — CPU, GPU, virtualization
-- 🤖 **Integrated AI tools** — Claude Code, Gemini CLI, Qwen Code
+- 🤖 **Integrated AI tools** — Claude Code, Gemini CLI
 - 📦 **Fully automated** with unattended mode available
 
 ---
@@ -166,7 +166,7 @@ ARCH LINUX ISO (LiveCD)
 | `wifi_toggle` | `Super+Alt+F` | WiFi toggle via nmcli with swaync notification |
 | `power_profile_menu` | `Super+Shift+P` | Power profile menu |
 | `gh0stzk-walls` | CLI | Download gh0stzk wallpapers (`--all`, `--theme`, `--list`) |
-| `xdg-open-wayland` | auto | xdg-open wrapper for Wayland OAuth (gemini-cli, qwen-cli) |
+| `xdg-open-wayland` | auto | xdg-open wrapper for Wayland OAuth (gemini-cli) |
 | `docker_menu` / `kvm_menu` | CLI | Docker and KVM management menus via Wofi |
 | `htb-connect` / `htb-disconnect` | CLI | HackTheBox VPN integration |
 
@@ -174,8 +174,7 @@ ARCH LINUX ISO (LiveCD)
 
 - **Claude Code CLI** (`@anthropic-ai/claude-code`) — via global npm
 - **Gemini CLI** (`@google/gemini-cli`) — via global npm
-- **Qwen Code** (`@qwen-code/qwen-code`) — via global npm
-- Zsh update aliases: `claudeupdate`, `geminiupdate`, `qwenupdate`
+- Zsh update aliases: `claudeupdate`, `geminiupdate`
 
 ### Pywal Integration
 
