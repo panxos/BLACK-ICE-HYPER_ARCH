@@ -1,5 +1,14 @@
 # CHANGELOG - BLACK-ICE ARCH
 
+## [3.6.2] - 2026-05-14 (P4nx0z "Cleanup" Edition)
+
+### 🧹 Limpieza
+
+- **Qwen eliminado**: Qwen Code CLI pasó a modelo de pago — eliminado de `08_ai_tools.sh` (instalación + alias `qwenupdate`), `05_software_suite.sh`, READMEs, docs. Desinstalado del sistema (`npm uninstall -g @qwen-code/qwen-code`).
+- **Antigravity eliminado**: Ya no es útil — eliminado de `99_finalization.sh` (wrapper antigravity-fix, .desktop, sed keybind), `05_software_suite.sh`, READMEs, `docs/`, keybind de `hyprland.conf` (repo + live). Archivos `~/.config/bin/antigravity-fix` y `~/.config/bin/antigravity/` eliminados del sistema.
+
+---
+
 ## [3.6.1] - 2026-05-14 (P4nx0z "Security Audit" Edition)
 
 ### 🛡️ Seguridad

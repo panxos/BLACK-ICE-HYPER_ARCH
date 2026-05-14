@@ -25,7 +25,7 @@ elif command -v whiptail &>/dev/null; then
     "Browsers" "Firefox y Brave Browser" ON \
     "DevTools" "Docker, KVM/QEMU, Kate, VS Code" ON \
     "Security" "Caido, Wireshark, Burp, IPScan" ON \
-    "AI_Tools" "Claude, Gemini, Antigravity" ON \
+    "AI_Tools" "Claude Code, Gemini CLI" ON \
     "Productivity" "Obsidian, Betterbird, KeePassXC" ON \
     "Multimedia" "VLC, OBS (Minimal), GIMP" ON \
     "Remote" "AnyDesk, RustDesk, Remmina" ON \
@@ -79,7 +79,6 @@ for choice in $CHOICES; do
             fi
 
             pkg_install "kate"
-            pkg_install "antigravity"
             
             # Configuración Docker
             log_info "Tuning Docker..."

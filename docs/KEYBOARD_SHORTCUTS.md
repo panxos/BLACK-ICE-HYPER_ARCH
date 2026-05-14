@@ -59,7 +59,6 @@
 | `Super + Tab` | **App Switcher** (wofi con ventanas abiertas) |
 | `Super + Shift + X` | **Pass Menu** (KeePassXC CLI via wofi) |
 | `Super + Ctrl + Enter` | **Terminal Manager** (sesiones Kitty multi-tab) |
-| `Super + Shift + A` | Antigravity (editor IA) |
 | `Super + Shift + C` | Caido (proxy web) |
 | `Super + Shift + P` | Perfil de energía (menu) |
 | `Super + H` | Portapapeles (cliphist via wofi) |

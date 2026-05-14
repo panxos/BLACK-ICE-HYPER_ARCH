@@ -32,18 +32,6 @@ install_npm_cli "@anthropic-ai/claude-code" "Claude Code CLI"
 # --- Gemini CLI ---
 install_npm_cli "@google/gemini-cli" "Gemini CLI"
 
-# --- Qwen Code ---
-if ! npm list -g --depth=0 "@qwen-code/qwen-code" &>/dev/null; then
-    log_info "Instalando Qwen Code CLI..."
-    if sudo npm install -g @qwen-code/qwen-code@latest >> "$LOG_FILE" 2>&1; then
-        log_success "Qwen Code instalado correctamente"
-    else
-        log_warn "Qwen Code: instalación falló (continúa)"
-    fi
-else
-    log_info "Qwen Code ya instalado"
-fi
-
 log_info "Configurando alias de actualización en ZSH..."
 
 # Detectar archivo de alias (idempotente: no duplica si ya existe)
@@ -56,14 +44,13 @@ if ! grep -q "claudeupdate" "$ZSH_ALIASES" 2>/dev/null; then
 # --- IA Update Aliases (BLACK-ICE) ---
 alias claudeupdate='tmp=$(mktemp /tmp/claude-install-XXXXXX.sh) && curl -fsSL https://claude.ai/install.sh -o "$tmp" && bash "$tmp"; rm -f "$tmp"'
 alias geminiupdate='sudo npm install -g @google/gemini-cli'
-alias qwenupdate='sudo npm install -g @qwen-code/qwen-code@latest'
 EOF
     log_info "Aliases de IA agregados a $ZSH_ALIASES"
 else
     log_info "Aliases de IA ya presentes en $ZSH_ALIASES"
 fi
 
-# --- Configurar browser por defecto para auth OAuth (Claude/Gemini/Qwen abren URLs) ---
+# --- Configurar browser por defecto para auth OAuth (Claude/Gemini abren URLs) ---
 # En Wayland/Hyprland sin browser default configurado los CLIs no pueden autenticar.
 log_info "Configurando browser por defecto para autenticación de CLIs..."
 

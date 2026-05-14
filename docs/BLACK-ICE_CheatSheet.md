@@ -23,7 +23,6 @@
 
 | Keybinding | Application |
 | :--- | :--- |
-| **`Win` + `Shift` + `A`** | Antigravity AI |
 | **`Win` + `Shift` + `B`** | Brave Browser |
 | **`Win` + `Shift` + `F`** | Firefox |
 | **`Win` + `Shift` + `D`** | Dolphin (File Manager) |

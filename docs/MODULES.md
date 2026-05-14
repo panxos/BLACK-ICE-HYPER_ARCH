@@ -24,9 +24,9 @@
 | `05_software_suite.sh` | Interactive checklist for extra apps (Browsers, Obsidian). | `paru` |
 | `06_sddm_setup.sh` | Installs and themes SDDM (Login Manager). | `sddm`, `qt5` |
 | `07_neovim_setup.sh` | Neovim + NvChad v2.5 + Mason LSPs. | `neovim`, `git` |
-| `08_ai_tools.sh` | Claude Code CLI, Gemini CLI, Qwen CLI via npm. | `nodejs`, `npm` |
+| `08_ai_tools.sh` | Claude Code CLI, Gemini CLI via npm. | `nodejs`, `npm` |
 | `09_grub_theme.sh` | Tema DedSec para GRUB2. Selector de variante via whiptail. Clona repo, copia tema, configura `GRUB_THEME` y regenera `grub.cfg`. | `git`, `grub` |
-| `99_finalization.sh` | XDG dirs, keyboard propagation to Hyprland, antigravity fix wrappers. | `xdg-user-dirs` |
+| `99_finalization.sh` | XDG dirs, keyboard propagation to Hyprland, xdg-open Wayland wrapper. | `xdg-user-dirs` |
 
 ## Libraries (`src/lib/`)
 
