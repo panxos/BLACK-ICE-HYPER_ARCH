@@ -1,10 +1,10 @@
 #!/bin/bash
 # xdg-open-wayland — Wrapper para abrir URLs en Wayland correctamente
-# Usado por gemini-cli, qwen-cli, auth OAuth, etc.
+# Usado por gemini-cli, auth OAuth, Ferdium, etc.
 # BLACK-ICE ARCH | P4nx0z
 
 URL="$1"
-[ -z "$URL" ] && exit 1
+[[ -z "$URL" ]] && exit 1
 
 # Exportar variables de entorno Wayland si no están definidas
 export WAYLAND_DISPLAY="${WAYLAND_DISPLAY:-wayland-1}"
@@ -12,12 +12,29 @@ export XDG_CURRENT_DESKTOP="${XDG_CURRENT_DESKTOP:-Hyprland}"
 export XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
 
 # Detectar browser disponible (en orden de preferencia)
+BROWSER_BIN=""
 for browser in brave-browser brave chromium firefox; do
     if command -v "$browser" &>/dev/null; then
-        exec "$browser" "$URL" &>/dev/null &
-        exit 0
+        BROWSER_BIN="$browser"
+        break
     fi
 done
 
-# Fallback: xdg-open del sistema
-exec /usr/bin/xdg-open "$URL"
+if [[ -z "$BROWSER_BIN" ]]; then
+    exec /usr/bin/xdg-open "$URL"
+fi
+
+# Lanzar browser con la URL
+"$BROWSER_BIN" "$URL" &>/dev/null &
+
+# Esperar a que la ventana aparezca y traerla al frente (Hyprland)
+if command -v hyprctl &>/dev/null; then
+    (
+        sleep 1
+        hyprctl dispatch focuswindow "class:^($BROWSER_BIN)$" 2>/dev/null || \
+        hyprctl dispatch focuswindow "class:^(brave-browser)$" 2>/dev/null || \
+        hyprctl dispatch focuswindow "class:^(Brave-browser)$" 2>/dev/null || true
+    ) &
+fi
+
+exit 0
