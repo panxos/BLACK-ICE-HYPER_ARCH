@@ -1,5 +1,35 @@
 # CHANGELOG - BLACK-ICE ARCH
 
+## [3.6.0] - 2026-05-14 (P4nx0z "Performance & AUR" Edition)
+
+### 🛠️ Fixes
+
+- **[BUG] `updates_status` JSON inválido**: `tr '\n' '\n'` era un no-op — los nombres de paquetes en el tooltip contenían newlines literales, produciendo JSON inválido. Waybar oculta el módulo cuando recibe JSON inválido. Fix: `tr '\n' ','` para separar paquetes con coma.
+- **[BUG] `updates_status` COUNT doble-cero**: `grep -c . || echo 0` — cuando grep no encontraba matches salía con código 1, disparando `|| echo 0`, resultando en `COUNT="0\n0"` y error aritmético `[[ ]]`. Fix: `wc -l` con guard `[[ -n "$UPDATES" ]]`.
+- **[BUG] `updates_status` no contaba AUR**: El script usaba `pacman -Qu` (sólo repos oficiales). Paquetes AUR instalados (`amass`, `android-apktool`, etc.) no aparecían como pendientes. Fix: `paru -Qu` como primary con fallback a `pacman -Qu`.
+- **[BUG] Grupo A themes no usaban script**: 7 themes (`Anubis-Death`, `Horus-Cyber`, `Isis-Magic`, `Matrix-Hacker`, `Matrix-Hacker/s4vitar-darkness`, `Ra-Solar`, `s4vitar-darkness`) tenían `exec: "pacman -Qu 2>/dev/null | wc -l"` hardcodeado en su config. Salida era número plano sin JSON — sin tooltip, sin color por clase, sin AUR. Migrados a `exec: "~/.config/bin/updates_status"` + `"return-type": "json"`.
+- **`updates_status` filtra `-git`**: Los paquetes `-git` siempre aparecen como "actualizables" (tracking HEAD). Filtrados con `grep -v '\-git '` para evitar ruido permanente en el contador.
+
+### 🚀 Novedades
+
+- **Sysctl performance (`99-black-ice-performance.conf`)**: Deploy automático en `99_finalization.sh` de config sysctl que incluye: `kernel.sched_util_clamp_min=0` (corrige CPU atascado en frecuencia máxima post-auto-cpufreq), TCP BBR + fq (mejor throughput), `vm.swappiness=5`, `dirty_ratio=10`, `vfs_cache_pressure=50`, buffers de red a 16MB.
+- **journald limits**: Deploy en `99_finalization.sh` de `/etc/systemd/journald.conf.d/size-limit.conf` — limita log del sistema a 200MB, retención 2 semanas.
+- **GRUB `mem_sleep_default=deep`**: `05_bootloader.sh` detecta batería (`/sys/class/power_supply/BAT0/1`) y agrega `mem_sleep_default=deep` al cmdline automáticamente — activa suspensión S3 (real suspend) en laptops donde el default de la BIOS es S0 (s2idle).
+
+---
+
+## [3.5.1] - 2026-05-12 (P4nx0z "Compatibility Fix" Edition)
+
+### 🛠️ Fixes
+
+- **Hyprland 0.49+ compat**: Removida opción `pseudotile = yes` del bloque `dwindle` en `hyprland.conf`. La opción fue eliminada en Hyprland v0.49 — causaba error fatal al inicio impidiendo arrancar la sesión. El pseudo-tiling sigue disponible por keybind (`$mod+P`) o via `windowrulev2 = pseudo, class:^(app)$`.
+- **Waybar updates module — intervalo**: Reducido `interval` de 3600s (1h) a 300s (5min) en los 22 themes. Con el intervalo anterior el módulo tardaba hasta 1 hora en reflejar que el sistema estaba actualizado.
+- **Waybar updates module — señal**: Agregado `"signal": 8` en todos los themes. Permite forzar refresh inmediato post-actualización con `pkill -RTMIN+8 waybar`.
+- **Waybar updates script**: Reemplazado `checkupdates` por `pacman -Qu` en `dotfiles/bin/updates_status` y `dotfiles/waybar/scripts/updates_status`. `checkupdates` descargaba la base de datos de pacman en cada ejecución (lento). `pacman -Qu` consulta la BD local — instantáneo.
+- **Waybar themes Grupo A**: 7 themes (`Anubis-Death`, `Horus-Cyber`, `Isis-Magic`, `Matrix-Hacker`, `Matrix-Hacker/s4vitar-darkness`, `Ra-Solar`, `s4vitar-darkness`) usaban `exec: "checkupdates | wc -l"` directo en el config. Migrados a `pacman -Qu 2>/dev/null | wc -l`.
+
+---
+
 ## [3.5.0] - 2026-04-14 (P4nx0z "Black Ops" Edition)
 
 ### 🚀 Novedades

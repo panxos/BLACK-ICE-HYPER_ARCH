@@ -137,8 +137,10 @@
             "on-click-right": "~/.config/bin/kvm_menu"
         },
         "custom/updates": {
-            "exec": "checkupdates | wc -l",
-            "interval": 3600,
+            "exec": "~/.config/bin/updates_status",
+            "return-type": "json",
+            "interval": 300,
+            "signal": 8,
             "format": " 󰚰 {} "
         },
         "custom/local_ip": {

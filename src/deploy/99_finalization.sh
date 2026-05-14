@@ -161,6 +161,44 @@ chown -h "$CURRENT_USER:$CURRENT_USER" \
     "$USER_HOME/.config/bin/music_widget"
 log_success "eww music widget instalado (Win+Shift+N para toggle)"
 
+# --- Optimizaciones de rendimiento del sistema ---
+log_info "Aplicando configuración de rendimiento (sysctl + journald)..."
+
+# sysctl: CPU scheduling, red, memoria
+cat > /etc/sysctl.d/99-black-ice-performance.conf << 'EOF'
+# BLACK-ICE ARCH - Performance Tuning
+vm.swappiness = 5
+vm.dirty_ratio = 10
+vm.dirty_background_ratio = 5
+vm.vfs_cache_pressure = 50
+# Evita que CPU quede fijo a frecuencia máxima (residuo de auto-cpufreq)
+kernel.sched_util_clamp_min = 0
+# TCP BBR + fq (mejor throughput en redes modernas)
+net.core.default_qdisc = fq
+net.ipv4.tcp_congestion_control = bbr
+net.core.netdev_max_backlog = 16384
+net.ipv4.tcp_fastopen = 3
+net.ipv4.ip_local_port_range = 1024 65535
+net.core.rmem_max = 16777216
+net.core.wmem_max = 16777216
+kernel.nmi_watchdog = 0
+kernel.unprivileged_userns_clone = 1
+kernel.perf_event_paranoid = 1
+EOF
+sysctl --system &>/dev/null || true
+log_success "sysctl aplicado (BBR, sched_util_clamp_min=0)"
+
+# journald: limitar tamaño del log
+mkdir -p /etc/systemd/journald.conf.d
+cat > /etc/systemd/journald.conf.d/size-limit.conf << 'EOF'
+[Journal]
+SystemMaxUse=200M
+SystemKeepFree=500M
+MaxRetentionSec=2week
+Compress=yes
+EOF
+log_success "journald limitado a 200M"
+
 # --- Generar resumen de instalación ---
 log_info "Generando resumen..."
 

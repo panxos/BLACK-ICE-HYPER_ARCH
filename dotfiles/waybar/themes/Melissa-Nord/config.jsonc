@@ -121,7 +121,8 @@
         "custom/updates": {
             "exec": "~/.config/bin/updates_status",
             "return-type": "json",
-            "interval": 3600,
+            "interval": 300,
+            "signal": 8,
             "format": " 󰚰 {} "
         },
         "custom/local_ip": {
