@@ -63,6 +63,10 @@ if [ "$ENCRYPT" == "true" ] || [ "$ENABLE_LUKS" == "yes" ]; then
 fi
 [ "$FILESYSTEM" == "btrfs" ] && GRUB_PARAMS="\$GRUB_PARAMS rootflags=subvol=@"
 [ "$NVME_STABILITY" == "yes" ] && GRUB_PARAMS="\$GRUB_PARAMS nvme_core.default_ps_max_latency_us=0"
+# Deep sleep S3 para laptops
+if [[ -d /sys/class/power_supply/BAT0 ]] || [[ -d /sys/class/power_supply/BAT1 ]]; then
+    GRUB_PARAMS="\$GRUB_PARAMS mem_sleep_default=deep"
+fi
 
 sed -i "s|GRUB_CMDLINE_LINUX_DEFAULT=\".*\"|GRUB_CMDLINE_LINUX_DEFAULT=\"\$GRUB_PARAMS\"|" /etc/default/grub
 

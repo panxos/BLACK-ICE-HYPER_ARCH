@@ -1,8 +1,12 @@
 #!/bin/bash
-# random_logo.sh - Black-Ice Arch v1.0
+# random_logo.sh - Black-Ice Fastfetch v3.1
+# Selección aleatoria de logos (PNG con aspect ratio, ASCII con colores de tema)
+# NOTA: Todo el config de logo va en config.jsonc, no por CLI
+
+LOGOS_DIR="$HOME/.config/fastfetch/logos"
+CACHE_THEME="$HOME/.cache/current_theme"
 
 # 1. Detectar Color del Tema
-CACHE_THEME="$HOME/.cache/current_theme"
 [ -f "$CACHE_THEME" ] && THEME=$(cat "$CACHE_THEME") || THEME="Horus-Cyber"
 
 case "$THEME" in
@@ -13,16 +17,29 @@ case "$THEME" in
     *)              COLOR="white" ;;
 esac
 
-# 2. Seleccionar Logo
-LOGOS_DIR="$HOME/.config/fastfetch/logos"
-IMG=$(find "$LOGOS_DIR" -maxdepth 1 -name "*.png" 2>/dev/null | shuf -n 1)
+# 2. Verificar si fastfetch tiene soporte de imágenes
+HAS_IMAGE_SUPPORT=false
+if [ -f /usr/lib/libMagickCore-7.Q16HDRI.so ] || [ -f /usr/lib/libMagickCore-7.Q16.so ]; then
+    HAS_IMAGE_SUPPORT=true
+fi
 
-# 3. Ejecutar
-if [ -n "$IMG" ] && [ -z "$SSH_CONNECTION" ] && [[ "$TERM" == *"kitty"* ]]; then
-    # Kitty Local: Imagen
-    # Usar --logo-width para versiones recientes de fastfetch
-    fastfetch --logo "$IMG" --logo-type kitty --logo-width 30 --color-keys "$COLOR" --color-title "$COLOR"
+# 3. Seleccionar Logo
+if [ "$HAS_IMAGE_SUPPORT" = true ]; then
+    IMG=$(find "$LOGOS_DIR" -maxdepth 1 -name "*.png" 2>/dev/null | shuf -n 1)
+    if [ -n "$IMG" ]; then
+        # Solo --kitty, el resto viene del config.jsonc
+        fastfetch --kitty "$IMG"
+        exit 0
+    fi
+fi
+
+# 4. Fallback: Usar logo ASCII aleatorio con color del tema
+RAW=$(find "$LOGOS_DIR" -maxdepth 1 -name "*.raw" 2>/dev/null | shuf -n 1)
+if [ -n "$RAW" ]; then
+    fastfetch --raw "$RAW" \
+              --logo-color-1 "$COLOR" \
+              --logo-color-2 "$COLOR" \
+              --bright-color
 else
-    # Fallback SSH/ASCII o si Kitty falla
-    fastfetch --color-keys "$COLOR" --color-title "$COLOR"
+    fastfetch
 fi

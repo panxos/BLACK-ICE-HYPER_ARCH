@@ -1,12 +1,19 @@
 #!/bin/bash
-# updates_status (Clean - No Colors)
-if command -v checkupdates &>/dev/null; then
-    upd=$(checkupdates 2>/dev/null | wc -l)
-    if [ "$upd" -gt 0 ]; then
-        echo "{\"text\": \"󰮯 $upd\", \"class\": \"updates\", \"tooltip\": \"$upd updates available\"}"
-    else
-        echo "{\"text\": \"󰮯 0\", \"class\": \"cleaned\", \"tooltip\": \"System Up to Date\"}"
-    fi
+# updates_status — paru -Qu (oficial + AUR), excluye -git
+UPDATES=""
+if command -v paru &>/dev/null; then
+    UPDATES=$(paru -Qu 2>/dev/null | grep -v '\-git ')
+elif command -v pacman &>/dev/null; then
+    UPDATES=$(pacman -Qu 2>/dev/null)
+fi
+
+COUNT=0
+[[ -n "$UPDATES" ]] && COUNT=$(echo "$UPDATES" | wc -l)
+
+if [[ "$COUNT" -gt 0 ]]; then
+    PKGS=$(echo "$UPDATES" | head -5 | awk '{print $1}' | tr '\n' ',' | sed 's/,$//')
+    [[ "$COUNT" -gt 5 ]] && PKGS="${PKGS}... (+$(( COUNT - 5 )) más)"
+    printf '{"text":"󰮯 %s","class":"updates","tooltip":"%s pendientes:\\n%s"}\n' "$COUNT" "$COUNT" "$PKGS"
 else
-    echo "{\"text\": \"\", \"class\": \"error\"}"
+    echo '{"text":"󰮯 0","class":"cleaned","tooltip":"Sistema actualizado"}'
 fi
