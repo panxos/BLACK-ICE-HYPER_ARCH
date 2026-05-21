@@ -108,13 +108,19 @@ if [[ -d "$BIN_SRC" ]]; then
     success "Scripts ~/.local/bin actualizados"
 fi
 
-# .zshrc
+# .zshrc — NO se sobreescribe si existe; el usuario puede tener aliases personales.
+# Para recibir updates del repo sin perder configs locales, usa ~/.zshrc.local
 if [[ -f "$DOTFILES_DIR/zsh/.zshrc" ]]; then
     if [[ "$DRY_RUN" == false ]]; then
-        cp "$DOTFILES_DIR/zsh/.zshrc" "$HOME/.zshrc"
-        success ".zshrc actualizado"
+        if [[ ! -f "$HOME/.zshrc" ]]; then
+            cp "$DOTFILES_DIR/zsh/.zshrc" "$HOME/.zshrc"
+            success ".zshrc instalado (primera vez)"
+        else
+            warn ".zshrc ya existe — no sobreescrito (aliases personales protegidos)"
+            info "Para configs personales usa: ~/.zshrc.local (se carga automáticamente)"
+        fi
     else
-        warn "[DRY-RUN] cp .zshrc → ~/.zshrc"
+        warn "[DRY-RUN] .zshrc — solo se instala si no existe"
     fi
 fi
 

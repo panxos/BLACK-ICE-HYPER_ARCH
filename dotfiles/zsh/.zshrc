@@ -1688,3 +1688,7 @@ fw-close() {
 
 # alias pwd con copia al clipboard
 alias pwd='builtin pwd | tee >(wl-copy -n)'
+
+# --- Configuraciones locales (aliases personales, API keys, etc.) ---
+# Crea ~/.zshrc.local para configs que NO deben ir al repo
+[[ -f ~/.zshrc.local ]] && source ~/.zshrc.local
