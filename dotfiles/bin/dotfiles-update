@@ -31,7 +31,7 @@ echo -e "\n${BOLD}${CYAN}BLACK-ICE ARCH — Dotfiles Updater${NC}\n"
 
 if [[ ! -d "$REPO_DIR/.git" ]]; then
     error "No se encontró el repositorio en $REPO_DIR"
-    error "Clona el repo primero: git clone https://github.com/panxos/BLACK-ICE_ARCH.git ~/BLACK-ICE_ARCH"
+    error "Clona el repo primero: git clone https://github.com/panxos/BLACK-ICE-HYPER_ARCH.git ~/BLACK-ICE_ARCH"
     exit 1
 fi
 
