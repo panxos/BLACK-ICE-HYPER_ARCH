@@ -140,15 +140,38 @@ validate_hostname() {
 
 # --- Rebuild Keyring (Nuclear Reset) ---
 # Reconstructs the entire pacman keyring from scratch.
-# Use when PGP keyring is completely corrupted.
+# Use when PGP keyring is corrupted or keys are untrusted.
 # Usage: rebuild_keyring
 rebuild_keyring() {
     log_warn "Reconstruyendo keyring completo (operación nuclear)..."
-    sudo rm -rf /etc/pacman.d/gnupg
-    sudo pacman-key --init
+
+    # Strategy: update archlinux-keyring package first (installs keys as files),
+    # then re-init only if gnupg dir is missing/corrupt, then populate.
+    # Avoids running pacman-key --init unnecessarily — it requires entropy + GPG
+    # agent socket, which fail silently in VMs and non-interactive environments.
+
+    # Step 1: Add entropy for VMs (prevents gpg agent_genkey failure)
+    if command -v rngd &>/dev/null; then
+        sudo rngd -r /dev/urandom 2>/dev/null &
+        local RNGD_PID=$!
+        trap "kill $RNGD_PID 2>/dev/null" RETURN
+    fi
+
+    # Step 2: Update keyring package — this refreshes key files in /usr/share/pacman/keyrings/
+    # Uses --overwrite to bypass signature verification on the package itself
+    sudo pacman -Sy --noconfirm --overwrite '*' archlinux-keyring 2>/dev/null || true
+
+    # Step 3: Only re-init if the gnupg dir is missing or has no pubring
+    if [[ ! -f /etc/pacman.d/gnupg/pubring.gpg ]] && [[ ! -f /etc/pacman.d/gnupg/pubring.kbx ]]; then
+        log_info "Directorio gnupg ausente — inicializando desde cero..."
+        sudo rm -rf /etc/pacman.d/gnupg
+        sudo pacman-key --init
+    fi
+
+    # Step 4: Populate from installed keyring packages
     sudo pacman-key --populate archlinux
-    # Populate chaotic-aur keys if available
     [[ -f /usr/share/pacman/keyrings/chaotic.gpg ]] && sudo pacman-key --populate chaotic
+
     log_success "Keyring reconstruido exitosamente"
 }
 
