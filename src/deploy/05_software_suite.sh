@@ -106,6 +106,8 @@ for choice in $CHOICES; do
         "\"Multimedia\""|"Multimedia")
             log_info "Instalando Multimedia & Diseño..."
             pkg_install "vlc"
+            pkg_install "mpv"           # Player de video/streaming (alias ytb en .zshrc)
+            pkg_install "yt-dlp"        # Descargador de videos (función bajavideo en .zshrc)
             pkg_install "gimp"
             pkg_install "spectacle"
 
@@ -226,6 +228,7 @@ MEGADEOF
             pkg_install "bleachbit"
             pkg_install "p7zip"
             pkg_install "ktorrent"
+            pkg_install "speedtest-cli" # Función speedtest en .zshrc
             ;;
     esac
 done

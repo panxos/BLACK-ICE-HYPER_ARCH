@@ -1,0 +1,120 @@
+#!/bin/bash
+# tpm2-luks-enroll — Enrolla TPM2 para desbloquear LUKS sin contraseña en máquinas de confianza
+#
+# REQUISITOS:
+#   - Secure Boot desactivado O con sbctl (shim signing)
+#   - tpm2-tools instalado
+#   - systemd-cryptenroll (parte de systemd ≥ 248)
+#   - El disco debe estar cifrado con LUKS2 (no LUKS1)
+#
+# SEGURIDAD:
+#   - PCR7 (Secure Boot state) + PCR0 (firmware) vinculan la llave al hardware
+#   - Si alguien saca el disco, no puede descifrarlo sin el TPM de esta máquina
+#   - Ante un cambio de firmware/BIOS se pide la contraseña de rescue
+#
+# Uso: sudo tpm2-luks-enroll [--device /dev/sdaX] [--remove]
+
+set -euo pipefail
+
+RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'
+CYAN='\033[0;36m'; BOLD='\033[1m'; NC='\033[0m'
+
+info()    { echo -e "${CYAN}[INFO]${NC} $*"; }
+success() { echo -e "${GREEN}[OK]${NC}   $*"; }
+warn()    { echo -e "${YELLOW}[WARN]${NC} $*"; }
+error()   { echo -e "${RED}[ERR]${NC}  $*" >&2; exit 1; }
+
+[[ "$EUID" -ne 0 ]] && error "Requiere root: sudo tpm2-luks-enroll"
+
+REMOVE=false
+LUKS_DEVICE=""
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --device) LUKS_DEVICE="$2"; shift 2 ;;
+        --remove) REMOVE=true; shift ;;
+        *) shift ;;
+    esac
+done
+
+echo -e "\n${BOLD}${CYAN}BLACK-ICE ARCH — TPM2 LUKS Enrollment${NC}\n"
+
+# Verificar dependencias
+for cmd in systemd-cryptenroll tpm2_getcap cryptsetup; do
+    command -v "$cmd" &>/dev/null || error "Falta: $cmd. Instala: pacman -S tpm2-tools"
+done
+
+# Detectar TPM2
+if ! tpm2_getcap properties-fixed 2>/dev/null | grep -q "TPM2_PT_VENDOR_STRING_1"; then
+    error "No se detectó TPM2 en este sistema."
+fi
+success "TPM2 detectado."
+
+# Auto-detectar dispositivo LUKS si no se especificó
+if [[ -z "$LUKS_DEVICE" ]]; then
+    LUKS_DEVICE=$(lsblk -rpo NAME,TYPE | awk '$2=="crypt"{print $1}' | head -1)
+    if [[ -z "$LUKS_DEVICE" ]]; then
+        # Intentar por crypttab
+        LUKS_DEVICE=$(awk 'NR>0 && !/^#/{print $2; exit}' /etc/crypttab 2>/dev/null || true)
+    fi
+    if [[ -z "$LUKS_DEVICE" ]]; then
+        error "No se detectó dispositivo LUKS. Usa: sudo tpm2-luks-enroll --device /dev/sdaX"
+    fi
+fi
+
+# Verificar que es LUKS2
+LUKS_VERSION=$(cryptsetup luksDump "$LUKS_DEVICE" 2>/dev/null | grep "Version:" | awk '{print $2}')
+if [[ "$LUKS_VERSION" != "2" ]]; then
+    error "El dispositivo $LUKS_DEVICE usa LUKS${LUKS_VERSION:-?}. Se requiere LUKS2."
+fi
+
+info "Dispositivo LUKS2: $LUKS_DEVICE"
+
+# Modo eliminación
+if [[ "$REMOVE" == true ]]; then
+    warn "Eliminando enrollment TPM2 de $LUKS_DEVICE..."
+    systemd-cryptenroll --wipe-slot=tpm2 "$LUKS_DEVICE"
+    success "TPM2 eliminado. El sistema pedirá contraseña al arrancar."
+    exit 0
+fi
+
+# Verificar si ya está enrollado
+if systemd-cryptenroll "$LUKS_DEVICE" 2>/dev/null | grep -q "tpm2"; then
+    warn "TPM2 ya está enrollado en este dispositivo."
+    read -p "¿Re-enrollar? [s/N]: " confirm < /dev/tty
+    [[ "${confirm,,}" != "s" ]] && exit 0
+    systemd-cryptenroll --wipe-slot=tpm2 "$LUKS_DEVICE"
+fi
+
+echo -e "\n${YELLOW}⚠ IMPORTANTE:${NC}"
+echo "  • Si cambias el firmware/BIOS, deberás introducir tu contraseña LUKS"
+echo "  • Guarda tu contraseña de rescue en un lugar seguro (KeePassXC)"
+echo "  • PCRs usados: 0 (firmware) + 7 (Secure Boot state)"
+echo ""
+read -p "¿Continuar con el enrollment? [s/N]: " confirm < /dev/tty
+[[ "${confirm,,}" != "s" ]] && { warn "Cancelado."; exit 0; }
+
+# Enrollment
+info "Enrollando TPM2 (necesitarás tu contraseña LUKS una vez)..."
+systemd-cryptenroll \
+    --tpm2-device=auto \
+    --tpm2-pcrs=0+7 \
+    "$LUKS_DEVICE"
+
+success "TPM2 enrollado correctamente en $LUKS_DEVICE"
+
+# Actualizar mkinitcpio para incluir tpm2-tss si es necesario
+if ! grep -q "tpm2-tss\|sd-encrypt" /etc/mkinitcpio.conf 2>/dev/null; then
+    warn "Considera agregar 'tpm2-tss' a HOOKS en /etc/mkinitcpio.conf y regenerar initramfs:"
+    echo "  sudo mkinitcpio -P"
+fi
+
+# Actualizar crypttab para usar tpm2-device
+CRYPT_NAME=$(awk 'NR>0 && !/^#/{print $1; exit}' /etc/crypttab 2>/dev/null || true)
+if [[ -n "$CRYPT_NAME" ]]; then
+    info "Para activar en crypttab, edita /etc/crypttab:"
+    echo "  ${CRYPT_NAME}  UUID=$(cryptsetup luksUUID "$LUKS_DEVICE")  -  tpm2-device=auto,tpm2-pcrs=0+7"
+fi
+
+echo -e "\n${GREEN}${BOLD}✓ Enrollment completado. El próximo arranque no pedirá contraseña LUKS.${NC}"
+echo -e "${YELLOW}Para revertir: sudo tpm2-luks-enroll --remove${NC}"
