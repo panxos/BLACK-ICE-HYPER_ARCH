@@ -166,7 +166,7 @@ case "$VIRT_SYSTEM" in
         ;;
     kvm|qemu)
         log_info "Hypervisor KVM/QEMU detectado: Instalando agente..."
-        HYPRLAND_PKGS+=("qemu-guest-agent")
+        HYPRLAND_PKGS+=("qemu-guest-agent" "spice-vdagent")
         SHOULD_ENABLE_QEMU="true"
         IS_VM=true
         ;;
@@ -278,6 +278,10 @@ fi
 # Solo habilitamos el servicio aquí
 sudo systemctl enable sddm
 
+# --- Servicios de VM ---
+[[ "${SHOULD_ENABLE_QEMU:-false}" == "true" ]] && sudo systemctl enable --now qemu-guest-agent spice-vdagentd 2>/dev/null || true
+[[ "${SHOULD_ENABLE_VMWARE:-false}" == "true" ]] && sudo systemctl enable --now open-vm-tools 2>/dev/null || true
+[[ "${SHOULD_ENABLE_VBOX:-false}" == "true" ]] && sudo systemctl enable --now vboxservice 2>/dev/null || true
 
 # --- Configuración de Audio y Bluetooth ---
 log_info "Configurando servicios de Audio (Pipewire) y Bluetooth..."
