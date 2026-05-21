@@ -363,20 +363,16 @@ git clone https://github.com/panxos/BLACK-ICE-HYPER_ARCH.git ~/BLACK-ICE_ARCH
 ### Step 2 — Update dotfiles and configurations
 
 ```bash
-dotfiles-update
+bash ~/BLACK-ICE_ARCH/dotfiles/bin/dotfiles-update
 ```
+
+> **Why not just `dotfiles-update`?** The short command only exists in `~/.local/bin/` after running `deploy_hyprland.sh`. If you installed with an older version or deleted the environment, always use the full path above — it works in every case. The script itself copies the binaries to `~/.local/bin/`, so future runs can use `dotfiles-update` directly.
 
 This command handles everything automatically:
 1. Downloads the latest changes from the repository (`git pull`)
 2. Creates a **snapshot backup** before applying any changes
 3. Re-creates all symlinks (Hyprland, Waybar, Kitty, Wofi, etc.)
 4. Reloads affected services (Waybar, Hyprland, SwayNC)
-
-If `dotfiles-update` is not available yet (you haven't run `deploy_hyprland.sh` on this system):
-
-```bash
-bash ~/BLACK-ICE_ARCH/dotfiles/bin/dotfiles-update
-```
 
 ### Step 3 — Update system packages
 
