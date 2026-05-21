@@ -203,7 +203,7 @@ EOF
 log_success "journald limitado a 200M"
 
 # --- Firewall profesional (nftables) ---
-log_info "Configurando firewall nftables (s3th-filter)..."
+log_info "Configurando firewall nftables (black-ice-filter)..."
 
 if command -v nft &>/dev/null; then
     # Instalar config si existe en dotfiles
@@ -211,7 +211,7 @@ if command -v nft &>/dev/null; then
         cp "$DOTFILES_DIR/nftables/nftables.conf" /etc/nftables.conf
         nft -f /etc/nftables.conf 2>/dev/null || true
         systemctl enable nftables
-        log_success "Firewall nftables activado (tabla inet s3th-filter)"
+        log_success "Firewall nftables activado (tabla inet black-ice-filter)"
     fi
 else
     log_warn "nftables no instalado — instalar con: pacman -S nftables"
