@@ -18,9 +18,11 @@ mkdir -p "$HOME/.cache/black-ice"
 
 # --- Detectar entorno y escribir overrides de performance + GPU ---
 VM_CONF="$HOME/.config/hypr/vm-performance.conf"
-VIRT=$(systemd-detect-virt 2>/dev/null || echo "none")
+if ! VIRT=$(systemd-detect-virt 2>/dev/null); then
+    VIRT="none"
+fi
 
-if [[ "$VIRT" != "none" && "$VIRT" != "" ]]; then
+if [[ "$VIRT" != "none" && -n "$VIRT" ]]; then
     # VM: deshabilitar efectos pesados y forzar renderer GLES2 (compatible VirGL)
     cat > "$VM_CONF" << 'EOF'
 # AUTO-GENERADO — VM detectada (KVM/QEMU/VBox): efectos desactivados + renderer VirGL
