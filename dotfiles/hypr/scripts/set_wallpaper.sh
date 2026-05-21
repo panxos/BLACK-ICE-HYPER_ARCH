@@ -46,7 +46,12 @@ if [ -f "$WALLPAPER" ]; then
         pkill mpvpaper 2>/dev/null
         if ! pgrep -x "awww-daemon" > /dev/null; then
             awww-daemon &
-            sleep 0.5
+            _awww_sock="${XDG_RUNTIME_DIR}/${WAYLAND_DISPLAY}-awww-daemon.sock"
+            for _i in $(seq 1 10); do
+                [ -S "$_awww_sock" ] && break
+                sleep 0.1
+            done
+            unset _i _awww_sock
         fi
         awww img "$WALLPAPER" --transition-type grow
     fi
