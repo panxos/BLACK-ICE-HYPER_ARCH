@@ -345,8 +345,6 @@ TIMEZONE=America/Santiago
 AUTO_MODE=true           # Skip all interactive prompts
 ```
 
-**Never commit `install.conf` with real passwords.**
-
 ---
 
 ## ⌨️ Keyboard Shortcuts

@@ -345,8 +345,6 @@ TIMEZONE=America/Santiago
 AUTO_MODE=true           # Omitir todas las preguntas interactivas
 ```
 
-**Nunca commitear `install.conf` con contraseñas reales.**
-
 ---
 
 ## ⌨️ Atajos de Teclado
