@@ -561,6 +561,18 @@ BLACK-ICE_ARCH/
 
 ---
 
+## 🗺️ Roadmap
+
+| Feature | Status | Estimated version |
+|---------|--------|-------------------|
+| RAM/vCPU detection and adaptive tuning (swappiness, vm.dirty_ratio, zram) | 🔜 Planned | v3.8.0 |
+| Graphics protocol detection (SPICE vs VNC) and optimal config per type | 🔜 Planned | v3.8.0 |
+| Clevis + Tang support for automatic LUKS unlock over network | 🔜 Planned | v3.8.0 |
+| Adaptive power profile based on VM type (low latency vs efficiency) | 💡 Idea | v3.9.0 |
+| TUI installation dashboard (ncurses) with real progress bar | 💡 Idea | v3.9.0 |
+
+---
+
 ## 📄 License
 
 MIT License — see [LICENSE](LICENSE)
