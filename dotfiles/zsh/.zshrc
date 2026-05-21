@@ -1662,14 +1662,14 @@ alias copy="xclip -selection clipboard"
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
 
-# ── Firewall helpers (nftables s3th-filter) ──────────────────────────────────
-alias fw-status='sudo nft list table inet s3th-filter'
-alias fw-log='sudo journalctl -k --grep="s3th-fw-drop" -n 30'
+# ── Firewall helpers (nftables black-ice-filter) ─────────────────────────────
+alias fw-status='sudo nft list table inet black-ice-filter'
+alias fw-log='sudo journalctl -k --grep="black-ice-fw-drop" -n 30'
 
 fw-open() {
     local port=$1 proto=${2:-tcp}
     [[ -z $port ]] && { echo "uso: fw-open PUERTO [tcp|udp]"; return 1; }
-    sudo nft add rule inet s3th-filter input ${proto} dport ${port} accept comment "temp:${port}/${proto}"
+    sudo nft add rule inet black-ice-filter input ${proto} dport ${port} accept comment "temp:${port}/${proto}"
     echo "[fw] Puerto ${proto}/${port} ABIERTO (temporal)"
 }
 
@@ -1677,9 +1677,9 @@ fw-close() {
     local port=$1 proto=${2:-tcp}
     [[ -z $port ]] && { echo "uso: fw-close PUERTO [tcp|udp]"; return 1; }
     local handle
-    handle=$(sudo nft -a list chain inet s3th-filter input 2>/dev/null | grep "temp:${port}/${proto}" | grep -oP '# handle \K[0-9]+')
+    handle=$(sudo nft -a list chain inet black-ice-filter input 2>/dev/null | grep "temp:${port}/${proto}" | grep -oP '# handle \K[0-9]+')
     if [[ -n $handle ]]; then
-        sudo nft delete rule inet s3th-filter input handle $handle
+        sudo nft delete rule inet black-ice-filter input handle $handle
         echo "[fw] Puerto ${proto}/${port} CERRADO"
     else
         echo "[fw] No se encontró regla temporal para ${proto}/${port}"
