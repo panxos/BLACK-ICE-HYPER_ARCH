@@ -101,7 +101,6 @@ for choice in $CHOICES; do
             pkg_install "obsidian"
             pkg_install "betterbird-bin"
             pkg_install "keepassxc"
-            pkg_install "ferdium-bin"
             ;;
         "\"Multimedia\""|"Multimedia")
             log_info "Instalando Multimedia & Diseño..."
