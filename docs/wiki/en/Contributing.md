@@ -30,7 +30,7 @@ By participating in this project, you agree to maintain a respectful and profess
 
 ### 1. Report Bugs
 
-Found a bug? [Open an issue](https://github.com/panxos/BLACK-ICE_ARCH/issues/new)
+Found a bug? [Open an issue](https://github.com/panxos/BLACK-ICE-HYPER_ARCH/issues/new)
 
 **Include**:
 
@@ -48,7 +48,7 @@ Found a bug? [Open an issue](https://github.com/panxos/BLACK-ICE_ARCH/issues/new
 
 ### 2. Suggest Features
 
-Have an idea? [Open an issue](https://github.com/panxos/BLACK-ICE_ARCH/issues/new) with the `enhancement` label.
+Have an idea? [Open an issue](https://github.com/panxos/BLACK-ICE-HYPER_ARCH/issues/new) with the `enhancement` label.
 
 **Include**:
 
@@ -92,7 +92,7 @@ git clone https://github.com/YOUR_USERNAME/BLACK-ICE_ARCH.git
 cd BLACK-ICE_ARCH
 
 # Add upstream
-git remote add upstream https://github.com/panxos/BLACK-ICE_ARCH.git
+git remote add upstream https://github.com/panxos/BLACK-ICE-HYPER_ARCH.git
 ```
 
 ### Create a Branch
@@ -402,8 +402,8 @@ Contributors will be acknowledged in:
 
 ## 📞 Contact
 
-- **Issues**: [GitHub Issues](https://github.com/panxos/BLACK-ICE_ARCH/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/panxos/BLACK-ICE_ARCH/discussions)
+- **Issues**: [GitHub Issues](https://github.com/panxos/BLACK-ICE-HYPER_ARCH/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/panxos/BLACK-ICE-HYPER_ARCH/discussions)
 
 ---
 

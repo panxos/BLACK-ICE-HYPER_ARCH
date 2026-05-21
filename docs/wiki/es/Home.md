@@ -132,8 +132,8 @@ curl -L http://is.gd/blackice | bash
 
 ## 🆘 ¿Necesitas Ayuda?
 
-- **Issues en GitHub**: [Reportar un problema](https://github.com/panxos/BLACK-ICE_ARCH/issues)
-- **Discusiones**: [Foro de la comunidad](https://github.com/panxos/BLACK-ICE_ARCH/discussions)
+- **Issues en GitHub**: [Reportar un problema](https://github.com/panxos/BLACK-ICE-HYPER_ARCH/issues)
+- **Discusiones**: [Foro de la comunidad](https://github.com/panxos/BLACK-ICE-HYPER_ARCH/discussions)
 - **Email**: Contacta al autor para consultas específicas
 
 ---

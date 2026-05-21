@@ -145,7 +145,7 @@ pacman -Sy
 pacman -S --needed --noconfirm git
 
 # Clonar BLACK-ICE ARCH
-git clone https://github.com/panxos/BLACK-ICE_ARCH.git
+git clone https://github.com/panxos/BLACK-ICE-HYPER_ARCH.git
 
 # Entrar al directorio
 cd BLACK-ICE_ARCH

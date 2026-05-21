@@ -388,11 +388,11 @@ sudo pacman -S nombre-herramienta
 
 ### ¿Dónde reporto bugs?
 
-[GitHub Issues](https://github.com/panxos/BLACK-ICE_ARCH/issues)
+[GitHub Issues](https://github.com/panxos/BLACK-ICE-HYPER_ARCH/issues)
 
 ### ¿Dónde pido ayuda?
 
-1. [GitHub Discussions](https://github.com/panxos/BLACK-ICE_ARCH/discussions)
+1. [GitHub Discussions](https://github.com/panxos/BLACK-ICE-HYPER_ARCH/discussions)
 2. [Troubleshooting Guide](Troubleshooting.md)
 3. [Arch Linux Forums](https://bbs.archlinux.org/)
 
@@ -535,6 +535,6 @@ git pull
 
 **[🏠 Volver a Wiki](Home.md)** | **[🔧 Troubleshooting](Troubleshooting.md)**
 
-**¿No encontraste tu pregunta? [Abre un issue](https://github.com/panxos/BLACK-ICE_ARCH/issues)**
+**¿No encontraste tu pregunta? [Abre un issue](https://github.com/panxos/BLACK-ICE-HYPER_ARCH/issues)**
 
 </div>

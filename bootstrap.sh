@@ -7,7 +7,7 @@
 #        curl -L https://cutt.ly/blackice | bash
 #
 # Author: Francisco Aravena (P4nX0Z)
-# Repository: https://github.com/panxos/BLACK-ICE_ARCH.git
+# Repository: https://github.com/panxos/BLACK-ICE-HYPER_ARCH.git
 # Version: 1.0
 #
 
@@ -23,7 +23,7 @@ readonly MAGENTA='\033[0;35m'
 readonly NC='\033[0m'
 
 # Configuration
-readonly REPO_URL="https://github.com/panxos/BLACK-ICE_ARCH.git"
+readonly REPO_URL="https://github.com/panxos/BLACK-ICE-HYPER_ARCH.git"
 readonly INSTALL_DIR="/tmp/black-ice-arch"
 readonly LOG_DIR="$INSTALL_DIR/logs"
 readonly LOG_FILE="$LOG_DIR/bootstrap.log"

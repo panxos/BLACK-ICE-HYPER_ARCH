@@ -737,7 +737,7 @@ cat ~/.config/hypr/hyprland.conf
 
 ### Recursos adicionales
 
-- [GitHub Issues](https://github.com/panxos/BLACK-ICE_ARCH/issues)
+- [GitHub Issues](https://github.com/panxos/BLACK-ICE-HYPER_ARCH/issues)
 - [Arch Linux Wiki](https://wiki.archlinux.org/)
 - [Hyprland Wiki](https://wiki.hyprland.org/)
 - [FAQ](FAQ.md)
@@ -748,6 +748,6 @@ cat ~/.config/hypr/hyprland.conf
 
 **[🏠 Volver a Wiki](Home.md)** | **[❓ FAQ](FAQ.md)**
 
-**¿No resolvió tu problema? [Abre un issue](https://github.com/panxos/BLACK-ICE_ARCH/issues)**
+**¿No resolvió tu problema? [Abre un issue](https://github.com/panxos/BLACK-ICE-HYPER_ARCH/issues)**
 
 </div>
