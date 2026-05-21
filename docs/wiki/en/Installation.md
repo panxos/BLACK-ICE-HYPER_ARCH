@@ -142,10 +142,10 @@ pacman -Sy
 pacman -S --needed --noconfirm git
 
 # Clone BLACK-ICE ARCH
-git clone https://github.com/panxos/BLACK-ICE-HYPER_ARCH.git
+git clone https://github.com/panxos/BLACK-ICE-HYPER_ARCH.git BLACK-ICE_ARCH
 
 # Enter directory
-cd BLACK-ICE-HYPER_ARCH
+cd BLACK-ICE_ARCH
 ```
 
 ### Step 5: Run Installer
@@ -257,7 +257,7 @@ After successful installation, the system reboots automatically.
 
 ```bash
 # Navigate to directory
-cd BLACK-ICE-HYPER_ARCH
+cd BLACK-ICE_ARCH
 
 # Run deployment
 ./deploy_hyprland.sh
