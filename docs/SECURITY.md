@@ -145,7 +145,7 @@ trap 'error_exit "Error en línea $LINENO"' ERR
 [TIMESTAMP] [LEVEL] [USER] [ACTION] [RESULT]
 
 # Ejemplo
-[2026-01-28 02:30:15] [INFO] [faravena] [Installing nmap] [SUCCESS]
+[2026-01-28 02:30:15] [INFO] [user] [Installing nmap] [SUCCESS]
 ```
 
 **Logs almacenados en**:
