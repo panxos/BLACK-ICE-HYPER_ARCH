@@ -42,6 +42,7 @@ curl -L http://is.gd/blackice | bash
 - [Customization](#-customization)
 - [Troubleshooting](#-troubleshooting)
 - [Repository Structure](#-repository-structure)
+- [Updating the System](#-updating-the-system)
 - [Documentation](#-documentation)
 - [Credits](#-credits)
 - [License](#-license)
@@ -351,26 +352,49 @@ AUTO_MODE=true           # Skip all interactive prompts
 
 BLACK-ICE ARCH includes dedicated commands to keep your system up to date **without reinstalling**.
 
-### Update dotfiles and configurations
+> **Note:** Many users delete the project directory after installation. If that's your case, start with **Step 1**. If you still have the repo at `~/BLACK-ICE_ARCH`, skip to **Step 2**.
+
+### Step 1 — Clone (or re-clone) the repository
+
+```bash
+git clone https://github.com/panxos/BLACK-ICE-HYPER_ARCH.git ~/BLACK-ICE_ARCH
+```
+
+### Step 2 — Update dotfiles and configurations
 
 ```bash
 dotfiles-update
 ```
 
-This command:
+This command handles everything automatically:
 1. Downloads the latest changes from the repository (`git pull`)
-2. Creates an automatic **snapshot backup** before applying changes
+2. Creates a **snapshot backup** before applying any changes
 3. Re-creates all symlinks (Hyprland, Waybar, Kitty, Wofi, etc.)
 4. Reloads affected services (Waybar, Hyprland, SwayNC)
 
-Available options:
+If `dotfiles-update` is not available yet (you haven't run `deploy_hyprland.sh` on this system):
+
+```bash
+bash ~/BLACK-ICE_ARCH/dotfiles/bin/dotfiles-update
+```
+
+### Step 3 — Update system packages
+
+```bash
+paru -Syu
+```
+
+### Advanced options
+
 ```bash
 dotfiles-update --dry-run    # Preview what would change without applying
-dotfiles-update --no-restart # Apply without reloading services
-dotfiles-update --no-backup  # Apply without creating a snapshot
+dotfiles-update --no-restart # Apply changes without reloading services
+dotfiles-update --no-backup  # Apply without creating a prior snapshot
 ```
 
 ### Roll back to a previous configuration
+
+If something breaks after an update:
 
 ```bash
 dotfiles-rollback
@@ -378,16 +402,11 @@ dotfiles-rollback
 
 Shows an interactive menu with the last 5 snapshots. Select one to restore instantly — no internet or reinstall needed.
 
-### Update system packages
-
-```bash
-paru -Syu    # Updates pacman + AUR packages
-```
-
-### When to use each command
+### Quick reference
 
 | Situation | Command |
 |-----------|---------|
+| Re-clone repository (repo was deleted) | `git clone https://github.com/panxos/BLACK-ICE-HYPER_ARCH.git ~/BLACK-ICE_ARCH` |
 | New project version released | `dotfiles-update` |
 | Something broke after an update | `dotfiles-rollback` |
 | Regular OS package updates | `paru -Syu` |
