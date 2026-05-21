@@ -89,6 +89,9 @@ for src in "${!LINKS[@]}"; do
     success "$(basename "$dst") actualizado"
 done
 
+# Asegurar permisos de ejecución en scripts de hypr
+find "$DOTFILES_DIR/hypr/scripts" -name "*.sh" -exec chmod +x {} \; 2>/dev/null || true
+
 # bin/ → ~/.local/bin/
 BIN_SRC="$DOTFILES_DIR/bin"
 BIN_DST="$HOME/.local/bin"
