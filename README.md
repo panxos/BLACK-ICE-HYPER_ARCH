@@ -561,6 +561,18 @@ BLACK-ICE_ARCH/
 
 ---
 
+## 🗺️ Roadmap
+
+| Feature | Estado | Versión estimada |
+|---------|--------|------------------|
+| Detección de RAM/vCPU y ajuste de swappiness, vm.dirty_ratio, zram | 🔜 Planificado | v3.8.0 |
+| Detección de protocolo gráfico (SPICE vs VNC) y configuración óptima por tipo | 🔜 Planificado | v3.8.0 |
+| Soporte Clevis + Tang para desbloqueo LUKS automático en red | 🔜 Planificado | v3.8.0 |
+| Perfil de energía adaptativo según tipo de VM (baja latencia vs eficiencia) | 💡 Idea | v3.9.0 |
+| Dashboard de instalación TUI (ncurses) con barra de progreso real | 💡 Idea | v3.9.0 |
+
+---
+
 ## 📄 Licencia
 
 MIT License — ver [LICENSE](LICENSE)
