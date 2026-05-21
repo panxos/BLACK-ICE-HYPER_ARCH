@@ -126,7 +126,8 @@
         "custom/updates": {
             "exec": "~/.config/bin/updates_status",
             "return-type": "json",
-            "interval": 300,
+            "interval": 60,
+            "signal": 8,
             "signal": 8,
             "format": " 󰚰 {} "
         },

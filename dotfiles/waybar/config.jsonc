@@ -119,9 +119,10 @@
         "custom/updates": {
             "exec": "~/.config/bin/updates_status",
             "return-type": "json",
-            "interval": 300,
+            "interval": 60,
+            "signal": 8,
             "format": " {} ",
-            "on-click": "kitty -e sudo pacman -Syu"
+            "on-click": "kitty -e sudo pacman -Syu && pkill -RTMIN+8 waybar"
         },
         "custom/local_ip": {
             "exec": "~/.config/bin/local_ip",
