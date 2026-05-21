@@ -1,5 +1,34 @@
 # CHANGELOG - BLACK-ICE ARCH
 
+## [3.7.1] - 2026-05-21 (P4nx0z "Polish" Edition)
+
+### 🎨 UI / UX
+
+- **Fastfetch**: Colores por módulo (`keyColor`), separador `│`, logo `auto`, padding mejorado.
+- **SwayNC**: Config expandida — timestamps relativos, `layer-shell-cover-screen`, atajos de teclado, panel 500px.
+- **Wofi grid**: Estilo refinado — bordes más finos, radios menores, mejor contraste.
+- **`updates_status`**: Reescrito para usar `paru -Qu` (incluye AUR), excluye `-git`, tooltip con lista de paquetes.
+- **Waybar themes**: Intervalo `updates_status` reducido de 3600s → 300s + signal 8 para refresh manual.
+- **Fastfetch logos**: Nuevos logos (`mr0b0t`, `skull_matrix`, `tux_hacker`, `vigil4dor`).
+
+### 🛠️ Fixes / Cleanup
+
+- **`startup.sh`**: `pkill` → `pkill -x` (coincidencia exacta, evita matar procesos relacionados).
+- **`02_security_tools.sh`**: Entrada duplicada `responder` eliminada.
+- **`08_ai_tools.sh`**: Qwen CLI removido (inestable). `claudeupdate` mejorado — ya no hace pipe directo a bash (descarga a tmpfile primero).
+- **`05_bootloader.sh`**: `mem_sleep_default=deep` agregado automáticamente en laptops (detecta BAT0/BAT1).
+- **GRUB**: Hook pacman para `grub-mkconfig` removido (ya innecesario con kernel hooks de mkinitcpio).
+- **Backups**: Eliminados archivos `.bak.emergency` y `.backup.final_rescue` del repo.
+- **GTK3**: Nuevo `dotfiles/gtk-3.0/gtk.css` para consistencia visual.
+- **SDDM CyberSec**: `Background.qml` y `Login.qml` actualizados.
+
+### 📝 Documentación
+
+- **README.md / README.en.md**: Badge de versión actualizado a `3.7.0`.
+- **`docs/MODULES.md`**: Sección `Binaries & Scripts` actualizada con nuevos scripts (`dotfiles-update`, `dotfiles-rollback`, `tpm2-luks-enroll`, `auto_monitors`).
+
+---
+
 ## [3.7.0] - 2026-05-21 (P4nx0z "SelfService" Edition)
 
 ### 🚀 Novedades
