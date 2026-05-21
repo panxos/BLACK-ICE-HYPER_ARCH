@@ -39,6 +39,10 @@
 | Script | Description |
 |--------|-------------|
 | `theme_selector` | Interactive theme picker for Waybar and Hyprland. |
-| `hardware_temp.sh` | (New) Monitors CPU/GPU temperatures and returns JSON for Waybar. |
+| `hardware_temp.sh` | Monitors CPU/GPU temperatures and returns JSON for Waybar. |
 | `wallpaper_visual` | Visual wallpaper selector using Wofi. |
 | `power_menu.sh` | Rofi-based system power management. |
+| `dotfiles-update` | Updates dotfiles from repo without reinstalling. Auto-snapshot, `--dry-run` support. |
+| `dotfiles-rollback` | Restores dotfiles from local snapshot. Interactive menu, no internet required. |
+| `tpm2-luks-enroll` | Enrolls TPM2 chip for passwordless LUKS2 unlock (PCR0+7). Auto-detects device. |
+| `auto_monitors.sh` | One-time monitor auto-detection on first Hyprland boot. Opens `nwg-displays` if 2+ monitors. |

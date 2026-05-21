@@ -1,0 +1,7 @@
+/* USER OVERRIDE — prioridad maxima sobre Sweet-Dark */
+flowbox flowboxchild:selected,
+flowboxchild:selected,
+row:selected {
+    background-color: rgba(130, 0, 220, 0.8);
+    outline-color: transparent;
+}
