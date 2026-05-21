@@ -1,0 +1,128 @@
+#!/bin/bash
+# dotfiles-update — Actualiza BLACK-ICE_ARCH dotfiles sin reinstalar
+# Uso: dotfiles-update [--dry-run] [--no-restart] [--no-backup]
+
+set -uo pipefail
+
+REPO_DIR="${BLACK_ICE_REPO:-$HOME/BLACK-ICE_ARCH}"
+DOTFILES_DIR="$REPO_DIR/dotfiles"
+BACKUP_DIR="$HOME/.cache/black-ice/backups"
+DRY_RUN=false
+NO_RESTART=false
+NO_BACKUP=false
+
+for arg in "$@"; do
+    case $arg in
+        --dry-run)   DRY_RUN=true ;;
+        --no-restart) NO_RESTART=true ;;
+        --no-backup) NO_BACKUP=true ;;
+    esac
+done
+
+RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'
+CYAN='\033[0;36m'; BOLD='\033[1m'; NC='\033[0m'
+
+info()    { echo -e "${CYAN}[INFO]${NC} $*"; }
+success() { echo -e "${GREEN}[OK]${NC}   $*"; }
+warn()    { echo -e "${YELLOW}[WARN]${NC} $*"; }
+error()   { echo -e "${RED}[ERR]${NC}  $*" >&2; }
+
+echo -e "\n${BOLD}${CYAN}BLACK-ICE ARCH — Dotfiles Updater${NC}\n"
+
+if [[ ! -d "$REPO_DIR/.git" ]]; then
+    error "No se encontró el repositorio en $REPO_DIR"
+    error "Clona el repo primero: git clone https://github.com/panxos/BLACK-ICE_ARCH.git ~/BLACK-ICE_ARCH"
+    exit 1
+fi
+
+# --- BACKUP ANTES DE TOCAR NADA ---
+SNAPSHOT=""
+if [[ "$DRY_RUN" == false && "$NO_BACKUP" == false ]]; then
+    SNAPSHOT="$BACKUP_DIR/$(date +%Y-%m-%d_%H-%M-%S)"
+    mkdir -p "$SNAPSHOT"
+    info "Creando snapshot en $SNAPSHOT ..."
+    for dir in hypr waybar kitty wofi swaync wlogout fastfetch nftables; do
+        src="$HOME/.config/$dir"
+        [[ -e "$src" ]] && cp -rL "$src" "$SNAPSHOT/$dir" 2>/dev/null || true
+    done
+    [[ -f "$HOME/.zshrc" ]] && cp "$HOME/.zshrc" "$SNAPSHOT/.zshrc"
+    # Guardar solo los últimos 5 backups
+    ls -dt "$BACKUP_DIR"/20* 2>/dev/null | tail -n +6 | xargs rm -rf 2>/dev/null || true
+    success "Snapshot guardado. Para revertir: dotfiles-rollback"
+fi
+
+# --- PULL REPO ---
+info "Pulling últimos cambios del repositorio..."
+if [[ "$DRY_RUN" == false ]]; then
+    if git -C "$REPO_DIR" pull --rebase --autostash 2>&1 | grep -q "Already up to date"; then
+        warn "Ya estás en la última versión. Sin cambios nuevos."
+    else
+        success "Repositorio actualizado."
+    fi
+else
+    warn "[DRY-RUN] git -C $REPO_DIR pull --rebase --autostash"
+fi
+
+# --- RE-LINK DOTFILES ---
+info "Re-sincronizando dotfiles..."
+
+declare -A LINKS=(
+    ["$DOTFILES_DIR/hypr"]="$HOME/.config/hypr"
+    ["$DOTFILES_DIR/waybar"]="$HOME/.config/waybar"
+    ["$DOTFILES_DIR/kitty"]="$HOME/.config/kitty"
+    ["$DOTFILES_DIR/wofi"]="$HOME/.config/wofi"
+    ["$DOTFILES_DIR/swaync"]="$HOME/.config/swaync"
+    ["$DOTFILES_DIR/wlogout"]="$HOME/.config/wlogout"
+    ["$DOTFILES_DIR/fastfetch"]="$HOME/.config/fastfetch"
+    ["$DOTFILES_DIR/nftables"]="$HOME/.config/nftables"
+)
+
+for src in "${!LINKS[@]}"; do
+    dst="${LINKS[$src]}"
+    [[ ! -d "$src" ]] && continue
+    if [[ "$DRY_RUN" == true ]]; then
+        warn "[DRY-RUN] symlink: $src → $dst"
+        continue
+    fi
+    [[ -d "$dst" && ! -L "$dst" ]] && rm -rf "$dst"
+    ln -sfn "$src" "$dst"
+    success "$(basename "$dst") actualizado"
+done
+
+# bin/ → ~/.local/bin/
+BIN_SRC="$DOTFILES_DIR/bin"
+BIN_DST="$HOME/.local/bin"
+if [[ -d "$BIN_SRC" ]]; then
+    mkdir -p "$BIN_DST"
+    for script in "$BIN_SRC"/*; do
+        name=$(basename "$script")
+        if [[ "$DRY_RUN" == false ]]; then
+            cp "$script" "$BIN_DST/$name" && chmod +x "$BIN_DST/$name"
+        else
+            warn "[DRY-RUN] cp $name → ~/.local/bin/"
+        fi
+    done
+    success "Scripts ~/.local/bin actualizados"
+fi
+
+# .zshrc
+if [[ -f "$DOTFILES_DIR/zsh/.zshrc" ]]; then
+    if [[ "$DRY_RUN" == false ]]; then
+        cp "$DOTFILES_DIR/zsh/.zshrc" "$HOME/.zshrc"
+        success ".zshrc actualizado"
+    else
+        warn "[DRY-RUN] cp .zshrc → ~/.zshrc"
+    fi
+fi
+
+# --- RELOAD SERVICIOS ---
+if [[ "$NO_RESTART" == false && "$DRY_RUN" == false ]]; then
+    info "Recargando servicios..."
+    pgrep -x waybar &>/dev/null && pkill -SIGUSR2 waybar 2>/dev/null && success "Waybar recargado" || true
+    [[ -n "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]] && hyprctl reload &>/dev/null && success "Hyprland recargado" || true
+    pgrep -x swaync &>/dev/null && swaync-client --reload-config &>/dev/null && success "SwayNC recargado" || true
+fi
+
+echo -e "\n${GREEN}${BOLD}✓ Dotfiles actualizados.${NC}"
+[[ -n "$SNAPSHOT" ]] && echo -e "${CYAN}↩ Para revertir: ${BOLD}dotfiles-rollback${NC}"
+[[ "$DRY_RUN" == true ]] && echo -e "${YELLOW}(Dry-run: ningún cambio aplicado)${NC}"
