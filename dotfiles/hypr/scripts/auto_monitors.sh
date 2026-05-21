@@ -16,12 +16,17 @@ FORCE_GUI=false
 
 mkdir -p "$HOME/.cache/black-ice"
 
-# --- Detectar VM y escribir overrides de performance ---
+# --- Detectar entorno y escribir overrides de performance + GPU ---
 VM_CONF="$HOME/.config/hypr/vm-performance.conf"
 VIRT=$(systemd-detect-virt 2>/dev/null || echo "none")
+
 if [[ "$VIRT" != "none" && "$VIRT" != "" ]]; then
+    # VM: deshabilitar efectos pesados y forzar renderer GLES2 (compatible VirGL)
     cat > "$VM_CONF" << 'EOF'
-# AUTO-GENERADO por auto_monitors.sh — VM detectada, efectos pesados desactivados
+# AUTO-GENERADO — VM detectada (KVM/QEMU/VBox): efectos desactivados + renderer VirGL
+env = WLR_RENDERER,gles2
+env = LIBVA_DRIVER_NAME,virpipe
+env = MESA_LOADER_DRIVER_OVERRIDE,virpipe
 decoration {
     blur { enabled = false }
     shadow { enabled = false }
@@ -33,7 +38,36 @@ misc {
 }
 EOF
 else
-    echo "# bare-metal — sin overrides de performance" > "$VM_CONF"
+    # Bare-metal: detectar GPU y activar aceleración óptima
+    GPU_VENDOR=""
+    if command -v lspci &>/dev/null; then
+        GPU_VENDOR=$(lspci 2>/dev/null | grep -iE "VGA|3D|Display" | head -1)
+    fi
+
+    if echo "$GPU_VENDOR" | grep -qi "Intel"; then
+        cat > "$VM_CONF" << 'EOF'
+# AUTO-GENERADO — bare-metal Intel: aceleración GPU activada
+env = LIBVA_DRIVER_NAME,iHD
+env = VDPAU_DRIVER,va_gl
+env = WLR_DRM_NO_ATOMIC,0
+EOF
+    elif echo "$GPU_VENDOR" | grep -qi "AMD\|Radeon\|AMDGPU"; then
+        cat > "$VM_CONF" << 'EOF'
+# AUTO-GENERADO — bare-metal AMD: aceleración GPU activada
+env = LIBVA_DRIVER_NAME,radeonsi
+env = VDPAU_DRIVER,radeonsi
+env = WLR_DRM_NO_ATOMIC,0
+EOF
+    elif echo "$GPU_VENDOR" | grep -qi "NVIDIA\|GeForce"; then
+        cat > "$VM_CONF" << 'EOF'
+# AUTO-GENERADO — bare-metal NVIDIA: modo offload activado
+env = WLR_DRM_NO_ATOMIC,1
+env = __GLX_VENDOR_LIBRARY_NAME,nvidia
+env = GBM_BACKEND,nvidia-drm
+EOF
+    else
+        echo "# bare-metal — GPU no identificada, sin overrides" > "$VM_CONF"
+    fi
 fi
 
 # Boots normales: si ya fue configurado antes, salir silenciosamente
