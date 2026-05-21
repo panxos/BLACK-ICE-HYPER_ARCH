@@ -104,7 +104,7 @@
 - **`02_security_tools.sh`**: Entrada duplicada `responder` eliminada del array `ALL_TOOLS` — causaba ítem duplicado en menú whiptail.
 - **`hardware_temp.sh`**: `printf "%.0f"` ahora solo se ejecuta si `cpu_temp` es numérico — previene error fatal si `sensors` devuelve valor no-numérico.
 - **`startup.sh`**: `pkill waybar/awww-daemon/swaync` → `pkill -x` — exact match previene matar procesos con nombre similar.
-- **`hyprland.conf`**: Sincronizado con versión live de s3th (rofi, Intel GPU env vars, HYPRLAND_INSTANCE_SIGNATURE, touchpad settings, gaps_out=3).
+- **`hyprland.conf`**: Sincronizado con configuración de producción (rofi, Intel GPU env vars, HYPRLAND_INSTANCE_SIGNATURE, touchpad settings, gaps_out=3).
 
 ### 🧹 Limpieza
 
@@ -230,7 +230,7 @@
 
 - **Módulo `09_grub_theme.sh`**: Integración de tema DedSec GRUB2 (GPL-3.0). Auto-detecta variantes disponibles en el repo clonado y ofrece selector `whiptail`. Configura `GRUB_THEME`, `GRUB_GFXMODE=1920x1080,auto` y `GRUB_TERMINAL_OUTPUT=gfxterm` en `/etc/default/grub`, luego regenera `grub.cfg`. Idempotente: reemplaza instalación previa si existe.
 - **4 nuevos temas Waybar** inspirados en gh0stzk/dotfiles (créditos en CREDITS.md): `Jan-CyberPunk`, `Emilia-TokyoNight`, `Marisol-Dracula`, `Melissa-Nord`. Cada tema incluye `config.jsonc` (2 barras) + `style.css` completo (~300-400 líneas) con todos los estados definidos y floating pills.
-- **`theme_selector` refactorizado**: eliminado `/home/faravena` hardcodeado → `$HOME`. Lista de temas ahora auto-detectada dinámicamente desde el directorio. Agrega fallback de wallpaper en 3 niveles (específico → gh0stzk-walls → aleatorio). Borde Hyprland actualizado para los 4 temas nuevos.
+- **`theme_selector` refactorizado**: eliminada ruta de usuario hardcodeada → `$HOME`. Lista de temas ahora auto-detectada dinámicamente desde el directorio. Agrega fallback de wallpaper en 3 niveles (específico → gh0stzk-walls → aleatorio). Borde Hyprland actualizado para los 4 temas nuevos.
 - **`gh0stzk-walls`** nuevo script: descarga wallpapers directamente del repo original de gh0stzk con crédito explícito. Soporta `--all`, `--theme NOMBRE`, `--list`.
 - **`CREDITS.md`**: nuevo archivo con créditos a gh0stzk, VandalByte (DedSec GRUB), y todos los colorschemes utilizados.
 - **`Horus-Cyber/style.css`**: eliminadas 5 reglas CSS duplicadas de `#custom-hardware_temp`.
@@ -255,9 +255,9 @@
 - **Migración yay → paru-bin**: Reemplazado `yay` por `paru-bin` (binario pre-compilado, sin necesidad de Rust toolchain). Más robusto, mejor resolución de dependencias. Usa `--skipreview` para instalaciones automáticas.
 - **Eliminación BlackArch**: Removido el bloque de setup completo (incluyendo `allow-weak-key-signatures` que era un downgrade de seguridad). Todos los tools de seguridad están disponibles en Chaotic-AUR/AUR/repos oficiales.
 - **`utils.sh`**: Todos los `yay` → `paru --skipreview`. Eliminada referencia a `blackarch.gpg` en `rebuild_keyring()`.
-- **`dotfiles/hypr/hyprland.conf`**: Añadido `exec-once = hypridle`. Corregido keybind `togglesplit` → `layoutmsg, togglesplit` (Hyprland 0.53+ breaking change). Corregida ruta hardcodeada `/home/faravena/` → `$HOME`.
+- **`dotfiles/hypr/hyprland.conf`**: Añadido `exec-once = hypridle`. Corregido keybind `togglesplit` → `layoutmsg, togglesplit` (Hyprland 0.53+ breaking change). Corregida ruta de usuario hardcodeada → `$HOME`.
 - **`dotfiles/hypr/hypridle.conf`**: Creado archivo faltante. El paquete se instalaba pero el daemon no tenía config y fallaba silenciosamente.
-- **`src/deploy/99_finalization.sh`**: Rutas hardcodeadas `/home/faravena/` en `.desktop` y keybind sed → `$USER_HOME`. Añadida propagación de `kb_layout` a `hyprland.conf`.
+- **`src/deploy/99_finalization.sh`**: Rutas de usuario hardcodeadas en `.desktop` y keybind sed → `$USER_HOME`. Añadida propagación de `kb_layout` a `hyprland.conf`.
 - **`src/deploy/08_ai_tools.sh`**: Nombre de paquete corregido (`@anthropic-ai/claude-cli` → `@anthropic-ai/claude-code`). `nodejs`/`npm` ahora via `safe_install`. Añadida idempotencia a instalación npm y a inyección de aliases.
 - **`CLAUDE.md`**: Añadidas secciones de Security Rules, Optimization Rules, Continuous Improvement Protocol y Documentation Mandatory Update Policy.
 - **`dotfiles/hypr/hyprlock.conf`**: Corregidos 3 bugs `##color` → `#color` en Pango markup (líneas con tiempo, placeholder y fail_text) — los colores no se renderizaban.
@@ -286,7 +286,7 @@
 ## [3.1.1] - 2026-04-06 (P4nx0z Edition)
 
 ### 🛠️ Mejoras y Correcciones de Entorno
-- **Limpieza de Archivos Obsoletos:** Se eliminaron scripts legacy y residuales (`fix_grub_kbd.sh`, `remote_path.txt`, `restore_env.sh`, `sync_to_s3th.sh`) para asegurar un estado de repositorio limpio.
+- **Limpieza de Archivos Obsoletos:** Se eliminaron scripts legacy y residuales (`fix_grub_kbd.sh`, `remote_path.txt`, `restore_env.sh`) para asegurar un estado de repositorio limpio.
 - **Compatibilidad Dinámica Multi-Kernel:** Resuelto un bug crítico que impedía instalar núcleos alternativos (`linux-zen`, `linux-hardened`). La verificación de los presets de `mkinitcpio`, el protocolo de auto-reparación y la auditoría final `99_final.sh` ahora resuelven variables dinámicamente sin fallos fatales.
 - **Modo de Espejo Mundial (Worldwide):** Integrada la nueva bandera de alcance "Worldwide" en el menú de países interactivos (tanto en TUI como en Whiptail) forzando al reflector a escanear todo el mundo (`reflector` sin ataduras de país).
 
@@ -298,10 +298,10 @@
 - **Hyprland Hardening (Misc Fix)**: Se añadió la sección `misc` en `hyprland.conf` para forzar la desactivación del fondo y el logo por defecto (`disable_hyprland_logo = true`). Esto garantiza un inicio limpio y profesional ("Black-Ice Mode").
 - **Automatización de Despliegue**: El instalador base ahora instala `awww` de forma automática, asegurando que el entorno sea funcional desde el primer arranque (Out of the Box).
 
-## [3.0.0] - 2026-03-18 (P4nx0z "s3th" Edition)
+## [3.0.0] - 2026-03-18 (P4nx0z Edition)
 
 ### 🚀 Novedades y Características
-- **Sincronización de Ecosistema s3th**: Importación completa de configuraciones de producción desde el host principal de P4nx0z.
+- **Dotfiles de Producción**: Importación completa de configuraciones probadas en producción.
   - **Dotfiles**: Versiones finales de Hyprland, Waybar, Kitty, y SwayNC.
   - **Scripts Tácticos**: Carpeta `~/bin/` integrada con scripts de automatización para HTB, TryHackMe, VPN y gestión de energía.
   - **Quotes Épicos**: Integración de `tech_quotes.sh` en el inicio de ZSH para motivación técnica al abrir la terminal.
@@ -324,7 +324,7 @@
 
 ### 🛡️ Seguridad y Hardening
 - **Logging Centralizado**: Redirección total de salida a `~/black_ice_install.log` para auditoría post-instalación.
-- **Agnosticismo de Usuario**: Eliminación de rutas absolutas `/home/faravena/` en favor de variables dinámicas `$HOME` para despliegues universales.
+- **Agnosticismo de Usuario**: Eliminación de rutas de usuario hardcodeadas en favor de variables dinámicas `$HOME` para despliegues universales.
 - **VPN Ready**: Instalación por defecto de `openvpn` para túneles de auditoría.
 
 ---

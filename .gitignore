@@ -40,12 +40,8 @@ config/install.conf
 *.conf.auto
 
 # Scripts personales/confidenciales (no publicar)
-dotfiles/bin/enacom-*.sh
-dotfiles/bin/proton-*.sh
-dotfiles/bin/tryhackme-*.sh
-dotfiles/bin/s3th-*.sh
-dotfiles/bin/install-sync-*.sh
-dotfiles/bin/sync-all-*.sh
+dotfiles/bin/*-personal.sh
+dotfiles/bin/*-private.sh
 dotfiles/bin/SYNC-README.md
 
 # Temporary/internal files
@@ -54,5 +50,6 @@ AUDIT_*.md
 docs/RESUME_CONTEXT.md
 docs/SOTA_EXECUTIVE_REPORT.md
 docs/_EXECUTIVE_REPORT.md
+tools/*.md
 *.log
 logs/
