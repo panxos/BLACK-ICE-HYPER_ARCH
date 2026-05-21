@@ -9,7 +9,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-cyan.svg)](LICENSE)
 [![Arch Linux](https://img.shields.io/badge/Arch-Linux-1793D1?logo=arch-linux&logoColor=fff)](https://archlinux.org/)
 [![Hyprland](https://img.shields.io/badge/Hyprland-v0.54+-00FFFF)](https://hyprland.org/)
-[![Version](https://img.shields.io/badge/Version-3.5.0-neon.svg)](https://github.com/panxos/BLACK-ICE-HYPER_ARCH)
+[![Version](https://img.shields.io/badge/Version-3.6.3-neon.svg)](https://github.com/panxos/BLACK-ICE_ARCH)
 
 **[🇪🇸 Español](README.md) | 🇬🇧 English**
 
@@ -288,7 +288,7 @@ curl -L http://is.gd/blackice | bash
 curl -L https://cutt.ly/blackice | bash
 
 # Option 3: Full URL
-curl -L https://raw.githubusercontent.com/panxos/BLACK-ICE-HYPER_ARCH/main/bootstrap.sh | bash
+curl -L https://raw.githubusercontent.com/panxos/BLACK-ICE_ARCH/main/bootstrap.sh | bash
 ```
 
 The bootstrap script automatically:
@@ -312,8 +312,8 @@ exit
 
 # Clone and install
 pacman -Sy git
-git clone https://github.com/panxos/BLACK-ICE-HYPER_ARCH.git
-cd BLACK-ICE-HYPER_ARCH
+git clone https://github.com/panxos/BLACK-ICE_ARCH.git
+cd BLACK-ICE_ARCH
 chmod +x install.sh
 ./install.sh
 ```
@@ -323,7 +323,7 @@ The installer walks through: disk → LUKS encryption → filesystem → kernel 
 ### Phase 2 — After first reboot (as normal user)
 
 ```bash
-cd BLACK-ICE-HYPER_ARCH
+cd BLACK-ICE_ARCH
 ./deploy_hyprland.sh
 ```
 

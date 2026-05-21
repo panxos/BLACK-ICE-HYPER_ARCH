@@ -35,6 +35,16 @@ if [ -f "$SCRIPT_DIR/dotfiles/bin/xdg-open-wayland" ]; then
     log_success "xdg-open → wrapper Wayland instalado en ~/.local/bin/"
 fi
 
+# Scripts de gestión BLACK-ICE
+for _script in dotfiles-update dotfiles-rollback tpm2-luks-enroll; do
+    if [ -f "$SCRIPT_DIR/dotfiles/bin/$_script" ]; then
+        cp "$SCRIPT_DIR/dotfiles/bin/$_script" "$USER_HOME/.local/bin/$_script"
+        chmod +x "$USER_HOME/.local/bin/$_script"
+        chown "$CURRENT_USER:$CURRENT_USER" "$USER_HOME/.local/bin/$_script"
+        log_success "$_script instalado en ~/.local/bin/"
+    fi
+done
+
 # Configurar browser por defecto
 sudo -u "$CURRENT_USER" xdg-settings set default-web-browser brave-browser.desktop 2>/dev/null || \
     sudo -u "$CURRENT_USER" xdg-settings set default-web-browser brave.desktop 2>/dev/null || true
@@ -122,40 +132,98 @@ log_success "eww music widget instalado (Win+Shift+N para toggle)"
 # --- Optimizaciones de rendimiento del sistema ---
 log_info "Aplicando configuración de rendimiento (sysctl + journald)..."
 
-# sysctl: CPU scheduling, red, memoria
 cat > /etc/sysctl.d/99-black-ice-performance.conf << 'EOF'
-# BLACK-ICE ARCH - Performance Tuning
+# BLACK-ICE ARCH — Performance Tuning
+# RAM
 vm.swappiness = 5
 vm.dirty_ratio = 10
 vm.dirty_background_ratio = 5
+vm.dirty_writeback_centisecs = 500
 vm.vfs_cache_pressure = 50
-# Evita que CPU quede fijo a frecuencia máxima (residuo de auto-cpufreq)
+vm.overcommit_memory = 1
+# CPU scheduling
 kernel.sched_util_clamp_min = 0
-# TCP BBR + fq (mejor throughput en redes modernas)
+kernel.sched_migration_cost_ns = 500000
+kernel.sched_autogroup_enabled = 1
+# TCP BBR + pentesting
 net.core.default_qdisc = fq
 net.ipv4.tcp_congestion_control = bbr
-net.core.netdev_max_backlog = 16384
+net.core.netdev_max_backlog = 65536
 net.ipv4.tcp_fastopen = 3
 net.ipv4.ip_local_port_range = 1024 65535
-net.core.rmem_max = 16777216
-net.core.wmem_max = 16777216
+net.core.rmem_max = 67108864
+net.core.wmem_max = 67108864
+net.core.rmem_default = 1048576
+net.core.wmem_default = 1048576
+net.core.somaxconn = 65535
+net.ipv4.tcp_max_syn_backlog = 8192
+net.ipv4.tcp_syncookies = 1
+net.ipv4.tcp_tw_reuse = 1
+net.ipv4.tcp_fin_timeout = 15
+# Docker / KVM
+net.ipv4.ip_forward = 1
+net.bridge.bridge-nf-call-iptables = 1
+net.bridge.bridge-nf-call-ip6tables = 1
+# Kernel hardening (compatible con pentesting)
 kernel.nmi_watchdog = 0
 kernel.unprivileged_userns_clone = 1
 kernel.perf_event_paranoid = 1
+kernel.kptr_restrict = 1
+fs.file-max = 2097152
+fs.inotify.max_user_watches = 524288
+fs.inotify.max_user_instances = 512
 EOF
 sysctl --system &>/dev/null || true
-log_success "sysctl aplicado (BBR, sched_util_clamp_min=0)"
+log_success "sysctl aplicado (BBR + optimizaciones Docker/KVM/pentesting)"
+
+# Módulos kernel persistentes para Docker y KVM
+_CPU_VENDOR=$(grep -m1 'vendor_id' /proc/cpuinfo | awk '{print $3}')
+_KVM_MODULE="kvm_intel"
+[[ "$_CPU_VENDOR" == "AuthenticAMD" ]] && _KVM_MODULE="kvm_amd"
+
+cat > /etc/modules-load.d/black-ice.conf << EOF
+br_netfilter
+${_KVM_MODULE}
+EOF
+modprobe br_netfilter 2>/dev/null || true
+modprobe "${_KVM_MODULE}" 2>/dev/null || true
+log_success "Módulos br_netfilter + ${_KVM_MODULE} configurados para boot"
 
 # journald: limitar tamaño del log
 mkdir -p /etc/systemd/journald.conf.d
 cat > /etc/systemd/journald.conf.d/size-limit.conf << 'EOF'
 [Journal]
 SystemMaxUse=200M
-SystemKeepFree=500M
+SystemKeepFree=200M
 MaxRetentionSec=2week
 Compress=yes
+RateLimitIntervalSec=30s
+RateLimitBurst=10000
 EOF
 log_success "journald limitado a 200M"
+
+# --- Firewall profesional (nftables) ---
+log_info "Configurando firewall nftables (s3th-filter)..."
+
+if command -v nft &>/dev/null; then
+    # Instalar config si existe en dotfiles
+    if [[ -f "$DOTFILES_DIR/nftables/nftables.conf" ]]; then
+        cp "$DOTFILES_DIR/nftables/nftables.conf" /etc/nftables.conf
+        nft -f /etc/nftables.conf 2>/dev/null || true
+        systemctl enable nftables
+        log_success "Firewall nftables activado (tabla inet s3th-filter)"
+    fi
+else
+    log_warn "nftables no instalado — instalar con: pacman -S nftables"
+fi
+
+# --- Hardening SSH ---
+log_info "Aplicando hardening SSH..."
+if grep -q "^PermitRootLogin yes" /etc/ssh/sshd_config 2>/dev/null; then
+    sed -i 's/^PermitRootLogin yes/PermitRootLogin prohibit-password/' /etc/ssh/sshd_config
+    log_success "SSH: PermitRootLogin → prohibit-password"
+fi
+systemctl reload sshd 2>/dev/null || true
 
 # --- Generar resumen de instalación ---
 log_info "Generando resumen..."
@@ -164,7 +232,7 @@ echo -e "\n${NEON_PURPLE}╔═════════════════�
 echo -e "${NEON_PURPLE}║${NC}  ${BOLD}RESUMEN DE INSTALACIÓN${NC}                          ${NEON_PURPLE}║${NC}"
 echo -e "${NEON_PURPLE}╚══════════════════════════════════════════════════╝${NC}\n"
 
-echo -e "${CYAN}✓${NC} Repositorios: yay, chaotic-aur, BlackArch"
+echo -e "${CYAN}✓${NC} Repositorios: yay, chaotic-aur"
 echo -e "${CYAN}✓${NC} Desktop: Hyprland + Waybar + Kitty + Dolphin"
 echo -e "${CYAN}✓${NC} Wallpapers: $(ls -1 "$WALLPAPER_DEST/" 2>/dev/null | wc -l) disponibles"
 echo -e "${CYAN}✓${NC} Terminal: Zsh + Powerlevel10k (usuario y root)"

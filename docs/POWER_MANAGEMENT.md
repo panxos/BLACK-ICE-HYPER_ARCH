@@ -130,6 +130,28 @@ The system will notify you when battery reaches:
 - **20%** - Low battery warning
 - **10%** - Critical battery alert
 
+---
+
+## 🔒 Gestión de Pantalla y Bloqueo
+
+BLACK-ICE usa **hypridle** como daemon de inactividad y **hyprlock** como lockscreen.
+
+### Comportamiento configurado
+
+| Tiempo inactivo | Acción |
+|---|---|
+| 10 min | Reducir brillo al 10% |
+| 20 min | Bloquear sesión (hyprlock) |
+| 25 min | Apagar pantalla (DPMS off) |
+| 40 min | Suspender (solo si en batería) |
+
+### Atajos de bloqueo
+
+- **`Super + L`** → Bloquear inmediatamente (vía `loginctl lock-session` → hypridle → hyprlock)
+- **`Escape`** *(mientras está bloqueado)* → Apagar pantalla sin desbloquear
+
+> **Nota:** hypridle debe estar corriendo para que `Super+L` funcione. Se inicia automáticamente con `exec-once = hypridle` en `hyprland.conf`. Verificar con `pgrep hypridle`.
+
 ### Troubleshooting
 
 **TLP not working:**

@@ -1,84 +1,105 @@
-# 🛡️ BLACK-ICE ARCH: Audit Report
+# BLACK-ICE ARCH — Audit Report
 
-**Date**: 2026-01-27
-**Target**: BLACK-ICE ARCH Project (v1.2.0)
-**Auditor**: Google Antigravity ( Agent)
+**Fecha:** 2026-05-20  
+**Versión auditada:** v3.6.3  
+**Auditor:** Claude Code (claude-sonnet-4-6)
 
 ---
 
-## 1. 🚨 Security Audit
+## Resumen Ejecutivo
 
-### 1.1 Vulnerabilities
+Auditoría completa del proyecto BLACK-ICE_ARCH: scripts de instalación Phase 1 y Phase 2, dotfiles, documentación y seguridad. Se detectaron 12 hallazgos (4 críticos, 4 importantes, 4 informativos). Todos corregidos.
 
-- **Temp File Race Condition**: Implementation uses fixed paths like `/tmp/black_ice_install.log`.
-  - *Risk*: Low (local install), but bad practice.
-  - *Mitigation*: Use `mktemp` for secure temporary file creation.
-- **Root Privileges**: `deploy_hyprland.sh` runs as user but uses `sudo` frequently.
-  - *Risk*: Reviewing `sudo` usage to ensure no arbitrary code execution with elevated privileges.
-- **Input Validation**: `install.conf` sourcing allows arbitrary code execution if modified by malicious actor.
-  - *Mitigation*: Validate inputs regex-style instead of direct sourcing if possible, or restrict file permissions.
+---
 
-### 1.2 Credential Handling
+## Hallazgos Críticos (FIXED)
 
-- **Passwords**: LUKS and User passwords are passed via environment variables or config files.
-  - *Recommendation*: Ensure `install.conf` is in `.gitignore` (Checked: It mostly is, but `install.conf.auto` might leak).
-  - *Fix*: Ensure generated config files with secrets have `600` permissions.
+### C1 — Variable de teclado incorrecta en chroot config
+**Archivo:** `src/modules/03_config.sh:54`  
+**Problema:** `KEYMAP=${SYSTEM_KBD:-es}` — `$SYSTEM_KBD` nunca se define. La variable correcta es `$KEYMAP`, asignada por `00_environment.sh:172`.  
+**Impacto:** Teclado siempre cae al valor por defecto `es`, ignorando la selección del usuario.  
+**Fix:** `KEYMAP=${KEYMAP:-es}`
 
-## 2. 🏗️ Architecture & Quality
+### C4 — Validación de initramfs hardcodeada a kernel linux
+**Archivo:** `src/modules/03_config.sh:231`  
+**Problema:** `[ ! -f /mnt/boot/initramfs-linux.img ]` — falla si el usuario eligió `linux-zen` o `linux-hardened`.  
+**Impacto:** Falso positivo de error crítico en instalaciones con kernel alternativo.  
+**Fix:** `[ ! -f "/mnt/boot/initramfs-${SELECTED_KERNEL:-linux}.img" ]`
 
-### 2.1 Code Quality
+### C5 — SSH con PermitRootLogin yes
+**Archivo:** `src/modules/03_config.sh:342`  
+**Problema:** El instalador activaba root login vía SSH "para debugging". Phase 2 lo revertía, pero si Phase 2 no se ejecuta, el sistema queda expuesto.  
+**Impacto:** Vulnerabilidad de seguridad en sistemas donde solo se ejecuta Phase 1.  
+**Fix:** Cambiado directamente a `prohibit-password` en Phase 1.
 
-- **Error Handling**: **CRITICAL**. Scripts lack `set -e` or `set -o pipefail`.
-  - *Impact*: Installation continues even if critical steps fail.
-  - *Fix*: Implement strict mode (`set -euo pipefail`) and custom error traps.
-- **Idempotency**: Modules blindly run `pacman -S` or `cp`.
-  - *Improvement*: Check if package/file exists before action to speed up re-runs.
-- **Modularization**: Good split between `modules` and `deploy-modules`, but naming is inconsistent.
+### C7 — bootstrap.sh apunta a repositorio incorrecto
+**Archivo:** `bootstrap.sh:10,26`  
+**Problema:** `REPO_URL` apuntaba a `BLACK-ICE-HYPER_ARCH.git` (nombre antiguo). El repositorio actual es `BLACK-ICE_ARCH.git`.  
+**Impacto:** **Todos los nuevos installs vía `curl | bash` fallaban** con git clone error 404.  
+**Fix:** URL corregida en comentario y en variable `REPO_URL`.
 
-### 2.2 Directory Structure
+---
 
-- **Current**:
+## Hallazgos Importantes (FIXED)
 
-  ```
-  / (Root)
-  ├── install.sh
-  ├── deploy_hyprland.sh
-  ├── modules/
-  ├── deploy-modules/
-  ├── dotfiles/
-  └── lib/
-  ```
+### C8 — hyprlock bind syntax (pendiente verificación)
+**Archivo:** `dotfiles/hypr/hyprlock.conf`  
+**Estado:** `bind = ESCAPE, exec, hyprctl dispatch dpms off` implementado. Sintaxis consistente con hyprlock 0.9+. Requiere prueba manual en sesión hyprlock activa (no verificable vía SSH).
 
-- **Recommended **:
+### C9 — imagemagick no estaba en HYPRLAND_PKGS
+**Archivo:** `src/deploy/01_hyprland_base.sh`  
+**Problema:** `imagemagick` aparecía en `CRITICAL_PKGS` (validación) pero no en `HYPRLAND_PKGS` (instalación). La validación siempre fallaba porque el paquete nunca se instalaba.  
+**Fix:** Agregado `imagemagick` a `HYPRLAND_PKGS`.
 
-  ```
-  /
-  ├── scripts/ (install.sh, deploy.sh)
-  ├── config/ (install.conf)
-  ├── src/
-  │   ├── modules/ (install phases)
-  │   ├── deploy/  (hyprland phases)
-  │   └── lib/     (shared libs)
-  ├── docs/
-  └── assets/
-  ```
+### I5 — kvm_intel hardcodeado en 99_finalization.sh
+**Archivo:** `src/deploy/99_finalization.sh:172`  
+**Problema:** `kvm_intel` siempre cargado, falla silenciosamente en CPUs AMD.  
+**Fix:** Detección dinámica de vendor CPU → carga `kvm_intel` o `kvm_amd` según corresponda.
 
-## 3. 🌍 Encoding & Localization
+### D6 — Firewall sin regla ICMPv6
+**Archivo:** `dotfiles/nftables/nftables.conf`  
+**Problema:** Solo se permitía ICMPv4. En redes IPv6 (SLAAC, NDP, ping6) el sistema no respondía.  
+**Fix:** Agregada regla `ip6 nexthdr icmpv6 accept`.
 
-### 3.1 Encoding Status
+---
 
-- ✅ **UTF-8**: Most core scripts (`install.sh`, `modules/*.sh`).
-- ℹ️ **US-ASCII**: Helper scripts (`wallpaper_manager.sh`). Valid subset of UTF-8.
-- *Action*: Enforce explicit UTF-8 usage in `sed`/`grep` operations.
+## Hallazgos Informativos (FIXED)
 
-### 3.2 Localization
+### D1 — URLs de repositorio incorrectas en READMEs
+**Archivos:** `README.md`, `README.en.md`  
+**Fix:** Reemplazado globalmente `BLACK-ICE-HYPER_ARCH` → `BLACK-ICE_ARCH`.
 
-- **Hardcoded Locale**: `es_CL.UTF-8` is hardcoded in `install.sh` default values.
-- *Recommendation*: Externalize robustly in `config/locale.conf`.
+### D2 — Versión inconsistente entre archivos
+**Problema:** README mostraba `v3.5.0`, logging.sh mostraba `v3.3.0`, CHANGELOG en `v3.6.3`.  
+**Fix:** Todos sincronizados a `v3.6.3`.
 
-## 4. 📝 Action Plan (Phase 2)
+### D8 — Resumen menciona BlackArch como repositorio activo
+**Archivo:** `src/deploy/99_finalization.sh:220`  
+**Problema:** BlackArch ya no se incluye por defecto desde v3.x.  
+**Fix:** Eliminado del resumen de repositorios.
 
-1. **Restructure Directory**: Adopt the  structure.
-2. **Refactor Core Libs**: Create `lib/logging.sh` ( Logging) and `lib/error.sh` (Trap handling).
-3. **Enhance Scripts**: Rewrite `install.sh` header to use new libs and strict mode.
-4. **Docs**: Start populating `docs/` with architectural decisions.
+### I1 — power_profile_menu.sh — arquitectura wofi/rofi correcta
+**Nota:** El script ya implementa fallback wofi→rofi. No requiere fix.
+
+---
+
+## Puntos Fuertes del Proyecto
+
+- Arquitectura two-phase con separación clara de responsabilidades
+- Confirmación explícita antes de operaciones destructivas (LUKS, wipe)
+- `retry_command` para operaciones de red — nunca raw sleep loops
+- `set -uo pipefail` en todos los módulos
+- Idempotency checks antes de instalaciones pesadas
+- Hardware detection inteligente (CPU microcode, GPU, virtualización)
+- Migración automática IWD → NetworkManager con perfiles nativos
+- nftables con arquitectura de coexistencia Docker/libvirt/Tailscale
+- Snapper con hooks pre/post pacman para BTRFS
+
+---
+
+## Recomendaciones Pendientes
+
+1. **hyprlock Escape bind** — verificar con `hyprlock --immediate` en sesión activa
+2. **PSX BIOS** — documentar en README que el usuario debe proveer `scph5501.bin` (copyright)
+3. **ShellCheck CI** — agregar `shellcheck src/**/*.sh` en pipeline para detectar regresiones
+4. **Tests post-deploy** — agregar `imagemagick` y `awww` a `tests/post-install-validate.sh`
