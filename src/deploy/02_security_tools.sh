@@ -84,7 +84,7 @@ ALL_TOOLS=(
     "hashcat|Hashcat - GPU Cracker|Crack"
     "hydra|Hydra - Network Bruteforcer|Crack"
     "medusa|Medusa - Parallel Bruteforcer|Crack"
-    "trufflehog|TruffleHog - Secret Scanner|Crack"
+    "trufflehog-bin|TruffleHog - Secret Scanner|Crack"
     "gitleaks|Gitleaks - Git Secret Scanner|Crack"
     "cewl|CeWL - Wordlist Generator|Crack"
     "crunch|Crunch - Wordlist Creator|Crack"
