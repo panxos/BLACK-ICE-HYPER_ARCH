@@ -16,6 +16,26 @@ FORCE_GUI=false
 
 mkdir -p "$HOME/.cache/black-ice"
 
+# --- Detectar VM y escribir overrides de performance ---
+VM_CONF="$HOME/.config/hypr/vm-performance.conf"
+VIRT=$(systemd-detect-virt 2>/dev/null || echo "none")
+if [[ "$VIRT" != "none" && "$VIRT" != "" ]]; then
+    cat > "$VM_CONF" << 'EOF'
+# AUTO-GENERADO por auto_monitors.sh — VM detectada, efectos pesados desactivados
+decoration {
+    blur { enabled = false }
+    shadow { enabled = false }
+}
+animations { enabled = false }
+misc {
+    vfr = true
+    render_ahead_of_time = false
+}
+EOF
+else
+    echo "# bare-metal — sin overrides de performance" > "$VM_CONF"
+fi
+
 # Boots normales: si ya fue configurado antes, salir silenciosamente
 if [[ -f "$STATE_FILE" && "$FORCE_GUI" == false ]]; then
     exit 0

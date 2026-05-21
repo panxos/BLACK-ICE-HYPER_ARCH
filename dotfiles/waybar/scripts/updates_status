@@ -1,17 +1,27 @@
 #!/bin/bash
-# updates_status — paru -Qu (oficial + AUR), excluye -git
-UPDATES=""
-if command -v paru &>/dev/null; then
-    UPDATES=$(paru -Qu 2>/dev/null | grep -v '\-git ')
+# updates_status — checkupdates (oficial) + paru -Qu (AUR)
+set -uo pipefail
+
+OFFICIAL=0
+AUR=0
+
+# Oficial: checkupdates es seguro (no bloquea lockfile de pacman)
+if command -v checkupdates &>/dev/null; then
+    OFFICIAL=$(checkupdates 2>/dev/null | wc -l)
 elif command -v pacman &>/dev/null; then
-    UPDATES=$(pacman -Qu 2>/dev/null)
+    OFFICIAL=$(pacman -Qu 2>/dev/null | wc -l)
 fi
 
-COUNT=0
-[[ -n "$UPDATES" ]] && COUNT=$(echo "$UPDATES" | wc -l)
+# AUR: solo si paru disponible
+if command -v paru &>/dev/null; then
+    AUR=$(paru -Qu --aur 2>/dev/null | grep -v '\-git ' | wc -l || echo 0)
+fi
+
+COUNT=$(( OFFICIAL + AUR ))
 
 if [[ "$COUNT" -gt 0 ]]; then
-    PKGS=$(echo "$UPDATES" | head -5 | awk '{print $1}' | tr '\n' ',' | sed 's/,$//')
+    PKGS=""
+    command -v checkupdates &>/dev/null && PKGS=$(checkupdates 2>/dev/null | head -5 | awk '{print $1}' | tr '\n' ',' | sed 's/,$//')
     [[ "$COUNT" -gt 5 ]] && PKGS="${PKGS}... (+$(( COUNT - 5 )) más)"
     printf '{"text":"󰮯 %s","class":"updates","tooltip":"%s pendientes:\\n%s"}\n' "$COUNT" "$COUNT" "$PKGS"
 else
