@@ -35,6 +35,7 @@ safe_install chafa
 safe_install ttf-jetbrains-mono-nerd
 safe_install fzf
 safe_install bat        # Previews en fzf-tab
+safe_install btop
 
 # --- fzf-tab (tab completion con preview visual) ---
 log_info "Instalando fzf-tab..."
