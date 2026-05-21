@@ -42,5 +42,4 @@ waybar &
 "$HOME/.config/hypr/scripts/portal.sh" &
 export PYTHONUNBUFFERED=1
 "$HOME/.config/bin/udiskie-fix" &
-"$HOME/.config/hypr/scripts/launch_mega.sh" &
 "$HOME/.config/bin/battery_notify.sh" &
