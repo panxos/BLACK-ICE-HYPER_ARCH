@@ -1,5 +1,54 @@
 # CHANGELOG - BLACK-ICE ARCH
 
+## [3.7.0] - 2026-05-21 (P4nx0z "SelfService" Edition)
+
+### 🚀 Novedades
+
+- **`dotfiles-update`**: Nuevo comando — actualiza dotfiles desde el repo sin reinstalar. Auto-snapshot antes de aplicar. Soporte `--dry-run`, `--no-restart`, `--no-backup`.
+- **`dotfiles-rollback`**: Nuevo comando — restaura dotfiles desde snapshot local sin internet. Menú interactivo. Retiene últimos 5 backups.
+- **`auto_monitors.sh`**: Detección automática de monitores en primer boot. 2+ monitores → genera `monitors.conf` + abre `nwg-displays`. Boots siguientes: salida inmediata (state file). Reconfigurar con `--force-gui`.
+- **`tpm2-luks-enroll`**: Script para enrollar TPM2 en LUKS2 — desbloqueo sin contraseña vinculado al hardware (PCR0+7). Auto-detección de dispositivo. `--remove` para revertir.
+- **`nwg-displays` + `tpm2-tools`**: Agregados a paquetes de instalación Phase 2.
+- **`mpv` + `yt-dlp` + `speedtest-cli`**: Agregados a `05_software_suite.sh` — eran usados por `.zshrc` pero no se instalaban.
+
+### 🛠️ Fixes
+
+- **`.zshrc`**: Eliminado alias `genpass` (apuntaba a script inexistente).
+
+---
+
+## [3.6.4] - 2026-05-21 (P4nx0z "AuditFix" Edition)
+
+### 🛡️ Seguridad
+
+- **`03_config.sh:342`**: `PermitRootLogin yes` → `prohibit-password` en Phase 1. Ya no depende de Phase 2 para cerrar el vector SSH.
+- **`bootstrap.sh`**: URL del repo corregida (`BLACK-ICE-HYPER_ARCH` → `BLACK-ICE_ARCH`). El one-liner de instalación estaba roto con 404.
+
+### 🛠️ Fixes
+
+- **`03_config.sh:54`**: Variable de teclado `SYSTEM_KBD` (nunca definida) → `KEYMAP`. El layout del usuario se ignoraba silenciosamente.
+- **`03_config.sh:231`**: Validación de initramfs hardcodeada a `linux` → `${SELECTED_KERNEL:-linux}`. Fallaba con kernels zen/hardened.
+- **`01_hyprland_base.sh`**: `imagemagick` agregado a `HYPRLAND_PKGS` — aparecía en validación post-install pero nunca se instalaba.
+- **`99_finalization.sh`**: `kvm_intel` hardcodeado → detección dinámica Intel/AMD.
+- **`nftables.conf`**: Agregada regla ICMPv6 (`ip6 nexthdr icmpv6 accept`).
+- **`99_finalization.sh`**: Eliminado "BlackArch" del resumen (no instalado por defecto desde v3.x).
+
+### 📚 Documentación
+
+- **`README.md` + `README.en.md`**: URLs y versión badge corregidos a v3.6.4.
+- **`docs/AUDIT_REPORT.md`**: Informe completo de auditoría con hallazgos y fixes.
+
+---
+
+## [3.6.3] - 2026-05-21 (P4nx0z "LockFix" Edition)
+
+### 🛠️ Fixes
+
+- **`hyprlock.conf`: Escape apaga pantalla en lockscreen**: Añadido `bind = ESCAPE, exec, hyprctl dispatch dpms off` — cuando la sesión está bloqueada, Escape apaga el display (DPMS off) sin desbloquear.
+- **`hyprland.conf`: `exec-once = hypridle` validado**: Confirmado que hypridle arranca correctamente vía `exec-once`. El keybind `Super+L` (`loginctl lock-session`) depende de hypridle como receptor de la señal de bloqueo.
+
+---
+
 ## [3.6.2] - 2026-05-14 (P4nx0z "Cleanup" Edition)
 
 ### 🧹 Limpieza

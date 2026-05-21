@@ -51,7 +51,7 @@ set -e
 TIMEZONE=$(printf '%q' "${TIMEZONE:-America/Santiago}")
 SYSTEM_LANG=$(printf '%q' "${SYSTEM_LANG:-es_CL}")
 SYSTEM_LOCALE=$(printf '%q' "${SYSTEM_LOCALE:-es_CL}")
-KEYMAP=${SYSTEM_KBD:-es}
+KEYMAP=${KEYMAP:-es}
 HOSTNAME=$(printf '%q' "${HOSTNAME:-black-ice}")
 
 # Timezone
@@ -228,7 +228,7 @@ if ! arch-chroot /mnt /bin/bash -c "mkinitcpio -P"; then
 fi
 
 # Step 3: Validate initramfs was generated
-if [ ! -f /mnt/boot/initramfs-linux.img ]; then
+if [ ! -f "/mnt/boot/initramfs-${SELECTED_KERNEL:-linux}.img" ]; then
      log_error "Error crítico: No se generó el archivo de imagen en /boot."
      exit 1
 fi
@@ -338,8 +338,7 @@ arch-chroot /mnt /bin/bash << 'SERVICES_EOF'
 systemctl enable NetworkManager
 systemctl enable sshd
 systemctl enable iwd
-# Facilitar debugging: Permitir root login temporalmente
-sed -i 's/^#PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config
+sed -i 's/^#PermitRootLogin.*/PermitRootLogin prohibit-password/' /etc/ssh/sshd_config
 SERVICES_EOF
 
 success "Sistema configurado (Locales, Hostname, Initramfs, Snapper, Pacman)"

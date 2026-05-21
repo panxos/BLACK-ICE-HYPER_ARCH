@@ -114,6 +114,8 @@ HYPRLAND_PKGS=(
     "hypridle"              # Idle daemon
     "grimblast-git"         # Screenshot helper
     "cliphist"              # Clipboard manager
+    "nwg-displays"          # Configurador visual de monitores multi-pantalla
+    "tpm2-tools"            # TPM2 — para tpm2-luks-enroll (LUKS sin contraseña)
     "wev"                   # Wayland event viewer
     "eww"                   # Widget system (music widget, etc.)
     "pipewire"
@@ -129,6 +131,7 @@ HYPRLAND_PKGS=(
     "bat"                   # cat moderno (alias cat en .zshrc)
     "fzf"                   # Fuzzy finder (sourced en .zshrc)
     "xclip"                 # alias copy en .zshrc
+    "imagemagick"           # requerido por python-pywal y scripts de temas
 )
 
 # --- Detección de Hardware y Virtualización ( Smart-Detect) ---

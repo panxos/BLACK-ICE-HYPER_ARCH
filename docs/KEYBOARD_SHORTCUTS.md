@@ -63,6 +63,7 @@
 | `Super + Shift + P` | Perfil de energía (menu) |
 | `Super + H` | Portapapeles (cliphist via wofi) |
 | `Super + L` | Bloquear pantalla (Hyprlock) |
+| `Escape` *(en lockscreen)* | Apagar pantalla (DPMS off) sin desbloquear |
 
 ---
 
