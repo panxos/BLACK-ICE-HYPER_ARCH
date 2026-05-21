@@ -312,8 +312,8 @@ exit
 
 # Clonar e instalar
 pacman -Sy git
-git clone https://github.com/panxos/BLACK-ICE-HYPER_ARCH.git
-cd BLACK-ICE-HYPER_ARCH
+git clone https://github.com/panxos/BLACK-ICE-HYPER_ARCH.git BLACK-ICE_ARCH
+cd BLACK-ICE_ARCH
 chmod +x install.sh
 ./install.sh
 ```
@@ -323,7 +323,7 @@ El instalador guía por: disco → cifrado LUKS → filesystem → kernel → lo
 ### Fase 2 — Después del primer reboot (como usuario normal)
 
 ```bash
-cd BLACK-ICE-HYPER_ARCH
+cd ~/BLACK-ICE_ARCH
 ./deploy_hyprland.sh
 ```
 
@@ -344,6 +344,53 @@ USERNAME=usuario         # Nombre de usuario
 TIMEZONE=America/Santiago
 AUTO_MODE=true           # Omitir todas las preguntas interactivas
 ```
+
+---
+
+## 🔄 Actualización del Sistema
+
+BLACK-ICE ARCH incluye comandos dedicados para mantener el sistema actualizado **sin necesidad de reinstalar**.
+
+### Actualizar dotfiles y configuraciones
+
+```bash
+dotfiles-update
+```
+
+Este comando:
+1. Descarga los últimos cambios del repositorio (`git pull`)
+2. Crea un **snapshot de respaldo** automático antes de aplicar cambios
+3. Re-crea todos los symlinks (Hyprland, Waybar, Kitty, Wofi, etc.)
+4. Recarga los servicios afectados (Waybar, Hyprland, SwayNC)
+
+Opciones disponibles:
+```bash
+dotfiles-update --dry-run    # Ver qué cambiaría sin aplicarlo
+dotfiles-update --no-restart # Aplicar sin recargar servicios
+dotfiles-update --no-backup  # Aplicar sin crear snapshot
+```
+
+### Revertir a configuración anterior
+
+```bash
+dotfiles-rollback
+```
+
+Muestra un menú interactivo con los últimos 5 snapshots. Selecciona uno para restaurar sin internet ni reinstalación.
+
+### Actualizar paquetes del sistema
+
+```bash
+paru -Syu    # Actualiza pacman + AUR
+```
+
+### ¿Cuándo usar cada comando?
+
+| Situación | Comando |
+|-----------|---------|
+| Nueva versión del proyecto publicada | `dotfiles-update` |
+| Algo se rompió después de un update | `dotfiles-rollback` |
+| Actualizaciones regulares del sistema | `paru -Syu` |
 
 ---
 

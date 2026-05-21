@@ -312,8 +312,8 @@ exit
 
 # Clone and install
 pacman -Sy git
-git clone https://github.com/panxos/BLACK-ICE-HYPER_ARCH.git
-cd BLACK-ICE-HYPER_ARCH
+git clone https://github.com/panxos/BLACK-ICE-HYPER_ARCH.git BLACK-ICE_ARCH
+cd BLACK-ICE_ARCH
 chmod +x install.sh
 ./install.sh
 ```
@@ -323,7 +323,7 @@ The installer walks through: disk → LUKS encryption → filesystem → kernel 
 ### Phase 2 — After first reboot (as normal user)
 
 ```bash
-cd BLACK-ICE-HYPER_ARCH
+cd ~/BLACK-ICE_ARCH
 ./deploy_hyprland.sh
 ```
 
@@ -344,6 +344,53 @@ USERNAME=user            # Username
 TIMEZONE=America/Santiago
 AUTO_MODE=true           # Skip all interactive prompts
 ```
+
+---
+
+## 🔄 Updating the System
+
+BLACK-ICE ARCH includes dedicated commands to keep your system up to date **without reinstalling**.
+
+### Update dotfiles and configurations
+
+```bash
+dotfiles-update
+```
+
+This command:
+1. Downloads the latest changes from the repository (`git pull`)
+2. Creates an automatic **snapshot backup** before applying changes
+3. Re-creates all symlinks (Hyprland, Waybar, Kitty, Wofi, etc.)
+4. Reloads affected services (Waybar, Hyprland, SwayNC)
+
+Available options:
+```bash
+dotfiles-update --dry-run    # Preview what would change without applying
+dotfiles-update --no-restart # Apply without reloading services
+dotfiles-update --no-backup  # Apply without creating a snapshot
+```
+
+### Roll back to a previous configuration
+
+```bash
+dotfiles-rollback
+```
+
+Shows an interactive menu with the last 5 snapshots. Select one to restore instantly — no internet or reinstall needed.
+
+### Update system packages
+
+```bash
+paru -Syu    # Updates pacman + AUR packages
+```
+
+### When to use each command
+
+| Situation | Command |
+|-----------|---------|
+| New project version released | `dotfiles-update` |
+| Something broke after an update | `dotfiles-rollback` |
+| Regular OS package updates | `paru -Syu` |
 
 ---
 
