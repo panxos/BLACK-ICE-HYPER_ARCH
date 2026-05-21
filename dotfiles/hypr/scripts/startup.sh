@@ -1,33 +1,35 @@
 #!/bin/bash
-# startup.sh - Orquestador de Inicio BLACK-ICE (P4nx0z Final Fix v4)
+# startup.sh — Orquestador de Inicio BLACK-ICE
 
-# 1. Limpieza Nuclear (Matamos todo lo que maneje notificaciones y bus)
-pkill -x waybar
-pkill -x awww-daemon
-pkill -x swaync
-pkill -f xdg-desktop-portal
-pkill -f udiskie
+# 1. Limpieza
+pkill -x waybar 2>/dev/null
+pkill -x awww-daemon 2>/dev/null
+pkill -x swaync 2>/dev/null
+pkill -f xdg-desktop-portal 2>/dev/null
+pkill -f udiskie 2>/dev/null
 pkill -f notification-daemon 2>/dev/null
 
-# 2. Sincronizar el Bus de Datos con Systemd (EL FIX MAESTRO)
+# 2. Sincronizar bus con systemd
 dbus-update-activation-environment --systemd --all
 systemctl --user import-environment --all
 
-# 3. Lanzar el Panel de Notificaciones PRIMERO y forzar su registro
-# Esto asegura que sea el DUEÑO del bus org.freedesktop.Notifications
+# 3. Lanzar swaync — esperar registro en dbus (max ~2s, típico <400ms)
 swaync &
-sleep 3 # Damos tiempo real para que el bus se registre
+for _i in $(seq 1 20); do
+    dbus-send --session --print-reply --dest=org.freedesktop.DBus \
+        /org/freedesktop/DBus org.freedesktop.DBus.ListNames 2>/dev/null \
+        | grep -q "org.freedesktop.Notifications" && break
+    sleep 0.1
+done
 
-# 4. Lanzar los Portales (GTK -> Hyprland)
+# 4. Portales en background — no bloqueamos el resto del startup
 "$HOME/.config/hypr/scripts/portal.sh" &
-sleep 2
 
-# 5. Lanzar udiskie con el bus ya sincronizado y un delay
+# 5. udiskie
 export PYTHONUNBUFFERED=1
-# Usamos el binario con -n para notificaciones
 "$HOME/.config/bin/udiskie-fix" &
 
-# 6. Iniciar el resto del ecosistema
+# 6. Resto del ecosistema
 awww-daemon &
 "$HOME/.config/hypr/scripts/set_wallpaper.sh" &
 waybar &
