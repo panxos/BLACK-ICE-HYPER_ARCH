@@ -2,7 +2,7 @@
     {
         "layer": "top",
         "position": "top",
-        "height": 30,
+        "height": 22,
         "spacing": 0,
         "modules-left": [
             "custom/launcher",
@@ -85,7 +85,7 @@
     {
         "layer": "top",
         "position": "bottom",
-        "height": 30,
+        "height": 22,
         "spacing": 0,
         "modules-left": [
             "custom/docker",
