@@ -53,3 +53,4 @@ docs/_EXECUTIVE_REPORT.md
 tools/*.md
 *.log
 logs/
+dotfiles/zsh/.zshrc
