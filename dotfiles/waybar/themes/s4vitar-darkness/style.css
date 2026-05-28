@@ -1,20 +1,18 @@
 * {
-    font-family: "JetBrainsMono Nerd Font", "Roboto", "Helvetica", "Arial", sans-serif;
-    font-size: 14px;
+    font-family: "JetBrainsMono Nerd Font", "JetBrainsMono NFM", "Roboto", monospace;
+    font-size: 11px;
     font-weight: bold;
-    /* Bold as requested */
     border: none;
     border-radius: 0;
+    min-height: 0;
+    margin: 0;
 }
 
 window#waybar {
     background-color: rgba(13, 13, 13, 0.88);
     color: #cdd6f4;
-    transition-property: background-color;
-    transition-duration: .5s;
 }
 
-/* Glow effect top and bottom */
 window#waybar.top {
     border-bottom: 2px solid rgba(106, 13, 173, 0.5);
 }
@@ -30,164 +28,130 @@ tooltip {
 
 tooltip label {
     color: #cdd6f4;
-    font-weight: bold;
+    font-size: 10px;
 }
 
+/* ── Top bar modules ── */
 #custom-launcher {
     color: #1793d1;
-    padding-left: 10px;
-    font-size: 18px;
+    padding: 0 6px;
+    font-size: 12px;
 }
 
-#cpu {
-    color: #e06c75;
-}
+#cpu          { color: #e06c75;  font-size: 10px; padding: 0 4px; }
+#memory       { color: #56b6c2;  font-size: 10px; padding: 0 4px; }
+#disk         { color: #e5c07b;  font-size: 10px; padding: 0 4px; }
+#custom-vpn   { color: #98c379;  font-size: 10px; padding: 0 4px; }
+#pulseaudio   { color: #56b6c2;  font-size: 10px; padding: 0 4px; }
 
-#memory {
-    color: #56b6c2;
-}
-
-#disk {
-    color: #e5c07b;
-}
-
-#custom-vpn {
-    color: #98c379;
-}
-
-#network {
-    color: #98c379;
-}
-
-#pulseaudio {
-    color: #56b6c2;
-}
-
-#custom-updates {
-    color: #e5c07b;
-}
-
-#custom-power {
-    color: #e06c75;
-    padding-right: 15px;
-    font-size: 16px;
-}
-
-#clock {
-    color: #bd93f9;
+#custom-hardware_temp {
+    color: #00ff00;
+    font-size: 10px;
+    padding: 0 4px;
 }
 
 #custom-settarget {
     color: #bd93f9;
+    font-size: 10px;
+    padding: 0 4px;
 }
 
-#custom-docker {
-    color: #56b6c2;
-}
-
-#custom-kvm {
-    color: #bd93f9;
-}
-
-#custom-local_ip {
-    color: #e5c07b;
-}
-
-#custom-public_ip {
+#custom-power {
     color: #e06c75;
+    font-size: 12px;
+    padding: 0 6px;
 }
 
-/* Workspaces - Pacman Style */
+/* ── Workspaces ── */
 #workspaces button {
-    padding: 0 5px;
+    padding: 0 4px;
     color: #555555;
-    font-size: 18px;
-    /* Slightly larger for better visibility */
-    transition: all 0.3s ease;
+    font-size: 12px;
+    transition: all 0.2s ease;
+    min-width: 20px;
 }
 
-#workspaces button.active {
-    color: #00d4ff;
-    text-shadow: 0 0 8px rgba(0, 212, 255, 0.8);
-}
-
-#workspaces button.occupied {
+#workspaces button.active   { color: #00d4ff; text-shadow: 0 0 6px rgba(0,212,255,0.8); }
+#workspaces button:not(.active):not(.empty) {
     color: #bd93f9;
-    /* Ghost color */
+    min-height: 0;
+    margin: 0;
 }
+#workspaces button.urgent   { color: #ff5555; }
 
-#workspaces button.urgent {
-    color: #ff5555;
-}
+/* ── Bottom bar modules ── */
+#custom-docker  { color: #56b6c2; font-size: 10px; padding: 0 4px; }
+#custom-kvm     { color: #bd93f9; font-size: 10px; padding: 0 4px; }
+#custom-updates { color: #e5c07b; font-size: 10px; padding: 0 4px; }
 
-/* Module hover effect */
-#memory:hover,
-#cpu:hover,
-#disk:hover,
-#network:hover,
-#pulseaudio:hover,
-#custom-vpn:hover,
-#custom-updates:hover,
-#clock:hover,
-#custom-settarget:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-    border-radius: 4px;
-}
-#custom-hardware_temp {
-    color: #00ff00;
-    padding: 0 10px;
-    font-weight: bold;
-}
+#custom-local_ip  { color: #e5c07b; font-size: 10px; padding: 0 4px; }
+#custom-public_ip { color: #e06c75; font-size: 10px; padding: 0 4px; }
 
-#custom-hardware_temp {
-    color: #00ff00;
-    padding: 0 10px;
-    font-weight: bold;
-}
+#custom-player { color: #cdd6f4; font-size: 10px; padding: 0 4px; }
 
-#custom-hardware_temp {
-    color: #00ff00;
-    padding: 0 10px;
-    font-weight: bold;
-}
-
-#custom-hardware_temp {
-    color: #00ff00;
-    padding: 0 10px;
-    font-weight: bold;
-}
-
-#custom-hardware_temp {
-    color: #00ff00;
-    padding: 0 10px;
-    font-weight: bold;
-}
-
-#custom-hardware_temp {
-    color: #00ff00;
-    padding: 0 10px;
-    font-weight: bold;
-}
-
-/* Estilos de Batería Cyber */
-#battery {
-    color: #00ff88; /* Verde por defecto (Good) */
-    padding: 0 10px;
-}
-
-#battery.warning {
-    color: #ffff00; /* Amarillo */
-}
-
+#battery         { color: #00ff88; font-size: 10px; padding: 0 4px; }
+#battery.warning { color: #ffff00; }
 #battery.critical:not(.charging) {
-    color: #ff5555; /* Rojo */
-    animation-name: blink;
-    animation-duration: 0.5s;
-    animation-timing-function: linear;
-    animation-iteration-count: infinite;
-    animation-direction: alternate;
+    color: #ff5555;
+    animation: blink 0.5s linear infinite alternate;
+}
+#battery.charging { color: #64ffda; }
+
+#clock { color: #bd93f9; font-size: 10px; padding: 0 4px; }
+
+#tray { padding: 0 4px; }
+#tray > .passive { -gtk-icon-effect: dim; }
+#tray > .needs-attention { -gtk-icon-effect: highlight; }
+
+/* ── Hover ── */
+#cpu:hover, #memory:hover, #disk:hover,
+#pulseaudio:hover, #custom-vpn:hover,
+#custom-updates:hover, #clock:hover,
+#custom-settarget:hover, #battery:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+    border-radius: 3px;
 }
 
-#battery.charging {
-    color: #64ffda; /* Cian cuando carga */
+@keyframes blink {
+    to { color: #ff0000; }
+}
+
+/* ── FONT NORMALIZATION OVERRIDE ── */
+#cpu, #memory, #disk, #custom-vpn, #network,
+#pulseaudio, #custom-hardware_temp, #custom-settarget,
+#custom-docker, #custom-kvm, #custom-updates,
+#custom-local_ip, #custom-public_ip, #custom-player,
+#battery, #battery.warning, #battery.charging,
+#battery.critical, #clock, #tray, #custom-vpn,
+#temperature, #backlight, #bluetooth {
+    font-size: 11px;
+    min-height: 0;
+    margin: 0;
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+
+#custom-launcher, #custom-power {
+    font-size: 13px;
+    min-height: 0;
+    margin: 0;
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+
+#workspaces button {
+    font-size: 13px;
+    min-height: 0;
+    margin: 0;
+    padding: 0 4px;
+}
+
+* {
+    min-height: 0;
+    margin: 0;
+}
+
+.modules-left, .modules-center, .modules-right {
+    margin: 0;
+    padding: 0;
 }

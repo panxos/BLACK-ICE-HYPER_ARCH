@@ -6,7 +6,7 @@
     border: none;
     border-radius: 0;
     font-family: "JetBrains Mono Nerd Font", "JetBrains Mono", monospace;
-    font-size: 13px;
+    font-size: 11px;
     font-weight: bold;
     min-height: 0;
 }
@@ -48,8 +48,8 @@ tooltip label {
 /* ─── Launcher ──────────────────────────────────────────────────────────────── */
 #custom-launcher {
     color: #ff007c;
-    font-size: 20px;
-    padding: 0 14px;
+    font-size: 14px;
+    padding: 0 6px;
     margin: 0 2px;
     border-radius: 12px;
     transition: all 200ms ease;
@@ -93,79 +93,79 @@ tooltip label {
 }
 
 /* ─── CPU ───────────────────────────────────────────────────────────────────── */
-#cpu { color: #ff007c; padding: 0 10px; border-radius: 10px; transition: all 200ms ease; }
+#cpu { color: #ff007c; padding: 0 6px; border-radius: 10px; transition: all 200ms ease; }
 #cpu:hover { background: rgba(0, 0, 0, 0.12); }
 
 /* ─── Memory ────────────────────────────────────────────────────────────────── */
-#memory { color: #cc00ff; padding: 0 10px; border-radius: 10px; transition: all 200ms ease; }
+#memory { color: #cc00ff; padding: 0 6px; border-radius: 10px; transition: all 200ms ease; }
 #memory:hover { background: rgba(0, 0, 0, 0.12); }
 
 /* ─── Disk ──────────────────────────────────────────────────────────────────── */
-#disk { color: #00ff88; padding: 0 10px; border-radius: 10px; transition: all 200ms ease; }
+#disk { color: #00ff88; padding: 0 6px; border-radius: 10px; transition: all 200ms ease; }
 #disk:hover { background: rgba(0, 0, 0, 0.12); }
 
 /* ─── Temperature ───────────────────────────────────────────────────────────── */
-#temperature { color: #ffee00; padding: 0 10px; border-radius: 10px; transition: all 200ms ease; }
+#temperature { color: #ffee00; padding: 0 6px; border-radius: 10px; transition: all 200ms ease; }
 #temperature:hover { background: rgba(0, 0, 0, 0.12); }
 #temperature.critical { color: #ff4444; }
 
 /* ─── Hardware Temp ─────────────────────────────────────────────────────────── */
-#custom-hardware_temp { color: #ffee00; padding: 0 10px; border-radius: 10px; transition: all 200ms ease; }
+#custom-hardware_temp { color: #ffee00; padding: 0 6px; border-radius: 10px; transition: all 200ms ease; }
 #custom-hardware_temp:hover { background: rgba(0, 0, 0, 0.12); }
 
 /* ─── VPN ───────────────────────────────────────────────────────────────────── */
-#custom-vpn { padding: 0 10px; border-radius: 10px; transition: all 200ms ease; }
+#custom-vpn { padding: 0 6px; border-radius: 10px; transition: all 200ms ease; }
 #custom-vpn.connected { color: #00ff88; }
 #custom-vpn.disconnected { color: #ff4444; }
 
 /* ─── Network ───────────────────────────────────────────────────────────────── */
-#network { color: #ff007c; padding: 0 10px; border-radius: 10px; transition: all 200ms ease; }
+#network { color: #ff007c; padding: 0 6px; border-radius: 10px; transition: all 200ms ease; }
 #network:hover { background: rgba(0, 0, 0, 0.12); }
 #network.disconnected { color: #ff4444; }
 
 /* ─── Pulseaudio ────────────────────────────────────────────────────────────── */
-#pulseaudio { color: #00e5ff; padding: 0 10px; border-radius: 10px; transition: all 200ms ease; }
+#pulseaudio { color: #00e5ff; padding: 0 6px; border-radius: 10px; transition: all 200ms ease; }
 #pulseaudio:hover { background: rgba(0, 0, 0, 0.12); }
 #pulseaudio.muted { color: #1a1a2e; }
 
 /* ─── Battery ───────────────────────────────────────────────────────────────── */
-#battery { color: #00ff88; padding: 0 10px; border-radius: 10px; transition: all 200ms ease; }
+#battery { color: #00ff88; padding: 0 6px; border-radius: 10px; transition: all 200ms ease; }
 #battery.warning { color: #ffee00; }
 #battery.critical { color: #ff4444; }
 #battery.charging { color: #ff007c; }
 
 /* ─── Clock ─────────────────────────────────────────────────────────────────── */
-#clock { color: #00e5ff; font-size: 14px; padding: 0 14px; border-radius: 10px; transition: all 200ms ease; }
+#clock { color: #00e5ff; font-size: 14px; padding: 0 6px; border-radius: 10px; transition: all 200ms ease; }
 #clock:hover { background: rgba(0, 0, 0, 0.12); }
 
 /* ─── Set Target ────────────────────────────────────────────────────────────── */
-#custom-settarget { font-size: 13px; padding: 0 12px; border-radius: 10px; transition: all 200ms ease; }
+#custom-settarget { font-size: 13px; padding: 0 6px; border-radius: 10px; transition: all 200ms ease; }
 #custom-settarget.active { color: #ff007c; border: 1px solid rgba(255, 0, 124, 0.22); }
 #custom-settarget.inactive { color: #1a1a2e; }
 
 /* ─── Docker / KVM ──────────────────────────────────────────────────────────── */
-#custom-docker { color: #ff007c; padding: 0 10px; border-radius: 10px; transition: all 200ms ease; }
+#custom-docker { color: #ff007c; padding: 0 6px; border-radius: 10px; transition: all 200ms ease; }
 #custom-docker:hover { background: rgba(0, 0, 0, 0.12); }
-#custom-kvm { color: #ffee00; padding: 0 10px; border-radius: 10px; transition: all 200ms ease; }
+#custom-kvm { color: #ffee00; padding: 0 6px; border-radius: 10px; transition: all 200ms ease; }
 #custom-kvm:hover { background: rgba(0, 0, 0, 0.12); }
 
 /* ─── Updates ───────────────────────────────────────────────────────────────── */
-#custom-updates { color: #ffee00; padding: 0 10px; border-radius: 10px; transition: all 200ms ease; }
+#custom-updates { color: #ffee00; padding: 0 6px; border-radius: 10px; transition: all 200ms ease; }
 #custom-updates:hover { background: rgba(0, 0, 0, 0.12); }
 
 /* ─── Local / Public IP ─────────────────────────────────────────────────────── */
-#custom-local_ip { color: #00ff88; padding: 0 10px; border-radius: 10px; transition: all 200ms ease; }
-#custom-public_ip { color: #ff007c; padding: 0 10px; border-radius: 10px; transition: all 200ms ease; }
+#custom-local_ip { color: #00ff88; padding: 0 6px; border-radius: 10px; transition: all 200ms ease; }
+#custom-public_ip { color: #ff007c; padding: 0 6px; border-radius: 10px; transition: all 200ms ease; }
 
 /* ─── Player ────────────────────────────────────────────────────────────────── */
-#custom-player { color: #cc00ff; padding: 0 10px; border-radius: 10px; transition: all 200ms ease; }
+#custom-player { color: #cc00ff; padding: 0 6px; border-radius: 10px; transition: all 200ms ease; }
 #custom-player:hover { background: rgba(0, 0, 0, 0.12); }
 
 /* ─── Power ─────────────────────────────────────────────────────────────────── */
 #custom-power {
     color: #ff4444;
-    font-size: 16px;
-    padding: 0 12px;
+    font-size: 14px;
+    padding: 0 6px;
     margin: 0 2px;
     border-radius: 12px;
     transition: all 200ms ease;
@@ -176,3 +176,49 @@ tooltip label {
 #tray { padding: 0 8px; }
 #tray > .passive { -gtk-icon-effect: dim; }
 #tray > .needs-attention { -gtk-icon-effect: highlight; border-radius: 8px; }
+
+/* ── FONT NORMALIZATION OVERRIDE ── */
+#cpu, #memory, #disk, #custom-vpn, #network,
+#pulseaudio, #custom-hardware_temp, #custom-settarget,
+#custom-docker, #custom-kvm, #custom-updates,
+#custom-local_ip, #custom-public_ip, #custom-player,
+#battery, #battery.warning, #battery.charging,
+#battery.critical, #clock, #tray, #custom-vpn,
+#temperature, #backlight, #bluetooth {
+    font-size: 11px;
+    min-height: 0;
+    margin: 0;
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+
+#custom-launcher, #custom-power {
+    font-size: 13px;
+    min-height: 0;
+    margin: 0;
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+
+#workspaces button {
+    font-size: 13px;
+    min-height: 0;
+    margin: 0;
+    padding: 0 4px;
+}
+
+#workspaces button:not(.active):not(.empty) {
+    color: #ff79c6;
+    min-height: 0;
+    margin: 0;
+}
+
+* {
+    min-height: 0;
+    margin: 0;
+}
+
+.modules-left, .modules-center, .modules-right {
+    margin: 0;
+    padding: 0;
+}

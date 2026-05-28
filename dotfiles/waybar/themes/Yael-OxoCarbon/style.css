@@ -6,7 +6,7 @@
     border: none;
     border-radius: 0;
     font-family: "JetBrains Mono Nerd Font", "JetBrains Mono", monospace;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: bold;
     min-height: 0;
 }
@@ -34,8 +34,8 @@ window#waybar.bottom { border-top: 2px solid rgba(66, 190, 101, 0.45); }
 }
 
 /* ─── Separadores entre grupos via padding ──────────────────────────────────── */
-.modules-left   { border-right: 1px solid rgba(66, 190, 101, 0.20); padding-right: 12px; }
-.modules-right  { border-left: 1px solid rgba(66, 190, 101, 0.20);  padding-left: 12px; }
+.modules-left   { border-right: 1px solid rgba(66, 190, 101, 0.20); padding-right: 6px; }
+.modules-right  { border-left: 1px solid rgba(66, 190, 101, 0.20);  padding-left: 6px; }
 
 /* ─── Tooltips ──────────────────────────────────────────────────────────────── */
 tooltip { background: #1e1e1e; border-radius: 6px; border: 1px solid rgba(66, 190, 101, 0.35); }
@@ -55,12 +55,12 @@ tooltip label { color: #f4f4f4; padding: 4px 8px; }
 /* ─── Separador visual entre módulos (borde derecho sutil) ─────────────────── */
 #cpu, #memory, #temperature, #network, #battery {
     border-right: 1px solid rgba(66, 190, 101, 0.15);
-    padding-right: 10px;
+    padding-right: 6px;
     margin-right: 2px;
 }
 
 /* ─── Launcher ──────────────────────────────────────────────────────────────── */
-#custom-launcher { color: #42BE65; font-size: 18px; padding: 0 12px; }
+#custom-launcher { color: #42BE65; font-size: 14px; padding: 0 6px; }
 #custom-launcher:hover { color: #78a9ff; }
 
 /* ─── Workspaces ────────────────────────────────────────────────────────────── */
@@ -101,7 +101,7 @@ tooltip label { color: #f4f4f4; padding: 4px 8px; }
 #battery.charging { color: #42BE65; }
 
 /* ─── Clock ─────────────────────────────────────────────────────────────────── */
-#clock { color: #78a9ff; font-size: 13px; padding: 0 12px; }
+#clock { color: #78a9ff; font-size: 13px; padding: 0 6px; }
 
 /* ─── Set Target ────────────────────────────────────────────────────────────── */
 #custom-settarget.active   { color: #42BE65; }
@@ -116,7 +116,7 @@ tooltip label { color: #f4f4f4; padding: 4px 8px; }
 #custom-player    { color: #be95ff; }
 
 /* ─── Power ─────────────────────────────────────────────────────────────────── */
-#custom-power { color: #ff6b6b; font-size: 15px; padding: 0 12px; }
+#custom-power { color: #ff6b6b; font-size: 14px; padding: 0 6px; }
 #custom-power:hover { color: #f4f4f4; }
 
 /* ─── Tray ──────────────────────────────────────────────────────────────────── */
@@ -127,4 +127,50 @@ tooltip label { color: #f4f4f4; padding: 4px 8px; }
 /* ─── Blink animation para batería crítica ──────────────────────────────────── */
 @keyframes blink {
     to { color: #ff6b6b; opacity: 0.5; }
+}
+
+/* ── FONT NORMALIZATION OVERRIDE ── */
+#cpu, #memory, #disk, #custom-vpn, #network,
+#pulseaudio, #custom-hardware_temp, #custom-settarget,
+#custom-docker, #custom-kvm, #custom-updates,
+#custom-local_ip, #custom-public_ip, #custom-player,
+#battery, #battery.warning, #battery.charging,
+#battery.critical, #clock, #tray, #custom-vpn,
+#temperature, #backlight, #bluetooth {
+    font-size: 11px;
+    min-height: 0;
+    margin: 0;
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+
+#custom-launcher, #custom-power {
+    font-size: 13px;
+    min-height: 0;
+    margin: 0;
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+
+#workspaces button {
+    font-size: 13px;
+    min-height: 0;
+    margin: 0;
+    padding: 0 4px;
+}
+
+#workspaces button:not(.active):not(.empty) {
+    color: #78a9ff;
+    min-height: 0;
+    margin: 0;
+}
+
+* {
+    min-height: 0;
+    margin: 0;
+}
+
+.modules-left, .modules-center, .modules-right {
+    margin: 0;
+    padding: 0;
 }

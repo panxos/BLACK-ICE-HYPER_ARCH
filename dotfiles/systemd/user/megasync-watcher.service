@@ -1,0 +1,13 @@
+[Unit]
+Description=MEGAsync Hyprland window fixer (XWayland popup fix)
+After=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=/bin/bash %h/.config/bin/megasync-watcher.sh
+Restart=on-failure
+RestartSec=3
+Environment=DISPLAY=:1
+
+[Install]
+WantedBy=graphical-session.target

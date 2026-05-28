@@ -27,8 +27,6 @@ export PATH="$HOME/bin:$HOME/.local/bin:/usr/local/bin:/usr/bin:/bin:/usr/local/
 export DXVK_ASYNC=1
 export DXVK_STATE_CACHE=1
 export VISUAL=nano
-export GOOGLE_API_KEY=""  # definir en ~/.zshenv
-export GEMINI_API_KEY=""  # definir en ~/.zshenv
 export TELEGRAM_BOT_TOKEN=""  # definir en ~/.zshenv
 
 # Definición de PATH simplificada
@@ -1643,7 +1641,7 @@ pinalert() {
 
 # Alias para actualizar CLI tools - P4nx0z
 alias qwenupdate='sudo npm install -g @qwen-code/qwen-code@latest'
-alias geminiupdate='sudo npm install -g @google/gemini-cli@latest'
+alias claudeupdate='tmp=$(mktemp /tmp/claude-install-XXXXXX.sh) && curl -fsSL https://claude.ai/install.sh -o "$tmp" && bash "$tmp"; rm -f "$tmp"'
 
 # Syntax highlighting debe ir al final absoluto
 source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh

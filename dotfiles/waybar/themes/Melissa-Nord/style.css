@@ -5,7 +5,7 @@
     border: none;
     border-radius: 0;
     font-family: "JetBrains Mono Nerd Font", "JetBrains Mono", monospace;
-    font-size: 13px;
+    font-size: 11px;
     font-weight: bold;
     min-height: 0;
 }
@@ -52,8 +52,8 @@ tooltip label {
 /* ─── Launcher ──────────────────────────────────────────────────────────────── */
 #custom-launcher {
     color: #88c0d0;
-    font-size: 20px;
-    padding: 0 14px;
+    font-size: 14px;
+    padding: 0 6px;
     margin: 0 2px;
     border-radius: 12px;
     transition: all 200ms ease;
@@ -101,7 +101,7 @@ tooltip label {
 /* ─── CPU ───────────────────────────────────────────────────────────────────── */
 #cpu {
     color: #88c0d0;
-    padding: 0 10px;
+    padding: 0 6px;
     border-radius: 10px;
     transition: all 200ms ease;
 }
@@ -113,7 +113,7 @@ tooltip label {
 /* ─── Memory ────────────────────────────────────────────────────────────────── */
 #memory {
     color: #b48ead;
-    padding: 0 10px;
+    padding: 0 6px;
     border-radius: 10px;
     transition: all 200ms ease;
 }
@@ -125,7 +125,7 @@ tooltip label {
 /* ─── Disk ──────────────────────────────────────────────────────────────────── */
 #disk {
     color: #a3be8c;
-    padding: 0 10px;
+    padding: 0 6px;
     border-radius: 10px;
     transition: all 200ms ease;
 }
@@ -137,7 +137,7 @@ tooltip label {
 /* ─── Temperature ───────────────────────────────────────────────────────────── */
 #temperature {
     color: #ebcb8b;
-    padding: 0 10px;
+    padding: 0 6px;
     border-radius: 10px;
     transition: all 200ms ease;
 }
@@ -155,7 +155,7 @@ tooltip label {
 /* ─── Hardware Temp (custom) ────────────────────────────────────────────────── */
 #custom-hardware_temp {
     color: #ebcb8b;
-    padding: 0 10px;
+    padding: 0 6px;
     border-radius: 10px;
     transition: all 200ms ease;
 }
@@ -166,7 +166,7 @@ tooltip label {
 
 /* ─── VPN ───────────────────────────────────────────────────────────────────── */
 #custom-vpn {
-    padding: 0 10px;
+    padding: 0 6px;
     border-radius: 10px;
     transition: all 200ms ease;
 }
@@ -184,7 +184,7 @@ tooltip label {
 /* ─── Network ───────────────────────────────────────────────────────────────── */
 #network {
     color: #88c0d0;
-    padding: 0 10px;
+    padding: 0 6px;
     border-radius: 10px;
     transition: all 200ms ease;
 }
@@ -201,7 +201,7 @@ tooltip label {
 /* ─── Pulseaudio / Audio ────────────────────────────────────────────────────── */
 #pulseaudio {
     color: #81a1c1;
-    padding: 0 10px;
+    padding: 0 6px;
     border-radius: 10px;
     transition: all 200ms ease;
 }
@@ -218,7 +218,7 @@ tooltip label {
 /* ─── Battery ───────────────────────────────────────────────────────────────── */
 #battery {
     color: #a3be8c;
-    padding: 0 10px;
+    padding: 0 6px;
     border-radius: 10px;
     transition: all 200ms ease;
 }
@@ -252,7 +252,7 @@ tooltip label {
 #clock {
     color: #81a1c1;
     font-size: 14px;
-    padding: 0 14px;
+    padding: 0 6px;
     border-radius: 10px;
     transition: all 200ms ease;
 }
@@ -264,7 +264,7 @@ tooltip label {
 /* ─── Set Target ────────────────────────────────────────────────────────────── */
 #custom-settarget {
     font-size: 13px;
-    padding: 0 12px;
+    padding: 0 6px;
     border-radius: 10px;
     transition: all 200ms ease;
 }
@@ -283,7 +283,7 @@ tooltip label {
 /* ─── Docker ────────────────────────────────────────────────────────────────── */
 #custom-docker {
     color: #88c0d0;
-    padding: 0 10px;
+    padding: 0 6px;
     border-radius: 10px;
     transition: all 200ms ease;
 }
@@ -295,7 +295,7 @@ tooltip label {
 /* ─── KVM ───────────────────────────────────────────────────────────────────── */
 #custom-kvm {
     color: #ebcb8b;
-    padding: 0 10px;
+    padding: 0 6px;
     border-radius: 10px;
     transition: all 200ms ease;
 }
@@ -307,7 +307,7 @@ tooltip label {
 /* ─── Updates ───────────────────────────────────────────────────────────────── */
 #custom-updates {
     color: #ebcb8b;
-    padding: 0 10px;
+    padding: 0 6px;
     border-radius: 10px;
     transition: all 200ms ease;
 }
@@ -319,7 +319,7 @@ tooltip label {
 /* ─── Local IP ──────────────────────────────────────────────────────────────── */
 #custom-local_ip {
     color: #a3be8c;
-    padding: 0 10px;
+    padding: 0 6px;
     border-radius: 10px;
     transition: all 200ms ease;
 }
@@ -331,7 +331,7 @@ tooltip label {
 /* ─── Public IP ─────────────────────────────────────────────────────────────── */
 #custom-public_ip {
     color: #88c0d0;
-    padding: 0 10px;
+    padding: 0 6px;
     border-radius: 10px;
     transition: all 200ms ease;
 }
@@ -343,7 +343,7 @@ tooltip label {
 /* ─── Media Player ──────────────────────────────────────────────────────────── */
 #custom-player {
     color: #b48ead;
-    padding: 0 10px;
+    padding: 0 6px;
     border-radius: 10px;
     transition: all 200ms ease;
 }
@@ -355,8 +355,8 @@ tooltip label {
 /* ─── Power ─────────────────────────────────────────────────────────────────── */
 #custom-power {
     color: #bf616a;
-    font-size: 16px;
-    padding: 0 12px;
+    font-size: 14px;
+    padding: 0 6px;
     margin: 0 2px;
     border-radius: 12px;
     transition: all 200ms ease;
@@ -380,4 +380,50 @@ tooltip label {
     -gtk-icon-effect: highlight;
     background: rgba(191, 97, 106, 0.15);
     border-radius: 8px;
+}
+
+/* ── FONT NORMALIZATION OVERRIDE ── */
+#cpu, #memory, #disk, #custom-vpn, #network,
+#pulseaudio, #custom-hardware_temp, #custom-settarget,
+#custom-docker, #custom-kvm, #custom-updates,
+#custom-local_ip, #custom-public_ip, #custom-player,
+#battery, #battery.warning, #battery.charging,
+#battery.critical, #clock, #tray, #custom-vpn,
+#temperature, #backlight, #bluetooth {
+    font-size: 11px;
+    min-height: 0;
+    margin: 0;
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+
+#custom-launcher, #custom-power {
+    font-size: 13px;
+    min-height: 0;
+    margin: 0;
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+
+#workspaces button {
+    font-size: 13px;
+    min-height: 0;
+    margin: 0;
+    padding: 0 4px;
+}
+
+#workspaces button:not(.active):not(.empty) {
+    color: #88c0d0;
+    min-height: 0;
+    margin: 0;
+}
+
+* {
+    min-height: 0;
+    margin: 0;
+}
+
+.modules-left, .modules-center, .modules-right {
+    margin: 0;
+    padding: 0;
 }

@@ -49,6 +49,60 @@ done
 sudo -u "$CURRENT_USER" xdg-settings set default-web-browser brave-browser.desktop 2>/dev/null || \
     sudo -u "$CURRENT_USER" xdg-settings set default-web-browser brave.desktop 2>/dev/null || true
 
+# --- Fix xdg-open para Hyprland (DE desconocido cae en exit_failure) ---
+# xdg-utils 1.2+ detecta DE=Hyprland pero no tiene handler → falla silencioso
+# Parche: cambiar *) exit_failure → *) open_generic en el switch DE
+if [ -f /usr/bin/xdg-open ]; then
+    python3 -c "
+import sys
+with open('/usr/bin/xdg-open', 'r') as f:
+    content = f.read()
+old = '''    *)
+    exit_failure_operation_impossible \"no method available for opening '\$url'\"
+    ;;
+esac'''
+new = '''    *)
+    open_generic \"\$url\"
+    ;;
+esac'''
+if old in content:
+    content = content.replace(old, new, 1)
+    with open('/usr/bin/xdg-open', 'w') as f:
+        f.write(content)
+    sys.exit(0)
+sys.exit(1)
+" && log_success "xdg-open parcheado: Hyprland ahora usa open_generic como fallback" \
+  || log_info "xdg-open: parche no aplicado (ya aplicado o versión diferente)"
+fi
+
+# --- MEGAsync: autostart + watcher (solo si megasync está instalado) ---
+if command -v megasync &>/dev/null; then
+    log_info "MEGAsync detectado — instalando autostart y watcher Hyprland..."
+    mkdir -p "$USER_HOME/.config/autostart"
+    if [ -f "$SCRIPT_DIR/dotfiles/autostart/megasync.desktop" ]; then
+        cp "$SCRIPT_DIR/dotfiles/autostart/megasync.desktop" "$USER_HOME/.config/autostart/megasync.desktop"
+        chown "$CURRENT_USER:$CURRENT_USER" "$USER_HOME/.config/autostart/megasync.desktop"
+        log_success "megasync.desktop autostart instalado"
+    fi
+    if [ -f "$SCRIPT_DIR/dotfiles/bin/megasync-watcher.sh" ]; then
+        cp "$SCRIPT_DIR/dotfiles/bin/megasync-watcher.sh" "$USER_HOME/.config/bin/megasync-watcher.sh"
+        chmod +x "$USER_HOME/.config/bin/megasync-watcher.sh"
+        chown "$CURRENT_USER:$CURRENT_USER" "$USER_HOME/.config/bin/megasync-watcher.sh"
+        log_success "megasync-watcher.sh instalado en ~/.config/bin/"
+    fi
+else
+    log_info "MEGAsync no instalado — omitiendo autostart y watcher"
+fi
+if command -v megasync &>/dev/null && [ -f "$SCRIPT_DIR/dotfiles/systemd/user/megasync-watcher.service" ]; then
+    mkdir -p "$USER_HOME/.config/systemd/user"
+    cp "$SCRIPT_DIR/dotfiles/systemd/user/megasync-watcher.service" \
+        "$USER_HOME/.config/systemd/user/megasync-watcher.service"
+    chown -R "$CURRENT_USER:$CURRENT_USER" "$USER_HOME/.config/systemd/user"
+    sudo -u "$CURRENT_USER" systemctl --user daemon-reload 2>/dev/null || true
+    sudo -u "$CURRENT_USER" systemctl --user enable megasync-watcher.service 2>/dev/null || true
+    log_success "megasync-watcher.service habilitado (systemd --user)"
+fi
+
 # --- Waypaper config (subfolders habilitados para .webp en subdirectorios) ---
 mkdir -p "$USER_HOME/.config/waypaper"
 if [ -f "$SCRIPT_DIR/dotfiles/waypaper/config.ini" ]; then

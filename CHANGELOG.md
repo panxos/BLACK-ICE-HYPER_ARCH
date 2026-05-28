@@ -1,5 +1,46 @@
 # CHANGELOG - BLACK-ICE ARCH
 
+## [3.9.0] - 2026-05-28 (P4nx0z "Obsidian" Edition)
+
+### 🚀 Novedades
+
+- **MEGAsync Hyprland fix**: `megasync-watcher.sh` + `megasync-watcher.service` — convierte ventanas `POPUP_MENU`/`DIALOG` XWayland a tipo `NORMAL` al vuelo. Resuelve login inaccessible (ventana 1×1 hidden), auto-cierre, y sub-secciones (Backup, Add Sync) no navegables.
+- **`xdg-open` parcheado para Hyprland**: `xdg-utils` 1.2+ falla con `DE=Hyprland` (exit_failure en switch). El instalador ahora parchea `/usr/bin/xdg-open` para usar `open_generic` como fallback — links desde apps (Telegram, VSCode, terminal) abren el browser correctamente.
+- **Wofi reemplaza Rofi**: `$menu` cambiado a `env GTK_THEME=Adwaita:dark wofi --show drun`. Rofi no es nativo Wayland; wofi es el launcher correcto. Incluye override GTK para evitar accent colors del tema Sweet-Dark.
+- **Waybar 21 temas actualizados**: iconos de workspace creativos por tema (☥, ❀, ◉, ☠, ▲, ❄, etc.), occupied state via `"default"` key (corrige bug waybar v0.15.0 donde `"occupied"` no es válido), módulo `network` eliminado (redundante con systray nm-applet), launcher usa wofi.
+- **Kitty URL handling**: `open_url_with xdg-open` + `detect_urls yes` explícitos — Ctrl+click en URLs abre el browser correctamente.
+- **Hyprlock lockfile fix**: `rm -f /tmp/hyprlock-locked` en `startup.sh` — evita que el watchdog relance hyprlock inmediatamente tras un crash de sesión, bloqueando el login.
+- **Notificaciones swaync redimensionadas**: tamaños duplicados (`sz-title: 18px`, `sz-body: 16px`, width: 400px) para mejor legibilidad.
+
+### 🛠️ Fixes
+
+- **`vpn_status`**: iconos cambiados a BMP range (`U+F023`/`U+F09C` nf-fa-lock/unlock) — los iconos 4-byte `U+F0000+` no renderizan en todas las variantes de Nerd Font.
+- **MEGAsync autostart**: `QT_QPA_PLATFORM=xcb` mantenido (MEGA fuerza XCB internamente; usar `wayland` causa crash — issue #710).
+- **`megasync.desktop` autostart**: incluido en dotfiles para que systemd-xdg-autostart-generator lo procese correctamente en todos los sistemas.
+
+## [3.8.0] - 2026-05-27 (P4nx0z "Titanium" Edition)
+
+### 🛡️ Seguridad / Resiliencia (CRÍTICO)
+
+- **grub-btrfs integrado**: Snapshots de Snapper ahora aparecen como opción de boot en GRUB (`BLACK-ICE Snapshots`). Si una actualización rompe algo, se bootea el snapshot anterior.
+- **`fstrim.timer` habilitado**: TRIM semanal seguro por systemd. Reemplaza el peligroso `discard=async` que corrompió metadata btrfs en NVMe DRAM-less (Kingston NV2).
+- **`nodiscard` explícito en fstab**: Defensa en profundidad — nunca se usará `discard=async` aunque alguien lo agregue manualmente.
+- **`space_cache=v2` explícito en mount options**: Hardening del free space tree.
+- **LUKS `--allow-discards`**: TRIM ahora pasa a través de la capa de cifrado.
+- **SMART monitoring (`smartd`)**: Alertas tempranas de degradación de disco.
+- **Btrfs scrub mensual**: Timer systemd para detección temprana de corrupción antes de que sea fatal.
+- **`nvme.noacpi=1` + `NVME_STABILITY=yes` default**: Estabilidad NVMe para Linux en todos los sistemas.
+- **Snapper tuning conservador**: `SPACE_LIMIT` 0.5→0.3, `FREE_LIMIT` 0.2→0.3, `NUMBER_LIMIT` 50→20, `HOUR_LIMIT` 5→4. Reduce churn de CoW.
+
+### 🔧 Fixes
+
+- **`bootstrap.sh`**: URL del repo confirmada como `BLACK-ICE-HYPER_ARCH` (correspondiente al repo real de GitHub).
+- **`99_final.sh`**: Nuevo script `/etc/profile.d/blackice-health.sh` con comandos rápidos de salud del sistema (scrub, SMART, snapshots).
+
+### 📝 Documentación
+
+- **`CHANGELOG.md`**: Entrada v3.8.0 con todos los cambios documentados.
+
 ## [3.7.1] - 2026-05-21 (P4nx0z "Polish" Edition)
 
 ### 🎨 UI / UX

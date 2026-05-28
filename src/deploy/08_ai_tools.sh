@@ -29,9 +29,6 @@ install_npm_cli() {
 # --- Claude Code ---
 install_npm_cli "@anthropic-ai/claude-code" "Claude Code CLI"
 
-# --- Gemini CLI ---
-install_npm_cli "@google/gemini-cli" "Gemini CLI"
-
 log_info "Configurando alias de actualización en ZSH..."
 
 # Detectar archivo de alias (idempotente: no duplica si ya existe)
@@ -43,7 +40,6 @@ if ! grep -q "claudeupdate" "$ZSH_ALIASES" 2>/dev/null; then
 
 # --- IA Update Aliases (BLACK-ICE) ---
 alias claudeupdate='tmp=$(mktemp /tmp/claude-install-XXXXXX.sh) && curl -fsSL https://claude.ai/install.sh -o "$tmp" && bash "$tmp"; rm -f "$tmp"'
-alias geminiupdate='sudo npm install -g @google/gemini-cli'
 EOF
     log_info "Aliases de IA agregados a $ZSH_ALIASES"
 else

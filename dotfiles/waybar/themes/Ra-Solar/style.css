@@ -3,7 +3,7 @@
     border: none;
     border-radius: 0;
     font-family: "JetBrains Mono Nerd Font", monospace;
-    font-size: 13px;
+    font-size: 11px;
     font-weight: bold;
     color: #FFD700;
 }
@@ -48,7 +48,7 @@ window#waybar {
 #custom-local_ip,
 #custom-public_ip,
 #tray {
-    padding: 0 10px;
+    padding: 0 6px;
     color: @gold;
 }
 
@@ -97,42 +97,58 @@ window#waybar {
 
 /* Launcher */
 #custom-launcher {
-    font-size: 18px;
+    font-size: 14px;
     color: @orange;
     text-shadow: 0 0 5px @gold;
 }
 #custom-hardware_temp {
     color: #00ff00;
-    padding: 0 10px;
+    padding: 0 6px;
     font-weight: bold;
 }
 
-#custom-hardware_temp {
-    color: #00ff00;
-    padding: 0 10px;
-    font-weight: bold;
+/* ── FONT NORMALIZATION OVERRIDE ── */
+#cpu, #memory, #disk, #custom-vpn, #network,
+#pulseaudio, #custom-hardware_temp, #custom-settarget,
+#custom-docker, #custom-kvm, #custom-updates,
+#custom-local_ip, #custom-public_ip, #custom-player,
+#battery, #battery.warning, #battery.charging,
+#battery.critical, #clock, #tray, #custom-vpn,
+#temperature, #backlight, #bluetooth {
+    font-size: 11px;
+    min-height: 0;
+    margin: 0;
+    padding-top: 3px;
+    padding-bottom: 3px;
 }
 
-#custom-hardware_temp {
-    color: #00ff00;
-    padding: 0 10px;
-    font-weight: bold;
+#custom-launcher, #custom-power {
+    font-size: 13px;
+    min-height: 0;
+    margin: 0;
+    padding-top: 3px;
+    padding-bottom: 3px;
 }
 
-#custom-hardware_temp {
-    color: #00ff00;
-    padding: 0 10px;
-    font-weight: bold;
+#workspaces button {
+    font-size: 13px;
+    min-height: 0;
+    margin: 0;
+    padding: 0 4px;
 }
 
-#custom-hardware_temp {
-    color: #00ff00;
-    padding: 0 10px;
-    font-weight: bold;
+#workspaces button:not(.active):not(.empty) {
+    color: #ffb347;
+    min-height: 0;
+    margin: 0;
 }
 
-#custom-hardware_temp {
-    color: #00ff00;
-    padding: 0 10px;
-    font-weight: bold;
+* {
+    min-height: 0;
+    margin: 0;
+}
+
+.modules-left, .modules-center, .modules-right {
+    margin: 0;
+    padding: 0;
 }

@@ -6,7 +6,7 @@
     border: none;
     border-radius: 0;
     font-family: "JetBrains Mono Nerd Font", "JetBrains Mono", monospace;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: bold;
     min-height: 0;
 }
@@ -67,7 +67,7 @@ tooltip label { color: #f8f9fa; padding: 4px 8px; }
 }
 
 /* ─── Launcher ──────────────────────────────────────────────────────────────── */
-#custom-launcher { color: #adb5bd; font-size: 18px; padding: 0 12px; }
+#custom-launcher { color: #adb5bd; font-size: 14px; padding: 0 6px; }
 #custom-launcher:hover { color: #f8f9fa; border-color: rgba(173, 181, 189, 0.5); }
 
 /* ─── Workspaces ────────────────────────────────────────────────────────────── */
@@ -145,10 +145,56 @@ tooltip label { color: #f8f9fa; padding: 4px 8px; }
 #custom-player { color: #9a8fa0; }
 
 /* ─── Power ─────────────────────────────────────────────────────────────────── */
-#custom-power { color: #e05c5c; font-size: 15px; padding: 0 10px; }
+#custom-power { color: #e05c5c; font-size: 14px; padding: 0 6px; }
 #custom-power:hover { color: #f8f9fa; background: rgba(224, 92, 92, 0.2); border-color: rgba(224, 92, 92, 0.5); }
 
 /* ─── Tray ──────────────────────────────────────────────────────────────────── */
 #tray { padding: 0 6px; }
 #tray > .passive { -gtk-icon-effect: dim; }
 #tray > .needs-attention { -gtk-icon-effect: highlight; border-radius: 5px; }
+
+/* ── FONT NORMALIZATION OVERRIDE ── */
+#cpu, #memory, #disk, #custom-vpn, #network,
+#pulseaudio, #custom-hardware_temp, #custom-settarget,
+#custom-docker, #custom-kvm, #custom-updates,
+#custom-local_ip, #custom-public_ip, #custom-player,
+#battery, #battery.warning, #battery.charging,
+#battery.critical, #clock, #tray, #custom-vpn,
+#temperature, #backlight, #bluetooth {
+    font-size: 11px;
+    min-height: 0;
+    margin: 0;
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+
+#custom-launcher, #custom-power {
+    font-size: 13px;
+    min-height: 0;
+    margin: 0;
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+
+#workspaces button {
+    font-size: 13px;
+    min-height: 0;
+    margin: 0;
+    padding: 0 4px;
+}
+
+#workspaces button:not(.active):not(.empty) {
+    color: #aaaaaa;
+    min-height: 0;
+    margin: 0;
+}
+
+* {
+    min-height: 0;
+    margin: 0;
+}
+
+.modules-left, .modules-center, .modules-right {
+    margin: 0;
+    padding: 0;
+}

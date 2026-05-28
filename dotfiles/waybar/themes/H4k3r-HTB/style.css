@@ -51,8 +51,8 @@ tooltip label { color: #a4b1cd; padding: 3px 6px; }
 /* ─── Launcher: grande a la izquierda ──────────────────────────────────────── */
 #custom-launcher {
     color: #9fef00;
-    font-size: 22px;
-    padding: 0 16px;
+    font-size: 14px;
+    padding: 0 6px;
     background: transparent;
     transition: all 150ms ease;
     text-shadow: 0 0 10px rgba(159, 239, 0, 0.6);
@@ -117,7 +117,7 @@ tooltip label { color: #a4b1cd; padding: 3px 6px; }
 #battery.charging { color: #00ff7f; }
 
 /* ─── Clock ─────────────────────────────────────────────────────────────────── */
-#clock { color: #9fef00; font-size: 12px; padding: 0 10px; font-size: 11px; }
+#clock { color: #9fef00; font-size: 12px; padding: 0 6px; font-size: 11px; }
 
 /* ─── Set Target ────────────────────────────────────────────────────────────── */
 #custom-settarget.active   { color: #9fef00; }
@@ -132,7 +132,7 @@ tooltip label { color: #a4b1cd; padding: 3px 6px; }
 #custom-player    { color: #7e5bef; }
 
 /* ─── Power ─────────────────────────────────────────────────────────────────── */
-#custom-power { color: #ff4444; font-size: 14px; padding: 0 10px; }
+#custom-power { color: #ff4444; font-size: 14px; padding: 0 6px; }
 #custom-power:hover { color: #ff0000; text-shadow: 0 0 8px rgba(255, 0, 0, 0.7); }
 
 /* ─── Tray ──────────────────────────────────────────────────────────────────── */
@@ -143,4 +143,50 @@ tooltip label { color: #a4b1cd; padding: 3px 6px; }
 /* ─── Animaciones ───────────────────────────────────────────────────────────── */
 @keyframes blink-htb {
     to { opacity: 0.3; }
+}
+
+/* ── FONT NORMALIZATION OVERRIDE ── */
+#cpu, #memory, #disk, #custom-vpn, #network,
+#pulseaudio, #custom-hardware_temp, #custom-settarget,
+#custom-docker, #custom-kvm, #custom-updates,
+#custom-local_ip, #custom-public_ip, #custom-player,
+#battery, #battery.warning, #battery.charging,
+#battery.critical, #clock, #tray, #custom-vpn,
+#temperature, #backlight, #bluetooth {
+    font-size: 11px;
+    min-height: 0;
+    margin: 0;
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+
+#custom-launcher, #custom-power {
+    font-size: 13px;
+    min-height: 0;
+    margin: 0;
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+
+#workspaces button {
+    font-size: 13px;
+    min-height: 0;
+    margin: 0;
+    padding: 0 4px;
+}
+
+#workspaces button:not(.active):not(.empty) {
+    color: #9fef00;
+    min-height: 0;
+    margin: 0;
+}
+
+* {
+    min-height: 0;
+    margin: 0;
+}
+
+.modules-left, .modules-center, .modules-right {
+    margin: 0;
+    padding: 0;
 }

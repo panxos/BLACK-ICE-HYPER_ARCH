@@ -19,12 +19,12 @@
   --shadow-crit:    0 4px 20px rgba(0,0,0,0.65), 0 0 8px rgba(255,143,128,0.15);
   --radius:         11px;
   --font:           "Poppins", "JetBrains Mono Nerd Font", sans-serif;
-  --sz-title:       12px;
-  --sz-body:        11px;
-  --sz-time:        10px;
-  --icon-size:      31px;
-  --icon-app-size:  13px;
-  --group-icon-sz:  22px;
+  --sz-title:       10px;
+  --sz-body:        10px;
+  --sz-time:        9px;
+  --icon-size:      22px;
+  --icon-app-size:  11px;
+  --group-icon-sz:  14px;
   /* swaync compat */
   --noti-border-color: rgba(180, 218, 254, 0.2);
   --noti-bg:        29, 31, 40;
@@ -37,9 +37,9 @@
   --text-color:     rgba(253, 253, 253, 0.92);
   --text-color-disabled: rgba(253, 253, 253, 0.32);
   --bg-selected:    rgba(180, 218, 254, 0.85);
-  --notification-icon-size: 31px;
-  --notification-app-icon-size: 13px;
-  --notification-group-icon-size: 22px;
+  --notification-icon-size: 22px;
+  --notification-app-icon-size: 11px;
+  --notification-group-icon-size: 14px;
   --notification-shadow: var(--shadow);
   --font-size-body: 9px;
   --font-size-summary: 10px;
@@ -67,6 +67,7 @@
 
 notificationwindow, blankwindow {
   background: transparent;
+  border-radius: 14px !important;
 }
 
 /* ── Close dot ── */
@@ -103,17 +104,20 @@ notificationwindow, blankwindow {
 }
 
 .notification-row .notification-background {
-  padding: 3px 6px;
+  padding: 4px 6px;
+  border-radius: 14px !important;
+  overflow: hidden;
 }
 
 .notification-row .notification-background .notification {
   font-family: var(--font);
-  border-radius: var(--radius);
+  border-radius: 14px !important;
   border: 1px solid var(--border);
   padding: 0;
   transition: var(--hover-tranistion);
   background: rgba(var(--noti-bg), var(--noti-bg-alpha));
   box-shadow: var(--shadow);
+  overflow: hidden;
 }
 
 .notification-row .notification-background .notification.critical {
@@ -123,14 +127,14 @@ notificationwindow, blankwindow {
 
 /* ── Content area ── */
 .notification-row .notification-background .notification .notification-default-action {
-  padding: 6px 8px;
+  padding: 6px 10px;
   margin: 0;
   box-shadow: none;
   background: transparent;
   border: none;
   color: var(--text);
   transition: var(--hover-tranistion);
-  border-radius: var(--radius);
+  border-radius: 14px !important;
 }
 
 .notification-row .notification-background .notification .notification-default-action:hover {
@@ -152,9 +156,9 @@ notificationwindow, blankwindow {
 /* Icon — macOS rounded square */
 .notification-row .notification-background .notification .notification-default-action .notification-content .image {
   -gtk-icon-filter: none;
-  -gtk-icon-size: 31px;
-  border-radius: 7px;
-  margin: 0 9px 0 0;
+  -gtk-icon-size: 16px;
+  border-radius: 5px;
+  margin: 0 6px 0 0;
 }
 
 .notification-row .notification-background .notification .notification-default-action .notification-content .app-icon {

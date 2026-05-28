@@ -135,7 +135,8 @@ Utilidades del entorno instaladas automáticamente por `src/deploy/99_finalizati
 | `music_player` | `Win+Shift+M` | Lanzador ncmpcpp con MPD auto-start |
 | `power_profile_menu.sh` | `Win+Shift+P` | Selector perfil de energía (TLP) |
 | `power_menu.sh` | Waybar btn | Lock/Sleep/Reboot/Shutdown/Logout |
-| `vpn_status` | Waybar | Status de conexiones VPN activas |
+| `vpn_status` | Waybar | Status VPN activa con iconos BMP Nerd Font (U+F023/F09C) |
+| `megasync-watcher.sh` | systemd --user | Fix XWayland MEGAsync: convierte POPUP_MENU→NORMAL, centra ventana |
 | `target_status` | Waybar | Target IP para HTB/CTF |
 | `updates_status` | Waybar | Paquetes disponibles para actualizar |
 | `kvm_menu` | — | Gestión de VMs KVM via wofi |

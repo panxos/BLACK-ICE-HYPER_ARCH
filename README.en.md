@@ -9,7 +9,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-cyan.svg)](LICENSE)
 [![Arch Linux](https://img.shields.io/badge/Arch-Linux-1793D1?logo=arch-linux&logoColor=fff)](https://archlinux.org/)
 [![Hyprland](https://img.shields.io/badge/Hyprland-v0.54+-00FFFF)](https://hyprland.org/)
-[![Version](https://img.shields.io/badge/Version-3.7.1-neon.svg)](https://github.com/panxos/BLACK-ICE-HYPER_ARCH)
+[![Version](https://img.shields.io/badge/Version-3.9.0-neon.svg)](https://github.com/panxos/BLACK-ICE-HYPER_ARCH)
 
 **[🇪🇸 Español](README.md) | 🇬🇧 English**
 

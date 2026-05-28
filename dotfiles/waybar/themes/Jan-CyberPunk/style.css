@@ -6,7 +6,7 @@
     border: none;
     border-radius: 0;
     font-family: "JetBrains Mono Nerd Font", "JetBrains Mono", monospace;
-    font-size: 13px;
+    font-size: 11px;
     font-weight: bold;
     min-height: 0;
 }
@@ -26,7 +26,7 @@ window#waybar.top, window#waybar.bottom { background: transparent; }
 tooltip { background: #0f0e17; border-radius: 10px; border: 1px solid rgba(39, 251, 254, 0.20); }
 tooltip label { color: #fffffe; padding: 4px 8px; }
 
-#custom-launcher { color: #27fbfe; font-size: 20px; padding: 0 14px; margin: 0 2px; border-radius: 12px; transition: all 200ms ease; }
+#custom-launcher { color: #27fbfe; font-size: 14px; padding: 0 6px; margin: 0 2px; border-radius: 12px; transition: all 200ms ease; }
 #custom-launcher:hover { color: #ff8906; background: rgba(0,0,0,0.15); }
 
 #workspaces { padding: 0 4px; }
@@ -35,43 +35,89 @@ tooltip label { color: #fffffe; padding: 4px 8px; }
 #workspaces button:hover { color: #fffffe; background: rgba(255,255,255,0.08); }
 #workspaces button.urgent { color: #0f0e17; background: #fb007a; }
 
-#cpu { color: #27fbfe; padding: 0 10px; border-radius: 10px; transition: all 200ms ease; }
-#memory { color: #a839c2; padding: 0 10px; border-radius: 10px; transition: all 200ms ease; }
-#disk { color: #00ff7f; padding: 0 10px; border-radius: 10px; transition: all 200ms ease; }
-#temperature { color: #ffd700; padding: 0 10px; border-radius: 10px; transition: all 200ms ease; }
+#cpu { color: #27fbfe; padding: 0 6px; border-radius: 10px; transition: all 200ms ease; }
+#memory { color: #a839c2; padding: 0 6px; border-radius: 10px; transition: all 200ms ease; }
+#disk { color: #00ff7f; padding: 0 6px; border-radius: 10px; transition: all 200ms ease; }
+#temperature { color: #ffd700; padding: 0 6px; border-radius: 10px; transition: all 200ms ease; }
 #temperature.critical { color: #fb007a; }
-#custom-hardware_temp { color: #ffd700; padding: 0 10px; border-radius: 10px; transition: all 200ms ease; }
+#custom-hardware_temp { color: #ffd700; padding: 0 6px; border-radius: 10px; transition: all 200ms ease; }
 
-#custom-vpn { padding: 0 10px; border-radius: 10px; transition: all 200ms ease; }
+#custom-vpn { padding: 0 6px; border-radius: 10px; transition: all 200ms ease; }
 #custom-vpn.connected { color: #00ff7f; }
 #custom-vpn.disconnected { color: #fb007a; }
 
-#network { color: #27fbfe; padding: 0 10px; border-radius: 10px; transition: all 200ms ease; }
+#network { color: #27fbfe; padding: 0 6px; border-radius: 10px; transition: all 200ms ease; }
 #network.disconnected { color: #fb007a; }
-#pulseaudio { color: #ff8906; padding: 0 10px; border-radius: 10px; transition: all 200ms ease; }
+#pulseaudio { color: #ff8906; padding: 0 6px; border-radius: 10px; transition: all 200ms ease; }
 #pulseaudio.muted { color: #2a2a3d; }
 
-#battery { color: #00ff7f; padding: 0 10px; border-radius: 10px; transition: all 200ms ease; }
+#battery { color: #00ff7f; padding: 0 6px; border-radius: 10px; transition: all 200ms ease; }
 #battery.warning { color: #ffd700; }
 #battery.critical { color: #fb007a; }
 #battery.charging { color: #27fbfe; }
 
-#clock { color: #ff8906; font-size: 14px; padding: 0 14px; border-radius: 10px; transition: all 200ms ease; }
+#clock { color: #ff8906; font-size: 14px; padding: 0 6px; border-radius: 10px; transition: all 200ms ease; }
 
-#custom-settarget { font-size: 13px; padding: 0 12px; border-radius: 10px; transition: all 200ms ease; }
+#custom-settarget { font-size: 13px; padding: 0 6px; border-radius: 10px; transition: all 200ms ease; }
 #custom-settarget.active { color: #27fbfe; border: 1px solid rgba(39, 251, 254, 0.20); }
 #custom-settarget.inactive { color: #2a2a3d; }
 
-#custom-docker { color: #27fbfe; padding: 0 10px; border-radius: 10px; transition: all 200ms ease; }
-#custom-kvm { color: #ffd700; padding: 0 10px; border-radius: 10px; transition: all 200ms ease; }
-#custom-updates { color: #ffd700; padding: 0 10px; border-radius: 10px; transition: all 200ms ease; }
-#custom-local_ip { color: #00ff7f; padding: 0 10px; border-radius: 10px; transition: all 200ms ease; }
-#custom-public_ip { color: #27fbfe; padding: 0 10px; border-radius: 10px; transition: all 200ms ease; }
-#custom-player { color: #a839c2; padding: 0 10px; border-radius: 10px; transition: all 200ms ease; }
+#custom-docker { color: #27fbfe; padding: 0 6px; border-radius: 10px; transition: all 200ms ease; }
+#custom-kvm { color: #ffd700; padding: 0 6px; border-radius: 10px; transition: all 200ms ease; }
+#custom-updates { color: #ffd700; padding: 0 6px; border-radius: 10px; transition: all 200ms ease; }
+#custom-local_ip { color: #00ff7f; padding: 0 6px; border-radius: 10px; transition: all 200ms ease; }
+#custom-public_ip { color: #27fbfe; padding: 0 6px; border-radius: 10px; transition: all 200ms ease; }
+#custom-player { color: #a839c2; padding: 0 6px; border-radius: 10px; transition: all 200ms ease; }
 
-#custom-power { color: #fb007a; font-size: 16px; padding: 0 12px; margin: 0 2px; border-radius: 12px; transition: all 200ms ease; }
+#custom-power { color: #fb007a; font-size: 14px; padding: 0 6px; margin: 0 2px; border-radius: 12px; transition: all 200ms ease; }
 #custom-power:hover { color: #fffffe; background: rgba(255,0,0,0.15); }
 
 #tray { padding: 0 8px; }
 #tray > .passive { -gtk-icon-effect: dim; }
 #tray > .needs-attention { -gtk-icon-effect: highlight; border-radius: 8px; }
+
+/* ── FONT NORMALIZATION OVERRIDE ── */
+#cpu, #memory, #disk, #custom-vpn, #network,
+#pulseaudio, #custom-hardware_temp, #custom-settarget,
+#custom-docker, #custom-kvm, #custom-updates,
+#custom-local_ip, #custom-public_ip, #custom-player,
+#battery, #battery.warning, #battery.charging,
+#battery.critical, #clock, #tray, #custom-vpn,
+#temperature, #backlight, #bluetooth {
+    font-size: 11px;
+    min-height: 0;
+    margin: 0;
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+
+#custom-launcher, #custom-power {
+    font-size: 13px;
+    min-height: 0;
+    margin: 0;
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+
+#workspaces button {
+    font-size: 13px;
+    min-height: 0;
+    margin: 0;
+    padding: 0 4px;
+}
+
+#workspaces button:not(.active):not(.empty) {
+    color: #ff0055;
+    min-height: 0;
+    margin: 0;
+}
+
+* {
+    min-height: 0;
+    margin: 0;
+}
+
+.modules-left, .modules-center, .modules-right {
+    margin: 0;
+    padding: 0;
+}

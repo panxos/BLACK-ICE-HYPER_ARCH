@@ -15,7 +15,7 @@ BLACK-ICE ARCH es un sistema de despliegue automatizado de Arch Linux diseñado 
 - Recomendaciones
 
 **Estado de Seguridad**: ✅ SEGURO  
-**Última Auditoría**: 2026-04-07  
+**Última Auditoría**: 2026-05-28  
 **Auditor**: Francisco Aravena (P4nX0Z)
 
 > **v3.2.0 Security Changes**: Eliminado bloque BlackArch que escribía `allow-weak-key-signatures` en el GPG system config (downgrade de seguridad). Eliminada referencia a `blackarch.gpg` en `rebuild_keyring()`. Variables sin default con `set -u` corregidas para evitar ejecución inesperada de código.

@@ -8,6 +8,7 @@ pkill -x swaync 2>/dev/null
 pkill -f xdg-desktop-portal 2>/dev/null
 pkill -f udiskie 2>/dev/null
 pkill -f notification-daemon 2>/dev/null
+rm -f /tmp/hyprlock-locked
 
 # 2. Sincronizar bus con systemd
 dbus-update-activation-environment --systemd --all
