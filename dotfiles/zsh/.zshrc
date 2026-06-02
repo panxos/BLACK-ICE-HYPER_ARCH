@@ -122,9 +122,17 @@ alias cat='bat --paging=never'
 alias catn='bat'
 alias catnl='cat'
 alias orphans='[[ -n $(pacman -Qdt) ]] && sudo pacman -Rs $(pacman -Qdtq) && paru -Yc || echo "no orphans to remove"'
-alias reflector-update="sudo reflector --latest 20 --country Chile,US --protocol https --sort rate --save /etc/pacman.d/mirrorlist"
-alias eject-toshiba='sync && sudo umount /dev/sda1 && echo "Seguro desconectar"'
-alias clauderemoto='claude --channels plugin:telegram@claude-plugins-official --dangerously-skip-permissions'
+reflectorupdate() {
+  local -a base=(--latest 20 --protocol https --sort rate --save /etc/pacman.d/mirrorlist)
+  case "$1" in
+    --chile)      sudo reflector --country Chile "${base[@]}" ;;
+    --usa)        sudo reflector --country US "${base[@]}" ;;
+    --world)      sudo reflector "${base[@]}" ;;
+    --automatica) sudo reflector --age 6 --fastest 10 "${base[@]}" ;;
+    *) echo "Uso: reflectorupdate [--chile|--usa|--world|--automatica]"; return 1 ;;
+  esac
+}
+
 alias pwd='builtin pwd | tee >(wl-copy -n)'
 
 # Alias especiales
@@ -168,7 +176,6 @@ alias nk='TERM=xterm-256color nano' # Nano compatible con Kitty
 alias nr='TERM=xterm nano'         # Nano para sesiones remotas
 alias nanoc='nano --colors=always'    # Nano con colores forzados
 
-alias burpsuite='/opt/Burpsuite-Professional/burpsuitepro'
 
 # Alias para la tabla de IPs (optimizado)
 alias IPS='echo -e "\n\033[1;34m╔════════════════════╦════════════════════╗\033[0m";
@@ -1591,14 +1598,7 @@ source /usr/share/zsh/plugins/zsh-sudo/sudo.plugin.zsh
 
 # Descomenta para ver el tiempo de carga
 # zprof
-alias update-isos="sudo bash ~/bin/register_all_isos.sh"
-export LIBVIRT_DEFAULT_URI="qemu:///system"
-# Cargar script de gestión de VMs
-if [[ -f "$HOME/bin/vm_sync.sh" ]]; then
-  source "$HOME/bin/vm_sync.sh"
-fi
 export PATH=~/.npm-global/bin:$PATH
-alias packettracer='env QT_QPA_PLATFORM=xcb /usr/lib/packettracer/packettracer.AppImage'
 export LS_COLORS='di=1;38;5;141:ln=38;5;81:so=38;5;183:pi=38;5;226:ex=38;5;118:bd=38;5;208:cd=38;5;208:su=38;5;196:sg=38;5;196:tw=38;5;141:ow=38;5;141'
 
 # opencode
@@ -1650,7 +1650,6 @@ source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zs
 if [[ -f ~/.zcompdump ]]; then
   zcompile ~/.zcompdump
 fi
-alias copy="xclip -selection clipboard"
 alias copy="xclip -selection clipboard"
 
 # bun completions

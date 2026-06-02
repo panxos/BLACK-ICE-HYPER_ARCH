@@ -30,6 +30,11 @@ case "$SELECTED_COUNTRY" in
     *)         REFLECTOR_COUNTRIES="$SELECTED_COUNTRY" ;;
 esac
 
+if ! command -v reflector &>/dev/null; then
+    log_info "Instalando reflector..."
+    sudo pacman -S --noconfirm reflector
+fi
+
 if command -v reflector &>/dev/null; then
     echo -e "${YELLOW}>> ¿Optimizar mirrors con reflector?"
     echo -e "   Esto puede tardar unos minutos pero mejora la velocidad de descarga.${NC}"
