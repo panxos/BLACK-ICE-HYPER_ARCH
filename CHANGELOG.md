@@ -1,5 +1,59 @@
 # CHANGELOG - BLACK-ICE ARCH
 
+## [3.11.0] - 2026-06-03 (P4nx0z "Themes" Edition)
+
+### 🎨 Waybar — Port Completo desde gh0stzk/BSPWM a Hyprland
+
+- **6 arquetipos visuales genuinamente distintos** portados desde las rices BSPWM de gh0stzk:
+  - **Solid Full** (H4k3r-HTB, Matrix-Hacker, Anubis-Death, Marisol-Dracula): barra sólida extremo a extremo, 26-28px, accent line en borde superior/inferior
+  - **Solid Tall** (Daniela-Catppuccin, Silvia-Gruvbox, Isabel-Frappe, Isis-Magic): gradient top→bottom, 34-36px — visualmente más alta
+  - **Floating Pill** (Emilia-TokyoNight 90%, Melissa-Nord 92%, Jan-CyberPunk 88%): barra centrada que NO toca los bordes, `border-radius` en `window#waybar`, box-shadow
+  - **Framed** (Janis-CyberMagenta 95%, s4vitar-darkness 82%, Brenda-Everforest 97%): borde sólido alrededor del bar, s4vitar la más estrecha (82% = 1120px centrados)
+  - **Module Pills** (Pamela-Lovelace, Karla-ZombieNight, Zombie-Decay, Varinka-Mono): fondo transparente, cada módulo con su propio background redondeado
+  - **Grouped Sections** (Ra-Solar, Yael-OxoCarbon): left/center/right agrupados en contenedores propios con border-radius
+
+- **config.jsonc diferenciado por tema**: `width`, `height`, `margin-left`, `margin-right` varían por tema. Ya no todos comparten height=22. Rango: 24-36px. Barras flotantes con margin calculado de `(1366 - width_px) / 2`.
+
+- **CSS sin colores hex de 8 dígitos** (`#rrggbbaa`): todos los alpha channels usan `rgba(r,g,b,a)` — compatible GTK3.
+
+- **21 previews 800×450 regenerados**: composite crop que amplifica las barras (40px crop → 60px rendered) para que sean visibles en el selector.
+
+- **Módulos idénticos a Horus-Cyber** en todos los temas: `hardware_temp`, `cpu`, `memory`, `disk`, `vpn`, `workspaces`, `settarget`, `pulseaudio`, `power`, `docker`, `kvm`, `updates`, `local_ip`, `public_ip`, `player`, `battery`, `clock`, `tray`.
+
+- **Horus-Cyber no modificado** (tema activo, intocable).
+
+### 📁 Archivos Modificados
+
+- `dotfiles/waybar/themes/*/config.jsonc` — todos excepto Horus-Cyber
+- `dotfiles/waybar/themes/*/style.css` — todos excepto Horus-Cyber
+- `dotfiles/waybar/themes/*/preview.png` — regenerados para todos
+- `dotfiles/waybar/themes/Horus-Cyber/config.jsonc` — height 22→24, remove network, wofi GTK_THEME
+- `src/lib/logging.sh` — versión → 3.11.0
+
+## [3.10.0] - 2026-06-03 (P4nx0z "Spectre" Edition)
+
+### 🚀 Novedades
+
+- **Workspaces estilo Pacman en Emilia-TokyoNight**: Íconos cambiados a `ᗧ` (activo, amarillo) / `·` (inactivo) / `ᗣ` (urgente, cyan). Elimina los Nerd Font icons `󰊯`/`󰾭` que renderizaban como manchas naranjas en fonts sin parche completo.
+- **VLC soporte completo de codecs**: Se agregan `vlc-plugin-ffmpeg` (H264/H265/MPEG4 via libavcodec), `vlc-plugin-ass` (subtítulos) y `vlc-plugin-dvd` al módulo Multimedia. Sin esto VLC reportaba "codec no soportado" para la mayoría de archivos de video comunes.
+- **`imv` como visor de imágenes predeterminado**: Reemplaza `nomacs` (no empaquetado en repos Arch estándar). Visor nativo Wayland, liviano y soporte completo de formatos (jpeg, png, gif, webp, avif, heic).
+- **`mimeapps.list` completo incluido**: Archivo de asociaciones de archivos instalado por `99_finalization.sh`. Cubre video, audio, imágenes, documentos office, archivos comprimidos, código fuente, PDF, email, directorios y esquemas URL. Elimina el problema de "abrir con" sin app por defecto.
+- **`waypaper` con `subfolders=True`**: Todos los wallpapers en subdirectorios (ej. `~/Pictures/wallpapers/gh0stzk/`) son visibles y seleccionables.
+
+### 🛠️ Fixes
+
+- **Waybar workspace icons renderizaban mal**: Los íconos Nerd Font de 4 bytes (`U+F0000+`) fallan en fonts sin parche completo. Solución: caracteres Unicode estándar para Pacman style.
+- **VLC "codec no soportado"**: VLC 3.0+ está modularizado en Arch — `vlc` base no incluye el plugin ffmpeg. Se debe instalar `vlc-plugin-ffmpeg` explícitamente.
+- **mimeapps.list referenciaba `org.nomacs.ImageLounge.desktop`** (no instalado): causaba "no hay app para abrir este archivo" en imágenes.
+
+### 📁 Archivos Modificados
+
+- `dotfiles/waybar/themes/Emilia-TokyoNight/config.jsonc` — íconos workspace Pacman
+- `dotfiles/waybar/themes/Emilia-TokyoNight/style.css` — CSS Pacman (color amarillo activo, cyan urgente)
+- `dotfiles/mimeapps.list` — nuevo archivo, asociaciones completas
+- `src/deploy/05_software_suite.sh` — agrega `vlc-plugin-ffmpeg`, `vlc-plugin-ass`, `vlc-plugin-dvd`, `imv`
+- `src/deploy/99_finalization.sh` — instala `mimeapps.list` en `~/.config/`
+
 ## [3.9.0] - 2026-05-28 (P4nx0z "Obsidian" Edition)
 
 ### 🚀 Novedades

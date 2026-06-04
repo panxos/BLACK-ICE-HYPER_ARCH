@@ -1,123 +1,63 @@
-/* Theme: Emilia-TokyoNight | Inspired by gh0stzk/dotfiles | Credits: https://github.com/gh0stzk/dotfiles */
-/* Tokyo Night | bg: #1a1b26 | acc: #7aa2f7 blue + #bb9af7 purple */
-
-/* ─── Global Reset ─────────────────────────────────────────────────────────── */
-* {
-    border: none;
-    border-radius: 0;
-    font-family: "JetBrains Mono Nerd Font", "JetBrains Mono", monospace;
-    font-size: 11px;
-    font-weight: bold;
-    min-height: 0;
+/* Archetype: Floating Pill */
+* { border: none; border-radius: 0; font-family: "JetBrains Mono Nerd Font", monospace; font-size: 11px; font-weight: bold; min-height: 0; margin: 0; padding: 0; }
+window#waybar {
+    background: rgba(26,27,38,0.93);
+    border-radius: 10px;
+    color: #c0caf5;
+    border: 1px solid rgba(122,162,247,0.15);
+    box-shadow: 0 4px 20px rgba(26,27,38,0.6), 0 0 1px rgba(122,162,247,0.3);
 }
+.modules-left, .modules-center, .modules-right { background: transparent; padding: 0 8px; }
 
-window#waybar { background: transparent; color: #c0caf5; }
-window#waybar.top, window#waybar.bottom { background: transparent; }
-
-.modules-left, .modules-center, .modules-right {
-    background: rgba(26, 27, 38, 0.93);
-    border-radius: 15px;
-    margin: 8px 10px;
-    padding: 2px 15px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.55);
-    border: 1px solid rgba(122, 162, 247, 0.18);
+#workspaces { background: transparent; padding: 0 4px; }
+#workspaces button {
+    all: unset; color: #3b4261; font-size: 15px; padding: 0 7px; min-width: 18px;
+    font-family: "JetBrains Mono Nerd Font", monospace; font-weight: bold;
 }
+#workspaces button.empty                                 { color: #3b4261; opacity: 0.35; }
+#workspaces button:not(.active):not(.empty):not(.urgent) { color: #f7768e; }
+#workspaces button.active                                { color: #7aa2f7; font-size: 20px; }
+#workspaces button.urgent                                { color: #f7768e; }
+#workspaces button:hover                                 { color: #c0caf5; }
 
-tooltip { background: #1a1b26; border-radius: 10px; border: 1px solid rgba(122, 162, 247, 0.18); }
-tooltip label { color: #c0caf5; padding: 4px 8px; }
-
-#custom-launcher { color: #7aa2f7; font-size: 14px; padding: 0 6px; margin: 0 2px; border-radius: 12px; transition: all 200ms ease; }
-#custom-launcher:hover { color: #7dcfff; background: rgba(0,0,0,0.15); }
-
-#workspaces { padding: 0 4px; }
-#workspaces button { color: #3b4261; background: transparent; padding: 0 8px; margin: 2px; border-radius: 10px; font-size: 13px; transition: all 200ms ease; min-width: 28px; }
-#workspaces button.active { color: #1a1b26; background: #7aa2f7; border-radius: 10px; }
-#workspaces button:hover { color: #c0caf5; background: rgba(255,255,255,0.08); }
-#workspaces button.urgent { color: #1a1b26; background: #f7768e; }
-
-#cpu { color: #7aa2f7; padding: 0 6px; border-radius: 10px; transition: all 200ms ease; }
-#memory { color: #bb9af7; padding: 0 6px; border-radius: 10px; transition: all 200ms ease; }
-#disk { color: #9ece6a; padding: 0 6px; border-radius: 10px; transition: all 200ms ease; }
-#temperature { color: #e0af68; padding: 0 6px; border-radius: 10px; transition: all 200ms ease; }
-#temperature.critical { color: #f7768e; }
-#custom-hardware_temp { color: #e0af68; padding: 0 6px; border-radius: 10px; transition: all 200ms ease; }
-
-#custom-vpn { padding: 0 6px; border-radius: 10px; transition: all 200ms ease; }
-#custom-vpn.connected { color: #9ece6a; }
-#custom-vpn.disconnected { color: #f7768e; }
-
-#network { color: #7aa2f7; padding: 0 6px; border-radius: 10px; transition: all 200ms ease; }
+#custom-launcher { color: #7aa2f7; padding: 0 6px; }
+#custom-power    { color: #f7768e; padding: 0 6px; }
+#cpu              { color: #7aa2f7; padding: 0 6px; }
+#memory           { color: #f7768e; padding: 0 6px; }
+#disk             { color: #7aa2f7; padding: 0 6px; }
+#clock            { color: #f7768e; padding: 0 6px; }
+#pulseaudio       { color: #7aa2f7; padding: 0 6px; }
+#network          { color: #7aa2f7; padding: 0 6px; }
 #network.disconnected { color: #f7768e; }
-#pulseaudio { color: #7dcfff; padding: 0 6px; border-radius: 10px; transition: all 200ms ease; }
 #pulseaudio.muted { color: #3b4261; }
-
-#battery { color: #9ece6a; padding: 0 6px; border-radius: 10px; transition: all 200ms ease; }
-#battery.warning { color: #e0af68; }
+#tray             { padding: 0 6px; }
+#tray > .passive  { -gtk-icon-effect: dim; }
+#tray > .needs-attention { -gtk-icon-effect: highlight; border-radius: 8px; }
+#temperature               { color: #e0af68; padding: 0 6px; }
+#temperature.critical      { color: #f7768e; }
+#custom-hardware_temp          { color: #e0af68; padding: 0 6px; }
+#custom-hardware_temp.normal   { color: #7aa2f7; }
+#custom-hardware_temp.warm     { color: #e0af68; }
+#custom-hardware_temp.high     { color: #f7768e; }
+#custom-hardware_temp.critical { color: #f7768e; }
+#custom-hardware_temp.unknown  { color: #3b4261; }
+#custom-vpn              { padding: 0 6px; }
+#custom-vpn.connected    { color: #7aa2f7; }
+#custom-vpn.disconnected { color: #f7768e; }
+#battery          { color: #7aa2f7; padding: 0 6px; }
+#battery.warning  { color: #e0af68; }
 #battery.critical { color: #f7768e; }
 #battery.charging { color: #7aa2f7; }
-
-#clock { color: #7dcfff; font-size: 14px; padding: 0 6px; border-radius: 10px; transition: all 200ms ease; }
-
-#custom-settarget { font-size: 13px; padding: 0 6px; border-radius: 10px; transition: all 200ms ease; }
-#custom-settarget.active { color: #7aa2f7; border: 1px solid rgba(122, 162, 247, 0.18); }
+#battery.plugged  { color: #7aa2f7; }
+#cpu.critical     { color: #f7768e; }
+#custom-docker    { color: #7aa2f7; padding: 0 6px; }
+#custom-kvm       { color: #e0af68; padding: 0 6px; }
+#custom-updates   { color: #f7768e; padding: 0 6px; }
+#custom-local_ip  { color: #7aa2f7; padding: 0 6px; }
+#custom-public_ip { color: #7aa2f7; padding: 0 6px; }
+#custom-player    { color: #f7768e; padding: 0 6px; }
+#custom-settarget          { padding: 0 6px; }
+#custom-settarget.active   { color: #f7768e; }
 #custom-settarget.inactive { color: #3b4261; }
-
-#custom-docker { color: #7aa2f7; padding: 0 6px; border-radius: 10px; transition: all 200ms ease; }
-#custom-kvm { color: #e0af68; padding: 0 6px; border-radius: 10px; transition: all 200ms ease; }
-#custom-updates { color: #e0af68; padding: 0 6px; border-radius: 10px; transition: all 200ms ease; }
-#custom-local_ip { color: #9ece6a; padding: 0 6px; border-radius: 10px; transition: all 200ms ease; }
-#custom-public_ip { color: #7aa2f7; padding: 0 6px; border-radius: 10px; transition: all 200ms ease; }
-#custom-player { color: #bb9af7; padding: 0 6px; border-radius: 10px; transition: all 200ms ease; }
-
-#custom-power { color: #f7768e; font-size: 14px; padding: 0 6px; margin: 0 2px; border-radius: 12px; transition: all 200ms ease; }
-#custom-power:hover { color: #c0caf5; background: rgba(255,0,0,0.15); }
-
-#tray { padding: 0 8px; }
-#tray > .passive { -gtk-icon-effect: dim; }
-#tray > .needs-attention { -gtk-icon-effect: highlight; border-radius: 8px; }
-
-/* ── FONT NORMALIZATION OVERRIDE ── */
-#cpu, #memory, #disk, #custom-vpn, #network,
-#pulseaudio, #custom-hardware_temp, #custom-settarget,
-#custom-docker, #custom-kvm, #custom-updates,
-#custom-local_ip, #custom-public_ip, #custom-player,
-#battery, #battery.warning, #battery.charging,
-#battery.critical, #clock, #tray, #custom-vpn,
-#temperature, #backlight, #bluetooth {
-    font-size: 11px;
-    min-height: 0;
-    margin: 0;
-    padding-top: 3px;
-    padding-bottom: 3px;
-}
-
-#custom-launcher, #custom-power {
-    font-size: 13px;
-    min-height: 0;
-    margin: 0;
-    padding-top: 3px;
-    padding-bottom: 3px;
-}
-
-#workspaces button {
-    font-size: 13px;
-    min-height: 0;
-    margin: 0;
-    padding: 0 4px;
-}
-
-#workspaces button:not(.active):not(.empty) {
-    color: #ff9e64;
-    min-height: 0;
-    margin: 0;
-}
-
-* {
-    min-height: 0;
-    margin: 0;
-}
-
-.modules-left, .modules-center, .modules-right {
-    margin: 0;
-    padding: 0;
-}
+tooltip { background: #1a1b26; border: 1px solid rgba(122,162,247,0.2); border-radius: 6px; }
+tooltip label { color: #c0caf5; padding: 4px 8px; }

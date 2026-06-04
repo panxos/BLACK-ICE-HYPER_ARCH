@@ -1,154 +1,59 @@
-/* Mechanically Rounded/Floating - Isis-Magic-p4nx0z */
-* {
-    border: none;
-    border-radius: 0;
-    font-family: "JetBrains Mono Nerd Font", monospace;
-    font-size: 11px;
-    font-weight: bold;
-    color: #ff00ff;
-}
+/* Archetype: Solid Tall */
+* { border: none; border-radius: 0; font-family: "JetBrains Mono Nerd Font", monospace; font-size: 11px; font-weight: bold; min-height: 0; margin: 0; padding: 0; }
+window#waybar { background: linear-gradient(to bottom, #1e1b2e, #16132a); color: #e2e8f0; }
+window#waybar.top    { border-bottom: 1px solid rgba(199,146,234,0.25); }
+window#waybar.bottom { border-top:    1px solid rgba(137,221,255,0.25); }
+.modules-left, .modules-center, .modules-right { background: transparent; padding: 0 8px; }
 
-window#waybar {
-    background: transparent;
-}
-
-.modules-left,
-.modules-center,
-.modules-right {
-    background: #1a0b1a;
-    border-radius: 15px;
-    margin: 8px 10px;
-    padding: 2px 15px;
-    /* GLOW SUTIL ISIS: Pink/Magenta */
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.7), 0 0 8px rgba(255, 0, 255, 0.3);
-    border: 1px solid rgba(255, 0, 255, 0.2);
-}
-
-@define-color pink #ff00ff;
-@define-color purple #bd93f9;
-@define-color bg_bar #1a0b1a;
-@define-color red #ff0000;
-@define-color green #00ff00;
-
-/* TODOS los módulos en PINK */
-#custom-launcher,
-#workspaces,
-#custom-vpn,
-#clock,
-#custom-settarget,
-#pulseaudio,
-#battery,
-#custom-power,
-#cpu,
-#memory,
-#temperature,
-#custom-docker,
-#custom-kvm,
-#custom-updates,
-#custom-local_ip,
-#custom-public_ip,
-#tray {
-    padding: 0 6px;
-    color: @pink;
-}
-
-/* Estados especiales */
-#custom-vpn.connected,
-#custom-settarget.active {
-    color: @green;
-    background: rgba(0, 255, 0, 0.2);
-    border-radius: 8px;
-}
-
-#battery.warning {
-    color: #ffff00;
-}
-
-#battery.critical {
-    color: #ff5555;
-}
-
-#custom-vpn.disconnected,
-#custom-settarget.inactive,
-#cpu.critical,
-#temperature.critical {
-    color: @red;
-    background: rgba(255, 0, 0, 0.2);
-    border-radius: 8px;
-}
-
-/* Workspaces */
+#workspaces { background: transparent; padding: 0 4px; }
 #workspaces button {
-    color: @pink;
-    padding: 0 5px;
-    border-radius: 50%;
+    all: unset; color: #383050; font-size: 15px; padding: 0 7px; min-width: 18px;
+    font-family: "JetBrains Mono Nerd Font", monospace; font-weight: bold;
 }
+#workspaces button.empty                                 { color: #383050; opacity: 0.35; }
+#workspaces button:not(.active):not(.empty):not(.urgent) { color: #89ddff; }
+#workspaces button.active                                { color: #c792ea; font-size: 20px; }
+#workspaces button.urgent                                { color: #ff5370; }
+#workspaces button:hover                                 { color: #e2e8f0; }
 
-#workspaces button.active {
-    color: #ffffff;
-    text-shadow: 0 0 8px #ff00ff;
-    background: radial-gradient(circle, #ff00ff 0%, #bd93f9 100%);
-    box-shadow: 0 0 10px rgba(255, 0, 255, 0.6);
-}
-
-#workspaces button:hover {
-    box-shadow: 0 0 8px #ff00ff;
-}
-
-/* Launcher */
-#custom-launcher {
-    font-size: 14px;
-    color: @purple;
-    text-shadow: 0 0 5px @pink;
-}
-#custom-hardware_temp {
-    color: #00ff00;
-    padding: 0 6px;
-    font-weight: bold;
-}
-
-/* ── FONT NORMALIZATION OVERRIDE ── */
-#cpu, #memory, #disk, #custom-vpn, #network,
-#pulseaudio, #custom-hardware_temp, #custom-settarget,
-#custom-docker, #custom-kvm, #custom-updates,
-#custom-local_ip, #custom-public_ip, #custom-player,
-#battery, #battery.warning, #battery.charging,
-#battery.critical, #clock, #tray, #custom-vpn,
-#temperature, #backlight, #bluetooth {
-    font-size: 11px;
-    min-height: 0;
-    margin: 0;
-    padding-top: 3px;
-    padding-bottom: 3px;
-}
-
-#custom-launcher, #custom-power {
-    font-size: 13px;
-    min-height: 0;
-    margin: 0;
-    padding-top: 3px;
-    padding-bottom: 3px;
-}
-
-#workspaces button {
-    font-size: 13px;
-    min-height: 0;
-    margin: 0;
-    padding: 0 4px;
-}
-
-#workspaces button:not(.active):not(.empty) {
-    color: #c792ea;
-    min-height: 0;
-    margin: 0;
-}
-
-* {
-    min-height: 0;
-    margin: 0;
-}
-
-.modules-left, .modules-center, .modules-right {
-    margin: 0;
-    padding: 0;
-}
+#custom-launcher { color: #c792ea; padding: 0 6px; }
+#custom-power    { color: #ff5370; padding: 0 6px; }
+#cpu              { color: #c792ea; padding: 0 6px; }
+#memory           { color: #89ddff; padding: 0 6px; }
+#disk             { color: #c792ea; padding: 0 6px; }
+#clock            { color: #89ddff; padding: 0 6px; }
+#pulseaudio       { color: #c792ea; padding: 0 6px; }
+#network          { color: #c792ea; padding: 0 6px; }
+#network.disconnected { color: #ff5370; }
+#pulseaudio.muted { color: #383050; }
+#tray             { padding: 0 6px; }
+#tray > .passive  { -gtk-icon-effect: dim; }
+#tray > .needs-attention { -gtk-icon-effect: highlight; border-radius: 8px; }
+#temperature               { color: #c3e88d; padding: 0 6px; }
+#temperature.critical      { color: #ff5370; }
+#custom-hardware_temp          { color: #c3e88d; padding: 0 6px; }
+#custom-hardware_temp.normal   { color: #c792ea; }
+#custom-hardware_temp.warm     { color: #c3e88d; }
+#custom-hardware_temp.high     { color: #89ddff; }
+#custom-hardware_temp.critical { color: #ff5370; }
+#custom-hardware_temp.unknown  { color: #383050; }
+#custom-vpn              { padding: 0 6px; }
+#custom-vpn.connected    { color: #c792ea; }
+#custom-vpn.disconnected { color: #ff5370; }
+#battery          { color: #c792ea; padding: 0 6px; }
+#battery.warning  { color: #c3e88d; }
+#battery.critical { color: #ff5370; }
+#battery.charging { color: #c792ea; }
+#battery.plugged  { color: #c792ea; }
+#cpu.critical     { color: #ff5370; }
+#custom-docker    { color: #c792ea; padding: 0 6px; }
+#custom-kvm       { color: #c3e88d; padding: 0 6px; }
+#custom-updates   { color: #89ddff; padding: 0 6px; }
+#custom-local_ip  { color: #c792ea; padding: 0 6px; }
+#custom-public_ip { color: #c792ea; padding: 0 6px; }
+#custom-player    { color: #89ddff; padding: 0 6px; }
+#custom-settarget          { padding: 0 6px; }
+#custom-settarget.active   { color: #ff5370; }
+#custom-settarget.inactive { color: #383050; }
+tooltip { background: #1e1b2e; border: 1px solid rgba(199,146,234,0.2); border-radius: 6px; }
+tooltip label { color: #e2e8f0; padding: 4px 8px; }

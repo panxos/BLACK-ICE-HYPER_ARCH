@@ -13,6 +13,7 @@ rm -f /tmp/hyprlock-locked
 # 2. Sincronizar bus con systemd
 dbus-update-activation-environment --systemd --all
 systemctl --user import-environment --all
+systemctl --user start hyprland-session.target
 
 # 3. Arrancar awww-daemon primero (minimiza pantalla gris de Hyprland)
 awww-daemon &
@@ -39,7 +40,15 @@ done
 unset _i
 waybar &
 
-# 7. Portales y resto en background
+# 7. Portapapeles — matar versiones previas y relanzar limpio
+pkill -x wl-clip-persist 2>/dev/null
+pkill -f "wl-paste.*cliphist" 2>/dev/null
+sleep 0.3
+wl-clip-persist --clipboard both &
+wl-paste --type text --watch cliphist store &
+wl-paste --type image --watch cliphist store &
+
+# 8. Portales y resto en background
 "$HOME/.config/hypr/scripts/portal.sh" &
 export PYTHONUNBUFFERED=1
 "$HOME/.config/bin/udiskie-fix" &

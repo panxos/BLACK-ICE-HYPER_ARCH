@@ -1,123 +1,63 @@
-/* Theme: Jan-CyberPunk | Inspired by gh0stzk/dotfiles | Credits: https://github.com/gh0stzk/dotfiles */
-/* CyberPunk | bg: #0f0e17 | acc: #27fbfe cyan + #fb007a magenta */
-
-/* ─── Global Reset ─────────────────────────────────────────────────────────── */
-* {
-    border: none;
-    border-radius: 0;
-    font-family: "JetBrains Mono Nerd Font", "JetBrains Mono", monospace;
-    font-size: 11px;
-    font-weight: bold;
-    min-height: 0;
+/* Archetype: Floating Pill */
+* { border: none; border-radius: 0; font-family: "JetBrains Mono Nerd Font", monospace; font-size: 11px; font-weight: bold; min-height: 0; margin: 0; padding: 0; }
+window#waybar {
+    background: rgba(15,14,23,0.94);
+    border-radius: 6px;
+    color: #fffffe;
+    border: 1px solid rgba(39,251,254,0.15);
+    box-shadow: 0 4px 20px rgba(15,14,23,0.6), 0 0 1px rgba(39,251,254,0.3);
 }
+.modules-left, .modules-center, .modules-right { background: transparent; padding: 0 8px; }
 
-window#waybar { background: transparent; color: #fffffe; }
-window#waybar.top, window#waybar.bottom { background: transparent; }
-
-.modules-left, .modules-center, .modules-right {
-    background: rgba(15, 14, 23, 0.93);
-    border-radius: 15px;
-    margin: 8px 10px;
-    padding: 2px 15px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.55);
-    border: 1px solid rgba(39, 251, 254, 0.20);
+#workspaces { background: transparent; padding: 0 4px; }
+#workspaces button {
+    all: unset; color: #4a4a6a; font-size: 15px; padding: 0 7px; min-width: 18px;
+    font-family: "JetBrains Mono Nerd Font", monospace; font-weight: bold;
 }
+#workspaces button.empty                                 { color: #4a4a6a; opacity: 0.35; }
+#workspaces button:not(.active):not(.empty):not(.urgent) { color: #fb007a; }
+#workspaces button.active                                { color: #27fbfe; font-size: 20px; }
+#workspaces button.urgent                                { color: #fb007a; }
+#workspaces button:hover                                 { color: #fffffe; }
 
-tooltip { background: #0f0e17; border-radius: 10px; border: 1px solid rgba(39, 251, 254, 0.20); }
-tooltip label { color: #fffffe; padding: 4px 8px; }
-
-#custom-launcher { color: #27fbfe; font-size: 14px; padding: 0 6px; margin: 0 2px; border-radius: 12px; transition: all 200ms ease; }
-#custom-launcher:hover { color: #ff8906; background: rgba(0,0,0,0.15); }
-
-#workspaces { padding: 0 4px; }
-#workspaces button { color: #2a2a3d; background: transparent; padding: 0 8px; margin: 2px; border-radius: 10px; font-size: 13px; transition: all 200ms ease; min-width: 28px; }
-#workspaces button.active { color: #0f0e17; background: #27fbfe; border-radius: 10px; }
-#workspaces button:hover { color: #fffffe; background: rgba(255,255,255,0.08); }
-#workspaces button.urgent { color: #0f0e17; background: #fb007a; }
-
-#cpu { color: #27fbfe; padding: 0 6px; border-radius: 10px; transition: all 200ms ease; }
-#memory { color: #a839c2; padding: 0 6px; border-radius: 10px; transition: all 200ms ease; }
-#disk { color: #00ff7f; padding: 0 6px; border-radius: 10px; transition: all 200ms ease; }
-#temperature { color: #ffd700; padding: 0 6px; border-radius: 10px; transition: all 200ms ease; }
-#temperature.critical { color: #fb007a; }
-#custom-hardware_temp { color: #ffd700; padding: 0 6px; border-radius: 10px; transition: all 200ms ease; }
-
-#custom-vpn { padding: 0 6px; border-radius: 10px; transition: all 200ms ease; }
-#custom-vpn.connected { color: #00ff7f; }
-#custom-vpn.disconnected { color: #fb007a; }
-
-#network { color: #27fbfe; padding: 0 6px; border-radius: 10px; transition: all 200ms ease; }
+#custom-launcher { color: #27fbfe; padding: 0 6px; }
+#custom-power    { color: #fb007a; padding: 0 6px; }
+#cpu              { color: #27fbfe; padding: 0 6px; }
+#memory           { color: #fb007a; padding: 0 6px; }
+#disk             { color: #27fbfe; padding: 0 6px; }
+#clock            { color: #fb007a; padding: 0 6px; }
+#pulseaudio       { color: #27fbfe; padding: 0 6px; }
+#network          { color: #27fbfe; padding: 0 6px; }
 #network.disconnected { color: #fb007a; }
-#pulseaudio { color: #ff8906; padding: 0 6px; border-radius: 10px; transition: all 200ms ease; }
-#pulseaudio.muted { color: #2a2a3d; }
-
-#battery { color: #00ff7f; padding: 0 6px; border-radius: 10px; transition: all 200ms ease; }
-#battery.warning { color: #ffd700; }
+#pulseaudio.muted { color: #4a4a6a; }
+#tray             { padding: 0 6px; }
+#tray > .passive  { -gtk-icon-effect: dim; }
+#tray > .needs-attention { -gtk-icon-effect: highlight; border-radius: 8px; }
+#temperature               { color: #ffe000; padding: 0 6px; }
+#temperature.critical      { color: #fb007a; }
+#custom-hardware_temp          { color: #ffe000; padding: 0 6px; }
+#custom-hardware_temp.normal   { color: #27fbfe; }
+#custom-hardware_temp.warm     { color: #ffe000; }
+#custom-hardware_temp.high     { color: #fb007a; }
+#custom-hardware_temp.critical { color: #fb007a; }
+#custom-hardware_temp.unknown  { color: #4a4a6a; }
+#custom-vpn              { padding: 0 6px; }
+#custom-vpn.connected    { color: #27fbfe; }
+#custom-vpn.disconnected { color: #fb007a; }
+#battery          { color: #27fbfe; padding: 0 6px; }
+#battery.warning  { color: #ffe000; }
 #battery.critical { color: #fb007a; }
 #battery.charging { color: #27fbfe; }
-
-#clock { color: #ff8906; font-size: 14px; padding: 0 6px; border-radius: 10px; transition: all 200ms ease; }
-
-#custom-settarget { font-size: 13px; padding: 0 6px; border-radius: 10px; transition: all 200ms ease; }
-#custom-settarget.active { color: #27fbfe; border: 1px solid rgba(39, 251, 254, 0.20); }
-#custom-settarget.inactive { color: #2a2a3d; }
-
-#custom-docker { color: #27fbfe; padding: 0 6px; border-radius: 10px; transition: all 200ms ease; }
-#custom-kvm { color: #ffd700; padding: 0 6px; border-radius: 10px; transition: all 200ms ease; }
-#custom-updates { color: #ffd700; padding: 0 6px; border-radius: 10px; transition: all 200ms ease; }
-#custom-local_ip { color: #00ff7f; padding: 0 6px; border-radius: 10px; transition: all 200ms ease; }
-#custom-public_ip { color: #27fbfe; padding: 0 6px; border-radius: 10px; transition: all 200ms ease; }
-#custom-player { color: #a839c2; padding: 0 6px; border-radius: 10px; transition: all 200ms ease; }
-
-#custom-power { color: #fb007a; font-size: 14px; padding: 0 6px; margin: 0 2px; border-radius: 12px; transition: all 200ms ease; }
-#custom-power:hover { color: #fffffe; background: rgba(255,0,0,0.15); }
-
-#tray { padding: 0 8px; }
-#tray > .passive { -gtk-icon-effect: dim; }
-#tray > .needs-attention { -gtk-icon-effect: highlight; border-radius: 8px; }
-
-/* ── FONT NORMALIZATION OVERRIDE ── */
-#cpu, #memory, #disk, #custom-vpn, #network,
-#pulseaudio, #custom-hardware_temp, #custom-settarget,
-#custom-docker, #custom-kvm, #custom-updates,
-#custom-local_ip, #custom-public_ip, #custom-player,
-#battery, #battery.warning, #battery.charging,
-#battery.critical, #clock, #tray, #custom-vpn,
-#temperature, #backlight, #bluetooth {
-    font-size: 11px;
-    min-height: 0;
-    margin: 0;
-    padding-top: 3px;
-    padding-bottom: 3px;
-}
-
-#custom-launcher, #custom-power {
-    font-size: 13px;
-    min-height: 0;
-    margin: 0;
-    padding-top: 3px;
-    padding-bottom: 3px;
-}
-
-#workspaces button {
-    font-size: 13px;
-    min-height: 0;
-    margin: 0;
-    padding: 0 4px;
-}
-
-#workspaces button:not(.active):not(.empty) {
-    color: #ff0055;
-    min-height: 0;
-    margin: 0;
-}
-
-* {
-    min-height: 0;
-    margin: 0;
-}
-
-.modules-left, .modules-center, .modules-right {
-    margin: 0;
-    padding: 0;
-}
+#battery.plugged  { color: #27fbfe; }
+#cpu.critical     { color: #fb007a; }
+#custom-docker    { color: #27fbfe; padding: 0 6px; }
+#custom-kvm       { color: #ffe000; padding: 0 6px; }
+#custom-updates   { color: #fb007a; padding: 0 6px; }
+#custom-local_ip  { color: #27fbfe; padding: 0 6px; }
+#custom-public_ip { color: #27fbfe; padding: 0 6px; }
+#custom-player    { color: #fb007a; padding: 0 6px; }
+#custom-settarget          { padding: 0 6px; }
+#custom-settarget.active   { color: #fb007a; }
+#custom-settarget.inactive { color: #4a4a6a; }
+tooltip { background: #0f0e17; border: 1px solid rgba(39,251,254,0.2); border-radius: 6px; }
+tooltip label { color: #fffffe; padding: 4px 8px; }

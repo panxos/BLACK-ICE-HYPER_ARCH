@@ -20,24 +20,26 @@
             "pulseaudio",
             "custom/power"
         ],
+        "custom/launcher": {
+            "format": " 󰣇 ",
+            "on-click": "GTK_THEME=Adwaita:dark wofi --show drun",
+            "tooltip": false
+        },
         "custom/hardware_temp": {
             "exec": "~/.config/bin/hardware_temp.sh",
             "return-type": "json",
             "interval": 2,
             "tooltip": true
         },
-        "custom/launcher": {
-            "format": " 󰣇 ",
-            "on-click": "GTK_THEME=Adwaita:dark wofi --show drun",
-            "tooltip": false
-        },
         "cpu": {
-            "format": "   {usage}% ",
-            "interval": 2
+            "format": "  {usage}% ",
+            "interval": 2,
+            "states": { "critical": 80 }
         },
         "memory": {
             "format": " 󰍛 {percentage}% ",
-            "interval": 2
+            "interval": 2,
+            "states": { "critical": 85 }
         },
         "disk": {
             "format": " 󰋊 {free} ",
@@ -54,11 +56,11 @@
             "format": "{icon}",
             "on-click": "activate",
             "format-icons": {
-                "active": "⊕",
-                "occupied": "⊙",
-                "default": "⊗",
-                "empty": "○",
-                "urgent": "⚠"
+                "active": "ᗧ",
+                "occupied": "•",
+                "default": "·",
+                "empty": "·",
+                "urgent": "ᗣ"
             },
             "persistent-workspaces": { "*": 5 }
         },
@@ -73,9 +75,7 @@
         "pulseaudio": {
             "format": " {icon} {volume}% ",
             "format-muted": " 󰝟 Muted ",
-            "format-icons": {
-                "default": ["󰕿", "󰖀", "󰕾"]
-            },
+            "format-icons": { "default": ["󰕿","󰖀","󰕾"] },
             "on-click": "pavucontrol"
         },
         "custom/power": {
@@ -104,17 +104,6 @@
             "clock",
             "tray"
         ],
-        "battery": {
-            "states": {
-                "good": 80,
-                "warning": 50,
-                "critical": 10
-            },
-            "format": "{icon} {capacity}%",
-            "format-charging": "󱐋 {capacity}%",
-            "format-plugged": " {capacity}%",
-            "format-icons": ["󰂎", "󰁺", "󰁻", "󰁼", "󰁽", "󰁾", "󰁿", "󰂀", "󰂁", "󰂂", "󰁹"]
-        },
         "custom/docker": {
             "exec": "~/.config/bin/docker_status",
             "return-type": "json",
@@ -159,13 +148,20 @@
             "interval": 5,
             "on-click": "playerctl play-pause"
         },
+        "battery": {
+            "states": { "good": 80, "warning": 30, "critical": 10 },
+            "format": "{icon} {capacity}%",
+            "format-charging": "󱐋 {capacity}%",
+            "format-plugged": "󰂄 {capacity}%",
+            "format-icons": ["󰂎","󰁺","󰁻","󰁼","󰁽","󰁾","󰁿","󰂀","󰂁","󰂂","󰁹"]
+        },
+        "clock": {
+            "format": " 󰥔 {:%H:%M   %d/%m} ",
+            "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>"
+        },
         "tray": {
             "icon-size": 18,
             "spacing": 10
-        },
-        "clock": {
-            "format": " 󰥔 {:%H:%M   %m-%d} ",
-            "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>"
         }
     }
 ]

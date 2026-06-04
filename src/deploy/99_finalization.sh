@@ -111,6 +111,15 @@ if [ -f "$SCRIPT_DIR/dotfiles/waypaper/config.ini" ]; then
     log_success "waypaper config instalada (subfolders=True)"
 fi
 
+# --- MIME associations ---
+log_info "Instalando asociaciones de archivos (mimeapps.list)..."
+mkdir -p "$USER_HOME/.config"
+if [ -f "$SCRIPT_DIR/dotfiles/mimeapps.list" ]; then
+    cp "$SCRIPT_DIR/dotfiles/mimeapps.list" "$USER_HOME/.config/mimeapps.list"
+    chown "$CURRENT_USER:$CURRENT_USER" "$USER_HOME/.config/mimeapps.list"
+    log_success "mimeapps.list instalado (video→vlc, imágenes→imv, docs→okular)"
+fi
+
 # --- gen_theme_previews — hacer ejecutable ---
 if [ -f "$USER_HOME/.config/bin/gen_theme_previews" ]; then
     chmod +x "$USER_HOME/.config/bin/gen_theme_previews"

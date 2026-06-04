@@ -1,0 +1,147 @@
+[Default Applications]
+# Browser
+text/html=brave-browser.desktop
+x-scheme-handler/http=brave-browser.desktop
+x-scheme-handler/https=brave-browser.desktop
+x-scheme-handler/ftp=brave-browser.desktop
+
+# Email
+x-scheme-handler/mailto=eu.betterbird.Betterbird.desktop
+
+# File Manager
+inode/directory=org.kde.dolphin.desktop
+
+# PDF & Documents
+application/pdf=okularApplication_pdf.desktop
+application/x-pdf=okularApplication_pdf.desktop
+application/epub+zip=okularApplication_epub.desktop
+application/x-cbz=okularApplication_comicbook.desktop
+application/x-cbr=okularApplication_comicbook.desktop
+application/x-djvu=okularApplication_djvu.desktop
+
+# Office
+application/msword=onlyoffice-desktopeditors.desktop
+application/vnd.openxmlformats-officedocument.wordprocessingml.document=onlyoffice-desktopeditors.desktop
+application/vnd.ms-excel=onlyoffice-desktopeditors.desktop
+application/vnd.openxmlformats-officedocument.spreadsheetml.sheet=onlyoffice-desktopeditors.desktop
+application/vnd.ms-powerpoint=onlyoffice-desktopeditors.desktop
+application/vnd.openxmlformats-officedocument.presentationml.presentation=onlyoffice-desktopeditors.desktop
+application/vnd.oasis.opendocument.text=onlyoffice-desktopeditors.desktop
+application/vnd.oasis.opendocument.spreadsheet=onlyoffice-desktopeditors.desktop
+application/vnd.oasis.opendocument.presentation=onlyoffice-desktopeditors.desktop
+
+# Text / Code
+text/plain=org.kde.kate.desktop
+text/x-python=visual-studio-code.desktop
+text/x-shellscript=org.kde.kate.desktop
+text/x-csrc=visual-studio-code.desktop
+text/x-chdr=visual-studio-code.desktop
+text/x-java=visual-studio-code.desktop
+text/x-lua=visual-studio-code.desktop
+text/x-makefile=org.kde.kate.desktop
+text/markdown=org.kde.kate.desktop
+text/x-markdown=org.kde.kate.desktop
+application/json=visual-studio-code.desktop
+application/x-yaml=visual-studio-code.desktop
+application/xml=visual-studio-code.desktop
+application/x-ipynb+json=visual-studio-code.desktop
+text/x-log=org.kde.kate.desktop
+text/x-patch=org.kde.kate.desktop
+
+# Archives
+application/zip=org.kde.ark.desktop
+application/x-tar=org.kde.ark.desktop
+application/x-gzip=org.kde.ark.desktop
+application/x-bzip2=org.kde.ark.desktop
+application/x-xz=org.kde.ark.desktop
+application/x-7z-compressed=org.kde.ark.desktop
+application/x-rar=org.kde.ark.desktop
+application/x-rar-compressed=org.kde.ark.desktop
+application/vnd.rar=org.kde.ark.desktop
+application/gzip=org.kde.ark.desktop
+
+# Images
+image/jpeg=imv.desktop
+image/png=imv.desktop
+image/gif=imv.desktop
+image/webp=imv.desktop
+image/bmp=imv.desktop
+image/tiff=imv.desktop
+image/x-tiff=imv.desktop
+image/svg+xml=gimp.desktop
+image/x-xcf=gimp.desktop
+image/avif=imv.desktop
+image/heic=imv.desktop
+image/jxl=imv.desktop
+
+# Video
+video/mp4=vlc.desktop
+video/x-matroska=vlc.desktop
+video/x-msvideo=vlc.desktop
+video/mpeg=vlc.desktop
+video/x-mpeg=vlc.desktop
+video/quicktime=vlc.desktop
+video/x-flv=vlc.desktop
+video/webm=vlc.desktop
+video/ogg=vlc.desktop
+video/x-ogm+ogg=vlc.desktop
+video/x-ms-wmv=vlc.desktop
+video/x-ms-asf=vlc.desktop
+video/3gpp=vlc.desktop
+video/3gpp2=vlc.desktop
+video/x-theora+ogg=vlc.desktop
+
+# Audio
+audio/mpeg=vlc.desktop
+audio/mp3=vlc.desktop
+audio/mp4=vlc.desktop
+audio/aac=vlc.desktop
+audio/flac=vlc.desktop
+audio/x-flac=vlc.desktop
+audio/ogg=vlc.desktop
+audio/vorbis=vlc.desktop
+audio/x-vorbis+ogg=vlc.desktop
+audio/wav=vlc.desktop
+audio/x-wav=vlc.desktop
+audio/x-ms-wma=vlc.desktop
+audio/opus=vlc.desktop
+audio/webm=vlc.desktop
+audio/aiff=vlc.desktop
+audio/x-aiff=vlc.desktop
+
+# Torrents
+application/x-bittorrent=org.kde.ktorrent.desktop
+
+# Misc
+x-scheme-handler/discord=vesktop.desktop
+x-scheme-handler/tg=org.telegram.desktop.desktop
+x-scheme-handler/claude-cli=claude-code-url-handler.desktop
+
+[Added Associations]
+image/jpeg=imv.desktop;gimp.desktop;
+image/png=imv.desktop;gimp.desktop;
+image/gif=imv.desktop;
+image/webp=imv.desktop;
+image/bmp=imv.desktop;
+image/tiff=imv.desktop;
+image/avif=imv.desktop;
+video/mp4=vlc.desktop;mpv.desktop;
+video/x-matroska=vlc.desktop;mpv.desktop;
+video/x-msvideo=vlc.desktop;mpv.desktop;
+video/mpeg=vlc.desktop;mpv.desktop;
+video/webm=vlc.desktop;mpv.desktop;
+audio/mpeg=vlc.desktop;
+audio/flac=vlc.desktop;
+audio/ogg=vlc.desktop;
+audio/wav=vlc.desktop;
+application/pdf=okularApplication_pdf.desktop;
+application/zip=org.kde.ark.desktop;
+application/x-7z-compressed=org.kde.ark.desktop;
+application/x-rar=org.kde.ark.desktop;
+text/plain=org.kde.kate.desktop;
+inode/directory=org.kde.dolphin.desktop;
+x-scheme-handler/http=brave-browser.desktop;
+x-scheme-handler/https=brave-browser.desktop;
+x-scheme-handler/mailto=eu.betterbird.Betterbird.desktop;
+x-scheme-handler/discord=vesktop.desktop;
+x-scheme-handler/tg=org.telegram.desktop.desktop;

@@ -1,0 +1,18 @@
+#!/bin/bash
+# save_theme_wall — Guarda el wallpaper actual como default del theme activo
+# Uso: se llama con Win+Shift+W después de cambiar el wallpaper con waypaper
+THEMES_DIR="$HOME/.config/waybar/themes"
+CACHE_THEME="$HOME/.cache/current_theme"
+
+CURRENT_THEME=$(cat "$CACHE_THEME" 2>/dev/null)
+[[ -z "$CURRENT_THEME" ]] && notify-send "BLACK-ICE" "No hay theme activo" --urgency=low && exit 1
+
+# Obtener wallpaper actual desde waypaper config
+WALL=$(grep "^wallpaper = " "$HOME/.config/waypaper/config.ini" 2>/dev/null | cut -d= -f2- | tr -d ' ')
+
+[[ -z "$WALL" || ! -f "$WALL" ]] && notify-send "BLACK-ICE" "No se pudo leer wallpaper actual" --urgency=low && exit 1
+
+THEME_WALL_FILE="$THEMES_DIR/$CURRENT_THEME/wallpaper"
+echo "$WALL" > "$THEME_WALL_FILE"
+notify-send "BLACK-ICE" "Wallpaper guardado para $CURRENT_THEME" \
+    --icon "$THEMES_DIR/$CURRENT_THEME/preview.png" 2>/dev/null

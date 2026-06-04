@@ -1,165 +1,59 @@
-/* Mechanically Rounded/Floating - Anubis-Death-p4nx0z */
-* {
-    border: none;
-    border-radius: 0;
-    font-family: "JetBrains Mono Nerd Font", monospace;
-    font-size: 11px;
-    font-weight: bold;
-    color: #44ff00;
-    /* Verde Tóxico Más Puro (Menos amarillo) */
-}
+/* Archetype: Solid Full */
+* { border: none; border-radius: 0; font-family: "JetBrains Mono Nerd Font", monospace; font-size: 11px; font-weight: bold; min-height: 0; margin: 0; padding: 0; }
+window#waybar { background: #110b1e; color: #d1b3f5; }
+window#waybar.top    { border-bottom: 2px solid #7f5af0; }
+window#waybar.bottom { border-top:    2px solid #f25f4c; }
+.modules-left, .modules-center, .modules-right { background: transparent; padding: 0 6px; }
 
-window#waybar {
-    background: transparent;
-}
-
-.modules-left,
-.modules-center,
-.modules-right {
-    background: #2d2d2d;
-    border-radius: 15px;
-    margin: 8px 10px;
-    padding: 2px 15px;
-    /* GLOW SUTIL ANUBIS: Verde Neon */
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.7), 0 0 8px rgba(68, 255, 0, 0.3);
-    border: 1px solid rgba(68, 255, 0, 0.2);
-}
-
-@define-color toxic_green #44ff00;
-@define-color bgreen #00ff00;
-@define-color bg_bar #2d2d2d;
-@define-color red #ff0000;
-@define-color green #00ff00;
-
-/* TODOS los módulos en VERDE TOXICO */
-#custom-launcher,
-#workspaces,
-#custom-vpn,
-#clock,
-#custom-settarget,
-#pulseaudio,
-#battery,
-#custom-power,
-#cpu,
-#memory,
-#temperature,
-#custom-docker,
-#custom-kvm,
-#custom-updates,
-#custom-local_ip,
-#custom-public_ip,
-#tray {
-    padding: 0 6px;
-    color: @toxic_green;
-}
-
-/* Forzar color explícito en barra inferior */
-#cpu,
-#memory,
-#temperature,
-#custom-docker,
-#custom-kvm,
-#custom-updates,
-#custom-local_ip,
-#custom-public_ip {
-    color: #44ff00;
-}
-
-/* Estados especiales */
-#custom-vpn.connected,
-#custom-settarget.active {
-    color: @green;
-    background: rgba(0, 255, 0, 0.2);
-    border-radius: 8px;
-}
-
-#battery.warning {
-    color: #ffff00;
-}
-
-#battery.critical {
-    color: #ff5555;
-}
-
-#custom-vpn.disconnected,
-#custom-settarget.inactive,
-#cpu.critical,
-#temperature.critical {
-    color: @red;
-    background: rgba(255, 0, 0, 0.2);
-    border-radius: 8px;
-}
-
-/* Workspaces */
+#workspaces { background: transparent; padding: 0 4px; }
 #workspaces button {
-    color: @toxic_green;
-    padding: 0 5px;
-    border-radius: 50%;
+    all: unset; color: #2a1a3e; font-size: 15px; padding: 0 7px; min-width: 18px;
+    font-family: "JetBrains Mono Nerd Font", monospace; font-weight: bold;
 }
+#workspaces button.empty                                 { color: #2a1a3e; opacity: 0.35; }
+#workspaces button:not(.active):not(.empty):not(.urgent) { color: #f25f4c; }
+#workspaces button.active                                { color: #7f5af0; font-size: 20px; }
+#workspaces button.urgent                                { color: #f25f4c; }
+#workspaces button:hover                                 { color: #d1b3f5; }
 
-#workspaces button.active {
-    color: #ffffff;
-    text-shadow: 0 0 8px #44ff00;
-    background: radial-gradient(circle, #44ff00 0%, #33cc00 100%);
-    box-shadow: 0 0 10px rgba(68, 255, 0, 0.6);
-}
-
-#workspaces button:hover {
-    box-shadow: 0 0 8px #44ff00;
-}
-
-/* Launcher */
-#custom-launcher {
-    font-size: 14px;
-}
-#custom-hardware_temp {
-    color: #00ff00;
-    padding: 0 6px;
-    font-weight: bold;
-}
-
-/* ── FONT NORMALIZATION OVERRIDE ── */
-#cpu, #memory, #disk, #custom-vpn, #network,
-#pulseaudio, #custom-hardware_temp, #custom-settarget,
-#custom-docker, #custom-kvm, #custom-updates,
-#custom-local_ip, #custom-public_ip, #custom-player,
-#battery, #battery.warning, #battery.charging,
-#battery.critical, #clock, #tray, #custom-vpn,
-#temperature, #backlight, #bluetooth {
-    font-size: 11px;
-    min-height: 0;
-    margin: 0;
-    padding-top: 3px;
-    padding-bottom: 3px;
-}
-
-#custom-launcher, #custom-power {
-    font-size: 13px;
-    min-height: 0;
-    margin: 0;
-    padding-top: 3px;
-    padding-bottom: 3px;
-}
-
-#workspaces button {
-    font-size: 13px;
-    min-height: 0;
-    margin: 0;
-    padding: 0 4px;
-}
-
-#workspaces button:not(.active):not(.empty) {
-    color: #d4af37;
-    min-height: 0;
-    margin: 0;
-}
-
-* {
-    min-height: 0;
-    margin: 0;
-}
-
-.modules-left, .modules-center, .modules-right {
-    margin: 0;
-    padding: 0;
-}
+#custom-launcher { color: #7f5af0; padding: 0 6px; }
+#custom-power    { color: #f25f4c; padding: 0 6px; }
+#cpu              { color: #7f5af0; padding: 0 6px; }
+#memory           { color: #f25f4c; padding: 0 6px; }
+#disk             { color: #7f5af0; padding: 0 6px; }
+#clock            { color: #f25f4c; padding: 0 6px; }
+#pulseaudio       { color: #7f5af0; padding: 0 6px; }
+#network          { color: #7f5af0; padding: 0 6px; }
+#network.disconnected { color: #f25f4c; }
+#pulseaudio.muted { color: #2a1a3e; }
+#tray             { padding: 0 6px; }
+#tray > .passive  { -gtk-icon-effect: dim; }
+#tray > .needs-attention { -gtk-icon-effect: highlight; border-radius: 8px; }
+#temperature               { color: #ffd803; padding: 0 6px; }
+#temperature.critical      { color: #f25f4c; }
+#custom-hardware_temp          { color: #ffd803; padding: 0 6px; }
+#custom-hardware_temp.normal   { color: #7f5af0; }
+#custom-hardware_temp.warm     { color: #ffd803; }
+#custom-hardware_temp.high     { color: #f25f4c; }
+#custom-hardware_temp.critical { color: #f25f4c; }
+#custom-hardware_temp.unknown  { color: #2a1a3e; }
+#custom-vpn              { padding: 0 6px; }
+#custom-vpn.connected    { color: #7f5af0; }
+#custom-vpn.disconnected { color: #f25f4c; }
+#battery          { color: #7f5af0; padding: 0 6px; }
+#battery.warning  { color: #ffd803; }
+#battery.critical { color: #f25f4c; }
+#battery.charging { color: #7f5af0; }
+#battery.plugged  { color: #7f5af0; }
+#cpu.critical     { color: #f25f4c; }
+#custom-docker    { color: #7f5af0; padding: 0 6px; }
+#custom-kvm       { color: #ffd803; padding: 0 6px; }
+#custom-updates   { color: #f25f4c; padding: 0 6px; }
+#custom-local_ip  { color: #7f5af0; padding: 0 6px; }
+#custom-public_ip { color: #7f5af0; padding: 0 6px; }
+#custom-player    { color: #f25f4c; padding: 0 6px; }
+#custom-settarget          { padding: 0 6px; }
+#custom-settarget.active   { color: #f25f4c; }
+#custom-settarget.inactive { color: #2a1a3e; }
+tooltip { background: #110b1e; border: 1px solid rgba(127,90,240,0.2); border-radius: 6px; }
+tooltip label { color: #d1b3f5; padding: 4px 8px; }

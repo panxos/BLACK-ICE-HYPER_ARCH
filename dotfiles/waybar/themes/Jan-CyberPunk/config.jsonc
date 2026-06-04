@@ -2,8 +2,11 @@
     {
         "layer": "top",
         "position": "top",
-        "height": 22,
+        "height": 28,
         "spacing": 4,
+        "width": 1202,
+        "margin-left": 82,
+        "margin-right": 82,
         "modules-left": [
             "custom/launcher",
             "custom/hardware_temp",
@@ -17,30 +20,27 @@
         ],
         "modules-right": [
             "custom/settarget",
-            "network",
             "pulseaudio",
             "custom/power"
         ],
-        "custom/launcher": {
-            "format": " 󰣇 ",
-            "on-click": "wofi --show drun",
-            "tooltip": false
-        },
         "custom/hardware_temp": {
             "exec": "~/.config/bin/hardware_temp.sh",
             "return-type": "json",
             "interval": 2,
             "tooltip": true
         },
+        "custom/launcher": {
+            "format": " 󰣇 ",
+            "on-click": "GTK_THEME=Adwaita:dark wofi --show drun",
+            "tooltip": false
+        },
         "cpu": {
-            "format": "  {usage}% ",
-            "interval": 2,
-            "states": { "critical": 80 }
+            "format": "   {usage}% ",
+            "interval": 2
         },
         "memory": {
             "format": " 󰍛 {percentage}% ",
-            "interval": 2,
-            "states": { "critical": 85 }
+            "interval": 2
         },
         "disk": {
             "format": " 󰋊 {free} ",
@@ -54,14 +54,11 @@
             "interval": 5
         },
         "hyprland/workspaces": {
-            "format": "{icon}",
+            "format": "{id}",
             "on-click": "activate",
-            "format-icons": {
-                "active": "▓",
-                "default": "░",
-                "urgent": "▊"
-            },
-            "persistent-workspaces": { "*": 5 }
+            "persistent-workspaces": {
+                "*": 5
+            }
         },
         "custom/settarget": {
             "format": "{}",
@@ -71,44 +68,39 @@
             "return-type": "json",
             "on-click": "~/.config/bin/settarget"
         },
-        "network": {
-            "format-wifi": " 󰖩 {bandwidthDownBits} ",
-            "format-ethernet": " 󰈀 {ipaddr} ",
-            "format-disconnected": " 󰖪 OFFLINE ",
-            "tooltip-format": "{essid} — {signalStrength}% | {ifname}"
-        },
         "pulseaudio": {
             "format": " {icon} {volume}% ",
             "format-muted": " 󰝟 Muted ",
-            "format-icons": { "default": ["󰕿","󰖀","󰕾"] },
             "on-click": "pavucontrol"
         },
         "custom/power": {
             "format": " ⏻ ",
             "on-click": "~/.config/bin/power_menu.sh",
             "tooltip": false
-        }
-    },
-    {
-        "layer": "top",
-        "position": "bottom",
-        "height": 22,
-        "spacing": 4,
-        "modules-left": [
-            "custom/docker",
-            "custom/kvm",
-            "custom/updates"
-        ],
-        "modules-center": [
-            "custom/local_ip",
-            "custom/public_ip"
-        ],
-        "modules-right": [
-            "custom/player",
-            "battery",
-            "clock",
-            "tray"
-        ],
+        },
+        "battery": {
+            "states": {
+                "good": 80,
+                "warning": 50,
+                "critical": 10
+            },
+            "format": "{icon} {capacity}%",
+            "format-charging": "󱐋 {capacity}%",
+            "format-plugged": " {capacity}%",
+            "format-icons": [
+                "󰂎",
+                "󰁺",
+                "󰁻",
+                "󰁼",
+                "󰁽",
+                "󰁾",
+                "󰁿",
+                "󰂀",
+                "󰂁",
+                "󰂂",
+                "󰁹"
+            ]
+        },
         "custom/docker": {
             "exec": "~/.config/bin/docker_status",
             "return-type": "json",
@@ -128,11 +120,11 @@
             "return-type": "json",
             "interval": 60,
             "signal": 8,
-            "signal": 8,
             "format": " 󰚰 {} "
         },
         "custom/local_ip": {
             "exec": "~/.config/bin/local_ip",
+            "on-click": "bash -c '~/.config/bin/copy_ip.sh ~/.config/bin/local_ip'",
             "on-click-right": "bash -c '~/.config/bin/copy_ip.sh ~/.config/bin/local_ip'",
             "return-type": "json",
             "interval": 10,
@@ -140,6 +132,7 @@
         },
         "custom/public_ip": {
             "exec": "~/.config/bin/public_ip",
+            "on-click": "bash -c '~/.config/bin/copy_ip.sh ~/.config/bin/public_ip'",
             "on-click-right": "bash -c '~/.config/bin/copy_ip.sh ~/.config/bin/public_ip'",
             "return-type": "json",
             "interval": 60,
@@ -151,20 +144,166 @@
             "interval": 5,
             "on-click": "playerctl play-pause"
         },
+        "tray": {
+            "icon-size": 18,
+            "spacing": 10
+        },
+        "clock": {
+            "format": " 󰥔 {:%H:%M   %m-%d} ",
+            "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>"
+        }
+    },
+    {
+        "layer": "top",
+        "position": "bottom",
+        "height": 28,
+        "spacing": 4,
+        "width": 1202,
+        "margin-left": 82,
+        "margin-right": 82,
+        "modules-left": [
+            "custom/docker",
+            "custom/kvm",
+            "custom/updates"
+        ],
+        "modules-center": [
+            "custom/local_ip",
+            "custom/public_ip"
+        ],
+        "modules-right": [
+            "custom/player",
+            "battery",
+            "clock",
+            "tray"
+        ],
+        "custom/hardware_temp": {
+            "exec": "~/.config/bin/hardware_temp.sh",
+            "return-type": "json",
+            "interval": 2,
+            "tooltip": true
+        },
+        "custom/launcher": {
+            "format": " 󰣇 ",
+            "on-click": "GTK_THEME=Adwaita:dark wofi --show drun",
+            "tooltip": false
+        },
+        "cpu": {
+            "format": "   {usage}% ",
+            "interval": 2
+        },
+        "memory": {
+            "format": " 󰍛 {percentage}% ",
+            "interval": 2
+        },
+        "disk": {
+            "format": " 󰋊 {free} ",
+            "interval": 60
+        },
+        "custom/vpn": {
+            "format": " {}",
+            "exec": "~/.config/bin/vpn_status",
+            "on-click-right": "bash -c '~/.config/bin/copy_ip.sh ~/.config/bin/vpn_status'",
+            "return-type": "json",
+            "interval": 5
+        },
+        "hyprland/workspaces": {
+            "format": "{id}",
+            "on-click": "activate",
+            "persistent-workspaces": {
+                "*": 5
+            }
+        },
+        "custom/settarget": {
+            "format": "{}",
+            "exec": "~/.config/bin/target_status",
+            "on-click-right": "bash -c '~/.config/bin/copy_ip.sh ~/.config/bin/target_status'",
+            "interval": 5,
+            "return-type": "json",
+            "on-click": "~/.config/bin/settarget"
+        },
+        "pulseaudio": {
+            "format": " {icon} {volume}% ",
+            "format-muted": " 󰝟 Muted ",
+            "on-click": "pavucontrol"
+        },
+        "custom/power": {
+            "format": " ⏻ ",
+            "on-click": "~/.config/bin/power_menu.sh",
+            "tooltip": false
+        },
         "battery": {
-            "states": { "good": 80, "warning": 30, "critical": 10 },
+            "states": {
+                "good": 80,
+                "warning": 50,
+                "critical": 10
+            },
             "format": "{icon} {capacity}%",
             "format-charging": "󱐋 {capacity}%",
             "format-plugged": " {capacity}%",
-            "format-icons": ["󰂎","󰁺","󰁻","󰁼","󰁽","󰁾","󰁿","󰂀","󰂁","󰂂","󰁹"]
+            "format-icons": [
+                "󰂎",
+                "󰁺",
+                "󰁻",
+                "󰁼",
+                "󰁽",
+                "󰁾",
+                "󰁿",
+                "󰂀",
+                "󰂁",
+                "󰂂",
+                "󰁹"
+            ]
         },
-        "clock": {
-            "format": " 󰥔 {:%H:%M   %d/%m} ",
-            "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>"
+        "custom/docker": {
+            "exec": "~/.config/bin/docker_status",
+            "return-type": "json",
+            "interval": 10,
+            "format": " {} ",
+            "on-click-right": "~/.config/bin/docker_menu"
+        },
+        "custom/kvm": {
+            "exec": "~/.config/bin/kvm_status",
+            "return-type": "json",
+            "interval": 10,
+            "format": " {} ",
+            "on-click-right": "~/.config/bin/kvm_menu"
+        },
+        "custom/updates": {
+            "exec": "~/.config/bin/updates_status",
+            "return-type": "json",
+            "interval": 60,
+            "signal": 8,
+            "format": " 󰚰 {} "
+        },
+        "custom/local_ip": {
+            "exec": "~/.config/bin/local_ip",
+            "on-click": "bash -c '~/.config/bin/copy_ip.sh ~/.config/bin/local_ip'",
+            "on-click-right": "bash -c '~/.config/bin/copy_ip.sh ~/.config/bin/local_ip'",
+            "return-type": "json",
+            "interval": 10,
+            "format": " {} "
+        },
+        "custom/public_ip": {
+            "exec": "~/.config/bin/public_ip",
+            "on-click": "bash -c '~/.config/bin/copy_ip.sh ~/.config/bin/public_ip'",
+            "on-click-right": "bash -c '~/.config/bin/copy_ip.sh ~/.config/bin/public_ip'",
+            "return-type": "json",
+            "interval": 60,
+            "format": " {} "
+        },
+        "custom/player": {
+            "exec": "playerctl metadata --format '󰝚 {{artist}} - {{title}}' 2>/dev/null || echo ''",
+            "format": " {} ",
+            "interval": 5,
+            "on-click": "playerctl play-pause"
         },
         "tray": {
             "icon-size": 18,
             "spacing": 10
+        },
+        "clock": {
+            "format": " 󰥔 {:%H:%M   %m-%d} ",
+            "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>"
         }
     }
 ]

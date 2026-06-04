@@ -1,192 +1,59 @@
-/* Theme: H4k3r-HTB | LAYOUT: COMPACT PILL-RIGHT — launcher izquierda, status derecha compacto */
-/* HackTheBox | bg: #0c1018 | acc: #9fef00 neon-green | Módulos como "tabs" con underline */
+/* Archetype: Solid Full */
+* { border: none; border-radius: 0; font-family: "JetBrains Mono Nerd Font", monospace; font-size: 11px; font-weight: bold; min-height: 0; margin: 0; padding: 0; }
+window#waybar { background: #0c1018; color: #a4b1cd; }
+window#waybar.top    { border-bottom: 2px solid #9fef00; }
+window#waybar.bottom { border-top:    2px solid #ff6b6b; }
+.modules-left, .modules-center, .modules-right { background: transparent; padding: 0 6px; }
 
-/* ─── Global Reset ─────────────────────────────────────────────────────────── */
-* {
-    border: none;
-    border-radius: 0;
-    font-family: "JetBrains Mono Nerd Font", "JetBrains Mono", monospace;
-    font-size: 11px;
-    font-weight: bold;
-    min-height: 0;
-}
-
-/* ─── Window — fondo oscuro con acento inferior neon ───────────────────────── */
-window#waybar {
-    background: rgba(12, 16, 24, 0.98);
-    color: #a4b1cd;
-    border-bottom: 1px solid rgba(159, 239, 0, 0.30);
-}
-
-window#waybar.top { border-bottom: 1px solid rgba(159, 239, 0, 0.30); }
-
-/* ─── Left: píldora standalone que funciona como launcher ──────────────────── */
-.modules-left {
-    background: rgba(159, 239, 0, 0.08);
-    border-radius: 0;
-    margin: 0;
-    padding: 0 6px;
-    border-right: 2px solid rgba(159, 239, 0, 0.35);
-}
-
-/* ─── Center: workspaces minimalista ───────────────────────────────────────── */
-.modules-center {
-    background: transparent;
-    margin: 0;
-    padding: 0 4px;
-}
-
-/* ─── Right: status compacto sin fondo ─────────────────────────────────────── */
-.modules-right {
-    background: transparent;
-    margin: 0;
-    padding: 0 8px;
-    border-left: 1px solid rgba(159, 239, 0, 0.15);
-}
-
-/* ─── Tooltips ──────────────────────────────────────────────────────────────── */
-tooltip { background: #0c1018; border-radius: 5px; border: 1px solid rgba(159, 239, 0, 0.35); }
-tooltip label { color: #a4b1cd; padding: 3px 6px; }
-
-/* ─── Launcher: grande a la izquierda ──────────────────────────────────────── */
-#custom-launcher {
-    color: #9fef00;
-    font-size: 14px;
-    padding: 0 6px;
-    background: transparent;
-    transition: all 150ms ease;
-    text-shadow: 0 0 10px rgba(159, 239, 0, 0.6);
-}
-#custom-launcher:hover { color: #00ff7f; text-shadow: 0 0 16px rgba(0, 255, 127, 0.8); }
-
-/* ─── Workspaces — style "terminal tabs" ───────────────────────────────────── */
-#workspaces { padding: 0 4px; }
+#workspaces { background: transparent; padding: 0 4px; }
 #workspaces button {
-    color: #1b2333;
-    background: transparent;
-    padding: 0 7px;
-    margin: 0 1px;
-    border-radius: 0;
-    font-size: 11px;
-    transition: all 150ms ease;
-    min-width: 22px;
-    border-bottom: 2px solid transparent;
+    all: unset; color: #2a3040; font-size: 15px; padding: 0 7px; min-width: 18px;
+    font-family: "JetBrains Mono Nerd Font", monospace; font-weight: bold;
 }
-#workspaces button.active {
-    color: #9fef00;
-    background: rgba(159, 239, 0, 0.06);
-    border-bottom: 2px solid #9fef00;
-}
-#workspaces button:hover {
-    color: #a4b1cd;
-    background: rgba(159, 239, 0, 0.04);
-    border-bottom: 2px solid rgba(159, 239, 0, 0.4);
-}
-#workspaces button.urgent {
-    color: #ff4444;
-    border-bottom: 2px solid #ff4444;
-}
+#workspaces button.empty                                 { color: #2a3040; opacity: 0.35; }
+#workspaces button:not(.active):not(.empty):not(.urgent) { color: #ff6b6b; }
+#workspaces button.active                                { color: #9fef00; font-size: 20px; }
+#workspaces button.urgent                                { color: #ff0000; }
+#workspaces button:hover                                 { color: #a4b1cd; }
 
-/* ─── Todos los módulos de status — compactos, sin padding excesivo ─────────── */
-#cpu, #memory, #disk, #temperature, #custom-hardware_temp,
-#custom-vpn, #network, #pulseaudio, #battery,
-#custom-settarget, #custom-docker, #custom-kvm,
-#custom-updates, #custom-local_ip, #custom-public_ip,
-#custom-player, #custom-power, #tray {
-    padding: 0 6px;
-    color: #a4b1cd;
-    transition: color 150ms ease;
-}
-
-/* ─── System modules ────────────────────────────────────────────────────────── */
-#cpu             { color: #9fef00; }
-#memory          { color: #7e5bef; }
-#disk            { color: #9fef00; }
-#temperature     { color: #ffcc00; }
-#temperature.critical { color: #ff4444; animation: blink-htb 0.8s linear infinite; }
-#custom-hardware_temp { color: #ffcc00; }
+#custom-launcher { color: #9fef00; padding: 0 6px; }
+#custom-power    { color: #ff0000; padding: 0 6px; }
+#cpu              { color: #9fef00; padding: 0 6px; }
+#memory           { color: #ff6b6b; padding: 0 6px; }
+#disk             { color: #9fef00; padding: 0 6px; }
+#clock            { color: #ff6b6b; padding: 0 6px; }
+#pulseaudio       { color: #9fef00; padding: 0 6px; }
+#network          { color: #9fef00; padding: 0 6px; }
+#network.disconnected { color: #ff0000; }
+#pulseaudio.muted { color: #2a3040; }
+#tray             { padding: 0 6px; }
+#tray > .passive  { -gtk-icon-effect: dim; }
+#tray > .needs-attention { -gtk-icon-effect: highlight; border-radius: 8px; }
+#temperature               { color: #f4a261; padding: 0 6px; }
+#temperature.critical      { color: #ff0000; }
+#custom-hardware_temp          { color: #f4a261; padding: 0 6px; }
+#custom-hardware_temp.normal   { color: #9fef00; }
+#custom-hardware_temp.warm     { color: #f4a261; }
+#custom-hardware_temp.high     { color: #ff6b6b; }
+#custom-hardware_temp.critical { color: #ff0000; }
+#custom-hardware_temp.unknown  { color: #2a3040; }
+#custom-vpn              { padding: 0 6px; }
 #custom-vpn.connected    { color: #9fef00; }
-#custom-vpn.disconnected { color: #ff4444; }
-#network         { color: #9fef00; }
-#network.disconnected { color: #ff4444; }
-#pulseaudio      { color: #00ff7f; }
-#pulseaudio.muted { color: #1b2333; }
-#battery         { color: #9fef00; }
-#battery.warning { color: #ffcc00; }
-#battery.critical { color: #ff4444; animation: blink-htb 0.8s linear infinite; }
-#battery.charging { color: #00ff7f; }
-
-/* ─── Clock ─────────────────────────────────────────────────────────────────── */
-#clock { color: #9fef00; font-size: 12px; padding: 0 6px; font-size: 11px; }
-
-/* ─── Set Target ────────────────────────────────────────────────────────────── */
-#custom-settarget.active   { color: #9fef00; }
-#custom-settarget.inactive { color: #1b2333; }
-
-/* ─── Docker / KVM / Updates ────────────────────────────────────────────────── */
-#custom-docker  { color: #9fef00; }
-#custom-kvm     { color: #ffcc00; }
-#custom-updates { color: #ffcc00; }
-#custom-local_ip  { color: #9fef00; }
-#custom-public_ip { color: #00ff7f; }
-#custom-player    { color: #7e5bef; }
-
-/* ─── Power ─────────────────────────────────────────────────────────────────── */
-#custom-power { color: #ff4444; font-size: 14px; padding: 0 6px; }
-#custom-power:hover { color: #ff0000; text-shadow: 0 0 8px rgba(255, 0, 0, 0.7); }
-
-/* ─── Tray ──────────────────────────────────────────────────────────────────── */
-#tray { padding: 0 4px; }
-#tray > .passive { -gtk-icon-effect: dim; }
-#tray > .needs-attention { -gtk-icon-effect: highlight; }
-
-/* ─── Animaciones ───────────────────────────────────────────────────────────── */
-@keyframes blink-htb {
-    to { opacity: 0.3; }
-}
-
-/* ── FONT NORMALIZATION OVERRIDE ── */
-#cpu, #memory, #disk, #custom-vpn, #network,
-#pulseaudio, #custom-hardware_temp, #custom-settarget,
-#custom-docker, #custom-kvm, #custom-updates,
-#custom-local_ip, #custom-public_ip, #custom-player,
-#battery, #battery.warning, #battery.charging,
-#battery.critical, #clock, #tray, #custom-vpn,
-#temperature, #backlight, #bluetooth {
-    font-size: 11px;
-    min-height: 0;
-    margin: 0;
-    padding-top: 3px;
-    padding-bottom: 3px;
-}
-
-#custom-launcher, #custom-power {
-    font-size: 13px;
-    min-height: 0;
-    margin: 0;
-    padding-top: 3px;
-    padding-bottom: 3px;
-}
-
-#workspaces button {
-    font-size: 13px;
-    min-height: 0;
-    margin: 0;
-    padding: 0 4px;
-}
-
-#workspaces button:not(.active):not(.empty) {
-    color: #9fef00;
-    min-height: 0;
-    margin: 0;
-}
-
-* {
-    min-height: 0;
-    margin: 0;
-}
-
-.modules-left, .modules-center, .modules-right {
-    margin: 0;
-    padding: 0;
-}
+#custom-vpn.disconnected { color: #ff0000; }
+#battery          { color: #9fef00; padding: 0 6px; }
+#battery.warning  { color: #f4a261; }
+#battery.critical { color: #ff0000; }
+#battery.charging { color: #9fef00; }
+#battery.plugged  { color: #9fef00; }
+#cpu.critical     { color: #ff0000; }
+#custom-docker    { color: #9fef00; padding: 0 6px; }
+#custom-kvm       { color: #f4a261; padding: 0 6px; }
+#custom-updates   { color: #ff6b6b; padding: 0 6px; }
+#custom-local_ip  { color: #9fef00; padding: 0 6px; }
+#custom-public_ip { color: #9fef00; padding: 0 6px; }
+#custom-player    { color: #ff6b6b; padding: 0 6px; }
+#custom-settarget          { padding: 0 6px; }
+#custom-settarget.active   { color: #ff0000; }
+#custom-settarget.inactive { color: #2a3040; }
+tooltip { background: #0c1018; border: 1px solid rgba(159,239,0,0.2); border-radius: 6px; }
+tooltip label { color: #a4b1cd; padding: 4px 8px; }

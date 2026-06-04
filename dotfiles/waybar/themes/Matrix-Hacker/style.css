@@ -1,142 +1,59 @@
-* {
-    font-family: "JetBrainsMono Nerd Font", "Roboto", "Helvetica", "Arial", sans-serif;
-    font-size: 11px;
-    font-weight: bold;
-    border: none;
-    border-radius: 0;
-}
+/* Archetype: Solid Full */
+* { border: none; border-radius: 0; font-family: "JetBrains Mono Nerd Font", monospace; font-size: 11px; font-weight: bold; min-height: 0; margin: 0; padding: 0; }
+window#waybar { background: #050f05; color: #00ff41; }
+window#waybar.top    { border-bottom: 2px solid #00ff41; }
+window#waybar.bottom { border-top:    2px solid #39ff14; }
+.modules-left, .modules-center, .modules-right { background: transparent; padding: 0 6px; }
 
-window#waybar {
-    background-color: rgba(5, 5, 5, 0.95);
-    color: #39ff14;
-    transition-property: background-color;
-    transition-duration: .5s;
-}
-
-window#waybar.top {
-    border-bottom: 2px solid rgba(57, 255, 20, 0.6);
-}
-
-window#waybar.bottom {
-    border-top: 2px solid rgba(57, 255, 20, 0.6);
-}
-
-tooltip {
-    background: #050505;
-    border: 1px solid #39ff14;
-}
-
-tooltip label {
-    color: #39ff14;
-    font-weight: bold;
-}
-
-#custom-launcher {
-    color: #39ff14;
-    padding-left: 6px;
-    font-size: 14px;
-    text-shadow: 0 0 5px #39ff14;
-}
-
-#cpu { color: #00ff00; }
-#memory { color: #32cd32; }
-#disk { color: #7cfc00; }
-#custom-vpn { color: #00ff00; }
-#network { color: #00fa9a; }
-#pulseaudio { color: #32cd32; }
-#custom-updates { color: #7cfc00; }
-
-#custom-power {
-    color: #ff0000;
-    padding-right: 6px;
-    font-size: 14px;
-    text-shadow: 0 0 5px #ff0000;
-}
-
-#clock, #custom-settarget, #custom-kvm, #battery { color: #39ff14; padding: 0 6px; }
-
-#battery.warning {
-    color: #ffff00;
-}
-
-#battery.critical {
-    color: #ff5555;
-}
-#custom-docker { color: #32cd32; }
-#custom-local_ip { color: #7cfc00; }
-#custom-public_ip { color: #00fa9a; }
-
+#workspaces { background: transparent; padding: 0 4px; }
 #workspaces button {
-    padding: 0 5px;
-    color: #115511;
-    font-size: 14px;
-    transition: all 0.3s ease;
+    all: unset; color: #003300; font-size: 15px; padding: 0 7px; min-width: 18px;
+    font-family: "JetBrains Mono Nerd Font", monospace; font-weight: bold;
 }
+#workspaces button.empty                                 { color: #003300; opacity: 0.35; }
+#workspaces button:not(.active):not(.empty):not(.urgent) { color: #39ff14; }
+#workspaces button.active                                { color: #00ff41; font-size: 20px; }
+#workspaces button.urgent                                { color: #ff0000; }
+#workspaces button:hover                                 { color: #00ff41; }
 
-#workspaces button.active {
-    color: #39ff14;
-    text-shadow: 0 0 10px rgba(57, 255, 20, 0.9);
-}
-
-#workspaces button:not(.active):not(.empty) {
-    color: #39ff14;
-    min-height: 0;
-    margin: 0;
-}
-
-#workspaces button.urgent {
-    color: #ff0000;
-    text-shadow: 0 0 10px rgba(255, 0, 0, 0.8);
-}
-
-#memory:hover, #cpu:hover, #disk:hover, #network:hover, #pulseaudio:hover, #custom-vpn:hover, #custom-updates:hover, #clock:hover, #custom-settarget:hover {
-    background-color: rgba(57, 255, 20, 0.15);
-    border-radius: 4px;
-}
-
-#custom-hardware_temp {
-    color: #39ff14;
-    padding: 0 5px;
-    font-weight: bold;
-    text-shadow: 0 0 5px rgba(57, 255, 20, 0.8);
-}
-
-/* ── FONT NORMALIZATION OVERRIDE ── */
-#cpu, #memory, #disk, #custom-vpn, #network,
-#pulseaudio, #custom-hardware_temp, #custom-settarget,
-#custom-docker, #custom-kvm, #custom-updates,
-#custom-local_ip, #custom-public_ip, #custom-player,
-#battery, #battery.warning, #battery.charging,
-#battery.critical, #clock, #tray, #custom-vpn,
-#temperature, #backlight, #bluetooth {
-    font-size: 11px;
-    min-height: 0;
-    margin: 0;
-    padding-top: 3px;
-    padding-bottom: 3px;
-}
-
-#custom-launcher, #custom-power {
-    font-size: 13px;
-    min-height: 0;
-    margin: 0;
-    padding-top: 3px;
-    padding-bottom: 3px;
-}
-
-#workspaces button {
-    font-size: 13px;
-    min-height: 0;
-    margin: 0;
-    padding: 0 4px;
-}
-
-* {
-    min-height: 0;
-    margin: 0;
-}
-
-.modules-left, .modules-center, .modules-right {
-    margin: 0;
-    padding: 0;
-}
+#custom-launcher { color: #00ff41; padding: 0 6px; }
+#custom-power    { color: #ff0000; padding: 0 6px; }
+#cpu              { color: #00ff41; padding: 0 6px; }
+#memory           { color: #39ff14; padding: 0 6px; }
+#disk             { color: #00ff41; padding: 0 6px; }
+#clock            { color: #39ff14; padding: 0 6px; }
+#pulseaudio       { color: #00ff41; padding: 0 6px; }
+#network          { color: #00ff41; padding: 0 6px; }
+#network.disconnected { color: #ff0000; }
+#pulseaudio.muted { color: #003300; }
+#tray             { padding: 0 6px; }
+#tray > .passive  { -gtk-icon-effect: dim; }
+#tray > .needs-attention { -gtk-icon-effect: highlight; border-radius: 8px; }
+#temperature               { color: #ffff00; padding: 0 6px; }
+#temperature.critical      { color: #ff0000; }
+#custom-hardware_temp          { color: #ffff00; padding: 0 6px; }
+#custom-hardware_temp.normal   { color: #00ff41; }
+#custom-hardware_temp.warm     { color: #ffff00; }
+#custom-hardware_temp.high     { color: #39ff14; }
+#custom-hardware_temp.critical { color: #ff0000; }
+#custom-hardware_temp.unknown  { color: #003300; }
+#custom-vpn              { padding: 0 6px; }
+#custom-vpn.connected    { color: #00ff41; }
+#custom-vpn.disconnected { color: #ff0000; }
+#battery          { color: #00ff41; padding: 0 6px; }
+#battery.warning  { color: #ffff00; }
+#battery.critical { color: #ff0000; }
+#battery.charging { color: #00ff41; }
+#battery.plugged  { color: #00ff41; }
+#cpu.critical     { color: #ff0000; }
+#custom-docker    { color: #00ff41; padding: 0 6px; }
+#custom-kvm       { color: #ffff00; padding: 0 6px; }
+#custom-updates   { color: #39ff14; padding: 0 6px; }
+#custom-local_ip  { color: #00ff41; padding: 0 6px; }
+#custom-public_ip { color: #00ff41; padding: 0 6px; }
+#custom-player    { color: #39ff14; padding: 0 6px; }
+#custom-settarget          { padding: 0 6px; }
+#custom-settarget.active   { color: #ff0000; }
+#custom-settarget.inactive { color: #003300; }
+tooltip { background: #050f05; border: 1px solid rgba(0,255,65,0.2); border-radius: 6px; }
+tooltip label { color: #00ff41; padding: 4px 8px; }

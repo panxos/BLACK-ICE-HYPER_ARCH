@@ -105,6 +105,10 @@ for choice in $CHOICES; do
         "\"Multimedia\""|"Multimedia")
             log_info "Instalando Multimedia & Diseño..."
             pkg_install "vlc"
+            pkg_install "vlc-plugin-ffmpeg"  # Codecs H264/H265/MPEG4 via libavcodec
+            pkg_install "vlc-plugin-ass"     # Subtítulos ASS/SSA
+            pkg_install "vlc-plugin-dvd"     # Soporte DVD
+            pkg_install "imv"                # Visor de imágenes Wayland (reemplaza nomacs)
             pkg_install "mpv"           # Player de video/streaming (alias ytb en .zshrc)
             pkg_install "yt-dlp"        # Descargador de videos (función bajavideo en .zshrc)
             pkg_install "gimp"
