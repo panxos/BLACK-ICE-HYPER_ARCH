@@ -44,6 +44,13 @@ dotfiles/bin/*-personal.sh
 dotfiles/bin/*-private.sh
 dotfiles/bin/SYNC-README.md
 
+# Wallpapers — binarios pesados (~90MB). Pendiente: git-lfs o GitHub Release archive.
+# Ver docs/PENDIENTES_v3x.md item #1
+dotfiles/wallpapers/*.webp
+dotfiles/wallpapers/*.jpeg
+dotfiles/wallpapers/*.jpg
+dotfiles/wallpapers/*.png
+
 # Temporary/internal files
 xauth_*
 AUDIT_*.md
