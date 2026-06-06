@@ -824,22 +824,65 @@ if ! pacman -Q plymouth &>/dev/null; then
         log_warn "Fallo la instalación de Plymouth. El sistema arrancará sin splash dinámico."
     fi
 fi
-# bgrt: muestra el logo del fabricante desde la UEFI (Lenovo, Dell, HP, etc.)
-# Viene incluido en el paquete plymouth base — no necesita instalación extra.
-if [ -d /usr/share/plymouth/themes/bgrt ]; then
-    sudo -n plymouth-set-default-theme bgrt
-    log_success "Plymouth theme: bgrt (logo del fabricante desde UEFI)"
+
+# Instalar tema arch-slider-and-glow desde GitHub.
+# Módulo two-step: soporta animación en boot/shutdown y diálogo LUKS con assets
+# propios (entry.png, lock.png, capslock.png). No requiere paquete AUR.
+PLYMOUTH_THEME_NAME="arch-slider-and-glow"
+PLYMOUTH_THEME_DEST="/usr/share/plymouth/themes/$PLYMOUTH_THEME_NAME"
+PLYMOUTH_BUNDLED="$SCRIPT_DIR/assets/themes/plymouth/$PLYMOUTH_THEME_NAME"
+PLYMOUTH_THEME_REPO="https://github.com/HasanAgitUnal/ArchSliderGlowPlymouth"
+PLYMOUTH_THEME_TMP="/tmp/$PLYMOUTH_THEME_NAME"
+
+if [[ ! -d "$PLYMOUTH_THEME_DEST" ]]; then
+    if [[ -f "$PLYMOUTH_BUNDLED/$PLYMOUTH_THEME_NAME.plymouth" ]]; then
+        log_info "Usando tema Plymouth bundleado en el repo (offline)..."
+        sudo mkdir -p "$PLYMOUTH_THEME_DEST"
+        sudo cp -r "$PLYMOUTH_BUNDLED/." "$PLYMOUTH_THEME_DEST/"
+        sudo chmod -R 755 "$PLYMOUTH_THEME_DEST"
+        sudo find "$PLYMOUTH_THEME_DEST" -type f -exec chmod 644 {} \;
+        log_success "Tema Plymouth $PLYMOUTH_THEME_NAME instalado (bundleado)"
+    else
+        log_info "Clonando tema Plymouth $PLYMOUTH_THEME_NAME desde GitHub..."
+        rm -rf "$PLYMOUTH_THEME_TMP"
+        if retry_command git clone --depth=1 "$PLYMOUTH_THEME_REPO" "$PLYMOUTH_THEME_TMP"; then
+            sudo mkdir -p "$PLYMOUTH_THEME_DEST"
+            sudo cp -r "$PLYMOUTH_THEME_TMP/resources" "$PLYMOUTH_THEME_DEST/"
+            sudo cp "$PLYMOUTH_THEME_TMP/$PLYMOUTH_THEME_NAME.plymouth" "$PLYMOUTH_THEME_DEST/"
+            sudo chmod -R 755 "$PLYMOUTH_THEME_DEST"
+            sudo find "$PLYMOUTH_THEME_DEST" -type f -exec chmod 644 {} \;
+            rm -rf "$PLYMOUTH_THEME_TMP"
+            log_success "Tema Plymouth $PLYMOUTH_THEME_NAME instalado (GitHub)"
+        else
+            log_warn "No se pudo obtener el tema Plymouth. Usando spinner como fallback."
+            PLYMOUTH_THEME_NAME="spinner"
+        fi
+    fi
 else
-    log_warn "Tema bgrt no encontrado — usando tema spinner por defecto"
-    sudo -n plymouth-set-default-theme spinner 2>/dev/null || true
+    log_info "Tema Plymouth $PLYMOUTH_THEME_NAME ya instalado"
 fi
 
-# Inyectar hook en mkinitcpio.conf y regenerar initramfs con manejo de error.
-# Esta es la ÚNICA invocación de mkinitcpio para Plymouth en todo el deploy.
+sudo -n plymouth-set-default-theme "$PLYMOUTH_THEME_NAME" 2>/dev/null \
+    && log_success "Plymouth theme: $PLYMOUTH_THEME_NAME" \
+    || log_warn "plymouth-set-default-theme falló — tema puede no activarse"
+
+# Inyectar hook 'plymouth' en mkinitcpio.conf.
+# El hook debe quedar DESPUÉS de keyboard/keymap para que el mapa VT esté listo.
 if ! grep -q "plymouth" /etc/mkinitcpio.conf; then
     log_info "Inyectando hook 'plymouth' en mkinitcpio.conf..."
     sudo -n sed -i 's/\(HOOKS=.*\)udev/\1udev plymouth/' /etc/mkinitcpio.conf
 fi
+
+# Plymouth usa libxkbcommon (evdev directo) para el diálogo LUKS, no el mapa VT.
+# Sin /etc/vconsole.conf en el initramfs cae al layout 'us' por defecto.
+# Esta línea garantiza que XKBLAYOUT/KEYMAP sean visibles para plymouthd.
+if ! grep -q "vconsole.conf" /etc/mkinitcpio.conf; then
+    log_info "Añadiendo /etc/vconsole.conf a FILES en mkinitcpio.conf..."
+    sudo -n sed -i 's|^FILES=()|FILES=(/etc/vconsole.conf)|' /etc/mkinitcpio.conf
+    # Si FILES ya tiene contenido, añadir al final de la lista
+    sudo -n sed -i 's|^FILES=(\(.*[^)]\))|FILES=(\1 /etc/vconsole.conf)|' /etc/mkinitcpio.conf
+fi
+
 if grep -q "plymouth" /etc/mkinitcpio.conf; then
     log_info "Regenerando initramfs con Plymouth..."
     if sudo -n mkinitcpio -P >> "$LOG_FILE" 2>&1; then

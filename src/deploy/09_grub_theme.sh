@@ -1,15 +1,16 @@
 #!/bin/bash
 # src/deploy/09_grub_theme.sh
-# Instala tema DedSec GRUB2 con selector de variante
-# Repo: https://github.com/VandalByte/dedsec-grub2-theme (GPL-3.0)
+# Instala tema Cyberpunk Arcade para GRUB2
+# Repo: https://github.com/Ricardo-Simoes/cyberpunk_arcade
 
-banner "MÓDULO 9" "GRUB2 Theme — DedSec"
+banner "MÓDULO 9" "GRUB2 Theme — Cyberpunk Arcade"
 cd "$USER_HOME" || exit 1
 
 GRUB_THEMES_DIR="/boot/grub/themes"
-THEME_DEST="$GRUB_THEMES_DIR/dedsec"
-REPO_URL="https://github.com/VandalByte/dedsec-grub2-theme"
-TMP_REPO="/tmp/dedsec-grub2-theme"
+THEME_DEST="$GRUB_THEMES_DIR/cyberpunk_arcade"
+BUNDLED_THEME="$SCRIPT_DIR/assets/themes/grub/cyberpunk_arcade"
+REPO_URL="https://github.com/Ricardo-Simoes/cyberpunk_arcade"
+TMP_REPO="/tmp/cyberpunk_arcade"
 GRUB_DEFAULT="/etc/default/grub"
 
 # --- Prerequisitos ---
@@ -20,119 +21,55 @@ if ! command -v grub-mkconfig &>/dev/null; then
     return 0
 fi
 
-# --- Clonar / Actualizar Repositorio ---
-if [ -d "$TMP_REPO/.git" ]; then
-    log_info "Repositorio DedSec ya descargado — actualizando..."
-    git -C "$TMP_REPO" pull --depth=1 2>/dev/null || true
+# --- Obtener fuente del tema ---
+# Primero usar assets bundleados en el repo (offline, garantizado).
+# Fallback: clonar desde GitHub si no están presentes.
+THEME_SOURCE=""
+
+if [[ -f "$BUNDLED_THEME/theme.txt" ]]; then
+    log_info "Usando tema bundleado en el repo (offline)..."
+    THEME_SOURCE="$BUNDLED_THEME"
 else
-    log_info "Clonando DedSec GRUB2 Theme..."
-    rm -rf "$TMP_REPO"
-    if ! retry_command git clone --depth=1 "$REPO_URL" "$TMP_REPO"; then
-        log_error "No se pudo clonar el repositorio DedSec. Verificar conexión."
+    log_info "Assets bundleados no encontrados — clonando desde GitHub..."
+    if [[ -d "$TMP_REPO/.git" ]]; then
+        git -C "$TMP_REPO" pull --depth=1 2>/dev/null || true
+    else
+        rm -rf "$TMP_REPO"
+        if ! retry_command git clone --depth=1 "$REPO_URL" "$TMP_REPO"; then
+            log_error "No se pudo clonar el repositorio. Verificar conexión."
+            return 0
+        fi
+    fi
+    if [[ ! -f "$TMP_REPO/theme.txt" ]]; then
+        log_error "theme.txt no encontrado en el repositorio clonado."
         return 0
     fi
+    THEME_SOURCE="$TMP_REPO"
 fi
-
-# --- Detectar variantes disponibles ---
-# Las variantes son subdirectorios que contienen theme.txt
-mapfile -t VARIANT_DIRS < <(find "$TMP_REPO" -maxdepth 4 -name "theme.txt" \
-    -exec dirname {} \; | sort)
-
-if [ ${#VARIANT_DIRS[@]} -eq 0 ]; then
-    log_error "No se encontraron variantes de tema en el repositorio clonado."
-    return 0
-fi
-
-log_info "Variantes disponibles: ${#VARIANT_DIRS[@]}"
-
-# --- Selector de Variante ---
-SELECTED_VARIANT=""
-
-if [ "${NON_INTERACTIVE:-false}" == "true" ]; then
-    # Modo automático: usar la primera variante disponible
-    SELECTED_VARIANT="${VARIANT_DIRS[0]}"
-    log_info "Modo no-interactivo: usando variante '$(basename "$SELECTED_VARIANT")'"
-
-elif command -v whiptail &>/dev/null; then
-    # Construir lista para whiptail (radiolist)
-    RADIO_ARGS=()
-    FIRST=true
-    for dir in "${VARIANT_DIRS[@]}"; do
-        name=$(basename "$dir")
-        if $FIRST; then
-            RADIO_ARGS+=("$name" "DedSec - $name" "ON")
-            FIRST=false
-        else
-            RADIO_ARGS+=("$name" "DedSec - $name" "OFF")
-        fi
-    done
-
-    CHOICE=$(whiptail --title "BLACK-ICE — GRUB THEME" \
-        --radiolist "Selecciona la variante del tema DedSec para GRUB:" \
-        20 60 10 \
-        "${RADIO_ARGS[@]}" \
-        3>&1 1>&2 2>&3 < /dev/tty) || true
-
-    # Mapear nombre elegido a path completo
-    if [ -n "$CHOICE" ]; then
-        CHOICE_CLEAN="${CHOICE//\"/}"
-        for dir in "${VARIANT_DIRS[@]}"; do
-            if [ "$(basename "$dir")" == "$CHOICE_CLEAN" ]; then
-                SELECTED_VARIANT="$dir"
-                break
-            fi
-        done
-    fi
-
-    if [ -z "$SELECTED_VARIANT" ]; then
-        log_warn "No se seleccionó ninguna variante. Usando la primera disponible."
-        SELECTED_VARIANT="${VARIANT_DIRS[0]}"
-    fi
-else
-    log_warn "whiptail no disponible. Usando primera variante: $(basename "${VARIANT_DIRS[0]}")"
-    SELECTED_VARIANT="${VARIANT_DIRS[0]}"
-fi
-
-VARIANT_NAME=$(basename "$SELECTED_VARIANT")
-log_info "Variante seleccionada: $VARIANT_NAME"
 
 # --- Instalar Tema ---
 log_info "Instalando tema en $THEME_DEST..."
 sudo mkdir -p "$GRUB_THEMES_DIR"
 
-# Limpiar instalación previa si existe
-if [ -d "$THEME_DEST" ]; then
-    log_info "Eliminando tema DedSec previo..."
+if [[ -d "$THEME_DEST" ]]; then
+    log_info "Eliminando tema previo..."
     sudo rm -rf "$THEME_DEST"
 fi
 
-sudo cp -r "$SELECTED_VARIANT" "$THEME_DEST"
+sudo cp -r "$THEME_SOURCE" "$THEME_DEST"
 sudo chmod -R 755 "$THEME_DEST"
 sudo find "$THEME_DEST" -type f -exec chmod 644 {} \;
+# Limpiar artefactos innecesarios si vinieron de git clone
+sudo rm -rf "$THEME_DEST/.git" "$THEME_DEST/screenshots" "$THEME_DEST/media" \
+            "$THEME_DEST/LICENSE" "$THEME_DEST/README.md"
 
-# Verificar que theme.txt quedó
-if [ ! -f "$THEME_DEST/theme.txt" ]; then
+if [[ ! -f "$THEME_DEST/theme.txt" ]]; then
     log_error "theme.txt no encontrado en $THEME_DEST — instalación fallida."
     return 0
 fi
 
-# Verificar background.png — muchas variantes lo requieren
-# Si no existe, copiar uno desde assets/backgrounds/
-if [ ! -f "$THEME_DEST/background.png" ] && grep -q 'desktop-image' "$THEME_DEST/theme.txt" 2>/dev/null; then
-    log_warn "background.png no encontrado — buscando en assets del repositorio..."
-    # Intentar hackerden (buen default para security workstation)
-    for fallback in hackerden compact legion reaper; do
-        BG_CANDIDATE=$(find "$TMP_REPO/assets/backgrounds" -name "${fallback}-1080p.png" 2>/dev/null | head -1)
-        if [ -n "$BG_CANDIDATE" ]; then
-            sudo cp "$BG_CANDIDATE" "$THEME_DEST/background.png"
-            log_success "background.png copiado desde: $BG_CANDIDATE"
-            break
-        fi
-    done
-    [ ! -f "$THEME_DEST/background.png" ] && log_warn "No se encontró background.png de fallback — el tema puede mostrar fondo negro."
-fi
-
-log_success "Tema DedSec ($VARIANT_NAME) copiado a $THEME_DEST"
+[[ -n "$TMP_REPO" && -d "$TMP_REPO" ]] && rm -rf "$TMP_REPO"
+log_success "Tema Cyberpunk Arcade copiado a $THEME_DEST"
 
 # --- Configurar /etc/default/grub ---
 log_info "Configurando GRUB_THEME en $GRUB_DEFAULT..."
@@ -145,13 +82,17 @@ else
     echo "GRUB_THEME=\"$THEME_DEST/theme.txt\"" | sudo tee -a "$GRUB_DEFAULT" > /dev/null
 fi
 
-# Resolución: si no está configurada, poner auto para máxima compatibilidad
-if ! grep -q "^GRUB_GFXMODE=" "$GRUB_DEFAULT" 2>/dev/null; then
-    echo 'GRUB_GFXMODE=1920x1080,auto' | sudo tee -a "$GRUB_DEFAULT" > /dev/null
-    log_info "GRUB_GFXMODE=1920x1080,auto configurado"
+# Resolución en cascada: 1080p → 768p → auto
+# El installer no puede detectar la resolución del hardware en chroot,
+# GRUB intentará cada modo en orden y usará el primero que soporte la GPU.
+if grep -q "^GRUB_GFXMODE=" "$GRUB_DEFAULT" 2>/dev/null; then
+    sudo sed -i 's|^GRUB_GFXMODE=.*|GRUB_GFXMODE=1920x1080x32,1366x768x32,auto|' "$GRUB_DEFAULT"
+else
+    echo 'GRUB_GFXMODE=1920x1080x32,1366x768x32,auto' | sudo tee -a "$GRUB_DEFAULT" > /dev/null
 fi
+log_info "GRUB_GFXMODE=1920x1080x32,1366x768x32,auto configurado"
 
-# El tema requiere gfxterm — SIEMPRE forzar (console rompe el tema visual)
+# El tema requiere gfxterm — forzar siempre
 if grep -q "^GRUB_TERMINAL_OUTPUT=" "$GRUB_DEFAULT" 2>/dev/null; then
     sudo sed -i 's|^GRUB_TERMINAL_OUTPUT=.*|GRUB_TERMINAL_OUTPUT="gfxterm"|' "$GRUB_DEFAULT"
 elif grep -q "^#GRUB_TERMINAL_OUTPUT=" "$GRUB_DEFAULT" 2>/dev/null; then
@@ -164,13 +105,12 @@ log_info "GRUB_TERMINAL_OUTPUT=gfxterm configurado"
 # --- Regenerar grub.cfg ---
 log_info "Regenerando grub.cfg con el nuevo tema..."
 if sudo grub-mkconfig -o /boot/grub/grub.cfg; then
-    log_success "grub.cfg regenerado correctamente con tema DedSec ($VARIANT_NAME)"
+    log_success "grub.cfg regenerado correctamente con tema Cyberpunk Arcade"
 else
     log_error "grub-mkconfig falló. Verificar /boot/grub/ y /etc/default/grub."
     log_warn "El sistema arrancará normalmente pero sin el tema visual."
 fi
 
-# Limpiar repo temporal
 rm -rf "$TMP_REPO"
 
-success "Tema GRUB DedSec ($VARIANT_NAME) instalado correctamente"
+success "Tema GRUB Cyberpunk Arcade instalado correctamente"
