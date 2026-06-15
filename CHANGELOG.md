@@ -1,5 +1,21 @@
 # CHANGELOG - BLACK-ICE ARCH
 
+## [3.12.2] - 2026-06-15
+
+### 🛠️ Fixes
+
+- **M-2 `00_environment.sh` keyring loop**: Bucle `while true` sin límite podía colgar indefinidamente si el keyserver permanecía caído. Limitado a 5 intentos con `_keyring_attempts`; `exit 1` en overflow.
+- **M-2 `00_environment.sh` mirror loop**: Mismo problema en el loop de reflector mirrors. Limitado a 3 intentos; `break` con warning en overflow.
+- **M-10 `00_environment.sh` eval**: `eval "$REFLECTOR_CMD"` con nombres de país provenientes de input del usuario → riesgo de inyección. Reemplazado por array `_reflector_args=(...); reflector "${_reflector_args[@]}"`.
+- **M-6 `deploy_hyprland.sh` trap ordering**: `trap cleanup SIGINT` definido en línea 18 pero `source colors.sh`/`logging.sh` hasta líneas 26-28. Si Ctrl+C llegaba antes del source, cleanup ejecutaba con `$RED`/`$NC` indefinidos → output corrupto. Movido el bloque cleanup+trap a después de los tres source.
+- **xdg-open `99_finalization.sh`**: Parche Python sobre `/usr/bin/xdg-open` sobreescrito por `pacman -Syu` en cada actualización. El wrapper en `~/.local/bin/xdg-open` (instalado desde `dotfiles/bin/xdg-open-wayland`) ya tiene prioridad por PATH y sobrevive updates. Parche Python eliminado; sustituido por `log_info`.
+
+### 🧪 Tests
+
+- **G-9 `tests/post-install-validate.sh`**: Cobertura expandida de 6 binarios a 17 (agregados: `paru`, `zsh`, `fastfetch`, `btop`, `nvim`, `nmap`, `pipewire`, `wireplumber`, `sddm`, `hyprlock`, `swaync`). Configs de 3 a 8 (agregados: `hyprlock.conf`, `waybar/style.css`, `wofi/config`, `swaync/config.json`, `~/.zshrc`). Nuevo helper `check_service()` con validación de `sddm.service`, `NetworkManager.service`, `bluetooth.service`. Nuevo helper `check_symlink()` para validar `/etc/xdg/menus/applications.menu`.
+
+---
+
 ## [3.12.1] - 2026-06-15
 
 ### 🛠️ Fixes

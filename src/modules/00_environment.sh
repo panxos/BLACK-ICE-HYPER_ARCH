@@ -64,29 +64,36 @@ log_info "Inicializando y sincronizando llaveros PGP (Arch Linux)..."
 mkdir -p /etc/pacman.d/gnupg
 chmod 700 /etc/pacman.d/gnupg
 
+_keyring_attempts=0
 while true; do
-    # Inicializar y poblar llaves antes de descargar el keyring
+    (( _keyring_attempts++ ))
+    if (( _keyring_attempts > 5 )); then
+        log_error "Keyring PGP: máximo de intentos alcanzado. Verifica conectividad y reinicia."
+        exit 1
+    fi
+
     pacman-key --init >/dev/null 2>&1
     pacman-key --populate archlinux >/dev/null 2>&1
-    
+
     if pacman -Syy --noconfirm archlinux-keyring >/dev/null 2>&1; then
         success "Llaveros PGP actualizados y validados."
         break
     else
-        log_warn "Error sincronizando llaveros. Aplicando limpieza profunda de GPG..."
+        log_warn "Error sincronizando llaveros (intento $_keyring_attempts/5). Aplicando limpieza profunda de GPG..."
         rm -rf /etc/pacman.d/gnupg/*
         pacman-key --init >/dev/null 2>&1
         pacman-key --populate archlinux >/dev/null 2>&1
-        
+
         if pacman -Syy --noconfirm archlinux-keyring >/dev/null 2>&1; then
              success "Llaveros PGP recuperados tras limpieza profunda."
              break
         fi
-        
-        log_error "Fallo persistente en PGP. Verificando conexión de red..."
+
+        log_error "Fallo persistente en PGP. Reintentando en 5s..."
         sleep 5
     fi
 done
+unset _keyring_attempts
 
 # 3.2 Country & Mirror Optimization
 echo -e "\n${NEON_PURPLE}┌──────────────────────────────────────────────┐${NC}"
@@ -114,7 +121,14 @@ case "$SELECTED_COUNTRY" in
     *)           REFLECTOR_COUNTRIES="$SELECTED_COUNTRY" ;;
 esac
 
+_mirror_attempts=0
 while true; do
+    (( _mirror_attempts++ ))
+    if (( _mirror_attempts > 3 )); then
+        log_warn "Mirrors: máximo de intentos alcanzado. Usando lista actual."
+        break
+    fi
+
     if ! command -v reflector &>/dev/null; then
         pacman -S --noconfirm reflector >/dev/null 2>&1 || continue
     fi
@@ -139,12 +153,12 @@ while true; do
     echo -e "${GREY}   Buscando los servidores más rápidos y recientes...${NC}"
     
     if [ "$REFLECTOR_COUNTRIES" == "Worldwide" ]; then
-        REFLECTOR_CMD="reflector --protocol https --latest 100 --number 10 --sort rate --connection-timeout 5 --download-timeout 5 --verbose --save /etc/pacman.d/mirrorlist"
+        _reflector_args=(--protocol https --latest 100 --number 10 --sort rate --connection-timeout 5 --download-timeout 5 --verbose --save /etc/pacman.d/mirrorlist)
     else
-        REFLECTOR_CMD="reflector --country \"$REFLECTOR_COUNTRIES\" --protocol https --latest 100 --number 10 --sort rate --connection-timeout 5 --download-timeout 5 --verbose --save /etc/pacman.d/mirrorlist"
+        _reflector_args=(--country "$REFLECTOR_COUNTRIES" --protocol https --latest 100 --number 10 --sort rate --connection-timeout 5 --download-timeout 5 --verbose --save /etc/pacman.d/mirrorlist)
     fi
-    
-    if eval "$REFLECTOR_CMD"; then
+
+    if reflector "${_reflector_args[@]}"; then
         success "Nodos de descarga optimizados para tu región."
         break
     else
@@ -161,6 +175,7 @@ while true; do
         fi
     fi
 done
+unset _mirror_attempts
 
 # 4. Keyboard Layout
 echo -e "\n${NEON_PURPLE}┌──────────────────────────────────────────────┐${NC}"

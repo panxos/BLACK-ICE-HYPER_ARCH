@@ -7,16 +7,6 @@
 # GitHub: https://github.com/panxos
 # ==============================================================================
 
-# --- Manejo de Interrupciones (SIGINT / Ctrl+C) ---
-cleanup() {
-    echo -e "\n\n${RED}!!! DESPLIEGUE INTERRUMPIDO (Ctrl+C) !!!${NC}"
-    echo -e "${YELLOW}[WARN] El sistema puede haber quedado en un estado parcial.${NC}"
-    log_error "Despliegue cancelado por el usuario (SIGINT)."
-    exit 130
-}
-
-trap cleanup SIGINT
-
 # --- Variables Globales ---
 # : SCRIPT_DIR es la raíz del proyecto
 SCRIPT_DIR=$(dirname "$(readlink -f "$0")")
@@ -26,6 +16,17 @@ DOTFILES_DIR="$SCRIPT_DIR/dotfiles"
 source "$SCRIPT_DIR/src/lib/colors.sh"
 source "$SCRIPT_DIR/src/lib/logging.sh"
 source "$SCRIPT_DIR/src/lib/utils.sh"
+
+# --- Manejo de Interrupciones (SIGINT / Ctrl+C) ---
+# Definido DESPUÉS de source para que $RED/$YELLOW/$NC estén disponibles
+cleanup() {
+    echo -e "\n\n${RED}!!! DESPLIEGUE INTERRUMPIDO (Ctrl+C) !!!${NC}"
+    echo -e "${YELLOW}[WARN] El sistema puede haber quedado en un estado parcial.${NC}"
+    log_error "Despliegue cancelado por el usuario (SIGINT)."
+    exit 130
+}
+
+trap cleanup SIGINT
 
 # --- Logging Setup (Global Redirection) ---
 # Save original stdout/stderr for interactive menus (whiptail/read)

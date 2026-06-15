@@ -49,31 +49,11 @@ done
 sudo -u "$CURRENT_USER" xdg-settings set default-web-browser brave-browser.desktop 2>/dev/null || \
     sudo -u "$CURRENT_USER" xdg-settings set default-web-browser brave.desktop 2>/dev/null || true
 
-# --- Fix xdg-open para Hyprland (DE desconocido cae en exit_failure) ---
-# xdg-utils 1.2+ detecta DE=Hyprland pero no tiene handler → falla silencioso
-# Parche: cambiar *) exit_failure → *) open_generic en el switch DE
-if [ -f /usr/bin/xdg-open ]; then
-    python3 -c "
-import sys
-with open('/usr/bin/xdg-open', 'r') as f:
-    content = f.read()
-old = '''    *)
-    exit_failure_operation_impossible \"no method available for opening '\$url'\"
-    ;;
-esac'''
-new = '''    *)
-    open_generic \"\$url\"
-    ;;
-esac'''
-if old in content:
-    content = content.replace(old, new, 1)
-    with open('/usr/bin/xdg-open', 'w') as f:
-        f.write(content)
-    sys.exit(0)
-sys.exit(1)
-" && log_success "xdg-open parcheado: Hyprland ahora usa open_generic como fallback" \
-  || log_info "xdg-open: parche no aplicado (ya aplicado o versión diferente)"
-fi
+# --- Fix xdg-open para Hyprland ---
+# El wrapper ~/.local/bin/xdg-open (instalado arriba desde dotfiles/bin/xdg-open-wayland)
+# toma precedencia sobre /usr/bin/xdg-open si ~/.local/bin está primero en PATH.
+# No modificamos /usr/bin/xdg-open — se sobreescribe en cada pacman -Syu.
+log_info "xdg-open: wrapper Wayland activo en ~/.local/bin/ (no se modifica /usr/bin/xdg-open)"
 
 # --- MEGAsync: autostart + watcher (solo si megasync está instalado) ---
 if command -v megasync &>/dev/null; then
