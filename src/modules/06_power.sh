@@ -176,9 +176,16 @@ swap-priority = 100
 fs-type = swap
 EOF
 
-# --- Exportar variables para uso en deploy ---
-# Guardamos el tipo de dispositivo para que deploy_hyprland.sh pueda usarlo
-echo "DEVICE_TYPE=$DEVICE_TYPE" >> "/mnt/etc/black-ice.env"
-echo "POWER_PROFILE=$POWER_PROFILE" >> "/mnt/etc/black-ice.env"
+# --- Exportar variables para uso en deploy (idempotente) ---
+_set_env_var() {
+    local key="$1" val="$2" file="/mnt/etc/black-ice.env"
+    if grep -q "^${key}=" "$file" 2>/dev/null; then
+        sed -i "s|^${key}=.*|${key}=${val}|" "$file"
+    else
+        echo "${key}=${val}" >> "$file"
+    fi
+}
+_set_env_var DEVICE_TYPE "$DEVICE_TYPE"
+_set_env_var POWER_PROFILE "$POWER_PROFILE"
 
 success "Gestión de energía configurada correctamente ($DEVICE_TYPE: $POWER_PROFILE)"

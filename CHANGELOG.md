@@ -1,5 +1,16 @@
 # CHANGELOG - BLACK-ICE ARCH
 
+## [3.12.3] - 2026-06-15
+
+### 🛠️ Fixes
+
+- **M-4 `06_power.sh`**: `echo "KEY=VAL" >> /mnt/etc/black-ice.env` no era idempotente — cada re-ejecución del instalador duplicaba las entradas. Reemplazado con `_set_env_var()` que hace `sed -i` si la clave ya existe o appends si no.
+- **M-1 `05_bootloader.sh`**: `blkid -s UUID -o value "${PART_ROOT:-}"` con `PART_ROOT` vacío devuelve UUID vacío y el script continúa generando un GRUB sin `cryptdevice`. Agregado `:?` expansion que aborta si `PART_ROOT` está sin definir, y validación explícita de `ROOT_UUID` vacío con `exit 1`.
+- **G-12 `01_hyprland_base.sh`**: 8 ocurrencias de `chown $CURRENT_USER:$CURRENT_USER` sin comillas (SC2086). En `set -u` con username con espacios rompería la invocación. Corregido con `chown "$CURRENT_USER":"$CURRENT_USER"` en todas las ocurrencias.
+- **G-3 `01_hyprland_base.sh`**: `dotfiles/hypr/` se copiaba 3 veces en el mismo script (líneas ~296, ~307, ~734). La segunda copia incluía un `cp hyprland.conf` redundante sobre el mismo destino. Eliminadas las dos copias espurias; queda una sola instancia con `chmod +x` para los scripts.
+
+---
+
 ## [3.12.2] - 2026-06-15
 
 ### 🛠️ Fixes

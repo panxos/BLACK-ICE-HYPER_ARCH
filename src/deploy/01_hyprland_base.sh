@@ -201,7 +201,7 @@ if [ "$IS_VM" = true ]; then
 # VM Graphics Fix for Hyprland (prevents black screen/flickering)
 export WLR_NO_HARDWARE_CURSORS=1
 EOF
-        chown $CURRENT_USER:$CURRENT_USER "$USER_HOME/.zprofile"
+        chown "$CURRENT_USER":"$CURRENT_USER" "$USER_HOME/.zprofile"
         log_success "WLR_NO_HARDWARE_CURSORS=1 configurado en .zprofile"
     fi
     
@@ -293,16 +293,9 @@ success "Hyprland, SDDM, Audio y Bluetooth configurados"
 # --- Copiar Dotfiles ---
 log_info "Copiando archivos de configuración..."
 mkdir -p "$USER_HOME/.config/hypr"
-cp -r "$DOTFILES_DIR/hypr/"* "$USER_HOME/.config/hypr/"
-
-# Inject final hyprland.conf (Hardware & 0.53.3 Logic)
-if [ -f "$DOTFILES_DIR/hypr/hyprland.conf" ]; then
-    cp "$DOTFILES_DIR/hypr/hyprland.conf" "$USER_HOME/.config/hypr/hyprland.conf"
-fi
 mkdir -p "$USER_HOME/.config/kitty"
 mkdir -p "$USER_HOME/.config/wofi"
 
-# Copiar dotfiles
 if [ -d "$DOTFILES_DIR/hypr" ]; then
     cp -r "$DOTFILES_DIR/hypr/"* "$USER_HOME/.config/hypr/"
     chmod +x "$USER_HOME/.config/hypr/scripts/"*.sh 2>/dev/null
@@ -313,7 +306,7 @@ fi
 if [ -f "$DOTFILES_DIR/zsh/.zshrc" ]; then
     cp "$DOTFILES_DIR/zsh/.zshrc" "$USER_HOME/.zshrc"
     cp "$DOTFILES_DIR/zsh/.p10k.zsh" "$USER_HOME/.p10k.zsh" 2>/dev/null || true
-    chown $CURRENT_USER:$CURRENT_USER "$USER_HOME/.zshrc" "$USER_HOME/.p10k.zsh"
+    chown "$CURRENT_USER":"$CURRENT_USER" "$USER_HOME/.zshrc" "$USER_HOME/.p10k.zsh"
     log_info "Configuración ZSH copiada (.zshrc + .p10k.zsh)"
 fi
 
@@ -572,7 +565,7 @@ else
             fi
         fi
     fi
-    chown -R $CURRENT_USER:$CURRENT_USER "$USER_HOME/.local/share/Kvantum" "$USER_HOME/.config/Kvantum"
+    chown -R "$CURRENT_USER":"$CURRENT_USER" "$USER_HOME/.local/share/Kvantum" "$USER_HOME/.config/Kvantum"
 fi
 
 # Copy Qt5ct and Qt6ct configurations (with color schemes)
@@ -580,7 +573,7 @@ mkdir -p "$USER_HOME/.config/qt5ct/colors"
 mkdir -p "$USER_HOME/.config/qt6ct/colors"
 cp -r "$DOTFILES_DIR/qt5ct/"* "$USER_HOME/.config/qt5ct/" 2>/dev/null || true
 cp -r "$DOTFILES_DIR/qt6ct/"* "$USER_HOME/.config/qt6ct/" 2>/dev/null || true
-chown -R $CURRENT_USER:$CURRENT_USER "$USER_HOME/.config/qt5ct" "$USER_HOME/.config/qt6ct"
+chown -R "$CURRENT_USER":"$CURRENT_USER" "$USER_HOME/.config/qt5ct" "$USER_HOME/.config/qt6ct"
 log_info "Configuración Qt5ct/Qt6ct copiada con color schemes"
 
 # Force Qt Environment Globally
@@ -729,12 +722,6 @@ mkdir -p "$USER_HOME/.config/wlogout"
 mkdir -p "$USER_HOME/.config/dunst"
 mkdir -p "$USER_HOME/.config/bin"
 
-# Copia Recursiva de configuraciones CORE
-if [ -d "$DOTFILES_DIR/hypr" ]; then
-    cp -r "$DOTFILES_DIR/hypr/"* "$USER_HOME/.config/hypr/"
-    log_info "Hyprland dotfiles copiados"
-fi
-
 if [ -d "$DOTFILES_DIR/waybar" ]; then
     cp -r "$DOTFILES_DIR/waybar/"* "$USER_HOME/.config/waybar/"
     # Re-crear symlinks después del cp (la copia puede sobrescribirlos si hay archivos raíz)
@@ -794,7 +781,7 @@ log_info "Instalando configuraciones ganadoras (KWrite, Kate, Dolphin)..."
 cp "$DOTFILES_DIR/kwrite/kwriterc" "$USER_HOME/.config/kwriterc" 2>/dev/null || true
 cp "$DOTFILES_DIR/kwrite/katerc" "$USER_HOME/.config/katerc" 2>/dev/null || true
 cp "$DOTFILES_DIR/kwrite/dolphinrc" "$USER_HOME/.config/dolphinrc" 2>/dev/null || true
-chown $CURRENT_USER:$CURRENT_USER "$USER_HOME/.config/kwriterc" "$USER_HOME/.config/katerc" "$USER_HOME/.config/dolphinrc" 2>/dev/null || true
+chown "$CURRENT_USER":"$CURRENT_USER" "$USER_HOME/.config/kwriterc" "$USER_HOME/.config/katerc" "$USER_HOME/.config/dolphinrc" 2>/dev/null || true
 
 # scripts ya instalados en fase EARLY
 log_info "Verificando scripts de utilidad..."
@@ -804,11 +791,11 @@ if [ -d "$USER_HOME/.config/bin" ]; then
 fi
 
 # --- Ajustar permisos ---
-chown -R $CURRENT_USER:$CURRENT_USER "$USER_HOME/.config/hypr"
-chown -R $CURRENT_USER:$CURRENT_USER "$USER_HOME/.config/waybar"
-chown -R $CURRENT_USER:$CURRENT_USER "$USER_HOME/.config/kitty"
-chown -R $CURRENT_USER:$CURRENT_USER "$USER_HOME/.config/wofi"
-chown -R $CURRENT_USER:$CURRENT_USER "$WALLPAPER_DEST" 2>/dev/null || true
+chown -R "$CURRENT_USER":"$CURRENT_USER" "$USER_HOME/.config/hypr"
+chown -R "$CURRENT_USER":"$CURRENT_USER" "$USER_HOME/.config/waybar"
+chown -R "$CURRENT_USER":"$CURRENT_USER" "$USER_HOME/.config/kitty"
+chown -R "$CURRENT_USER":"$CURRENT_USER" "$USER_HOME/.config/wofi"
+chown -R "$CURRENT_USER":"$CURRENT_USER" "$WALLPAPER_DEST" 2>/dev/null || true
 
 # --- PLYMOUTH (Boot Splash - via AUR) ---
 log_info "Instalando y configurando Plymouth (Boot Splash)..."

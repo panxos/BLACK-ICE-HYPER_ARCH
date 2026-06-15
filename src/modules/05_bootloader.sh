@@ -8,6 +8,7 @@ log_info "Instalando paquetes críticos para el arranque..."
 pacstrap /mnt grub efibootmgr ttf-dejavu 2>/dev/null
 
 # --- Sincronización de Variables ---
+: "${PART_ROOT:?PART_ROOT no está definido — abortando bootloader}"
 NVME_STABILITY="${NVME_STABILITY:-no}"
 ENCRYPT="${ENCRYPT:-false}"
 ENABLE_LUKS="${ENABLE_LUKS:-no}"
@@ -20,8 +21,12 @@ udevadm settle
 partprobe "$PART_ROOT" 2>/dev/null || true
 sleep 1
 
-ROOT_UUID=$(blkid -s UUID -o value "${PART_ROOT:-}")
-[ -z "$ROOT_UUID" ] && ROOT_UUID=$(lsblk -no UUID "${PART_ROOT:-}")
+ROOT_UUID=$(blkid -s UUID -o value "$PART_ROOT")
+[ -z "$ROOT_UUID" ] && ROOT_UUID=$(lsblk -no UUID "$PART_ROOT")
+if [ -z "$ROOT_UUID" ]; then
+    log_error "No se pudo obtener UUID de $PART_ROOT — verifica que la partición existe"
+    exit 1
+fi
 
 # --- Generación del Script de Chroot ---
 cat <<EOF > /mnt/root/grub_setup.sh
