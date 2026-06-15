@@ -131,7 +131,7 @@ ALL_TOOLS=(
     "sshuttle|SSHuttle - VPN over SSH|Net"
     "chisel|Chisel - TCP/UDP Tunnel|Net"
     "traceroute|Traceroute - Path Trace|Net"
-    "wireshark-qt|Wireshark CLI|Net"
+    "wireshark-cli|Wireshark CLI|Net"
     "bind|Bind-tools - dig/nslookup|Net"
     "whois|Whois - Domain Lookup|Net"
     "mtr|MTR - Ping+Traceroute|Net"

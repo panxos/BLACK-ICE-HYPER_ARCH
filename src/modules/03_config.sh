@@ -40,7 +40,11 @@ fi
 
 # Fstab
 log_info "Generando fstab..."
-genfstab -U /mnt >> /mnt/etc/fstab
+if grep -q "UUID=" /mnt/etc/fstab 2>/dev/null; then
+    log_info "fstab ya contiene entradas — omitiendo regeneración"
+else
+    genfstab -U /mnt > /mnt/etc/fstab
+fi
 
 # Chroot config setup with safe escaping
 cat <<EOF > /mnt/root/chroot_config.sh
@@ -279,10 +283,10 @@ EMPTY_PRE_POST_MIN_AGE="1800"
 EOF
 
 # Crear hooks de pacman para snapshots automáticos (DENTRO DEL SISTEMA DESTINO)
-mkdir -p /mnt/etc/pacman.d/hooks
+mkdir -p /etc/pacman.d/hooks
 
 # Hook PRE-transacción
-cat > /mnt/etc/pacman.d/hooks/00-snapper-pre.hook << EOF
+cat > /etc/pacman.d/hooks/00-snapper-pre.hook << EOF
 [Trigger]
 Operation = Upgrade
 Operation = Install
@@ -297,7 +301,7 @@ Exec = /usr/bin/snapper --config root create --description "pacman pre-transacti
 EOF
 
 # Hook POST-transacción
-cat > /mnt/etc/pacman.d/hooks/99-snapper-post.hook << EOF
+cat > /etc/pacman.d/hooks/99-snapper-post.hook << EOF
 [Trigger]
 Operation = Upgrade
 Operation = Install

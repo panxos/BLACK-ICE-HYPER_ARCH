@@ -56,5 +56,7 @@ if [ -f "$WALLPAPER" ]; then
         awww img "$WALLPAPER" --transition-type grow
     fi
 else
-    awww img <(convert -size 1920x1080 xc:'#0a0a0a' png:-) 2>/dev/null
+    _tmp=$(mktemp --suffix=.png)
+    convert -size 1920x1080 xc:'#0a0a0a' "$_tmp" 2>/dev/null && awww img "$_tmp" 2>/dev/null
+    rm -f "$_tmp"
 fi

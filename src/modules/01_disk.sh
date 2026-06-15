@@ -17,7 +17,11 @@ if [ -n "${TARGET_DISK:-}" ]; then
     # Configuración de cifrado desde variables
     if [ "${ENABLE_LUKS:-}" == "yes" ]; then
         ENCRYPT="true"
-        LUKS_PASS="$LUKS_PASSWORD"
+        LUKS_PASS="${LUKS_PASSWORD:-}"
+        if [ -z "$LUKS_PASS" ]; then
+            log_error "ENABLE_LUKS=yes pero LUKS_PASSWORD está vacío en install.conf — abortando"
+            exit 1
+        fi
         success "Cifrado LUKS habilitado (modo automatizado)"
     else
         ENCRYPT="false"

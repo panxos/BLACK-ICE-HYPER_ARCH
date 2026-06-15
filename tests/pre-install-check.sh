@@ -31,6 +31,7 @@ if [ "$EUID" -eq 0 ]; then
     success "Running as Root"
 else
     log_warn "Not running as root (Required for install.sh)"
+    FAIL=1
 fi
 
 log_info "4. Checking Keyring..."

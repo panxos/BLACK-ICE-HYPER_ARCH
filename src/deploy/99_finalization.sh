@@ -128,7 +128,7 @@ fi
 log_info "Aplicando fix KDE ksycoca (applications.menu)..."
 if [ ! -e /etc/xdg/menus/applications.menu ]; then
     if [ -f /etc/xdg/menus/plasma-applications.menu ]; then
-        ln -sf /etc/xdg/menus/plasma-applications.menu /etc/xdg/menus/applications.menu
+        sudo ln -sf /etc/xdg/menus/plasma-applications.menu /etc/xdg/menus/applications.menu
         log_success "symlink applications.menu → plasma-applications.menu creado"
     else
         log_warn "plasma-applications.menu no encontrado — Dolphin puede tener file associations rotas"
@@ -214,7 +214,7 @@ log_success "eww music widget instalado (Win+Shift+N para toggle)"
 # --- Optimizaciones de rendimiento del sistema ---
 log_info "Aplicando configuración de rendimiento (sysctl + journald)..."
 
-cat > /etc/sysctl.d/99-black-ice-performance.conf << 'EOF'
+sudo tee /etc/sysctl.d/99-black-ice-performance.conf > /dev/null << 'EOF'
 # BLACK-ICE ARCH — Performance Tuning
 # RAM
 vm.swappiness = 5
@@ -255,7 +255,7 @@ fs.file-max = 2097152
 fs.inotify.max_user_watches = 524288
 fs.inotify.max_user_instances = 512
 EOF
-sysctl --system &>/dev/null || true
+sudo sysctl --system &>/dev/null || true
 log_success "sysctl aplicado (BBR + optimizaciones Docker/KVM/pentesting)"
 
 # Módulos kernel persistentes para Docker y KVM
@@ -263,17 +263,17 @@ _CPU_VENDOR=$(grep -m1 'vendor_id' /proc/cpuinfo | awk '{print $3}')
 _KVM_MODULE="kvm_intel"
 [[ "$_CPU_VENDOR" == "AuthenticAMD" ]] && _KVM_MODULE="kvm_amd"
 
-cat > /etc/modules-load.d/black-ice.conf << EOF
+sudo tee /etc/modules-load.d/black-ice.conf > /dev/null << EOF
 br_netfilter
 ${_KVM_MODULE}
 EOF
-modprobe br_netfilter 2>/dev/null || true
-modprobe "${_KVM_MODULE}" 2>/dev/null || true
+sudo modprobe br_netfilter 2>/dev/null || true
+sudo modprobe "${_KVM_MODULE}" 2>/dev/null || true
 log_success "Módulos br_netfilter + ${_KVM_MODULE} configurados para boot"
 
 # journald: limitar tamaño del log
-mkdir -p /etc/systemd/journald.conf.d
-cat > /etc/systemd/journald.conf.d/size-limit.conf << 'EOF'
+sudo mkdir -p /etc/systemd/journald.conf.d
+sudo tee /etc/systemd/journald.conf.d/size-limit.conf > /dev/null << 'EOF'
 [Journal]
 SystemMaxUse=200M
 SystemKeepFree=200M
@@ -290,9 +290,9 @@ log_info "Configurando firewall nftables (black-ice-filter)..."
 if command -v nft &>/dev/null; then
     # Instalar config si existe en dotfiles
     if [[ -f "$DOTFILES_DIR/nftables/nftables.conf" ]]; then
-        cp "$DOTFILES_DIR/nftables/nftables.conf" /etc/nftables.conf
-        nft -f /etc/nftables.conf 2>/dev/null || true
-        systemctl enable nftables
+        sudo cp "$DOTFILES_DIR/nftables/nftables.conf" /etc/nftables.conf
+        sudo nft -f /etc/nftables.conf 2>/dev/null || true
+        sudo systemctl enable nftables
         log_success "Firewall nftables activado (tabla inet black-ice-filter)"
     fi
 else
@@ -302,10 +302,10 @@ fi
 # --- Hardening SSH ---
 log_info "Aplicando hardening SSH..."
 if grep -q "^PermitRootLogin yes" /etc/ssh/sshd_config 2>/dev/null; then
-    sed -i 's/^PermitRootLogin yes/PermitRootLogin prohibit-password/' /etc/ssh/sshd_config
+    sudo sed -i 's/^PermitRootLogin yes/PermitRootLogin prohibit-password/' /etc/ssh/sshd_config
     log_success "SSH: PermitRootLogin → prohibit-password"
 fi
-systemctl reload sshd 2>/dev/null || true
+sudo systemctl reload sshd 2>/dev/null || true
 
 # --- Generar resumen de instalación ---
 log_info "Generando resumen..."

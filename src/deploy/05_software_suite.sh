@@ -7,7 +7,7 @@ cd "$USER_HOME" || exit 1
 
 # Función para instalar paquetes (delega a safe_install para resiliencia PGP)
 pkg_install() {
-    pkg=$1
+    local pkg="$1"
     safe_install "$pkg"
 }
 

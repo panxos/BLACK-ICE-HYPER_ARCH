@@ -5,14 +5,16 @@ banner "FINALIZING PROTOCOL" "Post-Install Prep"
 
 # Copy the entire project to both the new user's home and /root for persistence
 log_info "Injecting full BLACK-ICE project for persistence..."
+: "${INSTALL_DIR:?INSTALL_DIR no definido — aborting cp}"
+: "${USER_NAME:?USER_NAME no definido — aborting cp}"
 
 # User Home
-mkdir -p "/mnt/home/${USER_NAME:-}/BLACK-ICE_ARCH"
-cp -r "${INSTALL_DIR:-}/"* "/mnt/home/${USER_NAME:-}/BLACK-ICE_ARCH/"
+mkdir -p "/mnt/home/${USER_NAME}/BLACK-ICE_ARCH"
+cp -r "${INSTALL_DIR}/"* "/mnt/home/${USER_NAME}/BLACK-ICE_ARCH/"
 
 # Root Home
 mkdir -p "/mnt/root/BLACK-ICE_ARCH"
-cp -r "${INSTALL_DIR:-}/"* "/mnt/root/BLACK-ICE_ARCH/"
+cp -r "${INSTALL_DIR}/"* "/mnt/root/BLACK-ICE_ARCH/"
 
 # Ensure scripts are executable
 chmod +x "/mnt/home/${USER_NAME:-}/BLACK-ICE_ARCH/deploy_hyprland.sh"

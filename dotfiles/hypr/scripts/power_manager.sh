@@ -11,7 +11,8 @@ NC='\033[0m'
 
 # Verificar si es laptop
 IS_LAPTOP=false
-if [ -d /sys/class/power_supply/BAT* ] || [ -d /sys/class/power_supply/battery ]; then
+if find /sys/class/power_supply/ -maxdepth 1 -name 'BAT*' -type d 2>/dev/null | grep -q . || \
+   [ -d /sys/class/power_supply/battery ]; then
     IS_LAPTOP=true
 fi
 

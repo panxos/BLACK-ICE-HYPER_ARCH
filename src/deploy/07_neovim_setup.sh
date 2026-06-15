@@ -23,7 +23,8 @@ if [ -d "$USER_HOME/.config/nvim/.git" ]; then
     git -C "$USER_HOME/.config/nvim" pull --depth=1 2>/dev/null || true
 else
     log_info "Limpiando instalaciones previas de Neovim..."
-    rm -rf "$USER_HOME/.config/nvim"
+    [ -d "$USER_HOME/.config/nvim" ] && \
+        mv "$USER_HOME/.config/nvim" "$USER_HOME/.config/nvim.bak.$(date +%s)"
     rm -rf "$USER_HOME/.local/state/nvim"
     rm -rf "$USER_HOME/.local/share/nvim"
     log_info "Clonando NvChad Starter..."

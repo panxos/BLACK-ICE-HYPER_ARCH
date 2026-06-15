@@ -1,5 +1,24 @@
 # CHANGELOG - BLACK-ICE ARCH
 
+## [3.12.1] - 2026-06-15
+
+### 🛠️ Fixes
+
+- **C-1 `99_finalization.sh`**: Escrituras a `/etc/sysctl.d/`, `/etc/modules-load.d/`, `/etc/systemd/journald.conf.d/`, `/etc/nftables.conf` y `/etc/ssh/sshd_config` sin `sudo` → silently no-op en instalación como usuario normal. Corregido con `sudo tee > /dev/null` y `sudo` en los comandos de sistema asociados.
+- **C-2 `01_disk.sh`**: En `AUTO_MODE` con `ENABLE_LUKS=yes`, si `LUKS_PASSWORD` estaba vacío en `install.conf`, `cryptsetup luksFormat` aceptaba passphrase vacía sin error → disco "cifrado" abrible con Enter. Agregada validación explícita con `exit 1`.
+- **C-3 `03_config.sh`**: Hooks de Snapper para pacman creados dentro de `arch-chroot /mnt` con rutas `/mnt/etc/pacman.d/hooks/` → doble prefijo `/mnt/mnt/etc/` en el host, inexistente. Los hooks nunca llegaban al sistema instalado. Corregido a `/etc/pacman.d/hooks/`.
+- **C-5 `99_final.sh`**: `cp -r "${INSTALL_DIR:-}/"*` con variable vacía expande a `cp -r //*` → intento de copiar filesystem raíz completo. Corregido con `:?` expansion que aborta con mensaje claro.
+- **M-3 `03_config.sh`**: `genfstab -U /mnt >> /mnt/etc/fstab` no era idempotente — segunda ejecución duplicaba todas las entradas. Corregido con guard `grep -q UUID=` antes de regenerar.
+- **M-9 `07_neovim_setup.sh`**: `rm -rf ~/.config/nvim` sin backup borraba configuración manual si no tenía `.git`. Corregido con `mv ... nvim.bak.$(date +%s)`.
+- **G-8 `tests/pre-install-check.sh`**: Check de root usaba `log_warn` sin setear `FAIL=1` → script terminaba con exit 0 aunque no se fuera root. Corregido.
+- **G-11 `dotfiles/hypr/scripts/power_manager.sh`**: `[ -d /sys/class/power_supply/BAT* ]` falla con "too many arguments" en sistemas con 2 baterías (BAT0 + BAT1). Corregido con `find ... | grep -q .`.
+- **G-7 `dotfiles/hypr/scripts/set_wallpaper.sh`**: `awww img <(...)` process substitution → awww recibía `/dev/fd/63` en lugar de un path real, fallback de pantalla negra nunca funcionaba. Corregido con archivo temporal.
+- **G-4 `05_software_suite.sh`**: Variable `pkg` en `pkg_install()` sin `local` → contaminaba entorno global. Corregido.
+- **M-7 `02_security_tools.sh`**: `wireshark-qt` duplicado en categorías "Sniff" y "Net". Entrada "Net" cambiada a `wireshark-cli`.
+- **Versioning**: `v3.11.1` era regresión (commit `8a0df75` ya era `v3.12.0`). Corregido a `v3.12.1` en `logging.sh` y CHANGELOG.
+
+---
+
 ## [3.11.1] - 2026-06-15
 
 ### 🛠️ Fixes
