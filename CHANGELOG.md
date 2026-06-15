@@ -1,5 +1,13 @@
 # CHANGELOG - BLACK-ICE ARCH
 
+## [3.11.1] - 2026-06-15
+
+### 🛠️ Fixes
+
+- **Dolphin file associations rotas en Hyprland** (`99_finalization.sh`, `startup.sh`): `kbuildsycoca6` busca `/etc/xdg/menus/applications.menu` para indexar apps. `plasma-desktop` provee `plasma-applications.menu` pero no el alias. Sin el symlink, `KApplicationTrader` retorna vacío → doble clic en cualquier archivo muestra dialog "Open With" vacío, ignorando `mimeapps.list`. Fix: symlink `applications.menu → plasma-applications.menu` en `/etc/xdg/menus/` durante la instalación + `kbuildsycoca6 &` en `startup.sh` para mantener el cache actualizado en cada sesión.
+
+---
+
 ## [3.11.0] - 2026-06-03 (P4nx0z "Themes" Edition)
 
 ### 🎨 Waybar — Port Completo desde gh0stzk/BSPWM a Hyprland

@@ -120,6 +120,25 @@ if [ -f "$SCRIPT_DIR/dotfiles/mimeapps.list" ]; then
     log_success "mimeapps.list instalado (video→vlc, imágenes→imv, docs→okular)"
 fi
 
+# --- KDE ksycoca fix: applications.menu symlink ---
+# kbuildsycoca6 busca /etc/xdg/menus/applications.menu para indexar apps de escritorio.
+# plasma-desktop provee plasma-applications.menu pero no el alias applications.menu.
+# Sin este symlink, KApplicationTrader retorna vacío → Dolphin muestra "Open With" vacío
+# al hacer doble clic en cualquier archivo, ignorando mimeapps.list por completo.
+log_info "Aplicando fix KDE ksycoca (applications.menu)..."
+if [ ! -e /etc/xdg/menus/applications.menu ]; then
+    if [ -f /etc/xdg/menus/plasma-applications.menu ]; then
+        ln -sf /etc/xdg/menus/plasma-applications.menu /etc/xdg/menus/applications.menu
+        log_success "symlink applications.menu → plasma-applications.menu creado"
+    else
+        log_warn "plasma-applications.menu no encontrado — Dolphin puede tener file associations rotas"
+    fi
+else
+    log_info "applications.menu ya existe — skip"
+fi
+sudo -u "$CURRENT_USER" kbuildsycoca6 2>/dev/null || true
+log_success "ksycoca6 regenerado — Dolphin abre archivos por tipo correctamente"
+
 # --- gen_theme_previews — hacer ejecutable ---
 if [ -f "$USER_HOME/.config/bin/gen_theme_previews" ]; then
     chmod +x "$USER_HOME/.config/bin/gen_theme_previews"

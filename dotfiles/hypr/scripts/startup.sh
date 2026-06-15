@@ -53,3 +53,4 @@ wl-paste --type image --watch cliphist store &
 export PYTHONUNBUFFERED=1
 "$HOME/.config/bin/udiskie-fix" &
 "$HOME/.config/bin/battery_notify.sh" &
+kbuildsycoca6 &
