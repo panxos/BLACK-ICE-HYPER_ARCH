@@ -15,10 +15,10 @@ if ! pgrep -x "awww-daemon" > /dev/null; then
 fi
 
 # Get list of wallpapers
-files=($WALLPAPER_DIR/*)
+files=("$WALLPAPER_DIR"/*)
 num_files=${#files[@]}
 
-if [ $num_files -eq 0 ]; then
+if [[ $num_files -eq 0 ]] || [[ ! -e "${files[0]}" ]]; then
     notify-send "Wallpaper Manager" "No wallpapers found in $WALLPAPER_DIR"
     exit 1
 fi
@@ -58,9 +58,9 @@ esac
 
 # Apply Wallpaper
 awww img "$target_file" \
-    --transition-type $TRANSITION_TYPE \
-    --transition-duration $TRANSITION_DURATION \
-    --transition-fps $TRANSITION_FPS \
+    --transition-type "$TRANSITION_TYPE" \
+    --transition-duration "$TRANSITION_DURATION" \
+    --transition-fps "$TRANSITION_FPS" \
     --transition-step 90
 
 # Optional: Generate Pywal Colors (Future implementation)

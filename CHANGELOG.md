@@ -1,5 +1,14 @@
 # CHANGELOG - BLACK-ICE ARCH
 
+## [3.12.4] - 2026-06-16
+
+### 🛠️ Fixes
+
+- **C-4 `install.sh`**: El stub de recuperación (`SKIP_BASE=true`) dejaba un comentario vacío — los módulos `03_config.sh`→`99_final.sh` asumen `/mnt` montado, pero nadie lo montaba. Añadida función `mount_only()` que: verifica si `/mnt` ya tiene sistema montado (idempotente), auto-detecta layout de particiones (NVMe/SATA), detecta y abre LUKS con passphrase interactiva, monta root con subvol `@` si es btrfs, monta EFI, y exporta `PART_ROOT`/`PART_EFI`/`ENCRYPT`/`FILESYSTEM`. La llamada `mount_only` reemplaza el stub vacío.
+- **wallpaper_manager.sh SC2206**: `files=($WALLPAPER_DIR/*)` sin comillas — glob expansion con espacios en rutas corrompe el array. Corregido a `files=("$WALLPAPER_DIR"/*)`. Agregado guard `[[ ! -e "${files[0]}" ]]` para detectar directorio vacío (bash expande el glob literal si no hay matches). Corchetes dobles en el check de `num_files`. Quoted `$TRANSITION_TYPE`/`$TRANSITION_DURATION`/`$TRANSITION_FPS` en llamada a `awww`.
+
+---
+
 ## [3.12.3] - 2026-06-15
 
 ### 🛠️ Fixes

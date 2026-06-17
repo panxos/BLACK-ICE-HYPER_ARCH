@@ -99,7 +99,7 @@ banner() {
     echo -e "${NEON_BLUE}██╔══██╗██║     ██╔══██║██║     ██╔═██╗     ██║██║     ██╔══╝  "
     echo -e "${NEON_PURPLE}██████╔╝███████╗██║  ██║╚██████╗██║  ██╗    ██║╚██████╗███████╗"
     echo -e "${NEON_BLUE}╚═════╝ ╚══════╝╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝    ╚═╝ ╚═════╝╚══════╝"
-    echo -e "    ${NEON_PURPLE}BLACK-ICE EDITION  ${NC}${GREY}|${NC}${NEON_CYAN}  v3.12.3${NC}"
+    echo -e "    ${NEON_PURPLE}BLACK-ICE EDITION  ${NC}${GREY}|${NC}${NEON_CYAN}  v3.12.4${NC}"
     
     local BORDER=$(printf '─%.0s' $(seq 1 98))
     echo -e "${NEON_BLUE}┌${BORDER}┐${NC}"

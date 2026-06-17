@@ -66,6 +66,62 @@ else
     SKIP_BASE=false
 fi
 
+mount_only() {
+    # Monta particiones existentes sin formatear — para modo de recuperación.
+    # Exports: PART_ROOT, PART_EFI, ENCRYPT, FILESYSTEM
+    if mountpoint -q /mnt && [ -f /mnt/etc/fstab ]; then
+        log_info "Recuperación: /mnt ya montado con sistema existente. Continuando."
+        return 0
+    fi
+
+    if [ -z "${DISK:-}" ]; then
+        log_error "DISK no definido. Especifícalo en install.conf o exporta DISK=/dev/sdX"
+        exit 1
+    fi
+
+    # Auto-detect partition layout (NVMe uses pN suffix, SATA/USB usa N)
+    if [[ "$DISK" == *"nvme"* ]] || [[ "$DISK" == *"mmcblk"* ]]; then
+        PART_EFI="${DISK}p1"
+        PART_ROOT="${DISK}p2"
+    else
+        PART_EFI="${DISK}1"
+        PART_ROOT="${DISK}2"
+    fi
+
+    # Detect LUKS
+    ENCRYPT=false
+    local _real_root="$PART_ROOT"
+    if cryptsetup isLuks "$PART_ROOT" 2>/dev/null; then
+        ENCRYPT=true
+        log_info "Recuperación: LUKS detectado en $PART_ROOT"
+        read -rsp "Passphrase LUKS para $PART_ROOT: " _luks_pass < /dev/tty
+        echo
+        if ! echo "$_luks_pass" | cryptsetup open "$PART_ROOT" cryptroot; then
+            log_error "Passphrase LUKS incorrecta"
+            exit 1
+        fi
+        _real_root="/dev/mapper/cryptroot"
+    fi
+
+    # Mount root
+    mkdir -p /mnt
+    FILESYSTEM="${FILESYSTEM:-ext4}"
+    if [[ "$FILESYSTEM" == "btrfs" ]]; then
+        mount -o subvol=@ "$_real_root" /mnt || { log_error "No se pudo montar btrfs @subvol"; exit 1; }
+    else
+        mount "$_real_root" /mnt || { log_error "No se pudo montar $_real_root en /mnt"; exit 1; }
+    fi
+
+    # Mount EFI
+    if [ -b "$PART_EFI" ]; then
+        mkdir -p /mnt/boot/efi
+        mount "$PART_EFI" /mnt/boot/efi 2>/dev/null || log_warn "No se pudo montar EFI ($PART_EFI) — bootloader puede fallar"
+    fi
+
+    export PART_ROOT PART_EFI ENCRYPT FILESYSTEM
+    log_success "Recuperación: /mnt listo (${FILESYSTEM} en ${_real_root})"
+}
+
 if [ "$SKIP_BASE" = false ]; then
     # 2. Disk Partitioning (Secure Wipe & Encryption)
     source "$INSTALL_DIR/src/modules/01_disk.sh"
@@ -74,8 +130,7 @@ if [ "$SKIP_BASE" = false ]; then
     source "$INSTALL_DIR/src/modules/02_base.sh"
 else
     log_info "Modo de recuperación/reconfiguración activo."
-    # Ensure /mnt is mounted if checking headers
-    # mount_partitions logic would go here if needed for chroot
+    mount_only
 fi
 
 # 4. System Configuration
