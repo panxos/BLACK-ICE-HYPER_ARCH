@@ -134,9 +134,16 @@ ln -sf "$THEMES_DIR/$SELECTION/style.css"    "$W_DIR/style.css"
 WALL_FILE="${WALLPAPERS[$SELECTION]:-}"
 WALL_APPLIED=false
 
+_waypaper_sync() {
+    local _wall="$1"
+    local _tilde="${_wall/$HOME/\~}"
+    sed -i "s|^wallpaper\s*=.*|wallpaper = $_tilde|" "$HOME/.config/waypaper/config.ini" 2>/dev/null || true
+}
+
 # 1. Wallpaper específico del tema en $WALL_DIR
 if [ -n "$WALL_FILE" ] && [ -f "$WALL_DIR/$WALL_FILE" ]; then
     echo "$WALL_DIR/$WALL_FILE" > "$CACHE_WALL"
+    _waypaper_sync "$WALL_DIR/$WALL_FILE"
     awww img "$WALL_DIR/$WALL_FILE" --transition-type grow --transition-duration 1
     WALL_APPLIED=true
 fi
@@ -145,6 +152,7 @@ fi
 if ! $WALL_APPLIED && [ -f "$WALL_DIR/gh0stzk/$SELECTION/wall-01.webp" ]; then
     WALL="$WALL_DIR/gh0stzk/$SELECTION/wall-01.webp"
     echo "$WALL" > "$CACHE_WALL"
+    _waypaper_sync "$WALL"
     awww img "$WALL" --transition-type grow --transition-duration 1
     WALL_APPLIED=true
 fi
@@ -153,7 +161,11 @@ fi
 if ! $WALL_APPLIED; then
     RANDOM_WALL=$(find "$WALL_DIR" -maxdepth 2 \
         \( -name "*.jpg" -o -name "*.png" -o -name "*.webp" \) 2>/dev/null | shuf -n 1)
-    [ -n "$RANDOM_WALL" ] && awww img "$RANDOM_WALL" --transition-type grow --transition-duration 1
+    if [ -n "$RANDOM_WALL" ]; then
+        echo "$RANDOM_WALL" > "$CACHE_WALL"
+        _waypaper_sync "$RANDOM_WALL"
+        awww img "$RANDOM_WALL" --transition-type grow --transition-duration 1
+    fi
 fi
 
 # ---------------------------------------------------------------------------

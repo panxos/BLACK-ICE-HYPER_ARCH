@@ -1,5 +1,16 @@
 # CHANGELOG - BLACK-ICE ARCH
 
+## [3.12.5] - 2026-06-27
+
+### 🛠️ Fixes
+
+- **W-1 `dotfiles/hypr/scripts/set_wallpaper.sh`**: No usaba `waypaper/config.ini` como fuente de verdad. El cache (`~/.cache/current_wallpaper`) apuntaba al wallpaper del install, no al que el usuario seleccionaba con waypaper GUI. Al reiniciar, el wallpaper volvía al anterior. Corregido: lee `waypaper/config.ini` primero (`grep "^wallpaper " | head -1` — con espacio para no capturar `wallpaperengine_folder`), actualiza el cache, y solo usa el cache como fallback.
+- **W-2 `dotfiles/bin/theme_selector`**: Cambiaba el wallpaper activo y actualizaba el cache pero NO sincronizaba `waypaper/config.ini`. Al abrir waypaper GUI después, el ini apuntaba al wallpaper antiguo (inconsistencia). Añadida función `_waypaper_sync()` que hace `sed -i` en `config.ini` cada vez que se aplica un wallpaper (en los 3 paths: tema específico, gh0stzk-walls, fallback aleatorio).
+- **W-3 `src/deploy/04_theme_setup.sh`**: El instalador actualizaba `waypaper/config.ini` pero no escribía `~/.cache/current_wallpaper`. Al primer reinicio, el cache estaba vacío o apuntaba a HORUS-CYBER.jpg. Añadida escritura de `~/.cache/current_wallpaper` inmediatamente después de actualizar el ini, con `chown` correcto.
+- **W-4 `dotfiles/bin/wofi-launcher`**: Faltaba bit de ejecución (`+x`). En nuevos installs el archivo se copiaba sin ejecutabilidad. Corregido con `git update-index --chmod=+x`.
+
+---
+
 ## [3.12.4] - 2026-06-16
 
 ### 🛠️ Fixes

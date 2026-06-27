@@ -81,6 +81,10 @@ if [ -f "$WAYPAPER_CONF" ] && [ -f "$WALL_DEFAULT" ]; then
     sed -i "s|^wallpaper\s*=.*|wallpaper = $WALL_DEFAULT_TILDE|" "$WAYPAPER_CONF"
     sed -i "s|^folder\s*=.*|folder = ~/Pictures/wallpapers|" "$WAYPAPER_CONF"
     chown "$CURRENT_USER:$CURRENT_USER" "$WAYPAPER_CONF"
+    # También sincronizar el cache para que set_wallpaper.sh y waypaper/config.ini arranquen alineados
+    mkdir -p "$USER_HOME/.cache"
+    echo "$WALL_DEFAULT" > "$USER_HOME/.cache/current_wallpaper"
+    chown "$CURRENT_USER:$CURRENT_USER" "$USER_HOME/.cache/current_wallpaper"
     log_success "waypaper config actualizada → $WALL_DEFAULT_TILDE"
 fi
 

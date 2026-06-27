@@ -12,23 +12,34 @@ else
 fi
 WALLPAPER_DIR="$PICTURES_DIR/wallpapers"
 
-# 1. Check Persistence Cache
-if [ -f "$CACHE_FILE" ]; then
+# 1. waypaper/config.ini — fuente de verdad (se actualiza al seleccionar con waypaper o theme_selector)
+_WP_CONFIG="$HOME/.config/waypaper/config.ini"
+if [[ -f "$_WP_CONFIG" ]]; then
+    _WP_WALL=$(grep "^wallpaper " "$_WP_CONFIG" | head -1 | cut -d= -f2 | tr -d ' ' | sed "s|^~|$HOME|")
+    if [[ -f "$_WP_WALL" ]]; then
+        echo "$_WP_WALL" > "$CACHE_FILE"
+        awww img "$_WP_WALL" --transition-type none
+        exit 0
+    fi
+fi
+
+# 2. Check Persistence Cache (fallback si waypaper/config.ini no tiene path válido)
+if [[ -f "$CACHE_FILE" ]]; then
     CACHED_WALL=$(cat "$CACHE_FILE")
-    if [ -f "$CACHED_WALL" ]; then
+    if [[ -f "$CACHED_WALL" ]]; then
         awww img "$CACHED_WALL" --transition-type none
         exit 0
     fi
 fi
 
-# 2. Fallback: HORUS-CYBER default (Si existe explícitamente)
-if [ -f "$WALLPAPER_DIR/HORUS-CYBER.jpg" ]; then
+# 4. Fallback: HORUS-CYBER default (Si existe explícitamente)
+if [[ -f "$WALLPAPER_DIR/HORUS-CYBER.jpg" ]]; then
     awww img "$WALLPAPER_DIR/HORUS-CYBER.jpg" --transition-type none
     echo "$WALLPAPER_DIR/HORUS-CYBER.jpg" > "$CACHE_FILE"
     exit 0
 fi
 
-# 3. Fallback: First image found
+# 6. Fallback: First image found
 WALLPAPER=$(find "$WALLPAPER_DIR" -type f \( -name "*.png" -o -name "*.jpg" -o -name "*.mp4" \) 2>/dev/null | head -n 1)
 
 if [ -f "$WALLPAPER" ]; then
