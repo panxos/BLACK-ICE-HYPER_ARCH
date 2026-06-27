@@ -51,6 +51,9 @@ dotfiles/wallpapers/*.jpeg
 dotfiles/wallpapers/*.jpg
 dotfiles/wallpapers/*.png
 
+# OpenSpec — documentación interna del proceso SDD (no para usuarios finales)
+.openspec/
+
 # Temporary/internal files
 xauth_*
 AUDIT_*.md
