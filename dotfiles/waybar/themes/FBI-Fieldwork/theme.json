@@ -1,9 +1,9 @@
 {
-  "wallpaper": "fbi-fieldwork-uhd.png",
+  "wallpaper": "fbi-fieldwork.png",
   "shape": "angular",
   "font": "Barlow Condensed",
   "layout": "single-top",
   "workspace": "shields",
-  "panorama": "fbi-fieldwork-panorama-uhd.png",
+  "panorama": "fbi-fieldwork-panorama.png",
   "sddm": "black-ice-fbi-fieldwork"
 }

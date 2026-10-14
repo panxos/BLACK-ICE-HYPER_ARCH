@@ -47,7 +47,7 @@ El 2026-10-14 se probó instalación limpia UEFI/Btrfs sin LUKS, reanudación co
 - Referencia exacta y similitud final de s4vitar, incluida la procedencia del fondo.
 - Recuperar y comparar el maestro Anubis aprobado desde el segundo equipo cuando esté disponible, sin enviar archivos hacia él.
 - Revisión de perfiles Yael/Varinka y acceso/bloqueo con pantallas físicas múltiples.
-- Recursos con detalle 4K nativo: los derivados existentes son reescalados y deben seguir rotulados como tales.
+- Fondos con detalle 4K nativo: las fuentes del catálogo tienen dimensiones variadas y se escalan al mostrarse; no se distribuyen derivados reescalados como si aportaran detalle 4K.
 - Mantener revisión visual de ambos idiomas al ampliar controles; traducciones externas y greeters de terceros dependen de sus propios catálogos.
 - Control y los veinte diseños de Conky ya usan el idioma seleccionado. La traducción por pruebas de los textos dibujados está cubierta; la apariencia final debe revisarse en una sesión gráfica nueva tras desplegar los archivos actualizados.
 

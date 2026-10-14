@@ -1,8 +1,8 @@
 {
-  "wallpaper": "karla-wall-01-uhd.png",
+  "wallpaper": "karla-wall-01.webp",
   "shape": "slab",
   "font": "Rajdhani",
   "layout": "single-top",
   "workspace": "numbers",
-  "panorama": "karla-panorama-uhd.png"
+  "panorama": "karla-panorama.png"
 }

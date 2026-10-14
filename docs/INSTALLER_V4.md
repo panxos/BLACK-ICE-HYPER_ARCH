@@ -51,7 +51,7 @@ La VM de QA comprobó instalación UEFI/Btrfs sin cifrado, reanudación, arranqu
 
 El despliegue verifica sus componentes antes de anunciar éxito. Para Lua se utiliza `waybar-git` con IPC compatible; Waybar 0.15 estable no incluye esa adaptación. Sustituir una instalación estable existente requiere una transacción revisada (`sudo pacman -S waybar-git`); el modo automático se detiene ante ese conflicto. Las firmas siguen habilitadas. El selector nativo de fondos funciona si Waypaper queda pendiente de revisión AUR.
 
-Plan de las seis mejoras de sistema: [SYSTEM_V4_IMPLEMENTATION_PLAN.md](SYSTEM_V4_IMPLEMENTATION_PLAN.md). Procedencia del reescalado: [WALLPAPER_UHD.md](WALLPAPER_UHD.md).
+Plan de las seis mejoras de sistema: [SYSTEM_V4_IMPLEMENTATION_PLAN.md](SYSTEM_V4_IMPLEMENTATION_PLAN.md). Catálogo y procedencia de fondos: [WALLPAPERS.md](WALLPAPERS.md).
 
 ## Copia al sistema instalado
 

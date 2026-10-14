@@ -15,7 +15,7 @@ class DistributionTests(unittest.TestCase):
             source = root / "source"
             target = root / "target"
             target.mkdir()
-            kept = ("install.sh", "config/apps.json", "config/install.conf.example", "dotfiles/bin/black-ice-control", "docs/THEMES.md", "assets/wallpapers/cyber/upscaled.json")
+            kept = ("install.sh", "config/apps.json", "config/install.conf.example", "dotfiles/bin/black-ice-control", "docs/THEMES.md", "assets/wallpapers/cyber/sources.json")
             excluded = ("AGENTS.md", ".handoff.md", ".claude/config.json", "openspec/changes/test/tasks.md", "config/install.conf", "install.conf.auto", ".env", "src/__pycache__/module.pyc", "docs/VM_VALIDATION_V4.md", "assets/wallpapers/cyber/prompts.json")
             for name in (*kept, *excluded):
                 path = source / name

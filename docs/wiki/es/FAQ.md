@@ -18,7 +18,7 @@ Utiliza el fondo individual. El panorama se reparte entre salidas alineadas cuan
 
 ## ¿Los 4K son nativos?
 
-Hay fuentes originales y derivados reescalados. [Dimensiones y métodos](../../WALLPAPER_UHD.md) evitan confundir resolución de archivo con detalle nativo.
+Los temas usan las fuentes originales y el entorno gráfico las ajusta al mostrarlas. [Fondos y procedencia](../../WALLPAPERS.md) explica el criterio y cómo declarar nuevos recursos.
 
 ## ¿Está listo para release?
 

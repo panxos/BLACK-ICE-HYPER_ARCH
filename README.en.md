@@ -56,7 +56,7 @@ Themes coordinate Waybar, Conky, Kitty, the launcher, menus and notifications. P
 | Displays | Individual wallpaper, panoramas per row or a shared scene |
 | F1 help | Search bindings actually loaded by the session |
 
-Gallery captures use demonstration data in an isolated Waybar session. UHD resources include upscaled derivatives; dimensions do not imply native 4K detail. [Sources and method](docs/WALLPAPER_UHD.md).
+Gallery captures use demonstration data in an isolated Waybar session. Themes use source images and scale them for display; the repository does not store enlarged copies that add no detail. [Wallpapers and sources](docs/WALLPAPERS.en.md).
 
 Studio is a simple configurator. A universal Hyprland designer remains a separate future project. Applying a theme with SDDM follow enabled updates the greeter palette and wallpaper for the next login. Saving a profile alone does not change SDDM. Hyprlock also has dedicated controls.
 

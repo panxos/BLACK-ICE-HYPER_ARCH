@@ -189,15 +189,16 @@ class StudioTests(unittest.TestCase):
         self.assertEqual(args[:3], ["pkexec", "/usr/lib/black-ice/system-transaction", "sddm-theme"])
         self.assertEqual(args[3], str(preview))
 
-    def test_sddm_preview_preserves_uhd_background_bytes(self):
+    def test_sddm_preview_preserves_source_background_bytes(self):
         import shutil
         sddm = self.config / "sddm"
         shutil.copytree(ROOT / "assets/sddm/themes/black-ice-obsidian", sddm / "black-ice-obsidian")
-        self.profile["wallpaper"] = str(ROOT / "assets/wallpapers/cyber/fbi-fieldwork-uhd.png")
+        self.profile["wallpaper"] = str(ROOT / "assets/wallpapers/cyber/fbi-fieldwork.png")
         with patch.object(model, "SDDM_ROOT", sddm), patch.object(model.subprocess, "run") as run:
             preview = model.sddm_preview(self.profile, self.config / "preview")
         run.assert_not_called()
-        self.assertEqual((preview / "background.png").read_bytes(), Path(self.profile["wallpaper"]).read_bytes())
+        background = preview / ("background" + Path(self.profile["wallpaper"]).suffix)
+        self.assertEqual(background.read_bytes(), Path(self.profile["wallpaper"]).read_bytes())
         import json
         pictures = self.config / "Pictures"
         walls = pictures / "wallpapers"

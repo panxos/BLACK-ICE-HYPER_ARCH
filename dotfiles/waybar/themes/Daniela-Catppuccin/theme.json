@@ -1,8 +1,8 @@
 {
-  "wallpaper": "daniela-wall-01-uhd.png",
+  "wallpaper": "daniela-wall-01.webp",
   "shape": "steps",
   "font": "Roboto",
   "layout": "single-bottom",
   "workspace": "dots",
-  "panorama": "daniela-panorama-uhd.png"
+  "panorama": "daniela-panorama.png"
 }

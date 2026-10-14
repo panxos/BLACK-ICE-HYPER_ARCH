@@ -7,6 +7,7 @@
 - Tor transparente para TCP/DNS IPv4 de aplicaciones instaladas, con UID dedicado, filtro nftables independiente y bloqueo de IPv6, UDP restante y reenvío. Caída del daemon conserva el filtro; apagado explícito recupera conexión normal.
 - Comprobados en VM conexión normal sin proxychains, DNS redirigido, bloqueo UDP/IPv6/reenvío y reinicio con filtro anterior a NetworkManager. No equivale a anonimato absoluto ni reemplaza Tor Browser.
 - Módulo compacto con paleta y tipografía de los 54 temas. Control permite apagar Tor y ocultar su indicador; no abre una consola especial.
+- Eliminadas 67 copias de fondos reescaladas (664 MiB). Los 54 temas, SDDM y el instalador utilizan las imágenes fuente, sin archivos duplicados que no añaden detalle nativo.
 - Preferencia español/inglés compartida por Control, Estudio, galerías y centro de sistema; IDs y datos personales conservados. SDDM y Rofi incorporan selección/etiquetas bilingües.
 - Suite GTK aislada por defecto en Xvfb. La ejecución anterior desde la sesión Wayland congelaba el escritorio al abrir ventanas de prueba.
 - `uwsm` ahora es dependencia crítica: SDDM selecciona `hyprland-uwsm.desktop`; sin el gestor la primera sesión Wayland cerraba inmediatamente.

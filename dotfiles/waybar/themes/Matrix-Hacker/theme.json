@@ -1,9 +1,9 @@
 {
-  "wallpaper": "matrix-signal-uhd.png",
+  "wallpaper": "matrix-signal.png",
   "shape": "angular",
   "font": "Share Tech Mono",
   "layout": "dual-top",
   "workspace": "code",
-  "panorama": "matrix-signal-uhd.png",
+  "panorama": "matrix-signal.png",
   "launcher": "matrix-code"
 }

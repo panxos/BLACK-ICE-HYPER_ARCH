@@ -1,8 +1,8 @@
 {
-  "wallpaper": "isis-lunar-panorama-uhd.png",
+  "wallpaper": "isis-lunar-panorama.png",
   "shape": "capsule",
   "font": "Ubuntu Sans",
   "layout": "single-bottom",
   "workspace": "ankh",
-  "panorama": "isis-lunar-panorama-uhd.png"
+  "panorama": "isis-lunar-panorama.png"
 }

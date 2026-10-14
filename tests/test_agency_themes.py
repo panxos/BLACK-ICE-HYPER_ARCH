@@ -32,7 +32,9 @@ class AgencyThemesTests(unittest.TestCase):
         for item in plan:
             target = destination / item["theme"]
             source = ROOT / "assets/wallpapers/cyber" / catalog[item["name"]]["wallpaper"]
-            self.assertEqual(hashlib.sha256((target / "assets/wallpaper.png").read_bytes()).digest(), hashlib.sha256(source.read_bytes()).digest())
+            installed = target / "assets" / ("wallpaper" + source.suffix.lower())
+            self.assertEqual(hashlib.sha256(installed.read_bytes()).digest(), hashlib.sha256(source.read_bytes()).digest())
+            self.assertIn("background=" + installed.relative_to(target).as_posix(), (target / "theme.conf").read_text())
             self.assertIn("title=" + item["name"].split("-")[0], (target / "theme.conf").read_text())
             self.assertTrue((target / "assets/fonts" / presets[item["name"]]["font_file"]).is_file())
             self.assertEqual((target / "Main.qml").stat().st_mode & 0o777, 0o644)
@@ -51,7 +53,7 @@ class AgencyThemesTests(unittest.TestCase):
         self.assertEqual((outside / "Main.qml").read_text(), "personal")
         self.assertFalse((destination / "black-ice-fbi-fieldwork").exists())
 
-    def test_rejects_low_resolution_before_writing(self):
+    def test_rejects_invalid_dimensions_before_writing(self):
         source = self.directory / "source"
         for path in ("assets/sddm/agency-presets.json", "dotfiles/waybar/cyber-catalog.json"):
             (source / path).parent.mkdir(parents=True, exist_ok=True)
@@ -60,9 +62,9 @@ class AgencyThemesTests(unittest.TestCase):
         shutil.copytree(ROOT / "assets/fonts/barlowcondensed", source / "assets/fonts/barlowcondensed")
         image = source / "assets/wallpapers/cyber" / catalog["FBI-Fieldwork"]["wallpaper"]
         image.parent.mkdir(parents=True)
-        image.write_bytes(b"\x89PNG\r\n\x1a\n" + struct.pack(">I", 13) + b"IHDR" + struct.pack(">II", 1920, 1080))
+        image.write_bytes(b"\x89PNG\r\n\x1a\n" + struct.pack(">I", 13) + b"IHDR" + struct.pack(">II", 0, 0))
         destination = self.directory / "themes"
-        with self.assertRaisesRegex(ValueError, "3840"):
+        with self.assertRaisesRegex(ValueError, "Dimensiones"):
             agency.install(source, destination, apply=True)
         self.assertFalse(destination.exists())
 

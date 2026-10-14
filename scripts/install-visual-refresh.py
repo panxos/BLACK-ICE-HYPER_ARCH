@@ -94,13 +94,15 @@ def sddm_backgrounds(source: Path, name: str = "Anubis-Sethek") -> dict[str, byt
     wall = (root / profile["wallpaper"]).resolve(strict=True)
     if not wall.is_relative_to(root):
         raise ValueError("Fondo fuera del catálogo")
-    files = {"assets/wallpaper.png": wall.read_bytes()}
-    options = {"background": "assets/wallpaper.png", "backgroundMode": profile.get("wallpaper_mode", "auto"),
+    wall_name = "assets/wallpaper" + wall.suffix.lower()
+    files = {wall_name: wall.read_bytes()}
+    options = {"background": wall_name, "backgroundMode": profile.get("wallpaper_mode", "auto"),
                "backgroundPanorama": "", "backgroundAnchor": profile.get("panorama_anchor", "center")}
     panorama = (root / profile.get("panorama", "")).resolve()
     if panorama.is_file() and panorama.is_relative_to(root):
-        files["assets/panorama.png"] = panorama.read_bytes()
-        options["backgroundPanorama"] = "assets/panorama.png"
+        panorama_name = "assets/panorama" + panorama.suffix.lower()
+        files[panorama_name] = panorama.read_bytes()
+        options["backgroundPanorama"] = panorama_name
     template = source / "assets/sddm/themes/black-ice-obsidian/theme.conf"
     files["theme.conf"] = ini_update(template.read_text(), {"General": options}).encode()
     return files

@@ -1,8 +1,8 @@
 {
-  "wallpaper": "brenda-wall-01-uhd.png",
+  "wallpaper": "brenda-wall-01.webp",
   "shape": "capsule",
   "font": "Inter",
   "layout": "single-top",
   "workspace": "dots",
-  "panorama": "brenda-panorama-uhd.png"
+  "panorama": "brenda-panorama.png"
 }

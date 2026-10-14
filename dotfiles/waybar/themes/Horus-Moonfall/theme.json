@@ -1,8 +1,8 @@
 {
-  "wallpaper": "horus-nightwatch-panorama-uhd.png",
+  "wallpaper": "horus-nightwatch-panorama.png",
   "shape": "angular",
   "font": "Inter",
   "layout": "dual-bottom",
   "workspace": "ankh",
-  "panorama": "horus-nightwatch-panorama-uhd.png"
+  "panorama": "horus-nightwatch-panorama.png"
 }

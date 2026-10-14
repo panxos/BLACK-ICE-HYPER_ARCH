@@ -29,4 +29,4 @@ BLACK-ICE ARCH 4.0.0-dev.2 es un candidato en validación. Estas guías describe
 
 El catálogo de aplicaciones se mantiene en `config/apps.json`. Las paletas, tipografías y distribuciones se generan desde `dotfiles/waybar/`; no edites únicamente los archivos derivados.
 
-Los registros de sesión, planes privados, contraseñas y evidencias con datos del equipo quedan fuera de la distribución. La procedencia de recursos está en [CREDITS.md](../CREDITS.md), [iconos](../assets/icons/README.md) y [fondos UHD](WALLPAPER_UHD.md).
+Los registros de sesión, planes privados, contraseñas y evidencias con datos del equipo quedan fuera de la distribución. La procedencia de recursos está en [CREDITS.md](../CREDITS.md), [iconos](../assets/icons/README.md) y [fondos de escritorio](WALLPAPERS.md).

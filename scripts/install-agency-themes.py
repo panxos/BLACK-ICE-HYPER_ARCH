@@ -11,6 +11,32 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def image_size(path):
+    data = path.read_bytes()
+    if data.startswith(b"\x89PNG\r\n\x1a\n") and data[12:16] == b"IHDR":
+        return struct.unpack(">II", data[16:24])
+    if not data.startswith(b"\xff\xd8"):
+        raise ValueError("Formato de imagen no compatible")
+    offset = 2
+    while offset + 4 <= len(data):
+        if data[offset] != 0xFF:
+            offset += 1
+            continue
+        while offset < len(data) and data[offset] == 0xFF:
+            offset += 1
+        marker = data[offset]
+        offset += 1
+        if marker in {0xD8, 0xD9, 0x01, *range(0xD0, 0xD8)}:
+            continue
+        length = int.from_bytes(data[offset:offset + 2], "big")
+        if marker in {0xC0, 0xC1, 0xC2, 0xC3, 0xC5, 0xC6, 0xC7, 0xC9, 0xCA, 0xCB, 0xCD, 0xCE, 0xCF}:
+            height = int.from_bytes(data[offset + 3:offset + 5], "big")
+            width = int.from_bytes(data[offset + 5:offset + 7], "big")
+            return width, height
+        offset += length
+    raise ValueError("No se pudieron leer las dimensiones de la imagen")
+
+
 def install(source=ROOT, destination=Path("/usr/share/sddm/themes"), apply=False):
     presets = json.loads((source / "assets/sddm/agency-presets.json").read_text())
     catalog = json.loads((source / "dotfiles/waybar/cyber-catalog.json").read_text())
@@ -29,36 +55,36 @@ def install(source=ROOT, destination=Path("/usr/share/sddm/themes"), apply=False
         panorama = (source / "assets/wallpapers/cyber" / profile.get("panorama", "")).resolve()
         if panorama.is_file() and not panorama.is_relative_to((source / "assets/wallpapers/cyber").resolve()):
             raise ValueError("Panorama fuera del catálogo")
-        with background.open("rb") as stream:
-            header = stream.read(24)
-        if header[:8] != b"\x89PNG\r\n\x1a\n" or header[12:16] != b"IHDR":
-            raise ValueError("Se requiere un PNG válido")
-        width, height = struct.unpack(">II", header[16:24])
-        if width < 3840 or height < 2160:
-            raise ValueError("El fondo de acceso debe conservar al menos 3840×2160")
+        width, height = image_size(background)
+        if width < 1 or height < 1:
+            raise ValueError("Dimensiones de fondo inválidas")
         target = destination / preset["theme"]
         if target.is_symlink() or any(p.is_symlink() for p in target.rglob("*")):
             raise ValueError("El destino del tema contiene enlaces simbólicos")
-        plan.append({"name": name, "theme": preset["theme"], "size": [width, height]})
+        plan.append({"name": name, "theme": preset["theme"], "size": [width, height],
+                     "background": "assets/wallpaper" + background.suffix.lower(),
+                     "panorama": "assets/panorama" + panorama.suffix.lower() if panorama.is_file() else ""})
     if not apply:
         return plan
     for item in plan:
         preset = presets[item["name"]]
         profile = catalog[item["name"]]
         target = destination / item["theme"]
-        shutil.copytree(template, target, dirs_exist_ok=True, ignore=shutil.ignore_patterns("wallpaper.png"))
-        shutil.copyfile(source / "assets/wallpapers/cyber" / profile["wallpaper"], target / "assets/wallpaper.png")
+        shutil.copytree(template, target, dirs_exist_ok=True, ignore=shutil.ignore_patterns("wallpaper.*"))
+        background = source / "assets/wallpapers/cyber" / profile["wallpaper"]
+        shutil.copyfile(background, target / item["background"])
         panorama = source / "assets/wallpapers/cyber" / profile.get("panorama", "")
         if panorama.is_file():
-            shutil.copyfile(panorama, target / "assets/panorama.png")
+            shutil.copyfile(panorama, target / item["panorama"])
         font = source / "assets/fonts" / preset["font_file"]
         shutil.copytree(font.parent, target / "assets/fonts" / font.parent.name, dirs_exist_ok=True)
         config = configparser.ConfigParser(interpolation=None)
         config.optionxform = str
         config.read(target / "theme.conf")
         config["General"].update(title=preset["title"], subtitle=preset["subtitle"],
+                                 background=item["background"],
                                  backgroundMode=profile.get("wallpaper_mode", "auto"),
-                                 backgroundPanorama="assets/panorama.png" if panorama.is_file() else "",
+                                 backgroundPanorama=item["panorama"],
                                  backgroundAnchor=profile.get("panorama_anchor", "center"),
                                  bodyFontFile="assets/fonts/" + preset["font_file"],
                                  font=profile["font"], bodyFont=profile["font"],

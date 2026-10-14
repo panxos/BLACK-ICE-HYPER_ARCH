@@ -7,7 +7,7 @@ bash -n install.sh deploy_hyprland.sh bootstrap.sh
 for script in "${scripts[@]}"; do bash -n "$script"; done
 shellcheck -S error install.sh deploy_hyprland.sh bootstrap.sh "${scripts[@]}"
 shellcheck -S warning install.sh deploy_hyprland.sh bootstrap.sh src/lib/install-safety.sh src/deploy/05_software_suite.sh dotfiles/bin/black-ice-apps
-ruff check scripts/select-apps.py scripts/upscale-wallpapers.py scripts/configure-vm-boot.py tests/test_vm_boot.py tests/test_installer_modernization.py tests/test_hyprland_ipc.py dotfiles/bin/black-ice-hypr dotfiles/bin/black-ice-doctor dotfiles/bin/hyprland-migrate dotfiles/bin/black-ice-appearance scripts/install-cyber-themes.py
+ruff check scripts/select-apps.py scripts/configure-vm-boot.py tests/test_vm_boot.py tests/test_installer_modernization.py tests/test_hyprland_ipc.py dotfiles/bin/black-ice-hypr dotfiles/bin/black-ice-doctor dotfiles/bin/hyprland-migrate dotfiles/bin/black-ice-appearance scripts/install-cyber-themes.py
 if ! command -v xvfb-run >/dev/null; then
     printf 'Pruebas GTK aisladas pendientes: instala xorg-server-xvfb.\n' >&2
     exit 1
@@ -17,7 +17,7 @@ ruff check src/system/manager.py scripts/module-state.py scripts/system-transact
 ruff check scripts/install-agency-themes.py scripts/build-waybar-themes.py tests/test_agency_themes.py
 ruff check dotfiles/bin/black_ice_workspaces.py dotfiles/bin/black-ice-workspaces dotfiles/bin/black_ice_shortcuts.py dotfiles/bin/cheatsheet dotfiles/bin/conky_visual tests/test_workspaces.py tests/test_conky_gallery.py tests/test_shortcuts.py
 ruff check dotfiles/bin/black_ice_launcher.py dotfiles/bin/black-ice-launcher tests/test_launcher.py
-ruff check scripts/render-theme-gallery.py scripts/check-distribution.py tests/test_distribution.py tests/test_wallpaper_upscale.py
+ruff check scripts/render-theme-gallery.py scripts/check-distribution.py tests/test_distribution.py
 ruff check dotfiles/bin scripts src/system tests
 ruff check dotfiles/bin/black-ice-waybar-binary
 python3 scripts/check-distribution.py

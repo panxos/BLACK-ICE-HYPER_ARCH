@@ -1,8 +1,8 @@
 {
-  "wallpaper": "jan-neon-district-uhd.png",
+  "wallpaper": "jan-neon-district.png",
   "shape": "terminal",
   "font": "Rajdhani",
   "layout": "single-top",
   "workspace": "dots",
-  "panorama": "jan-neon-district-uhd.png"
+  "panorama": "jan-neon-district.png"
 }

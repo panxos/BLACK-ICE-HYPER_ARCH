@@ -56,7 +56,7 @@ Cada tema coordina Waybar, Conky, Kitty, lanzador, menús y notificaciones. Los 
 | Monitores | Fondos individuales, panoramas por fila o una escena compartida |
 | Ayuda F1 | Buscar los bindings realmente cargados por la sesión |
 
-La galería usa capturas Waybar aisladas con datos de demostración. Los recursos UHD incluyen reescalados: sus dimensiones no equivalen a detalle nativo 4K. [Procedencia y método](docs/WALLPAPER_UHD.md).
+La galería usa capturas Waybar aisladas con datos de demostración. Los temas usan las imágenes fuente y las escalan al mostrarlas; el repositorio no almacena copias reescaladas sin detalle adicional. [Fondos y procedencia](docs/WALLPAPERS.md).
 
 El Estudio es un configurador sencillo. El diseñador universal de Hyprland queda como proyecto independiente futuro. Al aplicar un tema con seguimiento de SDDM, el acceso adopta su paleta y fondo para el próximo inicio de sesión. Guardar un perfil por sí solo no cambia SDDM. Hyprlock también tiene controles propios.
 

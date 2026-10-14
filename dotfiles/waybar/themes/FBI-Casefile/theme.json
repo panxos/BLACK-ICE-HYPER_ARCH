@@ -1,8 +1,8 @@
 {
-  "wallpaper": "fbi-casefile-uhd.png",
+  "wallpaper": "fbi-casefile.png",
   "shape": "steps",
   "font": "Barlow Condensed",
   "layout": "dual-top",
   "workspace": "shields",
-  "panorama": "fbi-casefile-uhd.png"
+  "panorama": "fbi-casefile.png"
 }

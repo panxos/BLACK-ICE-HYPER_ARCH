@@ -29,6 +29,6 @@ Las tres vistas previas de acceso abrieron en la VM sin errores QML; se revisaro
 
 ## Recursos y calidad
 
-Las composiciones y derivados están en `assets/wallpapers/cyber/`; las dimensiones, métodos y hashes están en `upscaled.json`. Los derivados superan 3840×2160 mediante reescalado Lanczos local; no se presentan como detalle nativo 4K. Las vistas previas personales de SDDM conservan los bytes y la resolución del fondo seleccionado.
+Las composiciones originales están en `assets/wallpapers/cyber/`. SDDM muestra la fuente seleccionada y la escala a la resolución de pantalla; el repositorio no distribuye copias generadas para simular 4K. Las vistas previas personales conservan los bytes del fondo seleccionado.
 
 Los emblemas son interpretaciones cinematográficas, no réplicas oficiales. La zona izquierda queda libre para el formulario real de SDDM; el fondo no contiene campos de contraseña ni indicadores inventados.

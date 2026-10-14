@@ -233,8 +233,9 @@ class Installer(base.Installer):
             candidate = Path(match.group(1).replace("$HOME",str(self.home)))
             if candidate.is_absolute() and candidate.is_relative_to(self.home):
                 pictures = candidate
-        for path in (self.source / "assets/wallpapers/cyber").glob("*.png"):
-            self.put(pictures / "wallpapers" / path.name,path.read_bytes())
+        for pattern in ("*.png", "*.jpg", "*.jpeg", "*.webp"):
+            for path in (self.source / "assets/wallpapers/cyber").glob(pattern):
+                self.put(pictures / "wallpapers" / path.name,path.read_bytes())
         wallpapers = json.loads((self.source / "assets/visual/obsidian/theme-wallpapers.json").read_text())
         for name in set(wallpapers.values()):
             path = self.source / "dotfiles/wallpapers" / name

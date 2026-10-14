@@ -27,7 +27,7 @@ El catálogo combina siete familias principales con símbolos específicos y fue
 
 Conky ofrece 20 estilos, paleta, transparencia, escala, posición y casillas para una o varias pantallas. **Aplicar** mantiene abierta la galería; **Cerrar** la termina. Puedes ocultar Conky y volver al estilo predeterminado del tema.
 
-La exportación JSON contiene ajustes; lleva también la imagen utilizada y revisa los nombres de salidas en otro equipo. Los derivados UHD y su procedencia se describen en [WALLPAPER_UHD.md](WALLPAPER_UHD.md).
+La exportación JSON contiene ajustes; lleva también la imagen utilizada y revisa los nombres de salidas en otro equipo. El tema conserva la fuente seleccionada; consulta [WALLPAPERS.md](WALLPAPERS.md) para el catálogo y su procedencia.
 
 ## Acceso y bloqueo
 

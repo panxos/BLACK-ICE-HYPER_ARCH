@@ -1,8 +1,8 @@
 {
-  "wallpaper": "seth-tempest-uhd.png",
+  "wallpaper": "seth-tempest.png",
   "shape": "steps",
   "font": "Rajdhani",
   "layout": "dual-top",
   "workspace": "ankh",
-  "panorama": "seth-tempest-extension-uhd.png"
+  "panorama": "seth-tempest-extension.png"
 }

@@ -1,8 +1,8 @@
 {
-  "wallpaper": "sekhmet-redline-panorama-uhd.png",
+  "wallpaper": "sekhmet-redline-panorama.png",
   "shape": "terminal",
   "font": "Rajdhani",
   "layout": "single-top",
   "workspace": "ankh",
-  "panorama": "sekhmet-redline-panorama-uhd.png"
+  "panorama": "sekhmet-redline-panorama.png"
 }

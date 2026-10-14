@@ -6,7 +6,7 @@ Las imágenes son capturas de Waybar real y fondo en Hyprland aislado a 1920×10
 
 Selecciona un tema desde **Super+Alt+T → Apariencia**. El Estudio permite crear perfiles propios sin reemplazar los originales. [Personalización](THEME_STUDIO.md) · [Conky](DESKTOP_MONITOR.md) · [Lanzador](LAUNCHER.md).
 
-Los fondos UHD incluyen reescalado local; consulta [dimensiones y procedencia](WALLPAPER_UHD.md). Una pantalla utiliza el fondo individual; varias alineadas usan el panorama declarado cuando existe. Anubis-Sethek utiliza una escena completa que incluye la pantalla inferior.
+Los fondos se escalan durante la presentación y conservan sus fuentes; consulta [catálogo y procedencia](WALLPAPERS.md). Una pantalla utiliza el fondo individual; varias alineadas usan el panorama declarado cuando existe. Anubis-Sethek utiliza una escena completa que incluye la pantalla inferior.
 
 ## Egipto y mitología
 

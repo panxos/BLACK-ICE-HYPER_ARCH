@@ -1,8 +1,8 @@
 {
-  "wallpaper": "varinka-wall-01-uhd.png",
+  "wallpaper": "varinka-wall-01.webp",
   "shape": "angular",
   "font": "Rajdhani",
   "layout": "dual-top",
   "workspace": "diamonds",
-  "panorama": "varinka-panorama-uhd.png"
+  "panorama": "varinka-panorama.png"
 }

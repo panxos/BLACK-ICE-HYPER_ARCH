@@ -1,8 +1,8 @@
 {
-  "wallpaper": "htb-lab-workstation-uhd.png",
+  "wallpaper": "htb-lab-workstation.png",
   "shape": "slab",
   "font": "Ubuntu Sans",
   "layout": "single-top",
   "workspace": "dots",
-  "panorama": "htb-lab-workstation-uhd.png"
+  "panorama": "htb-lab-workstation.png"
 }

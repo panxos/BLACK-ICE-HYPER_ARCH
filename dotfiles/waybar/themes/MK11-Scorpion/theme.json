@@ -1,9 +1,9 @@
 {
-  "wallpaper": "mk11-scorpion-uhd.png",
+  "wallpaper": "mk11-scorpion.png",
   "shape": "steps",
   "font": "Rajdhani",
   "layout": "single-top",
   "workspace": "diamonds",
-  "panorama": "mk11-scorpion-uhd.png",
+  "panorama": "mk11-scorpion.png",
   "launcher": "mortal-kombat"
 }

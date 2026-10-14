@@ -26,7 +26,7 @@ En la revisión posterior, los tres arcades de Underground quedan apagados: CRT 
 
 Los temas MK usan un dragón circular inspirado en la marca; los de autos, Toyota/Honda/Nissan; Matrix, un emblema propio de código vertical. Procedencia y licencias en [assets/icons/README.md](../assets/icons/README.md). SVG locales, sin procesos adicionales ni dependencia de glifos para el lanzador.
 
-Las fuentes de los derivados vigentes se conservan. Nuevos derivados: individual 3840×2162, panorama 6480×2160; son reescalados locales, no detalle nativo 4K. Hashes, dimensiones y referencias constan en `assets/wallpapers/cyber/{prompts,upscaled}.json`.
+En esa revisión se generaban derivados a partir de las fuentes; eran reescalados locales, no detalle nativo 4K. El estado vigente desde el 2026-10-14 conserva solo las fuentes en el catálogo y elimina los derivados para evitar copias redundantes. La procedencia externa sigue en `assets/wallpapers/cyber/sources.json`; las composiciones se documentan en `prompts.json`.
 
 ## Limpieza de recursos reemplazados
 

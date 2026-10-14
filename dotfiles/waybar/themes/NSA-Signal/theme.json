@@ -1,8 +1,8 @@
 {
-  "wallpaper": "nsa-signal-uhd.png",
+  "wallpaper": "nsa-signal.png",
   "shape": "angular",
   "font": "Inter",
   "layout": "single-top",
   "workspace": "shields",
-  "panorama": "nsa-signal-uhd.png"
+  "panorama": "nsa-signal.png"
 }

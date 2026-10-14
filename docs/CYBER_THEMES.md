@@ -20,6 +20,6 @@ Los módulos de seguridad conservan IP, VPN y objetivo. Docker/VM se ocultan cua
 
 ## Recursos
 
-Los fondos individuales y panorámicos tienen nombres explícitos; no se reemplaza el original de un tema para crear una variante diferente. Los metadatos de reescalado están en `assets/wallpapers/cyber/upscaled.json`; los recursos externos, en `sources.json`. Los registros de diseño quedan fuera de la publicación.
+Los fondos individuales y panorámicos tienen nombres explícitos; no se reemplaza el original de un tema para crear una variante diferente. Los recursos externos están registrados en `assets/wallpapers/cyber/sources.json`. Los temas usan los originales y no duplican archivos reescalados. Los registros de diseño quedan fuera de la publicación.
 
 [Estudio](THEME_STUDIO.md) · [Pantallas](DESKTOP_STABILITY.md) · [Fuentes y créditos](../CREDITS.md).

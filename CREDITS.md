@@ -22,7 +22,7 @@ El logo Hack4u se obtuvo del sitio solicitado para el homenaje s4vitar; su permi
 
 ## Fondos
 
-`assets/wallpapers/cyber/sources.json` registra fuentes externas. `upscaled.json` conserva dimensiones y hashes de originales/derivados utilizados. Los fondos individuales aprobados se mantienen separados de extensiones y variantes.
+`assets/wallpapers/cyber/sources.json` registra fuentes externas. Los temas apuntan directamente a las imágenes fuente; el catálogo no incluye copias reescaladas que aumentan el tamaño sin añadir detalle.
 
 ## Pendiente de publicación
 

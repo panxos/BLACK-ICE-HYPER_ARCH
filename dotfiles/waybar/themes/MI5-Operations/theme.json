@@ -1,9 +1,9 @@
 {
-  "wallpaper": "mi5-operations-uhd.png",
+  "wallpaper": "mi5-operations.png",
   "shape": "angular",
   "font": "Ubuntu Sans",
   "layout": "single-bottom",
   "workspace": "shields",
-  "panorama": "mi5-operations-panorama-uhd.png",
+  "panorama": "mi5-operations-panorama.png",
   "sddm": "black-ice-mi5-operations"
 }

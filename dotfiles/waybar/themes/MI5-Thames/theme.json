@@ -1,8 +1,8 @@
 {
-  "wallpaper": "mi5-thames-uhd.png",
+  "wallpaper": "mi5-thames.png",
   "shape": "slab",
   "font": "Ubuntu Sans",
   "layout": "single-bottom",
   "workspace": "shields",
-  "panorama": "mi5-thames-uhd.png"
+  "panorama": "mi5-thames.png"
 }

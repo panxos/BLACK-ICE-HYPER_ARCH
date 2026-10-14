@@ -1,8 +1,8 @@
 {
-  "wallpaper": "yael-wall-01-uhd.png",
+  "wallpaper": "yael-wall-01.webp",
   "shape": "slab",
   "font": "Ubuntu Sans",
   "layout": "single-bottom",
   "workspace": "dots",
-  "panorama": "yael-panorama-uhd.png"
+  "panorama": "yael-panorama.png"
 }

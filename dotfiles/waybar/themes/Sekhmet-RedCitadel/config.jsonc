@@ -10,6 +10,7 @@
       "group/lab",
       "group/addresses",
       "custom/vpn",
+      "custom/privacy",
       "custom/settarget"
     ],
     "modules-center": [
@@ -208,6 +209,16 @@
       "max-length": 28,
       "on-click-right": "~/.local/bin/black-ice-waybar copy target",
       "on-click": "~/.local/bin/black-ice-waybar choose-target"
+    },
+    "custom/privacy": {
+      "exec": "~/.local/bin/black-ice-privacy status --waybar",
+      "return-type": "json",
+      "interval": 3,
+      "format": "{}",
+      "escape": true,
+      "on-click": "~/.local/bin/black-ice-privacy toggle",
+      "on-click-right": "~/.local/bin/black-ice-privacy menu",
+      "tooltip": true
     },
     "group/lab": {
       "orientation": "inherit",
