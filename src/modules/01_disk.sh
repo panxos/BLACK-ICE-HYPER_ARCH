@@ -4,7 +4,11 @@
 
 if [ -n "${TARGET_DISK:-}" ]; then
     # Modo automatizado
-    DISK="/dev/$TARGET_DISK"
+    DISK="/dev/${TARGET_DISK#/dev/}"
+    if [[ "${CONFIRM_ERASE:-}" != "$DISK" ]]; then
+        log_error "Modo automatizado requiere CONFIRM_ERASE=$DISK. No se formateó nada."
+        exit 1
+    fi
     
     if [ ! -b "$DISK" ]; then
         log_error "El disco $DISK no existe."
@@ -43,18 +47,10 @@ else
         exit 1
     fi
 
-    # Mostrar menú numerado Cyberpunk
-    PS3=$(echo -e "\n${NEON_BLUE}[DISK]${NC} Selecciona el índice de la unidad: ")
-    select d_opt in "${DISK_LIST[@]}"; do
-        if [ -n "$d_opt" ]; then
-            DISK_NAME=$(echo "$d_opt" | awk '{print $1}')
-            DISK="/dev/$DISK_NAME"
-            success "Unidad fijada en: ${NEON_BLUE}$DISK${NC}"
-            break
-        else
-            log_warn "Índice no válido. Reintenta."
-        fi
-    done < /dev/tty
+    DISK_ENTRY=$(ask_option 'Elige el disco de destino / nombre, tamaño y modelo' "${DISK_LIST[@]}")
+    DISK_NAME=$(printf '%s\n' "$DISK_ENTRY" | awk '{print $1}')
+    DISK="/dev/$DISK_NAME"
+    success "Unidad fijada en: $DISK"
     
     if [ ! -b "$DISK" ]; then
         log_error "La unidad $DISK ha dejado de estar disponible."
@@ -62,12 +58,7 @@ else
     fi
     
     while true; do
-        echo -e "\n${RED}╔══════════════════════════════════════════════════════╗${NC}"
-        echo -e "${RED}║${NC}  ${BOLD}¡ADVERTENCIA DE SEGURIDAD!                          ${NC} ${RED}║${NC}"
-        echo -e "${RED}╠══════════════════════════════════════════════════════╣${NC}"
-        echo -e "${RED}║${NC}  La unidad ${BOLD}$DISK${NC} será purgada completamente.      ${RED}║${NC}"
-        echo -e "${RED}║${NC}  Todos los datos serán eliminados permanentemente.   ${RED}║${NC}"
-        echo -e "${RED}╚══════════════════════════════════════════════════════╝${NC}"
+        installer_ui black_ice_notice "$DISK"
         
         echo -ne "${YELLOW}[CONFIRM]${NC} Escribe ${BOLD}SI${NC} para continuar o ${BOLD}NO${NC} para abortar: "
         read -r CONFIRM < /dev/tty
@@ -88,9 +79,7 @@ else
     
     if [[ $(ask_option "¿Deseas cifrar el núcleo del sistema? (Recomendado)" "Si" "No") == "Si" ]]; then
         ENCRYPT="true"
-        echo -e "\n${NEON_PURPLE}┌────────────────────────────────────────────────────────┐${NC}"
-        echo -e "${NEON_PURPLE}│${NC}  ${BOLD}PROTOCOLO DE SEGURIDAD: CIFRADO COMPLETO DE DISCO     ${NC} ${NEON_PURPLE}│${NC}"
-        echo -e "${NEON_PURPLE}└────────────────────────────────────────────────────────┘${NC}"
+        print_step 'Cifrado del disco / LUKS'
         echo -e "${CYAN}Esta contraseña protege tu privacidad y archivos. Se te${NC}"
         echo -e "${CYAN}solicitará cada vez que enciendas el equipo.${NC}"
         echo -e "${YELLOW}¡IMPORTANTE! Si la pierdes, NO podrás recuperar tus datos.${NC}\n"
@@ -106,7 +95,7 @@ else
         done
     else
         ENCRYPT="false"
-        log_warn "Continuando sin cifrado de grado militar."
+        log_warn "El disco se instalará sin cifrado."
     fi
     
     # Filesystem Choice
@@ -117,6 +106,9 @@ else
 fi
 
 # --- PARTITIONING ---
+DISK=$(readlink -f "$DISK")
+validate_target_disk "$DISK" || exit 1
+case "${FILESYSTEM:-}" in btrfs|ext4|xfs|f2fs) ;; *) log_error "Sistema de archivos inválido"; exit 1 ;; esac
 log_info "Iniciando particionado de $DISK..."
 # Wipe functionality
 wipefs -a "$DISK" >/dev/null 2>&1
@@ -172,6 +164,8 @@ else
 fi
 
 # --- FORMATTING ---
+partprobe "$DISK"
+udevadm settle --timeout=15
 if [ "$BOOT_MODE" == "UEFI" ]; then
     log_info "Formateando partición de arranque EFI..."
     mkfs.fat -F32 "$PART_BOOT" >/dev/null 2>&1

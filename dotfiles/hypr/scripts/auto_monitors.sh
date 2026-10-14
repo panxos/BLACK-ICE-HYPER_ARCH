@@ -8,6 +8,14 @@
 #
 # Uso: auto_monitors.sh [--force-gui]
 
+# BLACK_ICE_LUA_SYNC_V1
+sync_generated_lua() {
+    if [[ -f "$HOME/.config/hypr/hyprland.lua" && -x "$HOME/.local/bin/hyprland-migrate" ]]; then
+        "$HOME/.local/bin/hyprland-migrate" --sync-generated
+    fi
+}
+trap sync_generated_lua EXIT
+
 MONITORS_CONF="$HOME/.config/hypr/monitors.conf"
 STATE_FILE="$HOME/.cache/black-ice/monitors_configured"
 FORCE_GUI=false
@@ -23,21 +31,14 @@ if ! VIRT=$(systemd-detect-virt 2>/dev/null); then
 fi
 
 if [[ "$VIRT" != "none" && -n "$VIRT" ]]; then
-    # VM: deshabilitar efectos pesados y forzar renderer GLES2 (compatible VirGL)
+    # Mesa detecta el controlador virtual; limitar solo los efectos costosos.
     cat > "$VM_CONF" << 'EOF'
-# AUTO-GENERADO — VM detectada (KVM/QEMU/VBox): efectos desactivados + renderer VirGL
-env = WLR_RENDERER,gles2
-env = LIBVA_DRIVER_NAME,virpipe
-env = MESA_LOADER_DRIVER_OVERRIDE,virpipe
+# AUTO-GENERADO — VM detectada (KVM/QEMU/VBox): efectos reducidos
 decoration {
     blur { enabled = false }
     shadow { enabled = false }
 }
 animations { enabled = false }
-misc {
-    vfr = true
-    render_ahead_of_time = false
-}
 EOF
 else
     # Bare-metal: detectar GPU y activar aceleración óptima
@@ -126,7 +127,7 @@ if command -v nwg-displays &>/dev/null; then
     notify-send "BLACK-ICE ARCH" \
         "Se detectaron $MONITOR_COUNT monitores. Abre nwg-displays para ajustar disposición." \
         --icon=display 2>/dev/null || true
-    nwg-displays &
+nwg-displays
 else
     notify-send "BLACK-ICE ARCH" \
         "$MONITOR_COUNT monitores detectados. Config base generada en monitors.conf" \

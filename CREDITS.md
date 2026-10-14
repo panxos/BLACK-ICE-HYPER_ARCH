@@ -1,72 +1,29 @@
-# Credits & Inspirations
+# Créditos y procedencia
 
-BLACK-ICE ARCH builds on the work of many talented creators. Where code, design, or assets are derived from other projects, credits are listed here.
+BLACK-ICE ARCH es un proyecto de **Francisco Aravena · P4NX0Z**. Los componentes externos conservan sus autores, licencias y marcas; este documento no concede una licencia general sobre ellos.
 
----
+## Escritorio y herramientas
 
-## gh0stzk — dotfiles
+- [Arch Linux](https://archlinux.org/) y sus mantenedores de paquetes.
+- [Hyprland](https://hypr.land/), Waybar, Conky/Cairo, Rofi, Wofi y SwayNC.
+- [gh0stzk/dotfiles](https://github.com/gh0stzk/dotfiles): inspiración de paletas y temas heredados. El árbol contiene recursos asociados a esas familias en `dotfiles/wallpapers/`; no se afirma que todos estén ausentes o que su licencia sea uniforme.
+- Powerlevel10k, Oh My Zsh y NvChad: componentes instalados desde sus fuentes y sujetos a sus respectivas licencias.
+- [Cyberpunk Arcade](https://github.com/Ricardo-Simoes/cyberpunk_arcade): tema GRUB descargado por el módulo de arranque.
 
-**Repo:** https://github.com/gh0stzk/dotfiles  
-**License:** GPL-3.0  
-**Author:** gh0stzk
+## Fuentes
 
-The following Waybar themes in `dotfiles/waybar/themes/` are **recreations** inspired by gh0stzk's bspwm rice color palettes and layout philosophy, **reimplemented from scratch** for Waybar + Hyprland:
+Las familias incorporadas tienen archivos de licencia y procedencia en [assets/fonts](assets/fonts/README.md) y `sources.json`. Inter, Barlow Condensed, Oxanium, Rajdhani, Share Tech Mono y Noto Sans JP incluyen OFL; Ubuntu Sans conserva Ubuntu Font Licence. Roboto se instala mediante paquetes del sistema. Los iconos tipográficos dependen de Nerd Fonts.
 
-| BLACK-ICE Theme | Based on Rice | Original Colorscheme |
-|---|---|---|
-| `Jan-CyberPunk` | Jan | Custom CyberPunk |
-| `Emilia-TokyoNight` | Emilia | Tokyo Night |
-| `Marisol-Dracula` | Marisol | Dracula |
-| `Melissa-Nord` | Melissa | Nord |
+## Iconos y marcas
 
-The wallpapers from gh0stzk's rices are **not bundled** in this repo. Use the `gh0stzk-walls` script to download them directly from the original repository, respecting the author's license.
+[assets/icons/README.md](assets/icons/README.md) identifica trazados de Simple Icons, emblemas propios y la interpretación del dragón Mortal Kombat.
 
-**No code was copied** from gh0stzk/dotfiles. The color values are derivatives of publicly available colorschemes (Tokyo Night, Dracula, Nord) which are themselves open source. The layout inspiration and aesthetic direction are attributed to gh0stzk's work.
+El logo Hack4u se obtuvo del sitio solicitado para el homenaje s4vitar; su permiso de redistribución no está verificado. Los nombres de agencias, automóviles, personajes y marcas describen temas de escritorio y no expresan afiliación oficial.
 
----
+## Fondos
 
-## DedSec GRUB2 Theme
+`assets/wallpapers/cyber/sources.json` registra fuentes externas. `upscaled.json` conserva dimensiones y hashes de originales/derivados utilizados. Los fondos individuales aprobados se mantienen separados de extensiones y variantes.
 
-**Repo:** https://github.com/VandalByte/dedsec-grub2-theme  
-**License:** GPL-3.0  
-**Author:** VandalByte
+## Pendiente de publicación
 
-Used as-is via the `09_grub_theme.sh` deploy module. Files are downloaded at install time from the original repository.
-
----
-
-## Colorschemes
-
-The following colorschemes are used as palettes across themes. Each has its own license and author:
-
-| Colorscheme | Author | Repo |
-|---|---|---|
-| Tokyo Night | enkia | https://github.com/enkia/tokyo-night-vscode-theme |
-| Dracula | Zeno Rocha | https://github.com/dracula/dracula-theme |
-| Nord | Arctic Ice Studio | https://github.com/nordtheme/nord |
-| Rose Pine | Emilia Dunfelt | https://github.com/rose-pine/palette |
-| Catppuccin | Catppuccin org | https://github.com/catppuccin/catppuccin |
-
----
-
-## s4vitar — Inspiración y Comunidad
-
-**Canal YouTube:** https://www.youtube.com/@s4vitar  
-**GitHub:** https://github.com/s4vitar  
-**Autor:** Marcelo Vázquez (s4vitar)
-
-Uno de los referentes más influyentes de la comunidad de ciberseguridad en español. El diseño general del entorno de trabajo, la filosofía de productividad en terminal y el espíritu de tener un setup ofensivo elegante y funcional están profundamente inspirados en su trabajo y en la comunidad que ha construido.
-
-El tema **`s4vitar-darkness`** de Waybar es un homenaje directo a su estética: barras duales, iconos Pacman, fondo ultra-oscuro y acentos en purple — el setup que él popularizó para pentesting profesional.
-
-> *"La forma en que trabajas define cómo piensas"* — filosofía que permea todo BLACK-ICE ARCH.
-
----
-
-## Other Tools & Resources
-
-- **Powerlevel10k** — romkatv — https://github.com/romkatv/powerlevel10k (MIT)
-- **Oh My Zsh** — robbyrussell — https://github.com/ohmyzsh/ohmyzsh (MIT)
-- **NvChad** — NvChad — https://github.com/NvChad/NvChad (GPL-3.0)
-- **Nerd Fonts** — ryanoasis — https://github.com/ryanoasis/nerd-fonts (MIT)
-- **awww** — Arch `extra/awww` — Wayland wallpaper daemon
+El árbol no contiene un archivo LICENSE general verificable. Se debe definir la licencia del código propio y completar la revisión de recursos externos antes de la publicación del candidato. La atribución por sí sola no equivale a permiso de redistribución.

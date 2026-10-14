@@ -1,20 +1,21 @@
 #!/bin/bash
 # modules/99_final.sh
 
-banner "FINALIZING PROTOCOL" "Post-Install Prep"
+install_stage 8 'Verificación y preparación del escritorio'
 
 # Copy the entire project to both the new user's home and /root for persistence
 log_info "Injecting full BLACK-ICE project for persistence..."
 : "${INSTALL_DIR:?INSTALL_DIR no definido — aborting cp}"
 : "${USER_NAME:?USER_NAME no definido — aborting cp}"
 
-# User Home
-mkdir -p "/mnt/home/${USER_NAME}/BLACK-ICE_ARCH"
-cp -r "${INSTALL_DIR}/"* "/mnt/home/${USER_NAME}/BLACK-ICE_ARCH/"
-
-# Root Home
-mkdir -p "/mnt/root/BLACK-ICE_ARCH"
-cp -r "${INSTALL_DIR}/"* "/mnt/root/BLACK-ICE_ARCH/"
+for destination in "/mnt/home/${USER_NAME}/BLACK-ICE_ARCH" /mnt/root/BLACK-ICE_ARCH; do
+    mkdir -p "$destination"
+    tar -C "$INSTALL_DIR" --exclude-from="$INSTALL_DIR/config/distribution-excludes.txt" \
+        -cf - . | tar -C "$destination" -xf -
+    printf 'SELECTED_COUNTRY=%q\nKEYBOARD_LAYOUT=%q\nSYSTEM_LANG=%q\nSYSTEM_LOCALE=%q\n' \
+        "${SELECTED_COUNTRY:-Chile}" "${KEYMAP:-us}" "${SYSTEM_LANG:-en_US}" "${SYSTEM_LOCALE:-es_CL}" > "$destination/install.conf.auto"
+    chmod 600 "$destination/install.conf.auto"
+done
 
 # Ensure scripts are executable
 chmod +x "/mnt/home/${USER_NAME:-}/BLACK-ICE_ARCH/deploy_hyprland.sh"
@@ -24,7 +25,8 @@ chmod +x "/mnt/home/${USER_NAME:-}/BLACK-ICE_ARCH/src/deploy/"*.sh
 arch-chroot /mnt chown -R "${USER_NAME:-}:${USER_NAME:-}" "/home/${USER_NAME:-}/BLACK-ICE_ARCH"
 
 log_info "Setting up MOTD (Message of the Day)..."
-cat <<EOF >> "/mnt/home/$USER_NAME/.bash_profile"
+mkdir -p "/mnt/home/$USER_NAME/.config"
+cat <<EOF > "/mnt/home/$USER_NAME/.config/black-ice-welcome.sh"
 # BLACK-ICE ARCH Welcome Message
 if [ -d "\$HOME/BLACK-ICE_ARCH" ]; then
     echo -e "\033[0;34m==================================================\033[0m"
@@ -35,6 +37,11 @@ if [ -d "\$HOME/BLACK-ICE_ARCH" ]; then
     echo
 fi
 EOF
+# HOME se expande al iniciar la sesión del usuario.
+# shellcheck disable=SC2016
+welcome_hook='[[ -f "$HOME/.config/black-ice-welcome.sh" ]] && source "$HOME/.config/black-ice-welcome.sh"'
+grep -Fxq "$welcome_hook" "/mnt/home/$USER_NAME/.bash_profile" 2>/dev/null || printf '%s\n' "$welcome_hook" >> "/mnt/home/$USER_NAME/.bash_profile"
+arch-chroot /mnt chown -R "$USER_NAME:$USER_NAME" "/home/$USER_NAME/.config" "/home/$USER_NAME/.bash_profile"
 
 # Copy Logs
 log_info "Archiving installation logs..."
@@ -45,72 +52,11 @@ mkdir -p /mnt/var/log/black-ice
 # --- FINAL SYSTEM AUDIT ---
 log_info "Ejecutando Auditoría Final del Sistema (Post-Install Check)..."
 
-cat <<AUDIT_EOF > /mnt/root/audit_system.sh
-#!/bin/bash
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-NC='\033[0m'
-
-FAIL_COUNT=0
-
-echo -e "\n\${GREEN}==============================================\${NC}"
-echo -e "\${GREEN}      REPORTE DE INTEGRIDAD DEL SISTEMA       \${NC}"
-echo -e "\${GREEN}==============================================\${NC}"
-
-# 1. Check Kernel & Initramfs
-if [ -f "/boot/vmlinuz-${SELECTED_KERNEL:-linux}" ] && [ -f "/boot/initramfs-${SELECTED_KERNEL:-linux}.img" ]; then
-    echo -e "\${GREEN}[PASS]\${NC} Kernel (${SELECTED_KERNEL:-linux}) detectado."
-    ls -lh "/boot/initramfs-${SELECTED_KERNEL:-linux}.img" | awk '{print "[INFO] Initramfs Size: " \$5}'
+source "$INSTALL_DIR/src/lib/post-install-audit.sh"
+if audit_installed_system /mnt "${SELECTED_KERNEL:-linux}" "${ENCRYPT:-false}"; then
+    printf 'BLACK_ICE_VERSION=%s\n' "$BLACK_ICE_VERSION" > /mnt/etc/black-ice-release
+    log_success "Instalación y auditoría completadas."
 else
-    echo -e "\${RED}[FAIL] CRITICAL: Faltan archivos de arranque en /boot\${NC}"
-    ((FAIL_COUNT++))
-fi
-
-# 2. Check GRUB Config for Encryption
-if grep -q "cryptdevice=UUID=" /boot/grub/grub.cfg; then
-    echo -e "\${GREEN}[PASS]\${NC} GRUB configurado con parámetros de cifrado."
-else
-    echo -e "\${RED}[FAIL] GRUB no tiene configuración de LUKS/Encryption.\${NC}"
-    ((FAIL_COUNT++))
-fi
-
-# 3. Check Network Persistence
-if [ "\$(ls -A /etc/NetworkManager/system-connections/ 2>/dev/null)" ] || [ "\$(ls -A /var/lib/iwd/ 2>/dev/null)" ]; then
-    echo -e "\${GREEN}[PASS]\${NC} Perfiles de red (NM/IWD) detectados y persistidos."
-else
-    echo -e "\${YELLOW}[WARN]\${NC} No se detectaron perfiles de red migrados."
-fi
-
-# 4. Check Fstab
-if [ -s /etc/fstab ]; then
-    echo -e "\${GREEN}[PASS]\${NC} Fstab generado correctamente."
-else
-    echo -e "\${RED}[FAIL] Fstab está vacío.\${NC}"
-    ((FAIL_COUNT++))
-fi
-
-echo -e "\${GREEN}==============================================\${NC}"
-
-if [ \$FAIL_COUNT -eq 0 ]; then
-    echo -e "\${GREEN}       SISTEMA LISTO PARA REINICIO            \${NC}"
-    echo -e "\${GREEN}==============================================\${NC}"
-    exit 0
-else
-    echo -e "\${RED}       !!! AUDITORÍA FINAL FALLIDA !!!        \${NC}"
-    echo -e "\${RED}==============================================\${NC}"
-    echo -e "\${RED}Se detectaron \$FAIL_COUNT errores críticos.\${NC}"
-    echo -e "\${YELLOW}NO REINICIES hasta corregirlos manualmente.\${NC}"
+    log_error "La auditoría final falló. Corrige los errores antes de reiniciar."
     exit 1
-fi
-AUDIT_EOF
-
-chmod +x /mnt/root/audit_system.sh
-if arch-chroot /mnt /root/audit_system.sh; then
-    rm /mnt/root/audit_system.sh
-    log_success "Instalación y Auditoría Completadas. System Ready."
-else
-    log_warn "La auditoría final detectó problemas."
-    log_error "Instalación completada con ERRORES. Revisa el reporte arriba."
-    # No borramos el script de auditoría para que el usuario pueda re-ejecutarlo
 fi

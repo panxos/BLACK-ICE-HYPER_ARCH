@@ -31,9 +31,7 @@ if [ "$INTERNET_OK" = true ]; then
     fi
 else
     log_warn "Sin enlace exterior detectado (8.8.8.8 off)."
-    echo -e "${NEON_PURPLE}┌──────────────────────────────────────────────┐${NC}"
-    echo -e "${NEON_PURPLE}│${NC}  ${BOLD}CONFIGURACIÓN DE RED REQUERIDA            ${NC} ${NEON_PURPLE}│${NC}"
-    echo -e "${NEON_PURPLE}└──────────────────────────────────────────────┘${NC}"
+    print_step 'Conexión de red'
     echo -e "${YELLOW}¿Deseas activar la red ahora (Protocolo BLACK-ICE)?${NC}"
     NET_CHOICE=$(ask_option "Elige herramienta:" "iwctl (WiFi)" "nmtui (General/Ethernet)" "No")
     if [ "$NET_CHOICE" == "iwctl (WiFi)" ]; then
@@ -57,48 +55,8 @@ else
     fi
 fi
 
-# 3.1 Update Keyring (Harden PGP environment)
-log_info "Inicializando y sincronizando llaveros PGP (Arch Linux)..."
-
-# Asegurar que el directorio de GPG existe y está limpio si hay problemas
-mkdir -p /etc/pacman.d/gnupg
-chmod 700 /etc/pacman.d/gnupg
-
-_keyring_attempts=0
-while true; do
-    (( _keyring_attempts++ ))
-    if (( _keyring_attempts > 5 )); then
-        log_error "Keyring PGP: máximo de intentos alcanzado. Verifica conectividad y reinicia."
-        exit 1
-    fi
-
-    pacman-key --init >/dev/null 2>&1
-    pacman-key --populate archlinux >/dev/null 2>&1
-
-    if pacman -Syy --noconfirm archlinux-keyring >/dev/null 2>&1; then
-        success "Llaveros PGP actualizados y validados."
-        break
-    else
-        log_warn "Error sincronizando llaveros (intento $_keyring_attempts/5). Aplicando limpieza profunda de GPG..."
-        rm -rf /etc/pacman.d/gnupg/*
-        pacman-key --init >/dev/null 2>&1
-        pacman-key --populate archlinux >/dev/null 2>&1
-
-        if pacman -Syy --noconfirm archlinux-keyring >/dev/null 2>&1; then
-             success "Llaveros PGP recuperados tras limpieza profunda."
-             break
-        fi
-
-        log_error "Fallo persistente en PGP. Reintentando en 5s..."
-        sleep 5
-    fi
-done
-unset _keyring_attempts
-
 # 3.2 Country & Mirror Optimization
-echo -e "\n${NEON_PURPLE}┌──────────────────────────────────────────────┐${NC}"
-echo -e "${NEON_PURPLE}│${NC}  ${BOLD}OPTIMIZACIÓN GEOGRÁFICA (MIRRORS)         ${NC} ${NEON_PURPLE}│${NC}"
-echo -e "${NEON_PURPLE}└──────────────────────────────────────────────┘${NC}"
+print_step 'Servidores de descarga / mirrors'
 echo -e "${CYAN}Elegir los servidores más cercanos acelerará la descarga.${NC}\n"
 
 if [ -n "${SELECTED_COUNTRY:-}" ]; then
@@ -121,66 +79,30 @@ case "$SELECTED_COUNTRY" in
     *)           REFLECTOR_COUNTRIES="$SELECTED_COUNTRY" ;;
 esac
 
-_mirror_attempts=0
-while true; do
-    (( _mirror_attempts++ ))
-    if (( _mirror_attempts > 3 )); then
-        log_warn "Mirrors: máximo de intentos alcanzado. Usando lista actual."
-        break
+OPTIMIZE_MIRRORS=true
+if valid_mirrorlist /etc/pacman.d/mirrorlist; then
+    if [[ ${AUTO_MODE:-false} == true ]]; then
+        OPTIMIZE_MIRRORS=false
+    elif [[ $(ask_option '¿Deseas revisar mirrors? (máximo 120 segundos)' 'No (Usar existentes)' 'Si (Optimizar)') == 'No (Usar existentes)' ]]; then
+        OPTIMIZE_MIRRORS=false
     fi
+fi
+if [[ "$OPTIMIZE_MIRRORS" == true ]]; then
+    optimize_arch_mirrors "$REFLECTOR_COUNTRIES"
+else
+    log_info 'Se conserva la lista HTTPS existente.'
+fi
 
-    if ! command -v reflector &>/dev/null; then
-        pacman -S --noconfirm reflector >/dev/null 2>&1 || continue
-    fi
-    
-    # --- Check for existing mirrors to avoid re-run ---
-    if [ -s /etc/pacman.d/mirrorlist ]; then
-        log_info "Lista de mirrors detectada previamente."
-        
-        if [ "${AUTO_MODE:-}" == "true" ]; then
-            log_info "Modo Desatendido: Usando mirrors existentes para ahorrar tiempo."
-            break
-        elif command -v ask_option >/dev/null; then
-             if [[ $(ask_option "¿Deseas re-escanear mirrors? (Toma tiempo)" "No (Usar existentes)" "Si (Optimizar)") == "No (Usar existentes)" ]]; then
-                log_info "Saltando optimización de mirrors."
-                break
-             fi
-        fi
-    fi
-
-    log_info "Ejecutando reflector para: $REFLECTOR_COUNTRIES..."
-    echo -e "${YELLOW}>> PROCESANDO MIRRORS... POR FAVOR ESPERE (ESTO PUEDE TARDAR UNOS MINUTOS)${NC}"
-    echo -e "${GREY}   Buscando los servidores más rápidos y recientes...${NC}"
-    
-    if [ "$REFLECTOR_COUNTRIES" == "Worldwide" ]; then
-        _reflector_args=(--protocol https --latest 100 --number 10 --sort rate --connection-timeout 5 --download-timeout 5 --verbose --save /etc/pacman.d/mirrorlist)
-    else
-        _reflector_args=(--country "$REFLECTOR_COUNTRIES" --protocol https --latest 100 --number 10 --sort rate --connection-timeout 5 --download-timeout 5 --verbose --save /etc/pacman.d/mirrorlist)
-    fi
-
-    if reflector "${_reflector_args[@]}"; then
-        success "Nodos de descarga optimizados para tu región."
-        break
-    else
-        log_warn "Fallo al optimizar con países específicos. Intentando modo global..."
-        if reflector --protocol https --latest 100 --number 10 --sort rate --connection-timeout 5 --download-timeout 5 --save /etc/pacman.d/mirrorlist >/dev/null 2>&1; then
-            success "Nodos globales actualizados (Fallo regional)."
-            break
-        fi
-        
-        log_warn "¿Reintentar optimización de mirrors?"
-        if [[ $(ask_option "Decisión:" "Si" "No") == "No" ]]; then
-            log_warn "Usando lista de mirrors actual sin optimizar."
-            break
-        fi
-    fi
-done
-unset _mirror_attempts
+log_info 'Inicializando y sincronizando llaveros PGP de Arch Linux...'
+mkdir -p /etc/pacman.d/gnupg
+chmod 700 /etc/pacman.d/gnupg
+retry_repository_command timeout --signal=TERM --kill-after=5s 60s pacman-key --init
+retry_repository_command timeout --signal=TERM --kill-after=5s 60s pacman-key --populate archlinux
+retry_repository_command pacman -Sy --needed --noconfirm archlinux-keyring
+success 'Llavero oficial actualizado; firmas habilitadas.'
 
 # 4. Keyboard Layout
-echo -e "\n${NEON_PURPLE}┌──────────────────────────────────────────────┐${NC}"
-echo -e "${NEON_PURPLE}│${NC}  ${BOLD}CONFIGURACIÓN DE ENTRADA (TECLADO)        ${NC} ${NEON_PURPLE}│${NC}"
-echo -e "${NEON_PURPLE}└──────────────────────────────────────────────┘${NC}"
+print_step 'Distribución del teclado'
 
 if [ -n "${KEYBOARD_LAYOUT:-}" ]; then
     loadkeys "$KEYBOARD_LAYOUT" 2>/dev/null
@@ -198,9 +120,7 @@ timedatectl set-ntp true
 success "Tiempo sincronizado con el núcleo."
 
 # 6. Hostname Configuration
-echo -e "\n${NEON_PURPLE}┌──────────────────────────────────────────────┐${NC}"
-echo -e "${NEON_PURPLE}│${NC}  ${BOLD}CONFIGURACIÓN DE IDENTIDAD (HOSTNAME)     ${NC} ${NEON_PURPLE}│${NC}"
-echo -e "${NEON_PURPLE}└──────────────────────────────────────────────┘${NC}"
+print_step 'Nombre del equipo'
 
 if [ -n "${HOSTNAME:-}" ] && [ "${AUTO_MODE:-}" == "true" ]; then
     # Unattended mode: use hostname from config file

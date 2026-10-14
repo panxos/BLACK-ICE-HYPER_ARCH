@@ -1,0 +1,32 @@
+#!/usr/bin/env python3
+"""Selecciona un backport verificado o conserva Waybar del sistema."""
+from __future__ import annotations
+
+import hashlib
+import json
+import os
+import subprocess
+from pathlib import Path
+
+
+def selected(root: Path | None = None) -> str:
+    root = root or Path.home() / ".local/libexec/black-ice/waybar-fast-ipc"
+    binary = root / "waybar"
+    try:
+        if not binary.is_file() or binary.is_symlink() or not os.access(binary, os.X_OK):
+            return "waybar"
+        record = json.loads((root / "manifest.json").read_text())
+        package = subprocess.run(["pacman", "-Q", "waybar-git"], capture_output=True, text=True, timeout=3, check=False)
+        if package.returncode or package.stdout.strip() != record["package"]:
+            return "waybar"
+        with binary.open("rb") as stream:
+            if hashlib.file_digest(stream, "sha256").hexdigest() != record["binary_sha256"]:
+                return "waybar"
+        subprocess.run([str(binary), "--version"], capture_output=True, timeout=3, check=True)
+        return str(binary)
+    except (OSError, ValueError, KeyError, TypeError, subprocess.SubprocessError):
+        return "waybar"
+
+
+if __name__ == "__main__":
+    print(selected())

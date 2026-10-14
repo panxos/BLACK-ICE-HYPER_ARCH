@@ -1,0 +1,12 @@
+#custom-privacy {
+    padding: 0 6px;
+    margin: 0;
+    border: none;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    color: @ice_privacy_muted;
+}
+#custom-privacy.protected, #custom-privacy.preparing { color: @ice_privacy_accent; }
+#custom-privacy.blocked { color: @ice_privacy_error; }
+#custom-privacy:hover { color: @ice_privacy_text; }

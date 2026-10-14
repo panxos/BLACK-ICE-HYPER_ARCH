@@ -1,0 +1,9 @@
+ClientOnly 1
+SocksPort 127.0.0.1:19050
+TransPort 127.0.0.1:19040 IsolateDestAddr IsolateDestPort
+DNSPort 127.0.0.1:19053
+AutomapHostsOnResolve 1
+VirtualAddrNetworkIPv4 10.192.0.0/10
+DataDirectory /var/lib/black-ice-tor
+ClientUseIPv6 0
+Log notice stdout

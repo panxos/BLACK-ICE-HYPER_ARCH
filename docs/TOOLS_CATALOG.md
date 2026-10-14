@@ -1,152 +1,247 @@
-# BLACK-ICE ARCH - Security Tools Catalog
+# Catálogo de aplicaciones
 
-## 📋 Table of Contents
+140 aplicaciones opcionales en 20 grupos. La fuente canónica es `config/apps.json`; la disponibilidad y las dependencias se comprueban al instalar. Esta lista no significa que todas estén instaladas ni autoriza uso contra terceros.
 
-- [Reconnaissance](#reconnaissance)
-- [Web Application Security](#web-application-security)
-- [Networking & Sniffing](#networking--sniffing)
-- [Wireless Security](#wireless-security)
-- [Exploitation & C2 Frameworks](#exploitation--c2-frameworks)
-- [Active Directory & Windows](#active-directory--windows)
-- [Forensics & Analysis](#forensics--analysis)
-- [Cracking & Secrets](#cracking--secrets)
-- [Reverse Engineering](#reverse-engineering)
+Abre **Control → Sistema → Centro de software** para instalar y reintentar. El selector de planes permite marcar aplicaciones, grupos o perfiles `minimal`, `desktop`, `pentest` y `full`. Cancelar omite software opcional. AUR requiere revisión separada.
 
----
+[Instalación](INSTALLER_V4.md) · [Gestor de software](SYSTEM_MANAGER.md).
 
-## 🔍 Reconnaissance
+## Navegadores
 
-- **nmap** - Network mapper and security scanner.
-- **masscan** - Fast TCP port scanner (scans entire internet in minutes).
-- **rustscan** - Modern port scanner written in Rust, extremely fast.
-- **netdiscover** - Active/passive ARP reconnaissance tool.
-- **theHarvester** - E-mail, subdomain, and name harvester (OSINT).
-- **sherlock** - Hunt down social media accounts by username.
+| Aplicación | ID del catálogo | Descarga pesada |
+|---|---|---|
+| Firefox | `firefox` | — |
+| Brave | `brave-bin` | — |
 
----
+## Desarrollo y laboratorios
 
-## 🌐 Web Application Security
+| Aplicación | ID del catálogo | Descarga pesada |
+|---|---|---|
+| Podman (contenedores sin root) | `podman` | — |
+| Docker Engine | `docker` | — |
+| Docker Compose | `docker-compose` | — |
+| QEMU/KVM completo | `qemu-full` | Sí |
+| libvirt | `libvirt` | — |
+| Gestor de máquinas virtuales | `virt-manager` | — |
+| dnsmasq | `dnsmasq` | — |
+| kate | `kate` | — |
+| Neovim + NvChad | `neovim` | — |
 
-- **Burp Suite Community** - The classic web proxy and vulnerability scanner.
-- **OWASP ZAP** - Open-source web application security scanner.
-- **sqlmap** - Automatic SQL injection and database takeover tool.
-- **nuclei** - Rapid vulnerability scanner based on customizable templates.
-- **ffuf** - Fast web fuzzer for directory and parameter discovery.
-- **gobuster** - URI and DNS subdomain busting tool.
+## Seguridad de escritorio
 
----
+| Aplicación | ID del catálogo | Descarga pesada |
+|---|---|---|
+| Caido Desktop | `caido-desktop` | — |
+| ipscan | `ipscan` | — |
 
-## 📡 Networking & Sniffing
+## Asistentes opcionales
 
-### Cisco & Interactive
+| Aplicación | ID del catálogo | Descarga pesada |
+|---|---|---|
+| Claude Desktop · cliente de la comunidad | `claude-desktop` | — |
+| Claude Code CLI | `claude-code-cli` | — |
 
-- **minicom** - Serial terminal for Cisco consoles and serial hardware.
-- **expect** - Automation of interactive sessions (Telnet/SSH/FTP).
-- **cisco-torch** - Advanced Cisco scanner and fingerprinting tool.
-- **snmpcheck** - Tool for enumerating SNMP information from agents.
-- **onesixtyone** - High-speed SNMP community string scanner.
+## Productividad
 
-### Analysis & Traffic
+| Aplicación | ID del catálogo | Descarga pesada |
+|---|---|---|
+| obsidian | `obsidian` | — |
+| betterbird-bin | `betterbird-bin` | — |
+| KeePassXC | `keepassxc` | — |
 
-- **wireshark-qt** - GUI-based network protocol analyzer.
-- **tcpdump** - Powerful CLI packet sniffer and analyzer.
-- **macchanger** - Utility for viewing/manipulating MAC addresses.
-- **bettercap** - The Swiss Army knife for 802.11, BLE and Ethernet networks.
-- **ettercap** - MITM framework for ARP poisoning and sniffing.
+## Multimedia
 
----
+| Aplicación | ID del catálogo | Descarga pesada |
+|---|---|---|
+| vlc | `vlc` | — |
+| imv | `imv` | — |
+| mpv | `mpv` | — |
+| yt-dlp | `yt-dlp` | — |
+| gimp | `gimp` | — |
+| spectacle | `spectacle` | — |
+| mpd | `mpd` | — |
+| ncmpcpp | `ncmpcpp` | — |
+| mpc | `mpc` | — |
+| playerctl | `playerctl` | — |
+| mpd-mpris | `mpd-mpris` | — |
 
-## 💥 Exploitation & C2 Frameworks
+## Acceso remoto
 
-- **metasploit** - Industry-standard exploit framework.
-- **sliver** - Modern, cross-platform C2 framework (Go) replacing MSF in many ops.
-- **villain** - Advanced reverse shell manager and multi-session handler.
-- **searchsploit** - Command-line interface for Exploit-DB (offline search).
-- **routersploit** - Framework for exploiting embedded devices/routers.
-- **beef** - Browser Exploitation Framework (XSS focused).
-- **set** - Social Engineering Toolkit for phishing.
+| Aplicación | ID del catálogo | Descarga pesada |
+|---|---|---|
+| anydesk-bin | `anydesk-bin` | — |
+| rustdesk-bin | `rustdesk-bin` | — |
+| remmina | `remmina` | — |
+| freerdp | `freerdp` | — |
 
----
+## Archivos y nube
 
-## 🏗️ Active Directory & Windows
+| Aplicación | ID del catálogo | Descarga pesada |
+|---|---|---|
+| filezilla | `filezilla` | — |
+| MEGAsync | `megasync-bin` | — |
 
-- **netexec (nxc)** - The successor to CrackMapExec; the "Swiss Army Knife" for AD pentesting.
-- **certipy** - Specialized tool for auditing and exploiting AD Certificate Services (AD CS).
-- **impacket** - Collection of Python classes for working with network protocols (SMB, MSRPC).
-- **bloodhound.py** - Python ingestor for BloodHound (collects AD data from Linux).
-- **evil-winrm** - Ultimate shell for WinRM (Windows Remote Management).
-- **coercer** - Automatic coercion of Windows authentication (MS-RPC).
-- **kerbrute** - Fast Kerberos pre-authenticator for user enumeration and bruteforce.
-- **responder** - Poisoner for LLMNR, NBT-NS and MDNS.
+## Oficina
 
-> ⚠️ **BloodHound (bloodhound)**: Requiere `neo4j-community` como dependencia AUR. Este paquete es un proyecto Maven/Scala de **165 módulos** que se compila desde fuente. La instalación puede tardar entre **20 y 60 minutos** dependiendo del hardware. El script avisa antes de comenzar — **no canceles el proceso**, es completamente normal.
+| Aplicación | ID del catálogo | Descarga pesada |
+|---|---|---|
+| OnlyOffice | `onlyoffice-bin` | — |
+| okular | `okular` | — |
 
----
+## Utilidades
 
-## 🔐 Cracking & Secrets
+| Aplicación | ID del catálogo | Descarga pesada |
+|---|---|---|
+| gparted | `gparted` | — |
+| bleachbit | `bleachbit` | — |
+| 7zip | `7zip` | — |
+| ktorrent | `ktorrent` | — |
+| speedtest-cli | `speedtest-cli` | — |
 
-- **hashcat** - World's fastest password recovery tool (GPU accelerated).
-- **john** - John the Ripper, versatile password cracker.
-- **trufflehog** - Scans repositories, S3 buckets, and filesystems for secrets/keys.
-- **gitleaks** - Highly effective tool for detecting secrets in Git history.
-- **pcredz** - Extracts credit card numbers and credentials from PCAP/Live traffic.
-- **hydra** - Parallel network login brute-forcing tool.
-- **cewl** - Custom wordlist generator based on target website content.
-- **seclists** - Massive collection of lists for payloads, passwords, and discovery.
+## Seguridad · Recon
 
----
+| Aplicación | ID del catálogo | Descarga pesada |
+|---|---|---|
+| Nmap - Network Scanner | `nmap` | — |
+| Masscan - Fast Port Scanner | `masscan` | — |
+| RustScan - Modern Port Scanner | `rustscan` | — |
+| Netdiscover - ARP Scanner | `netdiscover` | — |
+| ARP-Scan - Network Discovery | `arp-scan` | — |
+| Recon-ng - Recon Framework | `recon-ng` | — |
+| TheHarvester - OSINT Tool | `theharvester-git` | — |
+| SpiderFoot - OSINT Automation | `spiderfoot` | — |
+| Amass - Subdomain Enumeration | `amass` | — |
+| Sherlock - Username Hunter | `sherlock` | — |
+| DNSenum - DNS Enumeration | `dnsenum2` | — |
+| DNSrecon - DNS Recon | `python-dnsrecon` | — |
+| Enum4Linux - SMB Enumeration | `enum4linux` | — |
 
-## 🔬 Forensics & Analysis
+## Seguridad · Web
 
-- **autopsy** - Digital forensics platform and GUI.
-- **volatility3** - Advanced memory forensics framework.
-- **binwalk** - Firmware analysis and file extraction tool.
-- **exiftool** - Read and write meta information in files.
+| Aplicación | ID del catálogo | Descarga pesada |
+|---|---|---|
+| Burp Suite - Web Proxy | `burpsuite` | — |
+| OWASP ZAP - Web Scanner | `zaproxy` | — |
+| SQLMap - SQL Injection | `sqlmap` | — |
+| Nikto - Web Server Scanner | `nikto` | — |
+| WPScan - WordPress Scanner | `wpscan` | — |
+| WhatWeb - Web Fingerprinting | `whatweb` | — |
+| Gobuster - Directory Fuzzer | `gobuster` | — |
+| FFUF - Fast Web Fuzzer | `ffuf` | — |
+| Feroxbuster - Content Discovery | `feroxbuster` | — |
+| Nuclei - Vulnerability Scanner | `nuclei` | — |
+| HTTPx - HTTP Toolkit | `httpx` | — |
+| Commix - Command Injection | `commix` | — |
+| XSSer - XSS Scanner | `xsser` | — |
 
----
+## Seguridad · Wireless
 
-## 🛠️ Reverse Engineering
+| Aplicación | ID del catálogo | Descarga pesada |
+|---|---|---|
+| Aircrack-ng - WiFi Security | `aircrack-ng` | — |
+| Kismet - Wireless Detector | `kismet` | — |
+| Wifite - Automated WiFi Attack | `wifite` | — |
+| Reaver - WPS Attack | `reaver` | — |
+| Bully - WPS Bruteforce | `bully` | — |
+| PixieWPS - WPS Pixie Dust | `pixiewps` | — |
 
-- **ghidra** - NSA's software reverse engineering suite.
-- **radare2** - Complete framework for reverse engineering and analysis.
-- **gdb** - The GNU Debugger for Linux binary analysis.
-- **apktool** - Tool for reverse engineering Android APK files.
+## Seguridad · AD
 
----
+| Aplicación | ID del catálogo | Descarga pesada |
+|---|---|---|
+| Impacket - Python SMB/MSRPC | `impacket` | — |
+| NetExec - Modern CME (nxc) | `netexec` | — |
+| Evil-WinRM - WinRM Shell | `ruby-evil-winrm` | — |
+| BloodHound - AD Mapper [~60min] | `bloodhound` | Sí |
+| Certipy - AD CS Attack | `python-certipy-ad-git` | — |
+| Coercer - Forced Auth | `coercer` | — |
+| Kerbrute - Kerberos Bruteforce | `kerbrute-bin` | — |
+| Responder - LLMNR Poisoner | `responder` | — |
+| SMBMap - SMB Enumeration | `smbmap` | — |
+| Chntpw - Windows Password Reset | `chntpw` | — |
 
----
+## Seguridad · Crack
 
-## 🖥️ Scripts BLACK-ICE (`~/.config/bin/`)
+| Aplicación | ID del catálogo | Descarga pesada |
+|---|---|---|
+| John the Ripper - Password Cracker | `john` | — |
+| Hashcat - GPU Cracker | `hashcat` | — |
+| Hydra - Network Bruteforcer | `hydra` | — |
+| Medusa - Parallel Bruteforcer | `medusa` | — |
+| TruffleHog - Secret Scanner | `trufflehog-bin` | — |
+| Gitleaks - Git Secret Scanner | `gitleaks` | — |
+| CeWL - Wordlist Generator | `cewl` | — |
+| Crunch - Wordlist Creator | `crunch` | — |
+| HashID - Hash Identifier | `hashid` | — |
+| SecLists - Security Wordlists | `seclists` | — |
+| Wordlists - RockYou & More | `wordlists` | — |
 
-Utilidades del entorno instaladas automáticamente por `src/deploy/99_finalization.sh`:
+## Seguridad · Exploit
 
-| Script | Keybind | Descripción |
-|--------|---------|-------------|
-| `cheatsheet` | `Win+I` | Overlay GTK3 fullscreen con todos los keybinds |
-| `app_switcher` | `Win+Tab` | Selector de ventanas abiertas via wofi + hyprctl |
-| `pass_menu` | `Win+Shift+X` | KeePassXC CLI + Wofi. Copia pass/user/TOTP |
-| `terminal_manager` | `Win+Ctrl+Enter` | Sesiones Kitty multi-tab (Pentesting/Dev/SOC) |
-| `theme_selector` | `Win+Alt+T` | Cambia tema Waybar + wallpaper + colores Kitty (pywal) |
-| `theme_visual` | — | Preview visual de temas con capturas de pantalla |
-| `wallpaper_switcher` | `Win+Alt+W` | Selector de wallpaper con preview |
-| `wallpaper_visual` | — | Browser visual de wallpapers |
-| `wofi_style_selector` | `Win+Alt+R` | Cambia estilo Wofi (4 opciones) |
-| `wifi_toggle` | `Win+Alt+F` | Toggle WiFi via nmcli + notificación |
-| `music_player` | `Win+Shift+M` | Lanzador ncmpcpp con MPD auto-start |
-| `power_profile_menu.sh` | `Win+Shift+P` | Selector perfil de energía (TLP) |
-| `power_menu.sh` | Waybar btn | Lock/Sleep/Reboot/Shutdown/Logout |
-| `vpn_status` | Waybar | Status VPN activa con iconos BMP Nerd Font (U+F023/F09C) |
-| `megasync-watcher.sh` | systemd --user | Fix XWayland MEGAsync: convierte POPUP_MENU→NORMAL, centra ventana |
-| `target_status` | Waybar | Target IP para HTB/CTF |
-| `updates_status` | Waybar | Paquetes disponibles para actualizar |
-| `kvm_menu` | — | Gestión de VMs KVM via wofi |
-| `docker_menu` | — | Gestión de contenedores Docker via wofi |
-| `htb-connect.sh` | — | Conectar VPN HackTheBox |
-| `tryhackme-connect.sh` | — | Conectar VPN TryHackMe |
-| `settarget` | — | Fijar target IP para HTB/CTF |
-| `tech_quotes.sh` | Waybar | Cita técnica aleatoria en la barra |
+| Aplicación | ID del catálogo | Descarga pesada |
+|---|---|---|
+| Metasploit Framework | `metasploit` | — |
+| Sliver - C2 Framework (Go) [~15min] | `sliver` | Sí |
+| Villain - Reverse Shell Manager | `villain-c2-git` | — |
+| ExploitDB - Exploit Archive | `exploitdb` | — |
+| Social Engineer Toolkit | `social-engineer-toolkit` | — |
+| RouterSploit - Router Exploit | `routersploit` | — |
 
----
+## Seguridad · Sniff
 
-**Ubicación seguridad**: Todas las herramientas se gestionan desde `src/deploy/02_security_tools.sh`  
-**Actualización**: Ejecuta `paru -Syu` para mantener todo el arsenal al día.
+| Aplicación | ID del catálogo | Descarga pesada |
+|---|---|---|
+| Wireshark - Network Analyzer | `wireshark-qt` | — |
+| TCPDump - Packet Sniffer | `tcpdump` | — |
+| Ettercap - MITM Framework | `ettercap` | — |
+| Bettercap - Network Attack | `bettercap` | — |
+| MITMProxy - HTTP(S) Proxy | `mitmproxy` | — |
+| MACchanger - MAC Spoofer | `macchanger` | — |
+| Scapy - Packet Manipulation | `scapy` | — |
+
+## Seguridad · RE
+
+| Aplicación | ID del catálogo | Descarga pesada |
+|---|---|---|
+| GDB - GNU Debugger | `gdb` | — |
+| Radare2 - Reverse Framework | `radare2` | — |
+| Ghidra - NSA RE Tool [~20min] | `ghidra` | Sí |
+| NASM - Assembler | `nasm` | — |
+| APKTool - Android Decompiler | `android-apktool` | — |
+| JADX - Android Decompiler | `jadx` | — |
+| EDB - Qt Debugger | `edb-debugger` | — |
+
+## Seguridad · Forense
+
+| Aplicación | ID del catálogo | Descarga pesada |
+|---|---|---|
+| Autopsy - Digital Forensics [~20min] | `autopsy` | Sí |
+| SleuthKit - Forensic Toolkit | `sleuthkit` | — |
+| Volatility3 - Memory Forensics | `volatility3` | — |
+| Binwalk - Firmware Analysis | `binwalk` | — |
+| Foremost - File Recovery | `foremost` | — |
+| ExifTool - Metadata Reader | `perl-image-exiftool` | — |
+| Steghide - Steganography Tool | `steghide` | — |
+| Stegseek - Steg Cracker | `stegseek` | — |
+| HexEdit - Hex Editor | `hexedit` | — |
+
+## Seguridad · Net
+
+| Aplicación | ID del catálogo | Descarga pesada |
+|---|---|---|
+| Netcat - Network Swiss Army | `openbsd-netcat` | — |
+| Socat - Data Relay | `socat` | — |
+| Proxychains - Proxy Forcer | `proxychains-ng` | — |
+| SSHuttle - VPN over SSH | `sshuttle` | — |
+| Chisel - TCP/UDP Tunnel | `chisel` | — |
+| Traceroute - Path Trace | `traceroute` | — |
+| Wireshark CLI | `wireshark-cli` | — |
+| Bind-tools - dig/nslookup | `bind` | — |
+| Whois - Domain Lookup | `whois` | — |
+| MTR - Ping+Traceroute | `mtr` | — |
+| IPerf3 - Bandwidth Test | `iperf3` | — |
+| Nethogs - Bandwidth/Process | `nethogs` | — |
+| Iftop - Bandwidth/Host | `iftop` | — |
+| IPTraf-ng - Net Monitor | `iptraf-ng` | — |
+| Minicom - Serial Terminal | `minicom` | — |
+| Onesixtyone - SNMP Scanner | `onesixtyone` | — |

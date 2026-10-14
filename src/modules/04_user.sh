@@ -1,7 +1,7 @@
 #!/bin/bash
 # modules/04_user.sh
 
-banner "PASO 5" "Seguridad de Identidad y Acceso"
+install_stage 5 'Usuario y acceso'
 
 # Entorno de consola inicial (Bash por defecto para estabilidad)
 # Zsh se configurará en el deploy_hyprland.sh
@@ -31,7 +31,7 @@ else
 
     # --- USERNAME SECTION ---
     while true; do
-        echo -ne "${NEON_BLUE}[USER]${NC} Introduzca el nombre del nuevo usuario (ej: P4nx0z): "
+        echo -ne "${NEON_BLUE}[USER]${NC} Introduce el nombre del nuevo usuario (ej: benjie): "
         read -r USER_NAME < /dev/tty
         if [[ "$USER_NAME" =~ ^[a-z_][a-z0-9_-]*$ ]]; then
             break
@@ -56,20 +56,14 @@ fi
 
 export USER_NAME
 
-# Pasar contraseñas como variables de entorno — sin escribirlas en el script en disco
-# Esto evita doble-escape y exposición de credenciales en archivos temporales
-export _BI_ROOT_PASS="$ROOT_PASS"
-export _BI_USER_NAME="$USER_NAME"
-export _BI_USER_PASS="$USER_PASS"
-
 cat <<'SCRIPT_EOF' > /mnt/root/user_config.sh
 #!/bin/bash
 set -e
 
-# Variables inyectadas por el entorno del proceso padre (arch-chroot -E)
-ROOT_PASS="${_BI_ROOT_PASS}"
-USER_NAME="${_BI_USER_NAME}"
-USER_PASS="${_BI_USER_PASS}"
+# Credenciales recibidas por stdin; no aparecen en argv ni en archivos temporales.
+IFS= read -r -d "" ROOT_PASS
+IFS= read -r -d "" USER_NAME
+IFS= read -r -d "" USER_PASS
 
 echo "[INFO] Inyectando Hash de ROOT..."
 printf "%s:%s\n" "root" "$ROOT_PASS" | chpasswd
@@ -90,18 +84,20 @@ fi
 
 # Sudoers hardening
 mkdir -p /etc/sudoers.d
-echo "%wheel ALL=(ALL:ALL) NOPASSWD: ALL" > /etc/sudoers.d/wheel
-echo "[SUCCESS] Privilegios sudo (WHEEL) escalados."
+echo "%wheel ALL=(ALL:ALL) ALL" > /etc/sudoers.d/wheel
+chmod 0440 /etc/sudoers.d/wheel
+visudo -cf /etc/sudoers.d/wheel
+echo "[SUCCESS] Política sudo validada."
 SCRIPT_EOF
 
 chmod +x /mnt/root/user_config.sh
 log_info "Sincronizando identidades con el núcleo del sistema..."
-if ! arch-chroot /mnt /usr/bin/env _BI_ROOT_PASS="$_BI_ROOT_PASS" _BI_USER_NAME="$_BI_USER_NAME" _BI_USER_PASS="$_BI_USER_PASS" /root/user_config.sh; then
+if ! printf "%s\0%s\0%s\0" "$ROOT_PASS" "$USER_NAME" "$USER_PASS" | arch-chroot /mnt /bin/bash /root/user_config.sh; then
     log_error "Fallo en la sincronización de identidades."
     exit 1
 fi
 rm /mnt/root/user_config.sh
 # Limpiar variables de entorno con contraseñas
-unset _BI_ROOT_PASS _BI_USER_NAME _BI_USER_PASS
+unset ROOT_PASS USER_PASS ROOT_PASSWORD USER_PASSWORD LUKS_PASS LUKS_PASSWORD
 
 success "Entorno de identidades asegurado y Operador listo."

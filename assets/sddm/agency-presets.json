@@ -1,0 +1,20 @@
+{
+  "FBI-Fieldwork": {
+    "theme": "black-ice-fbi-fieldwork",
+    "title": "FBI",
+    "font_file": "barlowcondensed/BarlowCondensed-Regular.ttf",
+    "subtitle": "FIELD OPERATIONS"
+  },
+  "NSA-Intercept": {
+    "theme": "black-ice-nsa-intercept",
+    "title": "NSA",
+    "font_file": "inter/Inter-Variable.ttf",
+    "subtitle": "SIGNAL INTELLIGENCE"
+  },
+  "MI5-Operations": {
+    "theme": "black-ice-mi5-operations",
+    "title": "MI5",
+    "font_file": "ubuntu-sans/UbuntuSans-Variable.ttf",
+    "subtitle": "SECURITY SERVICE"
+  }
+}

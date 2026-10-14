@@ -1,0 +1,400 @@
+#!/usr/bin/env python3
+"""Software, recuperación, proyectos y laboratorios con estado persistente."""
+import argparse
+import json
+import os
+import subprocess
+import sys
+import threading
+from pathlib import Path
+
+data = Path(os.environ.get("XDG_DATA_HOME", Path.home() / ".local/share")) / "black-ice/system"
+source = Path(__file__).resolve().parents[2] / "src/system"
+sys.path.insert(0, str(source if (source / "manager.py").is_file() else data))
+from manager import HELPER, Manager, command
+
+
+def gui(manager, page):
+    import gi
+    gi.require_version("Gtk", "3.0")
+    from gi.repository import GLib, Gtk
+    window = Gtk.Window(title="BLACK-ICE · Sistema")
+    window.set_default_size(1040, 680)
+    window.connect("destroy", Gtk.main_quit)
+    outer = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=12, margin=18)
+    window.add(outer)
+    notebook = Gtk.Notebook()
+    outer.pack_start(notebook, True, True, 0)
+    feedback = Gtk.Label(xalign=0)
+    feedback.set_line_wrap(True)
+    feedback.set_max_width_chars(110)
+    feedback.set_lines(3)
+    outer.pack_end(feedback, False, False, 0)
+    closed = [False]
+    window.connect("destroy", lambda *_: closed.__setitem__(0, True))
+
+    def report(text):
+        if not closed[0]:
+            feedback.set_text(str(text)[-500:])
+        return False
+
+    def worker(operation, callback=None):
+        def execute():
+            try:
+                result = operation()
+                GLib.idle_add(report, "Operación terminada")
+                if callback:
+                    GLib.idle_add(callback, result)
+            except (OSError, TypeError, ValueError, RuntimeError, subprocess.TimeoutExpired) as error:
+                GLib.idle_add(report, str(error))
+        threading.Thread(target=execute, daemon=True).start()
+
+    def button(box, label, operation):
+        widget = Gtk.Button(label=label)
+        widget.connect("clicked", lambda *_: operation())
+        box.pack_start(widget, False, False, 0)
+        return widget
+
+    def ask(message):
+        dialog = Gtk.MessageDialog(transient_for=window, modal=True, message_type=Gtk.MessageType.QUESTION,
+                                   buttons=Gtk.ButtonsType.OK_CANCEL, text=message)
+        response = dialog.run()
+        dialog.destroy()
+        return response == Gtk.ResponseType.OK
+
+    def show_details(result):
+        dialog = Gtk.Dialog(title=result["app"]["name"], transient_for=window, modal=True)
+        dialog.set_default_size(700, 480)
+        dialog.add_button("Cerrar", Gtk.ResponseType.CLOSE)
+        scroll = Gtk.ScrolledWindow()
+        text = Gtk.TextView(editable=False, wrap_mode=Gtk.WrapMode.WORD_CHAR, monospace=True)
+        text.get_buffer().set_text(result["source"] + "\n" + result["details"])
+        scroll.add(text)
+        dialog.get_content_area().pack_start(scroll, True, True, 0)
+        dialog.show_all()
+        dialog.run()
+        dialog.destroy()
+
+    pages = {}
+    for key, label in [("software", "Software"), ("recovery", "Actualizaciones"), ("projects", "Proyectos / VPN"), ("labs", "Laboratorios"), ("security", "Seguridad")]:
+        box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10, margin=12)
+        page_scroll = Gtk.ScrolledWindow()
+        page_scroll.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
+        page_scroll.add(box)
+        notebook.append_page(page_scroll, Gtk.Label(label=label))
+        pages[key] = box
+
+    software = pages["software"]
+    toolbar = Gtk.Box(spacing=8)
+    software.pack_start(toolbar, False, False, 0)
+    search = Gtk.SearchEntry(placeholder_text="Buscar aplicaciones…")
+    toolbar.pack_start(search, True, True, 0)
+    groups = Gtk.ComboBoxText()
+    groups.append("", "Todos los grupos")
+    catalog = manager.catalog()
+    installed_apps = manager.installed(list(catalog))
+    for group in sorted({app["group"] for app in catalog.values()}):
+        groups.append(group, group)
+    groups.set_active(0)
+    toolbar.pack_start(groups, False, False, 0)
+    profiles = Gtk.ComboBoxText()
+    for key, label in (("minimal", "Mínimo"), ("desktop", "Escritorio"), ("pentest", "Pentest"), ("full", "Todo")):
+        profiles.append(key, label)
+    profiles.set_active(0)
+    toolbar.pack_start(profiles, False, False, 0)
+    scroll = Gtk.ScrolledWindow()
+    scroll.set_vexpand(True)
+    software.pack_start(scroll, True, True, 0)
+    listing = Gtk.ListBox(selection_mode=Gtk.SelectionMode.NONE)
+    scroll.add(listing)
+    checks = {}
+    rows = {}
+    for key, app in catalog.items():
+        row = Gtk.ListBoxRow()
+        content = Gtk.Box(spacing=12)
+        check = Gtk.CheckButton(label=f"{app['name']} · {key} · {app['group']}" + (" · instalado" if key in installed_apps else ""))
+        content.pack_start(check, True, True, 0)
+        button(content, "Detalles", lambda key=key: worker(lambda: manager.details(key), show_details))
+        row.add(content)
+        listing.add(row)
+        checks[key], rows[key] = check, row
+
+    def filter_apps(*_):
+        query = search.get_text().casefold()
+        group = groups.get_active_id()
+        for key, row in rows.items():
+            row.set_visible((not group or catalog[key]["group"] == group) and query in (key + catalog[key]["name"]).casefold())
+    search.connect("search-changed", filter_apps)
+    groups.connect("changed", filter_apps)
+    actions = Gtk.Box(spacing=8)
+    software.pack_start(actions, False, False, 0)
+    button(actions, "Marcar visibles", lambda: [check.set_active(True) for key, check in checks.items() if rows[key].get_visible()])
+    button(actions, "Limpiar selección", lambda: [check.set_active(False) for check in checks.values()])
+    def refresh_installed():
+        def apply_status(installed):
+            for key, check in checks.items():
+                app = catalog[key]
+                check.set_label(f"{app['name']} · {key} · {app['group']}" + (" · instalado" if key in installed else ""))
+        worker(lambda: manager.installed(list(catalog)), apply_status)
+    button(actions, "Consultar instalados", refresh_installed)
+    def load_profile():
+        selector = manager.catalog_path.parents[1] / "scripts/select-apps.py"
+        profile = profiles.get_active_id()
+        def apply_profile(result):
+            selected = set(json.loads(result)["apps"])
+            for key, check in checks.items():
+                check.set_active(key in selected)
+        worker(lambda: command([sys.executable, str(selector), "--profile", profile]), apply_profile)
+    button(actions, "Cargar perfil", load_profile)
+    queue = Gtk.ComboBoxText()
+    software.pack_start(queue, False, False, 0)
+
+    def refresh_jobs():
+        if closed[0]:
+            return False
+        selected = queue.get_active_id()
+        queue.remove_all()
+        for job in manager.read("jobs", []):
+            queue.append(job["id"], f"{job['state']} · intento {job['attempts']} · {', '.join(job['packages'])} · {job.get('error', '')[:120]}")
+        if selected:
+            queue.set_active_id(selected)
+        elif queue.get_model() and len(queue.get_model()):
+            queue.set_active(0)
+        return True
+
+    def enqueue(operation):
+        selected = [key for key, check in checks.items() if check.get_active()]
+        if not selected:
+            report("Selecciona aplicaciones")
+            return
+        def prepare():
+            if operation == "remove":
+                return command(["pkexec", HELPER, "remove-preview", *selected])
+            return "Se actualizará el sistema completo y se instalarán:\n" + ", ".join(selected)
+        def confirm(result):
+            if ask(result):
+                try:
+                    manager.enqueue(selected, operation)
+                    refresh_jobs()
+                    subprocess.Popen([sys.executable, __file__, "jobs", "run"], start_new_session=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                except (OSError, ValueError, RuntimeError) as error:
+                    report(error)
+        worker(prepare, confirm)
+    button(actions, "Instalar", lambda: enqueue("install"))
+    button(actions, "Desinstalar…", lambda: enqueue("remove"))
+    queue_actions = Gtk.Box(spacing=8)
+    software.pack_start(queue_actions, False, False, 0)
+    def change_job(operation):
+        job_id = queue.get_active_id()
+        worker(lambda: manager.change_job(job_id, operation))
+    button(queue_actions, "Reintentar", lambda: change_job("retry"))
+    button(queue_actions, "Cancelar pendiente", lambda: change_job("cancel"))
+    button(queue_actions, "Procesar cola", lambda: subprocess.Popen([sys.executable, __file__, "jobs", "run"], start_new_session=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL))
+    refresh_jobs()
+    GLib.timeout_add_seconds(2, refresh_jobs)
+
+    recovery = pages["recovery"]
+    recovery.pack_start(Gtk.Label(label="Btrfs: snapshot raíz + copia de /boot y ESP. La restauración se ejecuta desde la ISO.\nUn punto se muestra como verificado solo después de restaurar y arrancar.", xalign=0), False, False, 0)
+    recovery_text = Gtk.Label(xalign=0, selectable=True)
+    recovery_text.set_line_wrap(True)
+    recovery.pack_start(recovery_text, True, True, 0)
+    def recovery_run(operation):
+        if operation == "update" and not ask("¿Actualizar todo el sistema tras crear un punto de recuperación?"):
+            return
+        worker(lambda: command(["pkexec", HELPER, operation], timeout=7200), lambda result: recovery_text.set_text(result[-5000:]))
+    button(recovery, "Consultar puntos", lambda: recovery_run("status"))
+    button(recovery, "Crear punto de recuperación", lambda: recovery_run("checkpoint"))
+    button(recovery, "Actualizar sistema completo", lambda: recovery_run("update"))
+
+    projects = pages["projects"]
+    project_combo = Gtk.ComboBoxText()
+    projects.pack_start(project_combo, False, False, 0)
+    entries = {}
+    for key, placeholder in [("name", "Nombre del proyecto"), ("target", "IP o hostname objetivo"), ("vpn", "UUID del perfil VPN de NetworkManager (opcional)"), ("notes", "Notas privadas (opcional)")]:
+        entry = Gtk.Entry(placeholder_text=placeholder)
+        projects.pack_start(entry, False, False, 0)
+        entries[key] = entry
+    def load_projects(*_):
+        data = manager.read("projects", {})
+        name = project_combo.get_active_id()
+        if name in data.get("projects", {}):
+            entries["name"].set_text(name)
+            for key in ("target", "vpn", "notes"):
+                entries[key].set_text(data["projects"][name].get(key, ""))
+    def refresh_projects(*_):
+        data = manager.read("projects", {})
+        project_combo.remove_all()
+        for name in data.get("projects", {}):
+            project_combo.append(name, name + (" · activo" if name == data.get("active") else ""))
+        project_combo.set_active_id(data.get("active", ""))
+    project_combo.connect("changed", load_projects)
+    refresh_projects()
+    def save_project():
+        values = [entries[key].get_text() for key in ("name", "target", "vpn", "notes")]
+        worker(lambda: manager.save_project(*values), refresh_projects)
+    def activate_project():
+        name = project_combo.get_active_id()
+        worker(lambda: manager.activate_project(name), refresh_projects)
+    button(projects, "Guardar proyecto", save_project)
+    button(projects, "Activar proyecto", activate_project)
+    button(projects, "Sin proyecto / No target", lambda: worker(lambda: manager.activate_project(""), refresh_projects))
+    button(projects, "Conectar VPN del proyecto", lambda: worker(lambda: manager.vpn("connect")))
+    button(projects, "Desconectar VPN propia", lambda: worker(lambda: manager.vpn("disconnect")))
+    button(projects, "Consultar tun0", lambda: worker(manager.vpn_status, lambda result: report(json.dumps(result))))
+
+    from labs_ui import LabsPanel
+    labs_panel = LabsPanel(manager, manager.run, window, report)
+    pages["labs"].pack_start(labs_panel, False, False, 0)
+    window.labs_panel = labs_panel
+    from security_ui import build
+    build(pages["security"], manager, window, worker, button, ask, report)
+    from black_ice_i18n import bind
+    bind(window)
+    window.show_all()
+    notebook.set_current_page(list(pages).index(page) if page in pages else 0)
+    if page == "labs":
+        GLib.idle_add(lambda: labs_panel.check_requirements())
+    Gtk.main()
+    return 0
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("section", nargs="?", default="software", choices=["software", "recovery", "projects", "labs", "jobs", "target", "vpn", "security", "resources", "forensics", "cases"])
+    parser.add_argument("operation", nargs="?", default="gui")
+    parser.add_argument("values", nargs="*")
+    parser.add_argument("--target", default="")
+    parser.add_argument("--vpn", default="")
+    parser.add_argument("--notes", default="")
+    parser.add_argument("--template", type=Path)
+    parser.add_argument("--confirm", default="")
+    parser.add_argument("--output", type=Path)
+    from laboratories import TEMPLATES
+    parser.add_argument("--preset", choices=tuple(TEMPLATES))
+    parser.add_argument("--scope", nargs="+")
+    parser.add_argument("--cache-mib", type=int, default=8192)
+    parser.add_argument("--ttl-minutes", type=int, default=120)
+    args = parser.parse_args()
+    manager = Manager()
+    try:
+        if args.operation == "gui":
+            return gui(manager, args.section)
+        if args.section == "resources":
+            from storage import Storage
+            storage = Storage(manager)
+            if args.operation == "status":
+                result = storage.status()
+            elif args.operation == "configure":
+                result = storage.configure(args.cache_mib, args.ttl_minutes)
+            elif args.operation == "cleanup-plan":
+                result = storage.cleanup_plan()
+            elif args.operation == "cleanup" and args.template:
+                result = storage.cleanup(json.loads(args.template.read_text()))
+            elif args.operation == "expire":
+                result = manager.expire_labs()
+            else:
+                raise ValueError("Acción de recursos inválida")
+        elif args.section == "forensics":
+            from forensics import PROFILES, install, status
+            if args.operation == "profiles":
+                result = PROFILES
+            elif len(args.values) == 1 and args.values[0] in PROFILES:
+                if args.operation == "status":
+                    result = status(manager, args.values[0])
+                elif args.operation == "install":
+                    result = install(manager, args.values[0])
+                else:
+                    raise ValueError("Acción forense inválida")
+            else:
+                raise ValueError("Selecciona un perfil forense")
+        elif args.section == "cases":
+            from cases import Cases
+            cases = Cases(manager)
+            if args.operation == "list":
+                result = [path.parent.name for path in (manager.root / "cases").glob("*/case.json")]
+            elif len(args.values) >= 1:
+                name = args.values[0]
+                if args.operation == "create":
+                    result = cases.create(name, args.scope or [], args.vpn)
+                elif args.operation == "verify":
+                    result = cases.verify(name)
+                elif args.operation == "note":
+                    result = cases.note(name, args.notes)
+                elif args.operation == "preflight":
+                    result = cases.preflight(name, args.target)
+                elif args.operation == "evidence" and len(args.values) == 2:
+                    result = cases.evidence(name, args.values[1])
+                elif args.operation == "export" and args.output:
+                    result = cases.export(name, args.output)
+                else:
+                    raise ValueError("Acción de caso inválida")
+            else:
+                raise ValueError("Indica el nombre del caso")
+        elif args.section == "jobs":
+            if args.operation == "list":
+                result = manager.read("jobs", [])
+            elif args.operation in {"install", "remove"}:
+                result = manager.enqueue(args.values, args.operation)
+            elif args.operation == "run":
+                result = manager.run_jobs()
+            elif args.operation in {"retry", "cancel"} and len(args.values) == 1:
+                result = manager.change_job(args.values[0], args.operation)
+            else:
+                raise ValueError("Acción de cola inválida")
+        elif args.section == "projects":
+            if args.operation == "list":
+                result = manager.read("projects", {})
+            elif args.operation == "save" and len(args.values) == 1:
+                result = manager.save_project(args.values[0], args.target, args.vpn, args.notes)
+            elif args.operation == "activate" and len(args.values) == 1:
+                result = manager.activate_project(args.values[0])
+            elif args.operation == "clear":
+                result = manager.activate_project("")
+            elif args.operation == "export" and len(args.values) == 1 and args.output:
+                result = manager.export_project(args.values[0], args.output)
+            else:
+                raise ValueError("Acción de proyecto inválida")
+        elif args.section == "target":
+            result = manager.active_target() if args.operation == "status" else manager.set_target(args.operation, args.values[0] if args.values else "")
+        elif args.section == "vpn":
+            result = manager.vpn_status() if args.operation == "status" else manager.vpn(args.operation)
+        elif args.section == "labs":
+            from laboratories import TEMPLATES, Laboratories
+            assistant = Laboratories(manager, manager.run)
+            if args.operation == "list":
+                result = manager.labs()
+            elif args.operation == "presets":
+                result = TEMPLATES
+            elif args.operation == "requirements" and args.preset:
+                result = assistant.requirements(args.preset)
+            elif args.operation == "create" and args.preset and len(args.values) == 1:
+                result = assistant.create(args.preset, args.values[0], lambda text: print(text, file=sys.stderr))
+            elif args.operation == "create" and args.template:
+                spec = json.loads(args.template.read_text())
+                result = assistant.create(spec["template"], spec["name"]) if spec.get("template") else manager.create_lab(spec)
+            elif args.operation == "status" and len(args.values) == 1:
+                result = assistant.status(args.values[0])
+            elif args.operation == "open" and len(args.values) == 1:
+                launch = assistant.open_command(args.values[0])
+                subprocess.Popen(launch, start_new_session=True, stdin=subprocess.DEVNULL,
+                                 stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                result = {"lab": args.values[0], "console_requested": True}
+            elif args.operation == "export" and len(args.values) == 1 and args.output:
+                result = manager.export_lab(args.values[0], args.output)
+            elif args.operation in {"start", "stop", "force-stop", "delete"} and len(args.values) == 1:
+                result = manager.lab_action(args.values[0], args.operation, args.confirm)
+            else:
+                raise ValueError("Acción de laboratorio inválida")
+        else:
+            raise ValueError("Usa la interfaz gráfica o el helper de recuperación")
+        print(json.dumps(result, ensure_ascii=False))
+        if args.section == "cases" and args.operation in {"preflight", "verify"}:
+            return 0 if result.get("allowed", result.get("valid", False)) else 1
+        return 0
+    except (OSError, TypeError, ValueError, RuntimeError, subprocess.TimeoutExpired) as error:
+        print(str(error), file=sys.stderr)
+        return 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

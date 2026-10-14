@@ -4,13 +4,36 @@
 
 banner "FINALIZACIÓN" "Últimos ajustes"
 
+log_info "Instalando gestores de software, recuperación, proyectos y laboratorios..."
+install -d -m 700 "$USER_HOME/.local/share/black-ice/system"
+install -m 644 "$SCRIPT_DIR/src/system/"*.py "$USER_HOME/.local/share/black-ice/system/"
+install -d "$USER_HOME/.local/bin" "$USER_HOME/.local/share/black-ice/software/config" "$USER_HOME/.local/share/applications"
+install -m 755 "$SCRIPT_DIR/dotfiles/bin/black-ice-system" "$USER_HOME/.local/bin/black-ice-system"
+python3 "$SCRIPT_DIR/scripts/install-security-workspace.py"
+install -m 644 "$SCRIPT_DIR/config/apps.json" "$USER_HOME/.local/share/black-ice/software/config/apps.json"
+install -Dm644 "$SCRIPT_DIR/config/i18n/en.json" "$USER_HOME/.local/share/black-ice/i18n/en.json"
+sudo install -d -m 755 /usr/lib/black-ice /usr/share/black-ice
+sudo install -m 755 "$SCRIPT_DIR/scripts/system-transaction.py" /usr/lib/black-ice/system-transaction
+sudo install -m 755 "$SCRIPT_DIR/scripts/system-sddm-theme.py" /usr/lib/black-ice/system-sddm-theme
+sudo install -m 644 "$SCRIPT_DIR/config/apps.json" /usr/share/black-ice/apps.json
+sudo bash "$SCRIPT_DIR/scripts/install-system-tor.sh"
+cat > "$USER_HOME/.local/share/applications/black-ice-system.desktop" << EOF
+[Desktop Entry]
+Type=Application
+Name=BLACK-ICE Sistema
+Comment=Software, recuperación, proyectos y laboratorios
+Exec=$USER_HOME/.local/bin/black-ice-system
+Icon=system-software-install
+Categories=Settings;System;
+Terminal=false
+EOF
+
 # --- Crear directorios XDG del usuario ---
 log_info "Creando directorios XDG (Desktop, Downloads, etc.)..."
 sudo -u "$CURRENT_USER" xdg-user-dirs-update
 # Crear directorio Screenshots explícitamente (grim lo necesita)
 mkdir -p "$USER_HOME/Pictures/Screenshots"
 chown -R "$CURRENT_USER:$CURRENT_USER" "$USER_HOME/Pictures"
-chown -R "$CURRENT_USER:$CURRENT_USER" "$USER_HOME"
 
 # --- Hacer ejecutables los módulos ---
 chmod +x "$SCRIPT_DIR/src/deploy/"*.sh
@@ -36,7 +59,7 @@ if [ -f "$SCRIPT_DIR/dotfiles/bin/xdg-open-wayland" ]; then
 fi
 
 # Scripts de gestión BLACK-ICE
-for _script in dotfiles-update dotfiles-rollback tpm2-luks-enroll; do
+for _script in dotfiles-update dotfiles-rollback hyprland-migrate power_profile power_profile_menu.sh waybar_start.sh tpm2-luks-enroll; do
     if [ -f "$SCRIPT_DIR/dotfiles/bin/$_script" ]; then
         cp "$SCRIPT_DIR/dotfiles/bin/$_script" "$USER_HOME/.local/bin/$_script"
         chmod +x "$USER_HOME/.local/bin/$_script"
@@ -45,9 +68,16 @@ for _script in dotfiles-update dotfiles-rollback tpm2-luks-enroll; do
     fi
 done
 
-# Configurar browser por defecto
-sudo -u "$CURRENT_USER" xdg-settings set default-web-browser brave-browser.desktop 2>/dev/null || \
-    sudo -u "$CURRENT_USER" xdg-settings set default-web-browser brave.desktop 2>/dev/null || true
+# Configurar navegador cuando existe uno instalado y no hay una preferencia válida.
+_browser=$(xdg-settings get default-web-browser 2>/dev/null || true)
+if [[ -z "$_browser" || ! -f "/usr/share/applications/$_browser" && ! -f "$USER_HOME/.local/share/applications/$_browser" ]]; then
+    for _desktop in brave-browser.desktop brave.desktop firefox.desktop google-chrome.desktop chromium.desktop; do
+        if [[ -f "/usr/share/applications/$_desktop" ]]; then
+            xdg-settings set default-web-browser "$_desktop" 2>/dev/null || true
+            break
+        fi
+    done
+fi
 
 # --- Fix xdg-open para Hyprland ---
 # El wrapper ~/.local/bin/xdg-open (instalado arriba desde dotfiles/bin/xdg-open-wayland)
@@ -110,23 +140,24 @@ if [ ! -e /etc/xdg/menus/applications.menu ]; then
     if [ -f /etc/xdg/menus/plasma-applications.menu ]; then
         sudo ln -sf /etc/xdg/menus/plasma-applications.menu /etc/xdg/menus/applications.menu
         log_success "symlink applications.menu → plasma-applications.menu creado"
+    elif [ -f /etc/xdg/menus/arch-applications.menu ]; then
+        sudo ln -sf /etc/xdg/menus/arch-applications.menu /etc/xdg/menus/applications.menu
+        log_success "symlink applications.menu → arch-applications.menu creado"
     else
-        log_warn "plasma-applications.menu no encontrado — Dolphin puede tener file associations rotas"
+        log_error "No hay un menú XDG válido. Instala archlinux-xdg-menu y repite el despliegue."
+        return 1
     fi
 else
     log_info "applications.menu ya existe — skip"
 fi
-sudo -u "$CURRENT_USER" kbuildsycoca6 2>/dev/null || true
-log_success "ksycoca6 regenerado — Dolphin abre archivos por tipo correctamente"
-
-# --- gen_theme_previews — hacer ejecutable ---
-if [ -f "$USER_HOME/.config/bin/gen_theme_previews" ]; then
-    chmod +x "$USER_HOME/.config/bin/gen_theme_previews"
-    log_success "gen_theme_previews listo (se ejecuta en primer boot de Hyprland)"
+if sudo -u "$CURRENT_USER" kbuildsycoca6; then
+    log_success "Índice de aplicaciones KDE regenerado"
+else
+    log_warn "No se pudo regenerar el índice de aplicaciones KDE"
 fi
 
 # --- Kitty color themes — instalar los 21 esquemas de color ---
-log_info "Instalando esquemas de color Kitty para los 21 temas Waybar..."
+log_info "Instalando esquemas de color Kitty..."
 KITTY_THEMES_SRC="$DOTFILES_DIR/kitty/themes"
 KITTY_THEMES_DST="$USER_HOME/.config/kitty/themes"
 mkdir -p "$KITTY_THEMES_DST"
@@ -141,7 +172,7 @@ if [ -d "$KITTY_THEMES_SRC" ]; then
         cp "$KITTY_THEMES_SRC/Horus-Cyber.conf" "$DEFAULT_KITTY" 2>/dev/null || true
         chown "$CURRENT_USER:$CURRENT_USER" "$DEFAULT_KITTY"
     fi
-    log_success "Kitty themes instalados ($(ls "$KITTY_THEMES_DST"/*.conf 2>/dev/null | wc -l) archivos)"
+    log_success "Kitty themes instalados ($(find "$KITTY_THEMES_DST" -maxdepth 1 -name '*.conf' -printf '.' 2>/dev/null | wc -c) archivos)"
 else
     log_warn "No se encontró directorio kitty/themes — saltando"
 fi
@@ -159,22 +190,25 @@ for theme_dir in "$DOTFILES_DIR/waybar/themes"/*/; do
 done
 log_success "Previews de temas instaladas"
 
-# 3. Wrapper para Udiskie (XWayland para icono en la tray)
-cat << 'EOF' > "$USER_HOME/.config/bin/udiskie-fix"
-#!/bin/bash
-# udiskie-fix - P4nx0z Edition
-export XDG_CURRENT_DESKTOP=Unity
-export GDK_BACKEND=x11
-/usr/bin/udiskie --tray --notify --automount "$@"
-EOF
-chmod +x "$USER_HOME/.config/bin/udiskie-fix"
+install -Dm755 "$SCRIPT_DIR/dotfiles/bin/udiskie-fix" "$USER_HOME/.config/bin/udiskie-fix"
+install -Dm644 "$SCRIPT_DIR/dotfiles/systemd/user/black-ice-removable.service" "$USER_HOME/.config/systemd/user/black-ice-removable.service"
+install -Dm644 "$SCRIPT_DIR/dotfiles/systemd/user/black-ice-conky.service" "$USER_HOME/.config/systemd/user/black-ice-conky.service"
+mkdir -p "$USER_HOME/.config/systemd/user/hyprland-session.target.wants"
+ln -sfn ../black-ice-removable.service "$USER_HOME/.config/systemd/user/hyprland-session.target.wants/black-ice-removable.service"
+ln -sfn ../black-ice-conky.service "$USER_HOME/.config/systemd/user/hyprland-session.target.wants/black-ice-conky.service"
+if [[ ! -e "$USER_HOME/.config/udiskie/config.yml" ]]; then
+    install -Dm644 "$SCRIPT_DIR/dotfiles/udiskie/config.yml" "$USER_HOME/.config/udiskie/config.yml"
+fi
+chown -R "$CURRENT_USER:$CURRENT_USER" "$USER_HOME/.config/udiskie" "$USER_HOME/.config/systemd/user"
+chown "$CURRENT_USER:$CURRENT_USER" "$USER_HOME/.config/bin/udiskie-fix"
 
 # --- Propagar distribución de teclado a Hyprland ---
 HYPR_CONF="$USER_HOME/.config/hypr/hyprland.conf"
 if [ -f "$HYPR_CONF" ] && [ -n "${KEYBOARD_LAYOUT:-}" ]; then
-    ESCAPED_LAYOUT=$(printf '%s\n' "${KEYBOARD_LAYOUT}" | sed 's/[\/&]/\\&/g')
+    XKB_LAYOUT=$(console_to_xkb_layout "$KEYBOARD_LAYOUT")
+    ESCAPED_LAYOUT=$(printf '%s\n' "$XKB_LAYOUT" | sed 's/[\/&]/\\&/g')
     sed -i "s/^\(\s*kb_layout\s*=\s*\).*/\1${ESCAPED_LAYOUT}/" "$HYPR_CONF"
-    log_success "Teclado '${KEYBOARD_LAYOUT}' aplicado en Hyprland (kb_layout)."
+    log_success "Teclado '$XKB_LAYOUT' aplicado en Hyprland (kb_layout)."
 fi
 
 # --- eww music widget ---
@@ -183,7 +217,7 @@ mkdir -p "$USER_HOME/.config/eww"
 ln -sf "$DOTFILES_DIR/eww/eww.yuck" "$USER_HOME/.config/eww/eww.yuck"
 ln -sf "$DOTFILES_DIR/eww/eww.scss" "$USER_HOME/.config/eww/eww.scss"
 # music_widget toggle script
-ln -sf "$DOTFILES_DIR/bin/music_widget" "$USER_HOME/.config/bin/music_widget"
+cp --remove-destination "$DOTFILES_DIR/bin/music_widget" "$USER_HOME/.config/bin/music_widget"
 chmod +x "$USER_HOME/.config/bin/music_widget"
 chown -h "$CURRENT_USER:$CURRENT_USER" \
     "$USER_HOME/.config/eww/eww.yuck" \
@@ -205,7 +239,6 @@ vm.vfs_cache_pressure = 50
 vm.overcommit_memory = 1
 # CPU scheduling
 kernel.sched_util_clamp_min = 0
-kernel.sched_migration_cost_ns = 500000
 kernel.sched_autogroup_enabled = 1
 # TCP BBR + pentesting
 net.core.default_qdisc = fq
@@ -270,10 +303,19 @@ log_info "Configurando firewall nftables (black-ice-filter)..."
 if command -v nft &>/dev/null; then
     # Instalar config si existe en dotfiles
     if [[ -f "$DOTFILES_DIR/nftables/nftables.conf" ]]; then
-        sudo cp "$DOTFILES_DIR/nftables/nftables.conf" /etc/nftables.conf
-        sudo nft -f /etc/nftables.conf 2>/dev/null || true
-        sudo systemctl enable nftables
-        log_success "Firewall nftables activado (tabla inet black-ice-filter)"
+        if sudo nft --check -f "$DOTFILES_DIR/nftables/nftables.conf"; then
+            if [[ -s /etc/nftables.conf ]] && ! sudo cmp -s "$DOTFILES_DIR/nftables/nftables.conf" /etc/nftables.conf; then
+                log_warn "Se conserva el firewall existente. Revisa las diferencias antes de sustituir /etc/nftables.conf."
+            else
+                sudo install -m 600 "$DOTFILES_DIR/nftables/nftables.conf" /etc/nftables.conf
+                sudo nft -f /etc/nftables.conf
+                sudo systemctl enable nftables
+                log_success "Reglas nftables aplicadas sin errores."
+            fi
+        else
+            log_error "Las reglas nftables no pasaron la validación; no se aplicaron."
+            exit 1
+        fi
     fi
 else
     log_warn "nftables no instalado — instalar con: pacman -S nftables"
@@ -287,6 +329,51 @@ if grep -q "^PermitRootLogin yes" /etc/ssh/sshd_config 2>/dev/null; then
 fi
 sudo systemctl reload sshd 2>/dev/null || true
 
+if pacman -Q conky 2>/dev/null | grep -q '^conky 1\.25\.2-'; then
+    log_info "Preparando corrección de Conky 1.25.2 para Wayland..."
+    for _conky_dep in base-devel cmake ninja gperf lua54 wayland-protocols; do
+        safe_install "$_conky_dep" || return 1
+    done
+    python3 "$SCRIPT_DIR/scripts/build-conky-wayland.py" --apply || return 1
+fi
+
+# --- Identidad visual coordinada ---
+if [[ -f "$SCRIPT_DIR/scripts/install-visual-refresh.py" ]]; then
+    log_info "Instalando Obsidiana y sus controles visuales..."
+    safe_install "gtk3"
+    _visual_args=(--apply --no-activate)
+    if [[ -n ${HYPRLAND_INSTANCE_SIGNATURE:-} ]] && hyprctl monitors >/dev/null 2>&1; then
+        _visual_args=(--apply)
+    fi
+    if python3 "$SCRIPT_DIR/scripts/install-visual-refresh.py" "${_visual_args[@]}"; then
+        log_success "Identidad Obsidiana instalada; SDDM se usará en el próximo inicio"
+    else
+        log_warn "No se completó Obsidiana; revisa el error y el manifiesto de reversión"
+    fi
+fi
+
+if [[ -f "$SCRIPT_DIR/scripts/install-cyber-themes.py" ]]; then
+    _catalog_args=(--apply --no-activate)
+    if [[ -n ${HYPRLAND_INSTANCE_SIGNATURE:-} ]] && hyprctl monitors >/dev/null 2>&1; then
+        _catalog_args=(--apply)
+    fi
+    if python3 "$SCRIPT_DIR/scripts/install-cyber-themes.py" "${_catalog_args[@]}"; then
+        log_success "Catálogo de temas y módulos de seguridad instalado"
+    else
+        log_warn "No se completó el catálogo; revisa el manifiesto de reversión"
+    fi
+fi
+
+if [[ -f "$USER_HOME/.config/hypr/hyprland.conf" && -x "$USER_HOME/.local/bin/hyprland-migrate" ]]; then
+    log_info "Verificando migración compatible con la versión instalada de Hyprland..."
+    if ! python3 "$USER_HOME/.local/bin/hyprland-migrate"; then
+        log_error "La migración no pasó la validación; se conserva la configuración anterior."
+        return 1
+    fi
+fi
+
+systemctl --user daemon-reload
+
 # --- Generar resumen de instalación ---
 log_info "Generando resumen..."
 
@@ -294,11 +381,11 @@ echo -e "\n${NEON_PURPLE}╔═════════════════�
 echo -e "${NEON_PURPLE}║${NC}  ${BOLD}RESUMEN DE INSTALACIÓN${NC}                          ${NEON_PURPLE}║${NC}"
 echo -e "${NEON_PURPLE}╚══════════════════════════════════════════════════╝${NC}\n"
 
-echo -e "${CYAN}✓${NC} Repositorios: yay, chaotic-aur"
+echo -e "${CYAN}✓${NC} Repositorios: Arch, chaotic-aur; helper paru"
 echo -e "${CYAN}✓${NC} Desktop: Hyprland + Waybar + Kitty + Dolphin"
-echo -e "${CYAN}✓${NC} Wallpapers: $(ls -1 "$WALLPAPER_DEST/" 2>/dev/null | wc -l) disponibles"
+echo -e "${CYAN}✓${NC} Wallpapers: $(find "$WALLPAPER_DEST" -mindepth 1 -maxdepth 1 ! -name '.*' -printf '.' 2>/dev/null | wc -c) disponibles"
 echo -e "${CYAN}✓${NC} Terminal: Zsh + Powerlevel10k (usuario y root)"
-echo -e "${CYAN}✓${NC} Herramientas de seguridad: Instaladas"
+echo -e "${CYAN}•${NC} Paquetes opcionales seleccionados: ${#SELECTED_APPS[@]}; fallos: ${#FAILED_APPS[@]}"
 
 echo -e "\n${YELLOW}Hotkeys útiles:${NC}"
 echo -e "  ${GREEN}Win+Return${NC}     → Kitty (terminal)"
@@ -306,7 +393,7 @@ echo -e "  ${GREEN}Win+D${NC}          → Wofi (launcher)"
 echo -e "  ${GREEN}Win+E${NC}          → Dolphin (file manager)"
 echo -e "  ${GREEN}Win+Shift+S${NC}    → Screenshot"
 echo -e "  ${GREEN}Win+Alt+W${NC}      → Cambiar wallpaper (selector)"
-echo -e "  ${GREEN}Win+Alt+T${NC}      → Cambiar tema Waybar"
+echo -e "  ${GREEN}Win+Alt+T${NC}      → BLACK-ICE Control · Apariencia"
 echo -e "  ${GREEN}Win+Alt+R${NC}      → Cambiar estilo Wofi"
 echo -e "  ${GREEN}Win+Alt+F${NC}      → Toggle WiFi"
 echo -e "  ${GREEN}Win+Q${NC}          → Cerrar ventana

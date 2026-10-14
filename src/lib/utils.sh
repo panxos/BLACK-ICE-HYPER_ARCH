@@ -8,6 +8,18 @@ check_root() {
     fi
 }
 
+console_to_xkb_layout() {
+    case "${1:-us}" in
+        la-latin1|la-latin1-nodeadkeys) printf 'latam\n' ;;
+        br-abnt2) printf 'br\n' ;;
+        de-latin1|de-latin1-nodeadkeys) printf 'de\n' ;;
+        fr-latin1|fr-latin9) printf 'fr\n' ;;
+        uk) printf 'gb\n' ;;
+        es-winkeys) printf 'es\n' ;;
+        *) printf '%s\n' "${1:-us}" ;;
+    esac
+}
+
 check_boot_mode() {
     if [ -d "/sys/firmware/efi/efivars" ]; then
         BOOT_MODE="UEFI"
@@ -17,6 +29,7 @@ check_boot_mode() {
         log_warn "Modo de arranque: Legacy BIOS detectado."
         log_info "Se habilitará el soporte para particionado GPT + BIOS Boot."
     fi
+    export BOOT_MODE
 }
 
 ask_option() {
@@ -24,26 +37,18 @@ ask_option() {
     shift
     local options=("$@")
     
-    echo -e "${CYAN}$prompt${NC}" >&2
-    local choice=""
-    
-    # Save old PS3
-    local OLD_PS3="${PS3:-}"
-    PS3="Selecciona una opción: "
-    
-    select opt in "${options[@]}"; do
-        if [ -n "$opt" ]; then
-            choice="$opt"
-            break
-        else
-            echo -e "${RED}Opción inválida.${NC}" >&2
+    local choice count="${#options[@]}"
+    (( count > 0 )) || return 1
+    installer_ui black_ice_menu "$prompt" "${options[@]}" >&2
+    while true; do
+        printf '  Opción [1-%s] > ' "$count" >&2
+        IFS= read -r choice < /dev/tty || return 1
+        if [[ "$choice" =~ ^[0-9]{1,6}$ ]] && (( 10#$choice >= 1 && 10#$choice <= count )); then
+            printf '%s\n' "${options[10#$choice - 1]}"
+            return 0
         fi
-    done < /dev/tty
-    
-    # Restore PS3
-    PS3="$OLD_PS3"
-    
-    echo "$choice"
+        log_warn "Elige un número entre 1 y $count." >&2
+    done
 }
 
 # --- Resilience: Retry Logic ---
@@ -62,12 +67,13 @@ retry_command() {
             else
                 log_error "Comando falló tras $max intentos: $*"
                 # Si estamos en modo no interactivo, fallamos pero permitimos continuar al script si el caller lo maneja
-                if [ "${AUTO_MODE:-}" == "true" ] || [ "${NON_INTERACTIVE:-}" == "true" ]; then
+                if [[ ${ASSUME_YES:-false} == true || ${AUTO_MODE:-false} == true || ${NON_INTERACTIVE:-false} == true ]]; then
                     return 1
                 fi
                 # Si existe ask_option, preguntamos al usuario
                 if command -v ask_option >/dev/null; then
-                    local ACTION=$(ask_option "¿Qué deseas hacer con este fallo?" "Reintentar" "Saltar" "Abortar")
+                    local ACTION
+                    ACTION=$(ask_option "¿Qué deseas hacer con este fallo?" "Reintentar" "Saltar" "Abortar")
                     case "$ACTION" in
                         "Reintentar") n=1 ;;
                         "Saltar") return 1 ;;
@@ -143,174 +149,41 @@ validate_hostname() {
 # Use when PGP keyring is corrupted or keys are untrusted.
 # Usage: rebuild_keyring
 rebuild_keyring() {
-    log_warn "Reconstruyendo keyring completo (operación nuclear)..."
-
-    # Strategy: update archlinux-keyring package first (installs keys as files),
-    # then re-init only if gnupg dir is missing/corrupt, then populate.
-    # Avoids running pacman-key --init unnecessarily — it requires entropy + GPG
-    # agent socket, which fail silently in VMs and non-interactive environments.
-
-    # Step 1: Add entropy for VMs (prevents gpg agent_genkey failure)
-    if command -v rngd &>/dev/null; then
-        sudo rngd -r /dev/urandom 2>/dev/null &
-        local RNGD_PID=$!
-        trap "kill $RNGD_PID 2>/dev/null" RETURN
-    fi
-
-    # Step 2: Update keyring package — this refreshes key files in /usr/share/pacman/keyrings/
-    # Uses --overwrite to bypass signature verification on the package itself
-    sudo pacman -Sy --noconfirm --overwrite '*' archlinux-keyring 2>/dev/null || true
-
-    # Step 3: Only re-init if the gnupg dir is missing or has no pubring
-    if [[ ! -f /etc/pacman.d/gnupg/pubring.gpg ]] && [[ ! -f /etc/pacman.d/gnupg/pubring.kbx ]]; then
-        log_info "Directorio gnupg ausente — inicializando desde cero..."
-        sudo rm -rf /etc/pacman.d/gnupg
-        sudo pacman-key --init
-    fi
-
-    # Step 4: Populate from installed keyring packages
-    sudo pacman-key --populate archlinux
-    [[ -f /usr/share/pacman/keyrings/chaotic.gpg ]] && sudo pacman-key --populate chaotic
-
-    log_success "Keyring reconstruido exitosamente"
+    sudo pacman -Syu --needed archlinux-keyring || return 1
+    sudo pacman-key --init || return 1
+    sudo pacman-key --populate archlinux || return 1
+    log_success "Llaveros oficiales actualizados conservando verificación de firmas."
 }
 
-# --- Safe Install (PGP-Resilient Package Installer) ---
-# Installs a package with automatic PGP error detection and recovery.
-# Tries: 1) normal install, 2) fix PGP + retry, 3) ask user or skip.
-# Usage: safe_install <package_name>
-# Returns: 0 on success, 1 on failure/skip
 safe_install() {
     local pkg="$1"
-
-    # Ensure valid working directory for remote execution reliability
-    cd "$HOME" || cd /tmp || { log_error "No se pudo acceder a un directorio de trabajo válido."; return 1; }
-
-    # Skip if already installed
+    [[ "$pkg" =~ ^[a-zA-Z0-9@+_.:-]+$ ]] || { log_error "Nombre de paquete inválido"; return 1; }
     if pacman -Q "$pkg" &>/dev/null; then
-        echo -e "  ${GREEN}✓${NC} $pkg (ya instalado)"
+        log_info "$pkg ya está instalado"
         return 0
     fi
-
-    log_info "Instalando: $pkg"
-
-    # Check if paru is functional (not just present — broken libalpm ABI causes silent failures)
-    local PARU_OK=false
-    if command -v paru &>/dev/null && paru --version &>/dev/null 2>&1; then
-        PARU_OK=true
-    elif command -v paru &>/dev/null; then
-        log_warn "paru existe pero no funciona (libalpm ABI mismatch). Usando pacman como fallback."
-    fi
-
-    # Attempt 1: Normal installation via paru (handles both repos and AUR)
-    if [ "$PARU_OK" = true ]; then
-        if paru -S --noconfirm --needed --skipreview "$pkg" 2>/dev/null; then
-            log_success "$pkg instalado correctamente"
-            return 0
+    local -a command
+    if pacman -Si "$pkg" &>/dev/null; then
+        command=(sudo pacman -S --needed --noconfirm "$pkg")
+    elif command -v paru &>/dev/null && paru --version &>/dev/null; then
+        command=(paru -S --needed --batchinstall --noremovemake --nouseask "$pkg")
+        if [[ "${ALLOW_UNREVIEWED_AUR:-false}" == true ]]; then
+            command+=(--noconfirm --skipreview)
+        elif [[ "${NON_INTERACTIVE:-false}" == true || "${AUTO_MODE:-false}" == true ]]; then
+            log_warn "$pkg requiere revisión AUR; omitido en modo desatendido."
+            return 1
+        else
+            command+=(--confirm --review)
         fi
     else
-        if sudo -n pacman -S --noconfirm --needed "$pkg" 2>/dev/null; then
-            log_success "$pkg instalado correctamente"
-            return 0
-        fi
-    fi
-
-    # Capture error output for analysis
-    local error_output
-    if [ "$PARU_OK" = true ]; then
-        error_output=$(paru -S --noconfirm --needed --skipreview "$pkg" 2>&1)
-    else
-        error_output=$(sudo -n pacman -S --noconfirm --needed "$pkg" 2>&1)
-    fi
-
-    # Detect package conflict error — resolve by removing the conflicting package
-    if echo "$error_output" | grep -qiE "are in conflict|conflicting dependencies"; then
-        local conflict_pkg
-        conflict_pkg=$(echo "$error_output" | grep -oP 'Remove \K[^\?]+' | head -1 | tr -d ' ')
-        if [ -n "$conflict_pkg" ] && pacman -Q "$conflict_pkg" &>/dev/null; then
-            log_warn "Conflicto detectado: eliminando $conflict_pkg para instalar $pkg..."
-            sudo -n pacman -Rdd --noconfirm "$conflict_pkg" 2>/dev/null || \
-                sudo pacman -Rdd --noconfirm "$conflict_pkg" 2>/dev/null || true
-            # Retry after removing conflicting package
-            if [ "$PARU_OK" = true ]; then
-                paru -S --noconfirm --needed --skipreview "$pkg" 2>/dev/null && \
-                    { log_success "$pkg instalado tras resolver conflicto con $conflict_pkg"; return 0; }
-            else
-                sudo -n pacman -S --noconfirm --needed "$pkg" 2>/dev/null && \
-                    { log_success "$pkg instalado tras resolver conflicto con $conflict_pkg"; return 0; }
-            fi
-        fi
-        log_warn "No se pudo resolver conflicto para $pkg. Saltando."
+        log_error "$pkg no está en repositorios configurados y no hay helper AUR funcional."
         return 1
     fi
-
-    # Detect PGP/signature error
-    if echo "$error_output" | grep -qiE "unknown trust|invalid.*signature|corrupted|PGP|FAILED|gpg|key"; then
-        log_warn "Error PGP detectado para $pkg, intentando reparar..."
-
-        # Clean corrupted package from cache
-        sudo find /var/cache/pacman/pkg/ -name "${pkg%%[-_]*}*.pkg.tar.*" -delete 2>/dev/null
-
-        # Extract key ID and import
-        local key_id
-        key_id=$(echo "$error_output" | grep -oP '(?<=key ")[A-F0-9]+' | head -1)
-        if [ -z "$key_id" ]; then
-            key_id=$(echo "$error_output" | grep -oP '[A-F0-9]{8,}' | head -1)
-        fi
-
-        if [ -n "$key_id" ]; then
-            log_info "Importando clave PGP: $key_id"
-            sudo pacman-key --recv-keys "$key_id" 2>/dev/null || \
-                sudo pacman-key --recv-keys "$key_id" --keyserver keyserver.ubuntu.com 2>/dev/null
-            sudo pacman-key --lsign-key "$key_id" 2>/dev/null
-        fi
-
-        # Attempt 2: Retry after key repair
-        if [ "$PARU_OK" = true ]; then
-            if paru -S --noconfirm --needed --skipreview "$pkg" 2>/dev/null; then
-                log_success "$pkg instalado tras reparar firma PGP"
-                return 0
-            fi
-        else
-            if sudo -n pacman -S --noconfirm --needed "$pkg" 2>/dev/null; then
-                log_success "$pkg instalado tras reparar firma PGP"
-                return 0
-            fi
-        fi
-
-        # Attempt 3: Ask user or skip depending on install mode
-        if [ "${AUTO_MODE:-}" != "true" ] && [ "${NON_INTERACTIVE:-}" != "true" ]; then
-            log_warn "⚠️  $pkg sigue fallando por problemas de firma PGP."
-            echo -e "${YELLOW}Opciones: [s] Instalar sin verificación | [r] Reconstruir keyring | [n] Saltar${NC}"
-            read -rp "¿Qué deseas hacer? (s/r/N): " choice < /dev/tty
-            case "$choice" in
-                s|S)
-                    if [ "$PARU_OK" = true ]; then
-                        paru -S --noconfirm --needed --skipreview --mflags "--skippgpcheck" "$pkg" && return 0
-                    else
-                        sudo -n pacman -S --noconfirm --needed "$pkg" --overwrite '*' && return 0
-                    fi
-                    ;;
-                r|R)
-                    rebuild_keyring
-                    # Retry one more time after full rebuild
-                    if [ "$PARU_OK" = true ]; then
-                        paru -S --noconfirm --needed --skipreview "$pkg" 2>/dev/null && return 0
-                    else
-                        sudo -n pacman -S --noconfirm --needed "$pkg" 2>/dev/null && return 0
-                    fi
-                    ;;
-                *)
-                    log_warn "Saltando $pkg por decisión del usuario"
-                    return 1
-                    ;;
-            esac
-        else
-            log_warn "Saltando $pkg (modo desatendido, firma PGP inválida)"
-            return 1
-        fi
+    if "${command[@]}"; then
+        pacman -Q "$pkg" &>/dev/null || { log_error "El gestor no confirmó la instalación de $pkg"; return 1; }
+        log_success "$pkg instalado correctamente"
+        return 0
     fi
-
-    log_error "Fallo al instalar $pkg"
+    log_error "No se instaló $pkg. Se conservan firmas, dependencias y paquetes existentes."
     return 1
 }

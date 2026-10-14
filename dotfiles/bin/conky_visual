@@ -1,0 +1,337 @@
+#!/usr/bin/env python3
+"""Galería de estilos del monitor del escritorio."""
+import fcntl
+import importlib.machinery
+import importlib.util
+import json
+import os
+import subprocess
+import threading
+from pathlib import Path
+
+import gi
+
+gi.require_version("Gtk", "3.0")
+gi.require_version("Gdk", "3.0")
+from gi.repository import Gdk, GdkPixbuf, GLib, Gtk
+
+CONTROLLER = Path(__file__).with_name("black-ice-conky")
+loader = importlib.machinery.SourceFileLoader("conky_controller", str(CONTROLLER))
+spec = importlib.util.spec_from_loader(loader.name, loader)
+monitor = importlib.util.module_from_spec(spec)
+loader.exec_module(monitor)
+
+
+class Gallery(Gtk.Window):
+    def __init__(self):
+        super().__init__(title="BLACK-ICE — Estilos del escritorio")
+        self.set_default_size(1080, 650)
+        self.set_type_hint(Gdk.WindowTypeHint.DIALOG)
+        self.set_position(Gtk.WindowPosition.CENTER)
+        self.connect("destroy", Gtk.main_quit)
+        self.closed = False
+        self.busy = False
+        self.connect("destroy", self.on_destroy)
+        self.connect("key-press-event", self.key_press)
+        self.prefs = monitor.resolved_preferences()
+        self.selected = self.prefs["variant"]
+        self.preview_version, self.preview_timer = 0, None
+        palette = monitor.theme()
+        css = Gtk.CssProvider()
+        css.load_from_data(f"""
+            window {{ background: {palette['bg']}; color: {palette['fg']}; }}
+            label {{ color: {palette['fg']}; font-family: 'Roboto'; }}
+            .title {{ font-size: 23px; font-weight: bold; }}
+            .muted {{ font-size: 11px; }}
+            .style {{ background: transparent; border: 1px solid alpha({palette['fg']}, .18);
+                      border-radius: 12px; padding: 12px; box-shadow: none; }}
+            .style:hover, .style:focus {{ border-color: {palette['acc2']}; }}
+            .selected {{ border: 2px solid {palette['acc1']}; padding: 11px;
+                         background: alpha({palette['acc1']}, .09); }}
+            .name {{ font-size: 16px; font-weight: bold; }}
+            button {{ color: {palette['fg']}; background: alpha({palette['fg']}, .06);
+                      border: 1px solid alpha({palette['fg']}, .2); padding: 9px 14px; }}
+            button:focus {{ border-color: {palette['acc1']}; }}
+            .apply {{ background: alpha({palette['acc1']}, .2); border-color: {palette['acc1']}; }}
+            scale highlight {{ background: {palette['acc1']}; }}
+            checkbutton check:checked {{ background: {palette['acc1']}; border-color: {palette['acc1']}; color: {palette['bg']}; }}
+            flowboxchild {{ padding: 6px; }}
+        """.encode())
+        Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), css, Gtk.STYLE_PROVIDER_PRIORITY_USER + 1)
+        root = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=12, margin=22)
+        self.add(root)
+        title = Gtk.Label(label="Elige cómo se ve tu escritorio", xalign=0)
+        title.get_style_context().add_class("title")
+        heading = Gtk.Box(spacing=12)
+        heading.pack_start(title, True, True, 0)
+        category = Gtk.ComboBoxText()
+        for key, label in [("all", "Todos los estilos"), ("full", "Pantalla completa"), ("compact", "Compactos")]:
+            category.append(key, label)
+        category.set_active_id("all")
+        heading.pack_end(category, False, False, 0)
+        root.pack_start(heading, False, False, 0)
+        subtitle = Gtk.Label(label=f"Colores de {palette['name']} · pantallas a elección · Escape para cerrar", xalign=0)
+        subtitle.get_style_context().add_class("muted")
+        root.pack_start(subtitle, False, False, 0)
+        scroll = Gtk.ScrolledWindow()
+        scroll.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
+        root.pack_start(scroll, True, True, 0)
+        flow = Gtk.FlowBox()
+        flow.set_selection_mode(Gtk.SelectionMode.NONE)
+        flow.set_min_children_per_line(1)
+        flow.set_max_children_per_line(3)
+        flow.set_homogeneous(True)
+        scroll.add(flow)
+        self.buttons, self.images = {}, {}
+        for key, (name, description) in monitor.STYLES.items():
+            button = Gtk.Button()
+            button.get_style_context().add_class("style")
+            button.set_tooltip_text(description)
+            button.connect("clicked", self.choose, key)
+            content = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8)
+            button.add(content)
+            preview = Gtk.Image()
+            preview.set_size_request(290, 108)
+            content.pack_start(preview, False, False, 0)
+            label = Gtk.Label(label=name + (" · actual" if key == self.prefs["variant"] else ""), xalign=0)
+            label.get_style_context().add_class("name")
+            content.pack_start(label, False, False, 0)
+            label = Gtk.Label(label=description.split(" · ")[-1], xalign=0)
+            label.get_style_context().add_class("muted")
+            content.pack_start(label, False, False, 0)
+            flow.add(button)
+            self.buttons[key], self.images[key] = button, preview
+        category.connect("changed", self.filter_styles)
+        controls = Gtk.Box(spacing=12)
+        root.pack_start(controls, False, False, 0)
+        controls.pack_start(Gtk.Label(label="Opacidad del fondo"), False, False, 0)
+        self.opacity = Gtk.Scale.new_with_range(Gtk.Orientation.HORIZONTAL, 55, 95, 1)
+        self.opacity.set_value(self.prefs["opacity"] * 100)
+        self.opacity.set_digits(0)
+        self.opacity.set_value_pos(Gtk.PositionType.RIGHT)
+        self.opacity.connect("format-value", lambda _scale, value: f"{value:.0f}%")
+        controls.pack_start(self.opacity, True, True, 0)
+        options = Gtk.Box(spacing=12)
+        root.pack_start(options, False, False, 0)
+        options.pack_start(Gtk.Label(label="Colores"), False, False, 0)
+        self.colors = Gtk.ComboBoxText()
+        for key, (label, _accents) in monitor.COLORS.items():
+            self.colors.append(key, label)
+        self.colors.set_active_id(self.prefs["color"])
+        options.pack_start(self.colors, False, False, 0)
+        self.follow = Gtk.CheckButton(label="Recordar por tema")
+        self.follow.set_active(self.prefs["follow_theme"])
+        self.follow.set_tooltip_text("Cada tema recupera su estilo y colores. Desmarca para usar la misma selección con todos.")
+        options.pack_start(self.follow, False, False, 0)
+        placement = Gtk.Expander(label="Pantallas, posición y tamaño")
+        placement.set_expanded(True)
+        root.pack_start(placement, False, False, 0)
+        placement_controls = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8)
+        placement.add(placement_controls)
+        from black_ice_outputs import OutputChecks
+        self.output = Gtk.ComboBoxText()
+        for key, label in [("auto", "Una pantalla automática"), ("all", "Todas las pantallas"), ("selected", "Elegir pantallas")]:
+            self.output.append(key, label)
+        preferred = self.prefs["output"]
+        selected = self.prefs.get("outputs", []) if preferred in ("auto", "all", "selected") else [preferred]
+        self.output.set_active_id(preferred if preferred in ("auto", "all", "selected") else "selected")
+        try:
+            names = [m["name"] for m in monitor.hypr("monitors")]
+        except (OSError, ValueError, subprocess.SubprocessError):
+            names = []
+        self.outputs = OutputChecks(names, selected)
+        self.output.connect("changed", lambda widget: self.outputs.set_sensitive(widget.get_active_id() == "selected"))
+        self.outputs.set_sensitive(self.output.get_active_id() == "selected")
+        placement_controls.pack_start(self.output, False, False, 0)
+        placement_controls.pack_start(self.outputs, False, False, 0)
+        location = Gtk.Box(spacing=10)
+        placement_controls.pack_start(location, False, False, 0)
+        self.position = Gtk.ComboBoxText()
+        for key, label in monitor.POSITIONS.items():
+            self.position.append(key, label)
+        self.position.set_active_id(self.prefs["position"])
+        location.pack_start(self.position, False, False, 0)
+        location.pack_start(Gtk.Label(label="Tamaño %"), False, False, 0)
+        self.zoom = Gtk.SpinButton.new_with_range(65, 135, 5)
+        self.zoom.set_value(self.prefs["zoom"] * 100)
+        location.pack_start(self.zoom, False, False, 0)
+        offsets = Gtk.Box(spacing=10)
+        placement_controls.pack_start(offsets, False, False, 0)
+        self.offset_x, self.offset_y = Gtk.SpinButton.new_with_range(-4000, 4000, 5), Gtk.SpinButton.new_with_range(-4000, 4000, 5)
+        for label, widget, key in [("Desplazar X", self.offset_x, "offset_x"), ("Y", self.offset_y, "offset_y")]:
+            offsets.pack_start(Gtk.Label(label=label), False, False, 0)
+            widget.set_value(self.prefs[key])
+            widget.set_width_chars(5)
+            offsets.pack_start(widget, False, False, 0)
+        restore = Gtk.Button(label="Centrar y restablecer")
+        restore.connect("clicked", self.reset_position)
+        offsets.pack_start(restore, False, False, 0)
+        actions = Gtk.Box(spacing=12)
+        root.pack_start(actions, False, False, 0)
+        hide = Gtk.Button(label="Ocultar monitor")
+        hide.connect("clicked", lambda _button: self.run("off"))
+        actions.pack_start(hide, False, False, 0)
+        reset = Gtk.Button(label="Predeterminado del tema")
+        reset.connect("clicked", lambda _button: self.run("reset-theme"))
+        actions.pack_start(reset, False, False, 0)
+        self.apply = Gtk.Button(label="Aplicar estilo")
+        self.apply.get_style_context().add_class("apply")
+        self.apply.connect("clicked", self.commit)
+        actions.pack_end(self.apply, False, False, 0)
+        close = Gtk.Button(label="Cerrar")
+        close.connect("clicked", lambda _button: self.destroy())
+        actions.pack_end(close, False, False, 0)
+        self.action_buttons = (hide, reset, self.apply)
+        self.message = Gtk.Label(label="Preparando miniaturas…", xalign=0)
+        self.message.set_line_wrap(True)
+        self.message.get_style_context().add_class("muted")
+        root.pack_start(self.message, False, False, 0)
+        self.choose(None, self.selected)
+        from black_ice_i18n import bind
+        bind(self)
+        self.show_all()
+        GLib.timeout_add(200, self.place)
+        self.colors.connect("changed", self.request_previews)
+        self.opacity.connect("value-changed", self.request_previews)
+        self.zoom.connect("value-changed", self.request_previews)
+        self.request_previews()
+
+    def place(self):
+        try:
+            client = next((c for c in monitor.hypr("clients") if c["pid"] == os.getpid()), None)
+            if client:
+                display = Gdk.Display.get_default()
+                geometry = display.get_monitor_at_window(self.get_window()).get_geometry()
+                width, height = min(1080, geometry.width - 64), min(650, geometry.height - 100)
+                target = "address:" + client["address"]
+                for action, argument in [("setfloating", target),
+                                         ("resizewindowpixel", f"exact {width} {height},{target}"),
+                                         ("movewindowpixel", (f"exact {geometry.x + (geometry.width - width) // 2} "
+                                          f"{geometry.y + (geometry.height - height) // 2},{target}"))]:
+                    subprocess.run([str(Path.home() / ".local/bin/black-ice-hypr"), action, argument], capture_output=True, timeout=8, check=True)
+        except (OSError, ValueError, subprocess.SubprocessError):
+            pass
+        return False
+
+    def key_press(self, _widget, event):
+        if event.keyval == Gdk.KEY_Escape:
+            self.destroy()
+            return True
+        return False
+
+    def on_destroy(self, _widget):
+        self.closed = True
+        if self.preview_timer:
+            GLib.source_remove(self.preview_timer)
+            self.preview_timer = None
+
+    def filter_styles(self, combo):
+        selected = combo.get_active_id()
+        for key, button in self.buttons.items():
+            button.get_parent().set_visible(selected == "all" or (key in monitor.FULLSCREEN) == (selected == "full"))
+
+    def choose(self, _button, key):
+        self.selected = key
+        for name, button in self.buttons.items():
+            context = button.get_style_context()
+            context.add_class("selected") if name == key else context.remove_class("selected")
+        self.apply.set_label("Aplicar " + monitor.STYLES[key][0])
+
+    def request_previews(self, *_args):
+        if self.preview_timer:
+            GLib.source_remove(self.preview_timer)
+        self.preview_version += 1
+        self.preview_timer = GLib.timeout_add(350, self.start_previews)
+
+    def start_previews(self):
+        self.preview_timer = None
+        threading.Thread(target=self.render, args=(self.colors.get_active_id(),
+                         self.opacity.get_value() / 100, self.zoom.get_value() / 100,
+                         self.preview_version), daemon=True).start()
+        return False
+
+    def render(self, scheme, opacity, zoom, version):
+        try:
+            target = monitor.previews(scheme, opacity, zoom)
+            GLib.idle_add(self.show_previews, target, version)
+        except (OSError, RuntimeError, subprocess.SubprocessError) as error:
+            GLib.idle_add(self.message.set_text, f"No se generaron las miniaturas: {error}. Puedes aplicar un estilo igualmente.")
+
+    def show_previews(self, target, version):
+        if self.closed or version != self.preview_version:
+            return False
+        for key, widget in self.images.items():
+            pixbuf = GdkPixbuf.Pixbuf.new_from_file(str(target / f"{key}.png"))
+            ratio = min(290 / pixbuf.get_width(), 108 / pixbuf.get_height())
+            widget.set_from_pixbuf(pixbuf.scale_simple(round(pixbuf.get_width() * ratio),
+                                                     round(pixbuf.get_height() * ratio), GdkPixbuf.InterpType.BILINEAR))
+        self.message.set_text(f"{len(monitor.STYLES)} estilos · {len(monitor.FULLSCREEN)} de pantalla completa · miniaturas estáticas con datos de una captura.")
+        return False
+
+    def run(self, action, name=None):
+        if self.busy or self.closed:
+            return
+        self.busy = True
+        for button in self.action_buttons:
+            button.set_sensitive(False)
+        self.message.set_text("Aplicando cambios…")
+        threading.Thread(target=self.execute, args=(action, name), daemon=True).start()
+
+    def execute(self, action, name):
+        command = [str(CONTROLLER), action] + ([name] if name is not None else [])
+        try:
+            result = subprocess.run(command, capture_output=True, text=True, check=False, timeout=12)
+        except (OSError, subprocess.SubprocessError) as error:
+            message = f"No se pudo aplicar: {error}"
+            success = False
+        else:
+            success = result.returncode == 0
+            message = "Cambios aplicados. Puedes seguir probando estilos." if success else (result.stderr.strip() or "No se pudo aplicar. Revisa el servicio del monitor.")
+        GLib.idle_add(self.applied, action, success, message)
+
+    def applied(self, action, success, message):
+        if self.closed:
+            return False
+        self.busy = False
+        for button in self.action_buttons:
+            button.set_sensitive(True)
+        if success and action == "reset-theme":
+            self.prefs = monitor.resolved_preferences()
+            self.choose(None, self.prefs["variant"])
+            self.opacity.set_value(self.prefs["opacity"] * 100)
+            self.colors.set_active_id(self.prefs["color"])
+            self.follow.set_active(self.prefs["follow_theme"])
+            self.position.set_active_id(self.prefs["position"])
+            self.offset_x.set_value(self.prefs["offset_x"])
+            self.offset_y.set_value(self.prefs["offset_y"])
+            self.zoom.set_value(self.prefs["zoom"] * 100)
+            self.output.set_active_id(self.prefs["output"] if self.prefs["output"] in ("auto", "all", "selected") else "selected")
+            self.outputs.set_selection(self.prefs.get("outputs", []) if self.prefs["output"] in ("auto", "all", "selected") else [self.prefs["output"]])
+        if success and action == "off":
+            message = "Monitor oculto. Aplica un estilo para volver a mostrarlo."
+        self.message.set_text(message)
+        return False
+
+    def commit(self, _button):
+        self.run("apply", json.dumps({"variant": self.selected, "opacity": round(self.opacity.get_value() / 100, 2),
+                                      "color": self.colors.get_active_id(), "follow_theme": self.follow.get_active(),
+                                      "position": self.position.get_active_id(), "offset_x": self.offset_x.get_value_as_int(),
+                                      "offset_y": self.offset_y.get_value_as_int(), "zoom": self.zoom.get_value() / 100,
+                                      "output": self.output.get_active_id(), "outputs": self.outputs.get_text()}))
+
+    def reset_position(self, _button):
+        self.position.set_active_id("bottom_middle")
+        self.offset_x.set_value(0)
+        self.offset_y.set_value(0)
+        self.zoom.set_value(100)
+
+
+if __name__ == "__main__":
+    monitor.RUNTIME.mkdir(parents=True, exist_ok=True, mode=0o700)
+    with (monitor.RUNTIME / "gallery.lock").open("w") as lock:
+        try:
+            fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError:
+            raise SystemExit(0)
+        Gallery()
+        Gtk.main()

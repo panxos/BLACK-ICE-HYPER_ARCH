@@ -1,0 +1,79 @@
+#!/usr/bin/env python3
+"""Menú de aplicaciones BLACK-ICE; una segunda pulsación lo cierra."""
+from __future__ import annotations
+
+import argparse
+import fcntl
+import json
+import os
+import shutil
+import signal
+import subprocess
+import sys
+from pathlib import Path
+
+from black_ice_launcher import STYLES, atomic, preferences, select, theme
+from black_ice_workspaces import IPC
+
+
+def show() -> int:
+    signature = os.environ.get("HYPRLAND_INSTANCE_SIGNATURE", "desktop")
+    if "/" in signature:
+        raise ValueError("Firma de Hyprland inválida")
+    runtime = Path(os.environ.get("XDG_RUNTIME_DIR", f"/run/user/{os.getuid()}"))
+    with (runtime / f"black-ice-launcher-{signature}.lock").open("a+") as lock:
+        try:
+            fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError:
+            lock.seek(0)
+            try:
+                pid = int(lock.read())
+                if b"black-ice-launcher" in Path(f"/proc/{pid}/cmdline").read_bytes():
+                    os.kill(pid, signal.SIGUSR1)
+            except (OSError, ValueError):
+                pass
+            return 0
+        lock.seek(0)
+        lock.truncate()
+        lock.write(str(os.getpid()))
+        lock.flush()
+        style = preferences()["style"]
+        if style == "classic" or not shutil.which("rofi"):
+            args = ["env", "GTK_THEME=Adwaita:dark", "wofi", "--show", "drun", "--allow-images"]
+        else:
+            try:
+                monitors = IPC().query("monitors")
+            except (OSError, ValueError, RuntimeError):
+                monitors = []
+            path = runtime / f"black-ice-launcher-{signature}.rasi"
+            atomic(path, theme(style, monitors))
+            args = ["rofi", "-no-config", "-theme", str(path), "-show", "drun", "-show-icons", "-monitor", "-1"]
+        with subprocess.Popen(args) as child:
+            previous = signal.signal(signal.SIGUSR1, lambda *_: child.terminate())
+            try:
+                code = child.wait()
+            finally:
+                signal.signal(signal.SIGUSR1, previous)
+        return 0 if code in (0, 1, -signal.SIGTERM) else code
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("action", nargs="?", default="show", choices=("show", "set", "status"))
+    parser.add_argument("style", nargs="?", choices=tuple(STYLES))
+    args = parser.parse_args()
+    try:
+        if args.action == "set":
+            select(args.style or "cinematic")
+        elif args.action == "status":
+            print(json.dumps(preferences()))
+        else:
+            return show()
+    except (OSError, ValueError, RuntimeError) as error:
+        print(f"Menú de aplicaciones: {error}", file=sys.stderr)
+        return 1
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

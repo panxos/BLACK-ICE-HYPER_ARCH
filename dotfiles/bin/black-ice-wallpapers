@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+set -euo pipefail
+pictures=$(xdg-user-dir PICTURES 2>/dev/null) || pictures="$HOME/Pictures"
+if command -v waypaper >/dev/null 2>&1; then
+    exec waypaper --folder "$pictures/wallpapers" --backend awww
+fi
+exec python3 - "$pictures/wallpapers" <<'PY'
+import subprocess
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path.home() / ".local/bin"))
+from black_ice_i18n import bind
+
+import gi
+gi.require_version("Gtk", "3.0")
+from gi.repository import GdkPixbuf, Gtk
+
+dialog = Gtk.FileChooserDialog(title="Elegir fondo de escritorio", action=Gtk.FileChooserAction.OPEN)
+dialog.add_buttons("Cancelar", Gtk.ResponseType.CANCEL, "Aplicar fondo", Gtk.ResponseType.ACCEPT)
+dialog.set_default_size(900, 600)
+dialog.set_current_folder(sys.argv[1])
+images = Gtk.FileFilter()
+images.set_name("Fondos: PNG, JPEG, WebP y AVIF")
+for extension in ("png", "jpg", "jpeg", "webp", "avif"):
+    images.add_pattern("*." + extension)
+    images.add_pattern("*." + extension.upper())
+dialog.add_filter(images)
+preview = Gtk.Image()
+dialog.set_preview_widget(preview)
+
+def update_preview(chooser):
+    try:
+        image = GdkPixbuf.Pixbuf.new_from_file_at_scale(chooser.get_preview_filename(), 360, 240, True)
+        preview.set_from_pixbuf(image)
+        chooser.set_preview_widget_active(True)
+    except Exception:
+        chooser.set_preview_widget_active(False)
+
+dialog.connect("update-preview", update_preview)
+bind(dialog)
+response = dialog.run()
+chosen = dialog.get_filename()
+dialog.destroy()
+if response == Gtk.ResponseType.ACCEPT and chosen:
+    helper = Path.home() / ".local/bin/black-ice-appearance"
+    raise SystemExit(subprocess.call([str(helper), "wallpaper", chosen]))
+PY

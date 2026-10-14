@@ -46,18 +46,20 @@ if ping -c 1 -W 3 raw.githubusercontent.com &>/dev/null; then
     log_info "Internet disponible — descargando wallpapers gh0stzk (Emilia-TokyoNight)..."
     mkdir -p "$EMILIA_DIR"
     EMILIA_API="https://api.github.com/repos/gh0stzk/dotfiles/contents/config/bspwm/rices/emilia/walls"
-    EMILIA_URLS=$(curl -sf "$EMILIA_API" 2>/dev/null | \
-        grep '"download_url"' | \
-        grep -E '\.jpg|\.png|\.webp' | \
-        sed 's/.*"download_url": "\([^"]*\)".*/\1/' | \
-        head -6)
+    EMILIA_URLS=$(curl -fsS --connect-timeout 5 --max-time 20 "$EMILIA_API" 2>/dev/null | \
+        python3 -c 'import json, sys
+entries = json.load(sys.stdin)
+urls = [item.get("download_url") for item in entries if isinstance(item, dict)]
+print("\n".join([url for url in urls if url and url.lower().endswith((".jpg", ".png", ".webp"))][:6]))' \
+        2>/dev/null) || EMILIA_URLS=""
 
     if [ -n "$EMILIA_URLS" ]; then
         DOWNLOADED=0
         while IFS= read -r url; do
             fname=$(basename "$url")
             if [ ! -f "$EMILIA_DIR/$fname" ]; then
-                curl -sf --retry 2 -o "$EMILIA_DIR/$fname" "$url" 2>/dev/null && \
+                curl -fsS --connect-timeout 5 --max-time 30 --retry 2 -o "$EMILIA_DIR/$fname.part" "$url" 2>/dev/null && \
+                    mv "$EMILIA_DIR/$fname.part" "$EMILIA_DIR/$fname" && \
                     DOWNLOADED=$((DOWNLOADED + 1)) || true
             fi
         done <<< "$EMILIA_URLS"
@@ -65,8 +67,12 @@ if ping -c 1 -W 3 raw.githubusercontent.com &>/dev/null; then
         log_success "Wallpapers gh0stzk descargados: $DOWNLOADED archivos en $EMILIA_DIR"
 
         # Usar primer wallpaper descargado como activo
-        FIRST_ONLINE=$(ls "$EMILIA_DIR"/*.{jpg,png,webp} 2>/dev/null | head -1)
-        [ -n "$FIRST_ONLINE" ] && WALL_DEFAULT="$FIRST_ONLINE"
+        for FIRST_ONLINE in "$EMILIA_DIR"/*.{jpg,png,webp}; do
+            if [ -f "$FIRST_ONLINE" ]; then
+                WALL_DEFAULT="$FIRST_ONLINE"
+                break
+            fi
+        done
     else
         log_warn "No se pudo obtener listado de wallpapers — usando default generado"
     fi
@@ -105,8 +111,9 @@ else
 fi
 
 # --- Crear archivo settarget vacío ---
-touch "$USER_HOME/.settarget"
-echo "No target set" > "$USER_HOME/.settarget"
+if [ ! -e "$USER_HOME/.settarget" ]; then
+    printf '%s\n' 'No target set' > "$USER_HOME/.settarget"
+fi
 
 # --- Verificar Temas GTK ---
 log_info "Verificando instalación de temas GTK e Iconos..."

@@ -1,0 +1,90 @@
+/* BLACK-ICE Theme Selector — compatible rofi 2.0.0 */
+* {
+    bg:         #08080f;
+    bg-alt:     #10101c;
+    fg:         #cdd6f4;
+    fg-dim:     #585b70;
+    accent:     #89b4fa;
+    accent2:    #cba6f7;
+    selected:   #1e1e30;
+}
+
+window {
+    background-color: @bg;
+    border:           0px solid;
+    width:            100%;
+    height:           100%;
+    padding:          20px 28px;
+}
+
+mainbox {
+    background-color: transparent;
+    spacing:          14px;
+}
+
+inputbar {
+    background-color: @bg-alt;
+    border:           1px solid;
+    border-color:     #2a2a3d;
+    border-radius:    10px;
+    padding:          10px 16px;
+    children:         [prompt, entry];
+}
+
+prompt {
+    background-color: transparent;
+    text-color:       @accent;
+    font:             "Roboto 13";
+    padding:          0 10px 0 0;
+}
+
+entry {
+    background-color: transparent;
+    text-color:       @fg;
+    font:             "Roboto 13";
+    cursor:           text;
+    placeholder:      "Buscar theme...";
+    placeholder-color: @fg-dim;
+}
+
+listview {
+    background-color: transparent;
+    columns:          4;
+    lines:            4;
+    spacing:          12px;
+    padding:          0;
+    fixed-height:     true;
+    flow:             horizontal;
+    scrollbar:        true;
+}
+
+element {
+    background-color: @bg-alt;
+    border:           1px solid;
+    border-color:     #2a2a3d;
+    border-radius:    10px;
+    padding:          10px;
+    orientation:      vertical;
+    spacing:          6px;
+    cursor:           pointer;
+}
+
+element selected {
+    background-color: @selected;
+    border:           2px solid;
+    border-color:     @accent;
+}
+
+element-icon {
+    size:             110px;
+    border-radius:    6px;
+    horizontal-align: 0.5;
+}
+
+element-text {
+    background-color: transparent;
+    text-color:       @fg;
+    font:             "Roboto 10";
+    horizontal-align: 0.5;
+    padding:          4px 0 2px 0;
+}

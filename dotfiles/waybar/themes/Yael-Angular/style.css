@@ -1,0 +1,52 @@
+/* bg=#0f1113 acc1=#ee99bf acc2=#88cbea fg=#f2f4f8 dim=#b2b4b8 */
+
+* { border:none; border-radius:0; font-family:"Oxanium", "JetBrainsMono Nerd Font", sans-serif; font-size:12px; min-height:0; }
+window#waybar { background:transparent; color:#f2f4f8; border:0; box-shadow:none; }
+.modules-left, .modules-center, .modules-right { background-image:url("assets/panel.svg"); background-size:100% 100%; background-repeat:no-repeat; padding:0 11px; margin:4px 6px; }
+#custom-launcher { color:#ee99bf; padding:0 9px; font-size:17px; }
+#workspaces button { color:#b2b4b8; padding:0 8px; background:transparent; }
+#workspaces button.active { color:#ee99bf; background:alpha(#ee99bf,.14); }
+#workspaces button.urgent { color:#ffbd88; }
+#workspaces button:hover, #custom-control:hover, #custom-settarget:hover { background:alpha(#ee99bf,.18); }
+#network, #bluetooth, #pulseaudio, #battery, #clock, #tray, #custom-control, #custom-power { padding:0 8px; color:#b2b4b8; }
+#clock, #custom-player { color:#f2f4f8; }
+#custom-control, #custom-power, #custom-local_ip { color:#ee99bf; }
+#custom-public_ip, #custom-settarget { color:#88cbea; }
+#custom-vpn.connected { color:#ee99bf; }
+#custom-docker, #custom-kvm, #custom-updates, #custom-local_ip, #custom-public_ip, #custom-vpn, #custom-settarget, #custom-player { padding:0 8px; }
+#battery.charging { color:#9fd2b0; }
+#battery.warning, #custom-updates.updates { color:#e9c585; }
+#battery.critical { color:#ef8d9d; }
+#network.disconnected, #bluetooth.disabled, #pulseaudio.muted, #custom-vpn.disconnected, #custom-settarget.inactive, .unavailable { color:#b2b4b8; }
+tooltip { background:#0f1113; color:#f2f4f8; border:1px solid #ee99bf; }
+tooltip label { color:#f2f4f8; padding:8px; }
+menu, .menu, .context-menu, popover.background { background:#0f1113; background-image:none; color:#f2f4f8; border:1px solid alpha(#ee99bf,.45); }
+menuitem { background:transparent; color:#f2f4f8; padding:7px 12px; }
+menuitem label, menu label, popover label { color:#f2f4f8; }
+menuitem:hover, menuitem:selected { background:mix(#0f1113,#ee99bf,.2); color:#f2f4f8; }
+menuitem:disabled, menuitem:disabled label { color:#b2b4b8; }
+/* Fixed angular caps */
+window#waybar { background:transparent; background-image:none; border:0; box-shadow:none; }
+.modules-left, .modules-center, .modules-right {
+    background:alpha(#0f1113,0.94); background-image:none; background-clip:padding-box; border-radius:0; box-shadow:none;
+    border:2px solid transparent; border-left-width:13px; border-right-width:13px;
+    border-image-source:url("assets/angular.svg"); border-image-slice:2 14 fill;
+    border-image-width:2px 13px; border-image-repeat:stretch;
+    padding:0 3px; margin:3px 5px;
+}
+/* Laboratory status */
+#custom-vpn { background-image:url("assets/hackthebox-disconnected.svg"); background-size:14px 14px; background-repeat:no-repeat; background-position:6px center; padding:0 8px 0 26px; }
+#custom-vpn.connected { color:#9fef00; background-image:url("assets/hackthebox-connected.svg"); }
+#custom-vpn.disconnected { color:#ff6b6b; }
+#custom-control { font-family:"JetBrainsMono Nerd Font"; font-size:15px; padding:0 8px; }
+/* Theme typography */
+* { font-family:"Oxanium", "JetBrainsMono Nerd Font", sans-serif; font-size:12px; font-weight:500; }
+#workspaces button, #workspaces button label, #clock, #custom-player { font-family:"Oxanium", "JetBrainsMono Nerd Font", sans-serif; }
+#custom-local_ip, #custom-public_ip, #custom-vpn, #custom-settarget { font-family:"Oxanium", "JetBrainsMono Nerd Font", monospace; font-size:11px; font-weight:500; }
+#custom-launcher, #custom-control, #custom-power, #network, #bluetooth { font-family:"JetBrainsMono Nerd Font"; }
+/* Accessible workspace states */
+#workspaces button { color:#b2b4b8; min-width:18px; padding:0 7px; border:1px solid transparent; }
+#workspaces button.active { color:#f2f4f8; background:mix(#0f1113,#ee99bf,.30); border:1px solid #ee99bf; box-shadow:inset 0 1px alpha(#f2f4f8,.18); }
+#workspaces button.active label { color:#f2f4f8; font-weight:700; }
+#workspaces button:hover { color:#f2f4f8; background:mix(#0f1113,#ee99bf,.18); }
+#workspaces button.urgent { color:#ffffff; background:#9b303b; border-color:#ff8c97; }

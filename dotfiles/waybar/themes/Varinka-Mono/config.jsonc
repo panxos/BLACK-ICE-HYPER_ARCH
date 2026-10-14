@@ -1,309 +1,246 @@
 [
-    {
-        "layer": "top",
-        "position": "top",
-        "height": 30,
-        "spacing": 4,
-        "width": 1297,
-        "margin-left": 34,
-        "margin-right": 34,
-        "modules-left": [
-            "custom/launcher",
-            "custom/hardware_temp",
-            "cpu",
-            "memory",
-            "disk",
-            "custom/vpn"
-        ],
-        "modules-center": [
-            "hyprland/workspaces"
-        ],
-        "modules-right": [
-            "custom/settarget",
-            "pulseaudio",
-            "custom/power"
-        ],
-        "custom/hardware_temp": {
-            "exec": "~/.config/bin/hardware_temp.sh",
-            "return-type": "json",
-            "interval": 2,
-            "tooltip": true
-        },
-        "custom/launcher": {
-            "format": " 󰣇 ",
-            "on-click": "GTK_THEME=Adwaita:dark wofi --show drun",
-            "tooltip": false
-        },
-        "cpu": {
-            "format": "   {usage}% ",
-            "interval": 2
-        },
-        "memory": {
-            "format": " 󰍛 {percentage}% ",
-            "interval": 2
-        },
-        "disk": {
-            "format": " 󰋊 {free} ",
-            "interval": 60
-        },
-        "custom/vpn": {
-            "format": " {}",
-            "exec": "~/.config/bin/vpn_status",
-            "on-click-right": "bash -c '~/.config/bin/copy_ip.sh ~/.config/bin/vpn_status'",
-            "return-type": "json",
-            "interval": 5
-        },
-        "hyprland/workspaces": {
-            "format": "{id}",
-            "on-click": "activate",
-            "persistent-workspaces": {
-                "*": 5
-            }
-        },
-        "custom/settarget": {
-            "format": "{}",
-            "exec": "~/.config/bin/target_status",
-            "on-click-right": "bash -c '~/.config/bin/copy_ip.sh ~/.config/bin/target_status'",
-            "interval": 5,
-            "return-type": "json",
-            "on-click": "~/.config/bin/settarget"
-        },
-        "pulseaudio": {
-            "format": " {icon} {volume}% ",
-            "format-muted": " 󰝟 Muted ",
-            "on-click": "pavucontrol"
-        },
-        "custom/power": {
-            "format": " ⏻ ",
-            "on-click": "~/.config/bin/power_menu.sh",
-            "tooltip": false
-        },
-        "battery": {
-            "states": {
-                "good": 80,
-                "warning": 50,
-                "critical": 10
-            },
-            "format": "{icon} {capacity}%",
-            "format-charging": "󱐋 {capacity}%",
-            "format-plugged": " {capacity}%",
-            "format-icons": [
-                "󰂎",
-                "󰁺",
-                "󰁻",
-                "󰁼",
-                "󰁽",
-                "󰁾",
-                "󰁿",
-                "󰂀",
-                "󰂁",
-                "󰂂",
-                "󰁹"
-            ]
-        },
-        "custom/docker": {
-            "exec": "~/.config/bin/docker_status",
-            "return-type": "json",
-            "interval": 10,
-            "format": " {} ",
-            "on-click-right": "~/.config/bin/docker_menu"
-        },
-        "custom/kvm": {
-            "exec": "~/.config/bin/kvm_status",
-            "return-type": "json",
-            "interval": 10,
-            "format": " {} ",
-            "on-click-right": "~/.config/bin/kvm_menu"
-        },
-        "custom/updates": {
-            "exec": "~/.config/bin/updates_status",
-            "return-type": "json",
-            "interval": 60,
-            "signal": 8,
-            "format": " 󰚰 {} "
-        },
-        "custom/local_ip": {
-            "exec": "~/.config/bin/local_ip",
-            "on-click": "bash -c '~/.config/bin/copy_ip.sh ~/.config/bin/local_ip'",
-            "on-click-right": "bash -c '~/.config/bin/copy_ip.sh ~/.config/bin/local_ip'",
-            "return-type": "json",
-            "interval": 10,
-            "format": " {} "
-        },
-        "custom/public_ip": {
-            "exec": "~/.config/bin/public_ip",
-            "on-click": "bash -c '~/.config/bin/copy_ip.sh ~/.config/bin/public_ip'",
-            "on-click-right": "bash -c '~/.config/bin/copy_ip.sh ~/.config/bin/public_ip'",
-            "return-type": "json",
-            "interval": 60,
-            "format": " {} "
-        },
-        "custom/player": {
-            "exec": "playerctl metadata --format '󰝚 {{artist}} - {{title}}' 2>/dev/null || echo ''",
-            "format": " {} ",
-            "interval": 5,
-            "on-click": "playerctl play-pause"
-        },
-        "tray": {
-            "icon-size": 18,
-            "spacing": 10
-        },
-        "clock": {
-            "format": " 󰥔 {:%H:%M   %m-%d} ",
-            "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>"
-        }
+  {
+    "name": "desktop",
+    "layer": "top",
+    "position": "bottom",
+    "height": 36,
+    "spacing": 0,
+    "modules-left": [
+      "custom/launcher",
+      "group/lab",
+      "group/addresses",
+      "custom/vpn",
+      "custom/settarget"
+    ],
+    "modules-center": [
+      "hyprland/workspaces"
+    ],
+    "modules-right": [
+      "group/connectivity",
+      "pulseaudio",
+      "battery",
+      "group/media",
+      "custom/control",
+      "custom/power",
+      "tray"
+    ],
+    "custom/launcher": {
+      "format": "󰣇",
+      "tooltip": false,
+      "on-click": "wofi --show drun --allow-images"
     },
-    {
-        "layer": "top",
-        "position": "bottom",
-        "height": 30,
-        "spacing": 4,
-        "width": 1297,
-        "margin-left": 34,
-        "margin-right": 34,
-        "modules-left": [
-            "custom/docker",
-            "custom/kvm",
-            "custom/updates"
-        ],
-        "modules-center": [
-            "custom/local_ip",
-            "custom/public_ip"
-        ],
-        "modules-right": [
-            "custom/player",
-            "battery",
-            "clock",
-            "tray"
-        ],
-        "custom/hardware_temp": {
-            "exec": "~/.config/bin/hardware_temp.sh",
-            "return-type": "json",
-            "interval": 2,
-            "tooltip": true
-        },
-        "custom/launcher": {
-            "format": " 󰣇 ",
-            "on-click": "GTK_THEME=Adwaita:dark wofi --show drun",
-            "tooltip": false
-        },
-        "cpu": {
-            "format": "   {usage}% ",
-            "interval": 2
-        },
-        "memory": {
-            "format": " 󰍛 {percentage}% ",
-            "interval": 2
-        },
-        "disk": {
-            "format": " 󰋊 {free} ",
-            "interval": 60
-        },
-        "custom/vpn": {
-            "format": " {}",
-            "exec": "~/.config/bin/vpn_status",
-            "on-click-right": "bash -c '~/.config/bin/copy_ip.sh ~/.config/bin/vpn_status'",
-            "return-type": "json",
-            "interval": 5
-        },
-        "hyprland/workspaces": {
-            "format": "{id}",
-            "on-click": "activate",
-            "persistent-workspaces": {
-                "*": 5
-            }
-        },
-        "custom/settarget": {
-            "format": "{}",
-            "exec": "~/.config/bin/target_status",
-            "on-click-right": "bash -c '~/.config/bin/copy_ip.sh ~/.config/bin/target_status'",
-            "interval": 5,
-            "return-type": "json",
-            "on-click": "~/.config/bin/settarget"
-        },
-        "pulseaudio": {
-            "format": " {icon} {volume}% ",
-            "format-muted": " 󰝟 Muted ",
-            "on-click": "pavucontrol"
-        },
-        "custom/power": {
-            "format": " ⏻ ",
-            "on-click": "~/.config/bin/power_menu.sh",
-            "tooltip": false
-        },
-        "battery": {
-            "states": {
-                "good": 80,
-                "warning": 50,
-                "critical": 10
-            },
-            "format": "{icon} {capacity}%",
-            "format-charging": "󱐋 {capacity}%",
-            "format-plugged": " {capacity}%",
-            "format-icons": [
-                "󰂎",
-                "󰁺",
-                "󰁻",
-                "󰁼",
-                "󰁽",
-                "󰁾",
-                "󰁿",
-                "󰂀",
-                "󰂁",
-                "󰂂",
-                "󰁹"
-            ]
-        },
-        "custom/docker": {
-            "exec": "~/.config/bin/docker_status",
-            "return-type": "json",
-            "interval": 10,
-            "format": " {} ",
-            "on-click-right": "~/.config/bin/docker_menu"
-        },
-        "custom/kvm": {
-            "exec": "~/.config/bin/kvm_status",
-            "return-type": "json",
-            "interval": 10,
-            "format": " {} ",
-            "on-click-right": "~/.config/bin/kvm_menu"
-        },
-        "custom/updates": {
-            "exec": "~/.config/bin/updates_status",
-            "return-type": "json",
-            "interval": 60,
-            "signal": 8,
-            "format": " 󰚰 {} "
-        },
-        "custom/local_ip": {
-            "exec": "~/.config/bin/local_ip",
-            "on-click": "bash -c '~/.config/bin/copy_ip.sh ~/.config/bin/local_ip'",
-            "on-click-right": "bash -c '~/.config/bin/copy_ip.sh ~/.config/bin/local_ip'",
-            "return-type": "json",
-            "interval": 10,
-            "format": " {} "
-        },
-        "custom/public_ip": {
-            "exec": "~/.config/bin/public_ip",
-            "on-click": "bash -c '~/.config/bin/copy_ip.sh ~/.config/bin/public_ip'",
-            "on-click-right": "bash -c '~/.config/bin/copy_ip.sh ~/.config/bin/public_ip'",
-            "return-type": "json",
-            "interval": 60,
-            "format": " {} "
-        },
-        "custom/player": {
-            "exec": "playerctl metadata --format '󰝚 {{artist}} - {{title}}' 2>/dev/null || echo ''",
-            "format": " {} ",
-            "interval": 5,
-            "on-click": "playerctl play-pause"
-        },
-        "tray": {
-            "icon-size": 18,
-            "spacing": 10
-        },
-        "clock": {
-            "format": " 󰥔 {:%H:%M   %m-%d} ",
-            "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>"
-        }
-    }
+    "hyprland/workspaces": {
+      "format": "{name}",
+      "on-click": "activate",
+      "persistent-workspaces": {
+        "*": 5
+      }
+    },
+    "network": {
+      "format-wifi": "󰤨",
+      "format-ethernet": "󰈀",
+      "format-disconnected": "󰤭",
+      "tooltip-format": "{ifname} · {essid}",
+      "on-click": "~/.local/bin/black-ice-control network"
+    },
+    "bluetooth": {
+      "format": "󰂯",
+      "format-disabled": "󰂲",
+      "format-connected": "󰂱",
+      "tooltip-format": "{status}",
+      "on-click": "~/.local/bin/black-ice-control bluetooth"
+    },
+    "pulseaudio": {
+      "format": "󰕾 {volume}%",
+      "format-muted": "󰝟",
+      "on-click": "~/.local/bin/black-ice-control",
+      "on-click-right": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"
+    },
+    "battery": {
+      "format": "{capacity}%",
+      "format-charging": "󰂄 {capacity}%",
+      "states": {
+        "warning": 25,
+        "critical": 10
+      }
+    },
+    "clock": {
+      "format": "{:%H:%M}",
+      "tooltip-format": "{:%A, %d de %B}"
+    },
+    "custom/control": {
+      "format": "",
+      "tooltip-format": "Ajustes · clic derecho: notificaciones",
+      "on-click": "~/.local/bin/black-ice-control",
+      "on-click-right": "swaync-client -t -sw"
+    },
+    "custom/power": {
+      "format": "󰐥",
+      "tooltip": false,
+      "on-click": "~/.local/bin/black-ice-control session"
+    },
+    "tray": {
+      "icon-size": 14,
+      "spacing": 8
+    },
+    "custom/player": {
+      "exec": "~/.local/bin/black-ice-waybar player",
+      "return-type": "json",
+      "interval": 5,
+      "format": "{}",
+      "escape": true,
+      "tooltip": true,
+      "max-length": 24,
+      "on-click": "playerctl play-pause"
+    },
+    "custom/weather": {
+      "exec": "~/.local/bin/black-ice-waybar weather",
+      "return-type": "json",
+      "interval": 1800,
+      "format": "{}",
+      "escape": true,
+      "tooltip": true,
+      "max-length": 18
+    },
+    "group/connectivity": {
+      "orientation": "inherit",
+      "drawer": {
+        "transition-duration": 150
+      },
+      "modules": [
+        "network",
+        "bluetooth"
+      ]
+    },
+    "group/media": {
+      "orientation": "inherit",
+      "drawer": {
+        "transition-duration": 150
+      },
+      "modules": [
+        "clock",
+        "custom/player",
+        "custom/weather"
+      ]
+    },
+    "custom/docker": {
+      "exec": "~/.local/bin/black-ice-waybar docker",
+      "return-type": "json",
+      "interval": 15,
+      "format": "{}",
+      "escape": true,
+      "tooltip": true,
+      "max-length": 12,
+      "exec-if": "command -v docker >/dev/null 2>&1",
+      "hide-empty-text": true,
+      "on-click": "~/.config/bin/docker_menu"
+    },
+    "custom/kvm": {
+      "exec": "~/.local/bin/black-ice-waybar kvm",
+      "return-type": "json",
+      "interval": 15,
+      "format": "{}",
+      "escape": true,
+      "tooltip": true,
+      "max-length": 12,
+      "exec-if": "command -v virsh >/dev/null 2>&1",
+      "hide-empty-text": true,
+      "on-click": "~/.config/bin/kvm_menu"
+    },
+    "custom/updates": {
+      "exec": "~/.local/bin/black-ice-waybar updates",
+      "return-type": "json",
+      "interval": 1800,
+      "format": "{}",
+      "escape": true,
+      "tooltip": true,
+      "max-length": 12
+    },
+    "custom/local_ip": {
+      "exec": "~/.local/bin/black-ice-waybar local",
+      "return-type": "json",
+      "interval": 10,
+      "format": "{}",
+      "escape": true,
+      "tooltip": true,
+      "max-length": 24,
+      "on-click-right": "~/.local/bin/black-ice-waybar copy local"
+    },
+    "custom/public_ip": {
+      "exec": "~/.local/bin/black-ice-waybar public",
+      "return-type": "json",
+      "interval": 60,
+      "format": "{}",
+      "escape": true,
+      "tooltip": true,
+      "max-length": 24,
+      "on-click-right": "~/.local/bin/black-ice-waybar copy public"
+    },
+    "custom/vpn": {
+      "exec": "~/.local/bin/black-ice-waybar vpn",
+      "return-type": "json",
+      "interval": 5,
+      "format": "{}",
+      "escape": true,
+      "tooltip": true,
+      "max-length": 24,
+      "on-click-right": "~/.local/bin/black-ice-waybar copy vpn"
+    },
+    "custom/settarget": {
+      "exec": "~/.local/bin/black-ice-waybar target",
+      "return-type": "json",
+      "interval": 3,
+      "format": "{}",
+      "escape": true,
+      "tooltip": true,
+      "max-length": 28,
+      "on-click-right": "~/.local/bin/black-ice-waybar copy target",
+      "on-click": "~/.local/bin/black-ice-waybar choose-target"
+    },
+    "group/lab": {
+      "orientation": "inherit",
+      "modules": [
+        "custom/docker",
+        "custom/kvm",
+        "custom/updates"
+      ]
+    },
+    "group/addresses": {
+      "orientation": "inherit",
+      "drawer": {
+        "transition-duration": 150
+      },
+      "modules": [
+        "custom/local_ip",
+        "custom/public_ip"
+      ]
+    },
+    "group/operations": {
+      "orientation": "inherit",
+      "drawer": {
+        "transition-duration": 150
+      },
+      "modules": [
+        "custom/local_ip",
+        "custom/public_ip",
+        "custom/settarget",
+        "group/lab"
+      ]
+    },
+    "group/system": {
+      "orientation": "inherit",
+      "drawer": {
+        "transition-duration": 150
+      },
+      "modules": [
+        "custom/control",
+        "network",
+        "bluetooth",
+        "pulseaudio",
+        "battery",
+        "custom/power"
+      ]
+    },
+    "fixed-center": true
+  }
 ]

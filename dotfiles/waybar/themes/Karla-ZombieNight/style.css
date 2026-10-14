@@ -1,75 +1,43 @@
-/* Archetype: Module Pills */
-* { border: none; border-radius: 0; font-family: "JetBrains Mono Nerd Font", monospace; font-size: 11px; font-weight: bold; min-height: 0; margin: 0; padding: 0; }
-window#waybar { background: transparent; color: #c9c7cd; }
-.modules-left, .modules-center, .modules-right { background: transparent; padding: 2px 4px; }
+/* bg=#080a16 acc1=#8bb9e8 acc2=#bcc6ed fg=#c9c7cd dim=#93929a */
 
-#custom-launcher {
-    background: #7f3fbf; color: #0a0a1a;
-    border-radius: 8px; padding: 2px 14px; margin: 2px 3px; font-size: 13px;
-}
-#custom-power {
-    background: #f4436c; color: #0a0a1a;
-    border-radius: 8px; padding: 2px 12px; margin: 2px 3px;
-}
-#cpu, #memory, #disk, #clock, #temperature,
-#custom-hardware_temp, #custom-vpn, #network, #pulseaudio,
-#battery, #custom-settarget, #custom-docker, #custom-kvm,
-#custom-updates, #custom-local_ip, #custom-public_ip, #custom-player, #tray {
-    background: rgba(10,10,26,0.9);
-    border: 1px solid rgba(127,63,191,0.18);
-    border-radius: 8px;
-    padding: 2px 10px; margin: 2px 2px;
-}
-
-#workspaces { background: transparent; padding: 0 4px; }
-#workspaces button {
-    all: unset; color: #2a1a3e; font-size: 15px; padding: 0 7px; min-width: 18px;
-    font-family: "JetBrains Mono Nerd Font", monospace; font-weight: bold;
-}
-#workspaces button.empty                                 { color: #2a1a3e; opacity: 0.35; }
-#workspaces button:not(.active):not(.empty):not(.urgent) { color: #9ae6d3; }
-#workspaces button.active                                { color: #7f3fbf; font-size: 20px; }
-#workspaces button.urgent                                { color: #f4436c; }
-#workspaces button:hover                                 { color: #c9c7cd; }
-
-#custom-launcher { color: #7f3fbf; padding: 0 6px; }
-#custom-power    { color: #f4436c; padding: 0 6px; }
-#cpu              { color: #7f3fbf; padding: 0 6px; }
-#memory           { color: #9ae6d3; padding: 0 6px; }
-#disk             { color: #7f3fbf; padding: 0 6px; }
-#clock            { color: #9ae6d3; padding: 0 6px; }
-#pulseaudio       { color: #7f3fbf; padding: 0 6px; }
-#network          { color: #7f3fbf; padding: 0 6px; }
-#network.disconnected { color: #f4436c; }
-#pulseaudio.muted { color: #2a1a3e; }
-#tray             { padding: 0 6px; }
-#tray > .passive  { -gtk-icon-effect: dim; }
-#tray > .needs-attention { -gtk-icon-effect: highlight; border-radius: 8px; }
-#temperature               { color: #e6d373; padding: 0 6px; }
-#temperature.critical      { color: #f4436c; }
-#custom-hardware_temp          { color: #e6d373; padding: 0 6px; }
-#custom-hardware_temp.normal   { color: #7f3fbf; }
-#custom-hardware_temp.warm     { color: #e6d373; }
-#custom-hardware_temp.high     { color: #9ae6d3; }
-#custom-hardware_temp.critical { color: #f4436c; }
-#custom-hardware_temp.unknown  { color: #2a1a3e; }
-#custom-vpn              { padding: 0 6px; }
-#custom-vpn.connected    { color: #7f3fbf; }
-#custom-vpn.disconnected { color: #f4436c; }
-#battery          { color: #7f3fbf; padding: 0 6px; }
-#battery.warning  { color: #e6d373; }
-#battery.critical { color: #f4436c; }
-#battery.charging { color: #7f3fbf; }
-#battery.plugged  { color: #7f3fbf; }
-#cpu.critical     { color: #f4436c; }
-#custom-docker    { color: #7f3fbf; padding: 0 6px; }
-#custom-kvm       { color: #e6d373; padding: 0 6px; }
-#custom-updates   { color: #9ae6d3; padding: 0 6px; }
-#custom-local_ip  { color: #7f3fbf; padding: 0 6px; }
-#custom-public_ip { color: #7f3fbf; padding: 0 6px; }
-#custom-player    { color: #9ae6d3; padding: 0 6px; }
-#custom-settarget          { padding: 0 6px; }
-#custom-settarget.active   { color: #f4436c; }
-#custom-settarget.inactive { color: #2a1a3e; }
-tooltip { background: #0a0a1a; border: 1px solid rgba(127,63,191,0.2); border-radius: 6px; }
-tooltip label { color: #c9c7cd; padding: 4px 8px; }
+* { border:none; border-radius:0; font-family:"Rajdhani", "JetBrainsMono Nerd Font", sans-serif; font-size:14px; min-height:0; }
+window#waybar { background:transparent; color:#c9c7cd; border:0; box-shadow:none; }
+.modules-left, .modules-center, .modules-right { background-image:url("assets/panel.svg"); background-size:100% 100%; background-repeat:no-repeat; padding:0 11px; margin:4px 6px; }
+#custom-launcher { color:#8bb9e8; padding:0 9px; font-size:17px; }
+#workspaces button { color:#93929a; padding:0 8px; background:transparent; }
+#workspaces button.active { color:#8bb9e8; background:alpha(#8bb9e8,.14); }
+#workspaces button.urgent { color:#ffbd88; }
+#workspaces button:hover, #custom-control:hover, #custom-settarget:hover { background:alpha(#8bb9e8,.18); }
+#network, #bluetooth, #pulseaudio, #battery, #clock, #tray, #custom-control, #custom-power { padding:0 8px; color:#93929a; }
+#clock, #custom-player { color:#c9c7cd; }
+#custom-control, #custom-power, #custom-local_ip { color:#8bb9e8; }
+#custom-public_ip, #custom-settarget { color:#bcc6ed; }
+#custom-vpn.connected { color:#8bb9e8; }
+#custom-docker, #custom-kvm, #custom-updates, #custom-local_ip, #custom-public_ip, #custom-vpn, #custom-settarget, #custom-player { padding:0 8px; }
+#battery.charging { color:#9fd2b0; }
+#battery.warning, #custom-updates.updates { color:#e9c585; }
+#battery.critical { color:#ef8d9d; }
+#network.disconnected, #bluetooth.disabled, #pulseaudio.muted, #custom-vpn.disconnected, #custom-settarget.inactive, .unavailable { color:#93929a; }
+tooltip { background:#080a16; color:#c9c7cd; border:1px solid #8bb9e8; }
+tooltip label { color:#c9c7cd; padding:8px; }
+menu, .menu, .context-menu, popover.background { background:#080a16; background-image:none; color:#c9c7cd; border:1px solid alpha(#8bb9e8,.45); }
+menuitem { background:transparent; color:#c9c7cd; padding:7px 12px; }
+menuitem label, menu label, popover label { color:#c9c7cd; }
+menuitem:hover, menuitem:selected { background:mix(#080a16,#8bb9e8,.2); color:#c9c7cd; }
+menuitem:disabled, menuitem:disabled label { color:#93929a; }
+/* Laboratory status */
+#custom-vpn { background-image:url("assets/hackthebox-disconnected.svg"); background-size:14px 14px; background-repeat:no-repeat; background-position:6px center; padding:0 8px 0 26px; }
+#custom-vpn.connected { color:#9fef00; background-image:url("assets/hackthebox-connected.svg"); }
+#custom-vpn.disconnected { color:#ff6b6b; }
+#custom-control { font-family:"JetBrainsMono Nerd Font"; font-size:15px; padding:0 8px; }
+/* Theme typography */
+* { font-family:"Rajdhani", "JetBrainsMono Nerd Font", sans-serif; font-size:14px; font-weight:600; }
+#workspaces button, #workspaces button label, #clock, #custom-player { font-family:"Rajdhani", "JetBrainsMono Nerd Font", sans-serif; }
+#custom-local_ip, #custom-public_ip, #custom-vpn, #custom-settarget { font-family:"Rajdhani", "JetBrainsMono Nerd Font", monospace; font-size:11px; font-weight:500; }
+#custom-launcher, #custom-control, #custom-power, #network, #bluetooth { font-family:"JetBrainsMono Nerd Font"; }
+/* Accessible workspace states */
+#workspaces button { color:#93929a; min-width:18px; padding:0 7px; border:1px solid transparent; }
+#workspaces button.active { color:#c9c7cd; background:mix(#080a16,#8bb9e8,.30); border:1px solid #8bb9e8; box-shadow:inset 0 1px alpha(#c9c7cd,.18); }
+#workspaces button.active label { color:#c9c7cd; font-weight:700; }
+#workspaces button:hover { color:#c9c7cd; background:mix(#080a16,#8bb9e8,.18); }
+#workspaces button.urgent { color:#ffffff; background:#9b303b; border-color:#ff8c97; }

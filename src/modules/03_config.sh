@@ -1,4 +1,5 @@
 #!/bin/bash
+install_stage 4 'Idioma, región y sistema'
 # modules/03_config.sh ( Plymouth Hooks)
 
 
@@ -12,9 +13,7 @@ if [ "${AUTO_MODE:-}" == "true" ]; then
     success "  - Hostname: ${HOSTNAME:-}"
 else
     # --- LANGUAGE & LOCALE SELECTION ---
-    echo -e "${NEON_PURPLE}┌────────────────────────────────────────────────────────┐${NC}"
-    echo -e "${NEON_PURPLE}│${NC}  ${BOLD}PROTOCOLO DE LOCALIZACIÓN: IDIOMA Y REGIÓN           ${NC} ${NEON_PURPLE}│${NC}"
-    echo -e "${NEON_PURPLE}└────────────────────────────────────────────────────────┘${NC}"
+    print_step 'Idioma y formatos regionales'
     echo -e "${CYAN}Puedes elegir el idioma del sistema (menús, errores) y${NC}"
     echo -e "${CYAN}el formato regional independiente (moneda, fecha, etc.)${NC}\n"
 
@@ -45,6 +44,9 @@ if grep -q "UUID=" /mnt/etc/fstab 2>/dev/null; then
 else
     genfstab -U /mnt > /mnt/etc/fstab
 fi
+if [[ "${FILESYSTEM:-}" == btrfs ]]; then
+    sed -i -E 's/(,?)subvolid=[0-9]+(,?)/\1/g; s/,,+/,/g' /mnt/etc/fstab
+fi
 
 # Chroot config setup with safe escaping
 cat <<EOF > /mnt/root/chroot_config.sh
@@ -63,12 +65,12 @@ ln -sf "/usr/share/zoneinfo/\$TIMEZONE" /etc/localtime
 hwclock --systohc
 
 # Localization
-echo "\$SYSTEM_LANG.UTF-8 UTF-8" >> /etc/locale.gen
+grep -Fxq "\$SYSTEM_LANG.UTF-8 UTF-8" /etc/locale.gen || echo "\$SYSTEM_LANG.UTF-8 UTF-8" >> /etc/locale.gen
 if [ "\$SYSTEM_LANG" != "\$SYSTEM_LOCALE" ]; then
-    echo "\$SYSTEM_LOCALE.UTF-8 UTF-8" >> /etc/locale.gen
+    grep -Fxq "\$SYSTEM_LOCALE.UTF-8 UTF-8" /etc/locale.gen || echo "\$SYSTEM_LOCALE.UTF-8 UTF-8" >> /etc/locale.gen
 fi
-echo "es_ES.UTF-8 UTF-8" >> /etc/locale.gen
-echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen
+grep -Fxq "es_ES.UTF-8 UTF-8" /etc/locale.gen || echo "es_ES.UTF-8 UTF-8" >> /etc/locale.gen
+grep -Fxq "en_US.UTF-8 UTF-8" /etc/locale.gen || echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen
 locale-gen
 
 # Set Language
@@ -90,6 +92,9 @@ fi
 
 # vconsole.conf — teclado para consola, initramfs (LUKS) y SDDM
 echo "KEYMAP=${KEYMAP:-es}" > /etc/vconsole.conf
+if [ -f /usr/share/kbd/consolefonts/lat2-16.psfu.gz ]; then
+    echo 'FONT=lat2-16' >> /etc/vconsole.conf
+fi
 
 # Verify vconsole creation
 if [ ! -f /etc/vconsole.conf ]; then
@@ -99,9 +104,9 @@ fi
 
 # Hostname
 echo "\$HOSTNAME" > /etc/hostname
-echo "127.0.0.1   localhost" >> /etc/hosts
-echo "::1         localhost" >> /etc/hosts
-echo "127.0.1.1   \$HOSTNAME.localdomain \$HOSTNAME" >> /etc/hosts
+grep -Fxq "127.0.0.1   localhost" /etc/hosts || echo "127.0.0.1   localhost" >> /etc/hosts
+grep -Fxq "::1         localhost" /etc/hosts || echo "::1         localhost" >> /etc/hosts
+grep -Fxq "127.0.1.1   \$HOSTNAME.localdomain \$HOSTNAME" /etc/hosts || echo "127.0.1.1   \$HOSTNAME.localdomain \$HOSTNAME" >> /etc/hosts
 
 exit 0
 EOF
@@ -207,7 +212,7 @@ sed -i "s/^HOOKS=.*/HOOKS=($SED_HOOKS)/" /mnt/etc/mkinitcpio.conf
 
 # Generate Initramfs (with verification)
 # Step 1: Verify kernel presets exist (kernel package installed)
-if [ ! -f /mnt/etc/mkinitcpio.d/${SELECTED_KERNEL:-linux}.preset ]; then
+if [ ! -f "/mnt/etc/mkinitcpio.d/${SELECTED_KERNEL:-linux}.preset" ]; then
     log_error "CRÍTICO: No se encontró preset de kernel. El paquete '${SELECTED_KERNEL:-linux}' no se instaló correctamente."
     log_error "Verifica la conexión de red y ejecuta 'pacstrap /mnt ${SELECTED_KERNEL:-linux} ${SELECTED_KERNEL:-linux}-headers' manualmente."
     exit 1
@@ -247,24 +252,30 @@ if [ "${FILESYSTEM:-}" == "btrfs" ]; then
     
     # Crear configuración de snapper en chroot
     arch-chroot /mnt /bin/bash << SNAPPER_EOF
+set -euo pipefail
 # Crear configuración de snapper para root
-umount /.snapshots 2>/dev/null || true
-rm -rf /.snapshots
-snapper -c root create-config /
-btrfs subvolume delete /.snapshots
-mkdir /.snapshots
-mount -a
+new_config=false
+if [ ! -f /etc/snapper/configs/root ]; then
+    new_config=true
+    umount /.snapshots 2>/dev/null || true
+    rmdir /.snapshots || { echo "Snapshots existentes: se conserva su contenido"; exit 1; }
+    snapper --no-dbus -c root create-config /
+    btrfs subvolume delete /.snapshots
+    mkdir /.snapshots
+    mount -a
+fi
 
 # Configurar políticas de snapper
+if [[ "\$new_config" == true ]]; then
 cat > /etc/snapper/configs/root << EOF
 SUBVOLUME="/"
 FSTYPE="btrfs"
 QGROUP=""
 SPACE_LIMIT="0.5"
 FREE_LIMIT="0.2"
-ALLOW_USERS="${USERNAME:-}"
-ALLOW_GROUPS="wheel"
-SYNC_ACL="yes"
+ALLOW_USERS=""
+ALLOW_GROUPS=""
+SYNC_ACL="no"
 BACKGROUND_COMPARISON="yes"
 NUMBER_CLEANUP="yes"
 NUMBER_MIN_AGE="1800"
@@ -281,6 +292,56 @@ TIMELINE_LIMIT_YEARLY="0"
 EMPTY_PRE_POST_CLEANUP="yes"
 EMPTY_PRE_POST_MIN_AGE="1800"
 EOF
+fi
+
+python3 - <<'VALIDATE_SNAPSHOT_USERS'
+import grp
+import pwd
+import re
+import shlex
+from pathlib import Path
+
+path = Path('/etc/snapper/configs/root')
+content = path.read_text()
+for key, lookup in (('ALLOW_USERS', pwd.getpwnam), ('ALLOW_GROUPS', grp.getgrnam)):
+    match = re.search(r'^' + key + r'=(.*)$', content, re.MULTILINE)
+    if not match:
+        continue
+    tokens = shlex.split(match.group(1), comments=True)
+    names = tokens[0].split() if tokens else []
+    valid = []
+    for name in names:
+        try:
+            lookup(name)
+            valid.append(name)
+        except KeyError:
+            print('Snapper: se retira referencia a identidad inexistente:', name)
+    if valid != names:
+        content = re.sub(r'^' + key + r'=.*$', key + '="' + ' '.join(valid) + '"', content, flags=re.MULTILINE)
+path.write_text(content)
+VALIDATE_SNAPSHOT_USERS
+
+python3 - <<'REGISTER_CONFIG'
+from pathlib import Path
+import re
+import shlex
+
+path = Path('/etc/conf.d/snapper')
+content = path.read_text() if path.exists() else ''
+match = re.search(r'^SNAPPER_CONFIGS=(.*)$', content, re.MULTILINE)
+tokens = shlex.split(match.group(1), comments=True) if match else []
+names = tokens[0].split() if tokens else []
+if not all(re.fullmatch(r'[A-Za-z0-9_.-]+', name) for name in names):
+    raise ValueError('Registro Snapper inválido; no se sobrescribió')
+if 'root' not in names:
+    names.append('root')
+    value = 'SNAPPER_CONFIGS="' + ' '.join(names) + '"'
+    content = re.sub(r'^SNAPPER_CONFIGS=.*$', value, content, flags=re.MULTILINE) if match else content.rstrip() + '\n' + value + '\n'
+    path.write_text(content)
+REGISTER_CONFIG
+
+snapper --no-dbus -c root get-config >/dev/null
+btrfs subvolume show /.snapshots >/dev/null
 
 # Crear hooks de pacman para snapshots automáticos (DENTRO DEL SISTEMA DESTINO)
 mkdir -p /etc/pacman.d/hooks
@@ -297,7 +358,7 @@ Target = *
 [Action]
 Description = Creando snapshot pre-pacman con snapper...
 When = PreTransaction
-Exec = /usr/bin/snapper --config root create --description "pacman pre-transaction"
+Exec = /usr/bin/snapper --no-dbus --config root create --cleanup-algorithm number --description "pacman pre-transaction"
 EOF
 
 # Hook POST-transacción
@@ -312,7 +373,7 @@ Target = *
 [Action]
 Description = Creando snapshot post-pacman con snapper...
 When = PostTransaction
-Exec = /bin/sh -c '/usr/bin/snapper --config root create --description "pacman post-transaction" || true'
+Exec = /usr/bin/snapper --no-dbus --config root create --cleanup-algorithm number --description "pacman post-transaction"
 EOF
 
 # Habilitar timers de snapper

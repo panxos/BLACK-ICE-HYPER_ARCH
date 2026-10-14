@@ -1,662 +1,199 @@
 <div align="center">
 
-![BLACK-ICE ARCH Banner](docs/images/banner.png)
+# BLACK-ICE ARCH
 
-# 🧊 BLACK-ICE ARCH
+### Arch Linux · Hyprland · Puesto de trabajo para seguridad
 
-### Instalación Automatizada de Arch Linux con Hyprland y Herramientas de Ciberseguridad
+**Un escritorio de seguridad con 54 temas, controles propios y herramientas seleccionables.**
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-cyan.svg)](LICENSE)
-[![Arch Linux](https://img.shields.io/badge/Arch-Linux-1793D1?logo=arch-linux&logoColor=fff)](https://archlinux.org/)
-[![Hyprland](https://img.shields.io/badge/Hyprland-v0.54+-00FFFF)](https://hyprland.org/)
-[![Version](https://img.shields.io/badge/Version-3.9.0-neon.svg)](https://github.com/panxos/BLACK-ICE-HYPER_ARCH)
+[English](README.en.md) · [Instalación](docs/INSTALLER_V4.md) · [Galería](docs/THEMES.md) · [Guía](docs/GUIDE.md) · [Pendientes](docs/PENDING.md)
 
-**🇪🇸 Español | [🇬🇧 English](README.en.md)**
+<img src="docs/images/showcase/desktop-mr-robot.png" alt="Escritorio BLACK-ICE con el tema Mr-Robot" width="100%">
 
----
+<sub>Captura real de la VM de validación · Hyprland · tema Mr-Robot</sub>
 
-### 🚀 Instalación en Un Comando
-
-```bash
-curl -L http://is.gd/blackice | bash
-```
+**4.0.0-dev.2 · candidato en validación · aún sin release**
 
 </div>
 
----
-
-## 📋 Tabla de Contenidos
-
-- [Descripción](#-descripción)
-- [Arquitectura de Dos Fases](#-arquitectura-de-dos-fases)
-- [Características — Fase 1: Sistema Base](#-características--fase-1-sistema-base)
-- [Características — Fase 2: Entorno de Escritorio](#-características--fase-2-entorno-de-escritorio)
-- [Herramientas de Seguridad](#-herramientas-de-seguridad)
-- [Temas Waybar](#-temas-waybar-21-temas)
-- [Galería de Escritorios](#️-galería-de-escritorios)
-- [Requisitos del Sistema](#-requisitos-del-sistema)
-- [Instalación Rápida](#-instalación-rápida)
-- [Instalación Manual](#-instalación-manual)
-- [Configuración Desatendida](#-configuración-desatendida)
-- [Atajos de Teclado](#️-atajos-de-teclado)
-- [Personalización](#-personalización)
-- [Solución de Problemas](#-solución-de-problemas)
-- [Estructura del Repositorio](#-estructura-del-repositorio)
-- [Actualización del Sistema](#-actualización-del-sistema)
-- [Documentación](#-documentación)
-- [Créditos](#-créditos)
-- [Licencia](#-licencia)
-
----
-
-## 🎯 Descripción
-
-**BLACK-ICE ARCH** es un sistema de despliegue automatizado de dos fases para Arch Linux, diseñado específicamente para **profesionales de Ciberseguridad** y **Pentesters**. Transforma una ISO mínima de Arch en una workstation Hyprland completamente configurada, hardened y lista para auditorías de seguridad.
-
-### ¿Por qué BLACK-ICE ARCH?
-
-- ⚡ **Instalación en un comando** desde la LiveCD
-- 🎨 **Estética cyberpunk** con 21 temas Waybar intercambiables en vivo
-- 🛡️ **+100 herramientas de seguridad** organizadas en 10 categorías
-- 🔒 **Cifrado LUKS2** completo soportado desde la instalación base
-- 🚀 **Detección automática de hardware** — CPU, GPU, virtualización
-- 🤖 **Herramientas IA integradas** — Claude Code, Gemini CLI
-- 📦 **Completamente automatizado** con modo desatendido disponible
-
----
-
-## 🏗️ Arquitectura de Dos Fases
-
-```
-ARCH LINUX ISO (LiveCD)
-        │
-        ▼
-┌─────────────────────────────────────────┐
-│  FASE 1 — install.sh                    │
-│  src/modules/ (00→06, 99)               │
-│  Sistema base, disco, cifrado, kernel   │
-│  → Primer reboot                        │
-└─────────────────────────────────────────┘
-        │
-        ▼
-┌─────────────────────────────────────────┐
-│  FASE 2 — deploy_hyprland.sh            │
-│  src/deploy/ (00→09, 99)                │
-│  Entorno de escritorio, herramientas,   │
-│  temas, IA, dotfiles                    │
-└─────────────────────────────────────────┘
-```
-
----
-
-## ⚙️ Características — Fase 1: Sistema Base
-
-### Detección y Particionado de Disco
-
-- Soporte completo: SATA (`/dev/sdX`), NVMe, VirtIO (KVM), Xen, eMMC
-- Particionado automático UEFI/BIOS con detección del modo de arranque
-- **LUKS2** cifrado completo de disco con PBKDF2 — contraseña solicitada interactivamente desde `/dev/tty`
-- Sistemas de archivos soportados: **btrfs** (con snapshots), **ext4**, **xfs**, **f2fs**
-
-### Kernel y Microcódigo
-
-- Selección interactiva: `linux`, `linux-zen` (gaming/rendimiento), `linux-hardened` (seguridad)
-- Auto-detección CPU Intel/AMD → instala `intel-ucode` o `amd-ucode` automáticamente
-
-### Configuración del Sistema
-
-- Locale, timezone, hostname y distribución de teclado configurables
-- Creación de usuario con validación de credenciales
-- GRUB con soporte LUKS + **tema DedSec** (estilo Watch Dogs)
-- Recovery mode automático si se detecta instalación previa de BLACK-ICE
-
-### Gestión de Energía
-
-- Detección automática de entorno: Laptop → TLP + perfiles dinámicos, Desktop/VM → CPUpower rendimiento
-- NVMe APST, thermald (Intel físico), lm_sensors, acpid
-
----
-
-## 🖥️ Características — Fase 2: Entorno de Escritorio
-
-### Compositor y Desktop
-
-- **Hyprland v0.54+** — compositor Wayland con animaciones suaves, soporte multi-monitor y multi-workspace
-- **Waybar** — barra de estado completamente customizable con 21 temas cyberpunk
-- **SDDM** — gestor de inicio con tema CyberSec personalizado
-- **Kitty** — terminal GPU-acelerado con 21 esquemas de color coordinados con los temas Waybar
-- **Wofi** — lanzador de aplicaciones Wayland con 4 estilos intercambiables (`Super+Alt+R`)
-- **SwayNC** — centro de notificaciones con tema dark
-- **wlogout** — menú de cierre de sesión con animaciones fadeIn y hover glow
-
-### Shells y Terminal
-
-- **Zsh** + Oh-My-Zsh + **Powerlevel10k** con segmento SSH personalizado
-- **fzf-tab** — completado interactivo con previews (ls, bat, kill)
-- Aliases modernos: `lsd` (ls), `bat` (cat), xclip integrado
-- `tech_quotes.sh` — citas técnicas aleatorias al abrir terminal
-
-### Editor
-
-- **Neovim** con **NvChad** + LazyVim + LSP configurado
-- `git clone --depth=1` para instalación eficiente
-
-### Música
-
-- **MPD** + **ncmpcpp** — reproductor de música local con servicio systemd --user
-- **Eww Music Widget** (`Win+Shift+N`) — widget flotante 380×115px top-right con álbum art, barra de progreso interactiva, controles prev/play-pause/next, shuffle y loop
-- Alimentado por **playerctl/MPRIS**, CSS cyberpunk completo
-
-### AUR y Repositorios
-
-- **paru** desde chaotic-aur (binario compilado contra el pacman del sistema, nunca se rompe tras `pacman -Syu`)
-- Chaotic-AUR habilitado por defecto
-- `safe_install` — helper resiliente con detección de ABI mismatch y fallback automático a pacman
-
-### Herramientas BLACK-ICE Integradas
-
-| Script | Atajo | Descripción |
-|--------|-------|-------------|
-| `cheatsheet` | `Super+I` | Overlay GTK3 fullscreen con todos los atajos, 3 columnas |
-| `app_switcher` | `Super+Tab` | Switcher de ventanas via Wofi con íconos Nerd Font |
-| `pass_menu` | `Super+Shift+X` | KeePassXC CLI + Wofi — contraseña/usuario/TOTP, auto-limpia en 30s |
-| `terminal_manager` | `Super+Ctrl+Enter` | Sesiones Kitty multi-tab (Pentesting/Dev/SOC) |
-| `theme_selector` | `Super+Alt+T` | Selector visual de temas Waybar con thumbnails |
-| `wallpaper_visual` | `Super+Alt+W` | Selector de wallpapers waypaper GUI |
-| `wofi_style_selector` | `Super+Alt+R` | Selector de estilo Wofi (4 estilos) |
-| `wifi_toggle` | `Super+Alt+F` | Toggle WiFi nmcli con notificación swaync |
-| `power_profile_menu` | `Super+Shift+P` | Menú de perfil de energía |
-| `gh0stzk-walls` | CLI | Descarga wallpapers de gh0stzk (`--all`, `--theme`, `--list`) |
-| `xdg-open-wayland` | auto | Wrapper xdg-open para OAuth en Wayland (gemini-cli) |
-| `docker_menu` / `kvm_menu` | CLI | Menús de gestión Docker y KVM vía Wofi |
-| `htb-connect` / `htb-disconnect` | CLI | VPN HackTheBox integrada |
-
-### Herramientas de IA
-
-- **Claude Code CLI** (`@anthropic-ai/claude-code`) — via npm global
-- **Gemini CLI** (`@google/gemini-cli`) — via npm global
-- Aliases de actualización en Zsh: `claudeupdate`, `geminiupdate`
-
-### Integración Pywal
-
-- `theme_selector` ejecuta `wal -i <wallpaper> -n` al cambiar tema
-- Paleta generada del wallpaper activo → aplicada a Kitty via socket (`kitty @ set-colors`) + SIGUSR1
-- 21 temas `.conf` manuales por tema Waybar en `dotfiles/kitty/themes/`
-
----
-
-## 🛡️ Herramientas de Seguridad
-
-**+100 herramientas organizadas en 10 categorías, con instalador whiptail interactivo:**
-
-| Categoría | Herramientas destacadas |
-|-----------|------------------------|
-| 🔍 **Reconocimiento** | nmap, masscan, rustscan, recon-ng, theHarvester, amass, spiderfoot, sherlock |
-| 🌐 **Web Hacking** | burpsuite, zaproxy, sqlmap, nikto, gobuster, ffuf, wfuzz, feroxbuster, wpscan |
-| 📡 **Wireless** | aircrack-ng, kismet, wifite, reaver, bully, pixiewps |
-| 🪟 **Windows/AD** | impacket, netexec, bloodhound, evil-winrm, certipy, smbmap, neo4j |
-| 🔐 **Cracking** | john, hashcat, hydra, medusa, seclists, rockyou |
-| 💥 **Explotación** | metasploit, searchsploit, villain, SET, exploitdb |
-| 🕵️ **Sniffing/MITM** | wireshark, tcpdump, ettercap, bettercap, mitmproxy |
-| 🔧 **Ingeniería Inversa** | gdb, radare2, ghidra, apktool, jadx, dex2jar |
-| 🔬 **Forense Digital** | autopsy, volatility3, binwalk, foremost, steghide, stegseek, exiftool |
-| 🌐 **Redes/Tunneling** | proxychains, chisel, sshuttle, socat, minicom, snmpcheck |
-
-### Modos del Instalador
-
-- **Suite Estándar** (recomendada) — todo sin paquetes pesados, instalación rápida
-- **Selección personalizada** — checklist whiptail, ESPACIO para marcar/desmarcar
-- **Suite Completa** — incluye bloodhound (~60min), ghidra (~20min), autopsy (~20min)
-- **Modo desatendido** (`AUTO_MODE=true`) — instala Suite Estándar sin preguntas
-
----
-
-## 🎨 Temas Waybar (21 Temas)
-
-Cambia entre temas en tiempo real con `Super+Alt+T`. El selector actualiza automáticamente Waybar, Hyprland borders, colores de Hyprlock y paleta de Kitty.
-
-| Tema | Estilo |
-|------|--------|
-| **Horus-Cyber** | Cyberpunk cyan/purple — tema por defecto |
-| **H4k3r-HTB** | HackTheBox green, compact pill-right |
-| **Matrix-Hacker** | Matrix green rain aesthetic |
-| **Jan-CyberPunk** | CyberPunk magenta, floating pills |
-| **Janis-CyberMagenta** | Magenta vibrante |
-| **s4vitar-darkness** | Doble barra oscura — tributo a s4vitar |
-| **Emilia-TokyoNight** | Tokyo Night blue/purple |
-| **Marisol-Dracula** | Dracula purple |
-| **Isabel-Frappe** | Catppuccin Frappé |
-| **Daniela-Catppuccin** | Catppuccin Mocha |
-| **Melissa-Nord** | Nord minimalista |
-| **Silvia-Gruvbox** | Gruvbox warm |
-| **Brenda-Everforest** | Everforest green |
-| **Karla-ZombieNight** | ZombieNight dark |
-| **Zombie-Decay** | Decay oscuro |
-| **Pamela-Lovelace** | Lovelace pastel |
-| **Varinka-Mono** | Monochrome, módulos en caja |
-| **Yael-OxoCarbon** | OxoCarbon fullwidth slim |
-| **Anubis-Death** | Death black/red |
-| **Isis-Magic** | Magic purple/gold |
-| **Ra-Solar** | Solar orange/gold |
-
----
-
-## 🖼️ Galería de Escritorios
-
-> Cambia entre temas en tiempo real con `Super+Alt+T` (selector visual con thumbnails)
-
-| | | |
-|:---:|:---:|:---:|
-| ![Horus-Cyber](dotfiles/waybar/themes/Horus-Cyber/preview.png) | ![H4k3r-HTB](dotfiles/waybar/themes/H4k3r-HTB/preview.png) | ![Matrix-Hacker](dotfiles/waybar/themes/Matrix-Hacker/preview.png) |
-| **Horus-Cyber** | **H4k3r-HTB** | **Matrix-Hacker** |
-| ![Jan-CyberPunk](dotfiles/waybar/themes/Jan-CyberPunk/preview.png) | ![Janis-CyberMagenta](dotfiles/waybar/themes/Janis-CyberMagenta/preview.png) | ![s4vitar-darkness](dotfiles/waybar/themes/s4vitar-darkness/preview.png) |
-| **Jan-CyberPunk** | **Janis-CyberMagenta** | **s4vitar-darkness** |
-| ![Emilia-TokyoNight](dotfiles/waybar/themes/Emilia-TokyoNight/preview.png) | ![Marisol-Dracula](dotfiles/waybar/themes/Marisol-Dracula/preview.png) | ![Isabel-Frappe](dotfiles/waybar/themes/Isabel-Frappe/preview.png) |
-| **Emilia-TokyoNight** | **Marisol-Dracula** | **Isabel-Frappe** |
-| ![Daniela-Catppuccin](dotfiles/waybar/themes/Daniela-Catppuccin/preview.png) | ![Melissa-Nord](dotfiles/waybar/themes/Melissa-Nord/preview.png) | ![Silvia-Gruvbox](dotfiles/waybar/themes/Silvia-Gruvbox/preview.png) |
-| **Daniela-Catppuccin** | **Melissa-Nord** | **Silvia-Gruvbox** |
-| ![Brenda-Everforest](dotfiles/waybar/themes/Brenda-Everforest/preview.png) | ![Karla-ZombieNight](dotfiles/waybar/themes/Karla-ZombieNight/preview.png) | ![Zombie-Decay](dotfiles/waybar/themes/Zombie-Decay/preview.png) |
-| **Brenda-Everforest** | **Karla-ZombieNight** | **Zombie-Decay** |
-| ![Pamela-Lovelace](dotfiles/waybar/themes/Pamela-Lovelace/preview.png) | ![Varinka-Mono](dotfiles/waybar/themes/Varinka-Mono/preview.png) | ![Yael-OxoCarbon](dotfiles/waybar/themes/Yael-OxoCarbon/preview.png) |
-| **Pamela-Lovelace** | **Varinka-Mono** | **Yael-OxoCarbon** |
-| ![Anubis-Death](dotfiles/waybar/themes/Anubis-Death/preview.png) | ![Isis-Magic](dotfiles/waybar/themes/Isis-Magic/preview.png) | ![Ra-Solar](dotfiles/waybar/themes/Ra-Solar/preview.png) |
-| **Anubis-Death** | **Isis-Magic** | **Ra-Solar** |
-
----
-
-## 💻 Requisitos del Sistema
-
-| Componente | Mínimo | Recomendado |
-|-----------|--------|-------------|
-| **CPU** | Dual Core 64-bit | Quad Core+ |
-| **RAM** | 4 GB | 16 GB+ |
-| **Almacenamiento** | 20 GB SSD | 100 GB NVMe |
-| **GPU** | Integrada | AMD/NVIDIA dedicada |
-| **Red** | WiFi/Ethernet | Ethernet cableado |
-| **Modo de arranque** | UEFI (recomendado) o BIOS | UEFI |
-
----
-
-## 🚀 Instalación Rápida
-
-### Desde la LiveCD de Arch Linux
-
-```bash
-# Opción 1: URL corta
-curl -L http://is.gd/blackice | bash
-
-# Opción 2: URL alternativa
-curl -L https://cutt.ly/blackice | bash
-
-# Opción 3: URL completa
-curl -L https://raw.githubusercontent.com/panxos/BLACK-ICE-HYPER_ARCH/main/bootstrap.sh | bash
-```
-
-El bootstrap hace automáticamente:
-1. Verificar conexión a Internet y entorno Arch
-2. Instalar git
-3. Clonar el repositorio en `/tmp/black-ice-arch`
-4. Configurar permisos
-5. Lanzar `install.sh` interactivo
-
----
-
-## 📦 Instalación Manual
-
-### Fase 1 — Desde la LiveCD (como root)
-
-```bash
-# Conectar a internet (WiFi)
-iwctl
-station wlan0 connect "TU_RED"
-exit
-
-# Clonar e instalar
-pacman -Sy git
-git clone https://github.com/panxos/BLACK-ICE-HYPER_ARCH.git BLACK-ICE_ARCH
-cd BLACK-ICE_ARCH
-chmod +x install.sh
-./install.sh
-```
-
-El instalador guía por: disco → cifrado LUKS → filesystem → kernel → locale → usuario → bootloader.
-
-### Fase 2 — Después del primer reboot (como usuario normal)
-
-```bash
-cd ~/BLACK-ICE_ARCH
-./deploy_hyprland.sh
-```
-
-El deploy instala: repositorios AUR → Hyprland + desktop → herramientas de seguridad → terminal/shell → temas → software opcional → SDDM → Neovim → IA CLIs → dotfiles.
-
----
-
-## 🔧 Configuración Desatendida
-
-Copia `config/install.conf.example` a `config/install.conf` y ajusta las variables:
-
-```bash
-TARGET_DISK=sda          # Disco destino (sin /dev/)
-ENABLE_LUKS=yes          # Cifrado LUKS2
-FILESYSTEM=btrfs         # btrfs | ext4 | xfs | f2fs
-KERNEL=linux             # linux | linux-zen | linux-hardened
-USERNAME=usuario         # Nombre de usuario
-TIMEZONE=America/Santiago
-AUTO_MODE=true           # Omitir todas las preguntas interactivas
-```
-
----
-
-## 🔄 Actualización del Sistema
-
-BLACK-ICE ARCH incluye comandos dedicados para mantener el sistema actualizado **sin necesidad de reinstalar**.
-
-> **Nota:** Muchos usuarios eliminan el directorio del proyecto después de instalar. Si ese es tu caso, empieza por el **Paso 1**. Si aún tienes el repo en `~/BLACK-ICE_ARCH`, salta directo al **Paso 2**.
-
-### Paso 1 — Clonar (o re-clonar) el repositorio
-
-```bash
-git clone https://github.com/panxos/BLACK-ICE-HYPER_ARCH.git ~/BLACK-ICE_ARCH
-```
-
-### Paso 2 — Actualizar dotfiles y configuraciones
-
-```bash
-bash ~/BLACK-ICE_ARCH/dotfiles/bin/dotfiles-update
-```
-
-> **¿Por qué no `dotfiles-update` directamente?** El comando corto solo existe en `~/.local/bin/` después de haber corrido `deploy_hyprland.sh`. Si instalaste con una versión anterior del proyecto o borraste el entorno, usa siempre el path completo de arriba — funciona en cualquier caso. El mismo script copia los binarios a `~/.local/bin/`, así que en futuras ejecuciones ya podrás usar `dotfiles-update` sin path.
-
-Este comando hace todo automáticamente:
-1. Descarga los últimos cambios del repositorio (`git pull`)
-2. Crea un **snapshot de respaldo** antes de aplicar cualquier cambio
-3. Re-crea todos los symlinks (Hyprland, Waybar, Kitty, Wofi, etc.)
-4. Recarga los servicios afectados (Waybar, Hyprland, SwayNC)
-
-### Paso 3 — Actualizar paquetes del sistema
-
-```bash
-paru -Syu
-```
-
-### Opciones avanzadas
-
-```bash
-dotfiles-update --dry-run    # Ver qué cambiaría sin aplicarlo
-dotfiles-update --no-restart # Aplicar cambios sin recargar servicios
-dotfiles-update --no-backup  # Aplicar sin crear snapshot previo
-```
-
-### Revertir a configuración anterior
-
-Si algo se rompe después de actualizar:
-
-```bash
-dotfiles-rollback
-```
-
-Muestra un menú con los últimos 5 snapshots para restaurar sin internet ni reinstalación.
-
-### Resumen rápido
-
-| Situación | Comando |
-|-----------|---------|
-| Re-clonar repositorio (repo eliminado) | `git clone https://github.com/panxos/BLACK-ICE-HYPER_ARCH.git ~/BLACK-ICE_ARCH` |
-| Nueva versión del proyecto publicada | `dotfiles-update` |
-| Algo se rompió después de un update | `dotfiles-rollback` |
-| Actualizaciones regulares del sistema | `paru -Syu` |
-
----
-
-## ⌨️ Atajos de Teclado
-
-### Ventanas y Sistema
-
-| Atajo | Acción |
-|-------|--------|
-| `Super + Enter` | Terminal (Kitty) |
-| `Super + D` | Lanzador de apps (Wofi) |
-| `Super + Q` | Cerrar ventana |
-| `Super + M` | Salir de Hyprland |
-| `Super + L` | Bloquear pantalla (Hyprlock) |
-| `Super + V` | Toggle flotante |
-| `Super + F` | Fullscreen |
-| `Super + H` | Portapapeles (cliphist) |
-
-### Aplicaciones
-
-| Atajo | Acción |
-|-------|--------|
-| `Super + Shift + B` | Brave Browser |
-| `Super + Shift + F` | Firefox |
-| `Super + E` | Kate Editor |
-| `Super + Shift + D` | Dolphin (archivos) |
-| `Super + Shift + K` | KeePassXC |
-| `Super + Shift + M` | Music Player (ncmpcpp) |
-| `Super + Shift + N` | Eww Music Widget toggle |
-
-### Herramientas BLACK-ICE
-
-| Atajo | Acción |
-|-------|--------|
-| `Super + I` | Cheat Sheet interactivo (overlay) |
-| `Super + Tab` | App Switcher (ventanas abiertas) |
-| `Super + Shift + X` | Pass Menu (KeePassXC CLI) |
-| `Super + Ctrl + Enter` | Terminal Manager (sesiones multi-tab) |
-| `Super + Shift + P` | Menú de perfil de energía |
-
-### Personalización
-
-| Atajo | Acción |
-|-------|--------|
-| `Super + Alt + T` | Selector de tema Waybar (con thumbnails) |
-| `Super + Alt + W` | Selector visual de wallpapers |
-| `Super + Alt + R` | Selector de estilo Wofi |
-| `Super + Alt + F` | Toggle WiFi |
-
-### Capturas de Pantalla
-
-| Atajo | Acción |
-|-------|--------|
-| `Print` | Región → Swappy (editor) |
-| `Shift + Print` | Pantalla completa → portapapeles |
-| `Super + Print` | Región → `~/Pictures/Screenshots/` |
-| `Ctrl + Print` | Pantalla completa → `~/Pictures/Screenshots/` |
-
-### Multimedia
-
-| Atajo | Acción |
-|-------|--------|
-| `F10 / XF86AudioPlay` | Play/Pause (playerctl) |
-| `F11 / XF86AudioStop` | Stop |
-| `F4 / XF86AudioMicMute` | Mute micrófono (wpctl, PipeWire nativo) |
-| `XF86AudioRaiseVolume` | Volumen + (SwayOSD) |
-| `XF86AudioLowerVolume` | Volumen - (SwayOSD) |
-| `XF86MonBrightnessUp/Down` | Brillo ± (SwayOSD) |
-
-**[Cheat Sheet completo](docs/KEYBOARD_SHORTCUTS.md)**
-
----
-
-## 🎨 Personalización
-
-### Cambiar Tema Waybar
-
-```bash
-# Selector visual con thumbnails
-Super + Alt + T
-
-# Script directo
-~/.local/bin/theme_selector
-```
-
-El selector actualiza en tiempo real: Waybar, borde Hyprland, colores Hyprlock y paleta Kitty.
-
-### Cambiar Wallpaper
-
-```bash
-# Selector visual waypaper
-Super + Alt + W
-
-# Script directo
-~/.local/bin/wallpaper_visual
-
-# Descargar wallpapers de gh0stzk
-~/.local/bin/gh0stzk-walls --all
-~/.local/bin/gh0stzk-walls --theme Horus-Cyber
-~/.local/bin/gh0stzk-walls --list
-```
-
-### Estilos Wofi
-
-```bash
-Super + Alt + R   # Selector entre 4 estilos: default, minimal, fullscreen, grid
-```
-
----
-
-## 🔧 Solución de Problemas
-
-**Waybar no carga o da errores:**
-```bash
-killall waybar; sleep 1 && waybar &
-journalctl --user -u waybar -n 50
-```
-
-**paru roto tras actualización del sistema:**
-```bash
-sudo pacman -Rns paru paru-bin 2>/dev/null
-sudo pacman -S paru  # reinstala desde chaotic-aur
-```
-
-**SDDM no inicia:**
-```bash
-sudo systemctl enable --now sddm
-```
-
-**Plymouth no activa en el boot:**
-```bash
-grep "plymouth" /etc/mkinitcpio.conf  # debe aparecer en HOOKS
-sudo mkinitcpio -P                     # regenerar initramfs
-```
-
-**Teclado incorrecto en prompt LUKS:**
-```bash
-cat /etc/vconsole.conf  # verifica KEYMAP=<tu_layout>
-sudo mkinitcpio -P      # regenerar initramfs con el keymap correcto
-```
-
-**Música no reproduce (MPD):**
-```bash
-systemctl --user status mpd
-systemctl --user enable --now mpd
-```
-
----
-
-## 📁 Estructura del Repositorio
-
-```
-BLACK-ICE_ARCH/
-├── install.sh              # Punto de entrada Fase 1 (LiveCD root)
-├── deploy_hyprland.sh      # Punto de entrada Fase 2 (usuario normal)
-├── bootstrap.sh            # One-liner curl | bash
-├── config/
-│   └── install.conf.example
-├── src/
-│   ├── lib/
-│   │   ├── colors.sh       # Variables ANSI de color
-│   │   ├── logging.sh      # log_info/warn/error/success, banner
-│   │   └── utils.sh        # check_root, retry_command, safe_install
-│   ├── modules/            # Fase 1: 00_environment → 99_final
-│   └── deploy/             # Fase 2: 00_repositories → 99_finalization
-├── dotfiles/
-│   ├── hypr/               # hyprland.conf, hyprlock.conf, monitors.conf
-│   ├── waybar/             # config.jsonc, style.css, themes/ (21 temas)
-│   ├── kitty/              # kitty.conf, themes/ (21 esquemas)
-│   ├── wofi/               # config, styles/ (4 estilos)
-│   ├── swaync/             # config.json, style.css
-│   ├── wlogout/            # layout, style.css
-│   └── bin/                # Scripts: theme_selector, wallpaper_visual, etc.
-├── tests/
-│   ├── pre-install-check.sh
-│   └── post-install-validate.sh
-└── docs/
-    ├── ARCHITECTURE.md
-    ├── SECURITY.md
-    ├── MODULES.md
-    ├── TOOLS_CATALOG.md
-    ├── KEYBOARD_SHORTCUTS.md
-    └── BLACK-ICE_CheatSheet.md
-```
-
----
-
-## 📚 Documentación
-
-| Documento | Descripción |
-|-----------|-------------|
-| **[CHANGELOG.md](CHANGELOG.md)** | Historial de versiones |
-| **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)** | Arquitectura del sistema |
-| **[docs/SECURITY.md](docs/SECURITY.md)** | Análisis de seguridad y hardening |
-| **[docs/MODULES.md](docs/MODULES.md)** | Documentación de módulos |
-| **[docs/TOOLS_CATALOG.md](docs/TOOLS_CATALOG.md)** | Catálogo completo de herramientas |
-| **[docs/KEYBOARD_SHORTCUTS.md](docs/KEYBOARD_SHORTCUTS.md)** | Referencia completa de atajos |
-| **[docs/BLACK-ICE_CheatSheet.md](docs/BLACK-ICE_CheatSheet.md)** | Cheat Sheet imprimible |
-| **[CREDITS.md](CREDITS.md)** | Créditos y agradecimientos |
-
----
-
-## 🙏 Créditos
-
-- **[s4vitar](https://www.youtube.com/@s4vitar)** — Inspiración principal en workflow, estética de terminal y cultura de pentesting profesional. El tema `s4vitar-darkness` es un tributo directo a su icónico setup de doble barra.
-- **[gh0stzk](https://github.com/gh0stzk/dotfiles)** — Inspiración para los temas Jan-CyberPunk, Emilia-TokyoNight, Marisol-Dracula y Melissa-Nord. Script `gh0stzk-walls` integrado con crédito explícito.
-- **[VandalByte](https://github.com/VandalByte/dedsec-grub2-theme)** — Tema GRUB2 DedSec (GPL-3.0).
-- [Hyprland](https://hyprland.org/) — Compositor Wayland de próxima generación.
-- [Arch Linux](https://archlinux.org/) — La distribución Linux de referencia.
-- [Sweet Theme](https://github.com/EliverLara/Sweet) — Tema GTK Sweet-Dark.
-
-> Créditos completos: ver [CREDITS.md](CREDITS.md)
-
----
-
-## 🗺️ Roadmap
-
-| Feature | Estado | Versión estimada |
-|---------|--------|------------------|
-| Detección de RAM/vCPU y ajuste de swappiness, vm.dirty_ratio, zram | 🔜 Planificado | v3.8.0 |
-| Detección de protocolo gráfico (SPICE vs VNC) y configuración óptima por tipo | 🔜 Planificado | v3.8.0 |
-| Soporte Clevis + Tang para desbloqueo LUKS automático en red | 🔜 Planificado | v3.8.0 |
-| Perfil de energía adaptativo según tipo de VM (baja latencia vs eficiencia) | 💡 Idea | v3.9.0 |
-| Dashboard de instalación TUI (ncurses) con barra de progreso real | 💡 Idea | v3.9.0 |
-
----
-
-## 📄 Licencia
-
-MIT License — ver [LICENSE](LICENSE)
-
----
-
-## 👤 Autor
-
-**Francisco Aravena (P4nX0Z)**
-
-- Analista de Ciberseguridad | 15+ años en TI y seguridad
-- 🌐 [soporteinfo.net](https://www.soporteinfo.net)
-- 💼 [linkedin.com/in/faravena](https://www.linkedin.com/in/faravena/)
-- 📺 [youtube.com/@Soporteinfo](https://www.youtube.com/@Soporteinfo)
-- 🐙 [github.com/panxos](https://github.com/panxos)
-
----
+BLACK-ICE instala Arch Linux y prepara un escritorio Hyprland con temas, aplicaciones de seguridad y herramientas de administración. Puedes instalar el sistema completo desde una ISO o desplegar el escritorio sobre Arch existente.
+
+Este README describe cambios locales en validación. Clonar la rama remota entrega únicamente lo publicado; no garantiza obtener este candidato.
+
+## Elige tu recorrido
+
+| Quiero… | Empieza aquí |
+|---|---|
+| Instalar desde un disco vacío | [Instalación](docs/INSTALLER_V4.md) |
+| Desplegar el escritorio sobre Arch | [Guía completa](docs/GUIDE.md#instalar-y-reanudar) |
+| Personalizar sin perder mis ajustes | [Temas y perfiles](docs/GUIDE.md#temas-y-perfiles) |
+| Elegir español o inglés | [Idioma](docs/LANGUAGE.md) |
+| Usar mis aplicaciones mediante Tor | [Tor del sistema](docs/SECURITY_WORKSPACE.md#tor-del-sistema) |
+| Crear laboratorios o casos | [Seguridad y práctica](docs/GUIDE.md#laboratorios-y-casos) |
+| Revisar todo lo que falta | [Pendientes y criterios de cierre](docs/PENDING.md) |
+
+## Un escritorio, muchas identidades
+
+| Mr-Robot | Condor Noir | FBI · Fieldwork |
+|---|---|---|
+| ![Mr-Robot](docs/images/themes/Mr-Robot.webp) | ![Condor Noir](docs/images/themes/Kevin-Mitnick-Condor-Noir.webp) | ![FBI](docs/images/themes/FBI-Fieldwork.webp) |
+| Matrix · Hacker | Civic SI · Mugen | MK11 · SubZero |
+| ![Matrix](docs/images/themes/Matrix-Hacker.webp) | ![Civic](docs/images/themes/Civic-Si-Mugen.webp) | ![SubZero](docs/images/themes/MK11-SubZero.webp) |
+
+Cada tema coordina Waybar, Conky, Kitty, lanzador, menús y notificaciones. Los nombres propios permanecen al cambiar de idioma. [Explora los 54 temas](docs/THEMES.md).
 
 <div align="center">
-
-**⭐ Si te gusta el proyecto, dale una estrella en GitHub ⭐**
-
-**[🇬🇧 Read in English](README.en.md)**
-
-Hecho con ❤️ para la Comunidad de Ciberseguridad
-
+<img src="docs/images/showcase/theme-studio-mr-robot.png" alt="Estudio de temas de BLACK-ICE con vista previa del escritorio Mr-Robot" width="100%">
+<sub>Theme Studio: organiza módulos, barras y espacios de trabajo; los cambios se aplican solo al guardar.</sub>
 </div>
+
+| Componente | Qué puedes hacer |
+|---|---|
+| Control | Ajustar audio, brillo, red, energía, apariencia y sesión |
+| Estudio | Guardar perfiles `User-*`, ordenar módulos y ajustar barras, fuentes y colores |
+| Conky | Elegir entre 20 estilos y una, varias o todas las pantallas |
+| Lanzador | Cabecera panorámica, lista compacta, mosaicos o Wofi |
+| Monitores | Fondos individuales, panoramas por fila o una escena compartida |
+| Ayuda F1 | Buscar los bindings realmente cargados por la sesión |
+
+La galería usa capturas Waybar aisladas con datos de demostración. Los recursos UHD incluyen reescalados: sus dimensiones no equivalen a detalle nativo 4K. [Procedencia y método](docs/WALLPAPER_UHD.md).
+
+El Estudio es un configurador sencillo. El diseñador universal de Hyprland queda como proyecto independiente futuro. Al aplicar un tema con seguimiento de SDDM, el acceso adopta su paleta y fondo para el próximo inicio de sesión. Guardar un perfil por sí solo no cambia SDDM. Hyprlock también tiene controles propios.
+
+## Español e inglés
+
+**Control → Sistema → Idioma** guarda la elección para los controles del escritorio, independientemente del tema. También puedes usar:
+
+```bash
+black-ice-language set es
+black-ice-language set en
+```
+
+Control, Estudio, galerías y paneles del sistema usan traducciones compartidas. La revisión visual todavía encontró rótulos pendientes en Control y Conky. Los datos que escribes, nombres de perfiles e identificadores conservan su valor. SDDM Obsidiana ofrece una elección propia antes del acceso. Los programas externos gestionan sus traducciones y pueden necesitar reinicio o configuración de locale. [Cobertura y pruebas](docs/LANGUAGE.md).
+
+## Instalar en dos fases
+
+Necesitas acceso a repositorios, hardware compatible con Hyprland y un disco de destino revisado. Usa la ISO oficial de Arch para el sistema base y un usuario normal con sudo para el escritorio.
+
+```bash
+git clone https://github.com/panxos/BLACK-ICE-HYPER_ARCH.git BLACK-ICE_ARCH
+cd BLACK-ICE_ARCH
+```
+
+| Fase | Comando | Resultado |
+|---|---|---|
+| Base, desde la ISO | `sudo bash install.sh` | Disco, Btrfs/ext4, LUKS opcional, usuario, red y arranque |
+| Escritorio, después del reinicio | `bash deploy_hyprland.sh` | Hyprland, aplicaciones elegidas, dotfiles y servicios |
+
+**La fase base puede particionar y formatear el disco elegido.** Revisa [la configuración de ejemplo](config/install.conf.example) y [la guía](docs/INSTALLER_V4.md). La autorización de borrado identifica el disco exacto.
+
+Revisa la selección de software antes de instalar:
+
+```bash
+bash deploy_hyprland.sh --dry-run --profile pentest
+python3 scripts/select-apps.py --ui auto --output ~/.local/state/black-ice/apps-plan.json
+bash deploy_hyprland.sh --dry-run --plan ~/.local/state/black-ice/apps-plan.json
+```
+
+Ejecuta el último comando sin `--dry-run` cuando hayas revisado el plan. Hay **143 aplicaciones en 20 grupos** y perfiles `minimal`, `desktop`, `pentest` y `full`. Cancelar omite el software opcional. AUR requiere revisión; no se compila como root.
+
+`install.sh --resume` y `deploy_hyprland.sh --resume` comprueban destino, configuración y resultados. Reanudar no autoriza repetir el particionado. [Instalador](docs/INSTALLER_V4.md) · [Repositorios y autorización](docs/REPOSITORY_RECOVERY.md).
+
+## Tor para tus aplicaciones instaladas
+
+El módulo **○ Tor / ● Tor** es pequeño y hereda la apariencia de cada tema. Un clic solicita activarlo o apagarlo; el clic derecho abre controles. **Control → Sistema → Seguridad** permite apagar Tor y ocultar el indicador. Ocultarlo no detiene la conexión.
+
+Un cliente Tor dedicado y una tabla nftables independiente redirigen las conexiones TCP IPv4 normales y el DNS IPv4. **Puedes usar Kitty, Konsole u otra terminal con tus herramientas instaladas. No necesitas una consola especial ni anteponer proxychains.**
+
+| Mientras Tor está activo | Comportamiento |
+|---|---|
+| TCP IPv4 local | Redirección transparente mediante Tor |
+| DNS IPv4 UDP | Redirección al resolvedor Tor |
+| IPv6 y UDP restante, incluido QUIC | Bloqueados |
+| Tráfico reenviado por puentes de invitados | Bloqueado |
+| Loopback y DHCP IPv4 de broadcast | Excepciones locales explícitas |
+| Tor detenido o verificación fallida | El filtro permanece; no vuelve automáticamente a salida directa |
+
+```bash
+black-ice-privacy status
+black-ice-privacy enable
+curl --noproxy '*' https://check.torproject.org/api/ip
+black-ice-privacy disable
+```
+
+Activar requiere autorización administrativa. El estado activo comprueba reglas, servicio y salida real de una conexión normal. Activar o desactivar Tor no abre ninguna consola especial; usa las terminales y aplicaciones habituales, y apaga Tor desde el mismo control.
+
+Tor no transporta todos los protocolos ni evita que una aplicación revele identificadores, inicios de sesión o características del navegador. No protege ante root comprometido ni sustituye Tor Browser. VPN, videollamadas y herramientas UDP/ICMP/raw pueden dejar de funcionar. [Manual Tor](https://man.archlinux.org/man/tor.1.en) · [Instalación, emergencia y límites](docs/SECURITY_WORKSPACE.md).
+
+## Software, recuperación y práctica
+
+**Control → Sistema** reúne cinco páginas:
+
+- **Software:** selección, origen, cola persistente, errores y reintentos mediante un helper limitado al catálogo.
+- **Actualizaciones:** snapshots Btrfs y copia de `/boot`/ESP. Crear un punto no acredita recuperación; hay que restaurarlo offline y arrancar.
+- **Proyectos/VPN:** objetivos independientes y UUID de NetworkManager, sin guardar contraseñas en perfiles.
+- **Laboratorios:** Alpine, Debian, VM Alpine live, Juice Shop y WebGoat desde fuentes oficiales, con presupuesto agregado.
+- **Seguridad:** Tor, forense opcional, alcance de casos, notas privadas, evidencias SHA-256 y resumen saneado.
+
+Las plantillas son offline o publican únicamente en localhost; no montan carpetas personales. La caché se controla durante preparación y no equivale a una cuota física continua. Los vencimientos apagan recursos registrados sin borrar datos. El aislamiento no está validado para malware.
+
+[Guía completa](docs/GUIDE.md) · [Gestores](docs/SYSTEM_MANAGER.md) · [Laboratorios](docs/LABORATORIES.md)
+
+## Atajos para empezar
+
+| Tecla | Acción |
+|---|---|
+| Super / Super+D | Lanzador |
+| Super+Enter | Kitty |
+| Super+Alt+T / Super+Alt+W | Apariencia / fondos |
+| F1 / Super+I | Ayuda de los atajos activos |
+| Super+1…5 | Escritorio local del monitor enfocado |
+| Super+Alt+1…5 | Enviar ventana al escritorio local |
+| Super+F8 / Super+Shift+F8 | Conky / galería Conky |
+| Super+L | Bloquear |
+
+Los bindings personales pueden variar. [Referencia de teclas](docs/KEYBOARD_SHORTCUTS.md).
+
+## Actualizar y revertir
+
+Desde una copia revisada, inspecciona el plan:
+
+```bash
+bash dotfiles/bin/dotfiles-update --no-pull --dry-run
+bash dotfiles/bin/dotfiles-update --no-pull
+```
+
+Los instaladores visuales conservan preferencias mediante manifiestos y reversión. [Actualiza los controles nuevos](docs/SECURITY_WORKSPACE.md#actualizar-los-controles) o revisa [la migración Lua](docs/HYPRLAND_LUA_MIGRATION.md) antes del siguiente acceso. Revertir dotfiles y recuperar todo el sistema son mecanismos diferentes.
+
+## Estado de validación
+
+Hay evidencia de instalación UEFI/Btrfs sin cifrado en KVM, reanudación, acceso SDDM/Hyprland y recuperación offline seguida de arranque. Tor del sistema comprobó conexión normal, DNS, caída, bloqueo UDP/IPv6 y tráfico reenviado, apagado y recuperación de conectividad.
+
+Siguen abiertos BIOS/ext4/LUKS, fallos dentro de transacciones, pruebas físicas de pantallas/energía/USB, rendimiento comparable y redistribución de recursos. CI tiene definición local; falta su primera ejecución remota. **No hay release hasta cerrar los bloqueos.**
+
+[Todos los pendientes](docs/PENDING.md) · [Validación](docs/AUDIT_REPORT.md) · [Roadmap](docs/ROADMAP_SYSTEM_V4.md)
+
+## Desarrollo
+
+```bash
+bash scripts/check-project.sh
+python3 scripts/check-distribution.py
+```
+
+| Ruta | Responsabilidad |
+|---|---|
+| `src/modules/`, `src/deploy/` | Instalación base y escritorio |
+| `src/lib/`, `src/system/` | Utilidades y gestores |
+| `dotfiles/` | Escritorio, controles y servicios |
+| `config/` | Aplicaciones, idiomas, energía, Tor y exclusiones |
+| `assets/` | Fondos, fuentes, iconos y accesos |
+| `scripts/`, `tests/` | Generación y validación |
+| `docs/` | Guías, galería y estado |
+
+[Arquitectura](docs/ARCHITECTURE.md) · [Contribuir](docs/CONTRIBUTING.md) · [Cambios](CHANGELOG.md)
+
+## Autoría y recursos
+
+**Francisco Aravena · P4NX0Z** · [soporteinfo.net](https://soporteinfo.net)
+
+[Créditos y procedencia](CREDITS.md). Los componentes externos conservan licencias y marcas. La licencia general y permisos pendientes de redistribución deben resolverse antes de publicar el candidato. Configuraciones privadas, contraseñas, registros y evidencias quedan excluidos de Git y de la distribución.

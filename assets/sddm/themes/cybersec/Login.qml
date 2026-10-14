@@ -7,6 +7,8 @@ Item {
     id: loginPanel
     width: 500
     height: 600
+    property string interfaceLanguage: config.language || "es"
+    function tr(spanish, english) { return interfaceLanguage === "en" ? english : spanish; }
     
     property var userModel: userModel
     property var sessionModel: sessionModel
@@ -36,7 +38,7 @@ Item {
         // Identification Header
         Text {
             Layout.alignment: Qt.AlignHCenter
-            text: "SYSTEM IDENTITY VERIFICATION"
+            text: loginPanel.tr("INICIAR SESIÓN", "SIGN IN")
             color: "#00f3ff"
             font.family: "JetBrains Mono"
             font.pixelSize: 12
@@ -106,7 +108,7 @@ Item {
             CustomTextField {
                 id: passwordField
                 Layout.fillWidth: true
-                placeholderText: "ROOT_ACCESS_CODE"
+                placeholderText: loginPanel.tr("CONTRASEÑA", "PASSWORD")
                 echoMode: TextInput.Password
                 font.pixelSize: 18
                 onAccepted: loginPanel.login(userModel.lastUser, passwordField.text, sessionList.currentIndex)
@@ -148,7 +150,7 @@ Item {
         }
 
         CustomButton {
-            text: "EXECUTE_LOGIN"
+            text: loginPanel.tr("ENTRAR", "SIGN IN")
             Layout.fillWidth: true
             Layout.preferredHeight: 55
             glowColor: "#00f3ff"
@@ -157,7 +159,7 @@ Item {
         
         Text {
             Layout.alignment: Qt.AlignHCenter
-            text: "SECURE ENCLAVE ACTIVE // ENCRYPTION AES-512"
+            text: loginPanel.tr("ACCESO AL ESCRITORIO", "DESKTOP SIGN-IN")
             color: "#55ffffff"
             font.family: "JetBrains Mono"
             font.pixelSize: 9
@@ -171,13 +173,13 @@ Item {
         spacing: 40
 
         CustomButton {
-            text: "OFF"
+            text: loginPanel.tr("APAGAR", "OFF")
             Layout.preferredWidth: 80; Layout.preferredHeight: 30
             glowColor: "#ff0044"
             onClicked: sddm.powerOff()
         }
         CustomButton {
-            text: "REBT"
+            text: loginPanel.tr("REINICIAR", "REBOOT")
             Layout.preferredWidth: 80; Layout.preferredHeight: 30
             glowColor: "#ffcc00"
             onClicked: sddm.reboot()

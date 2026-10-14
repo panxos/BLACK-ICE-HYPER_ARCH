@@ -3,7 +3,7 @@
 # Author: Francisco Aravena (P4nX0Z)
 # Modified: 2026-02-11 — Fix: Detección completa de hardware, lm_sensors, perfiles de energía
 
-banner "PASO 6" "Optimización de Energía y Rendimiento"
+install_stage 6 'Energía y rendimiento'
 
 # --- Detección de hardware (VM/Desktop/Laptop) ---
 # detect_power_profile() — Detecta tipo de dispositivo y asigna perfil inicial
@@ -114,6 +114,12 @@ DISK_APM_LEVEL_ON_BAT="128 128"
 SATA_LINKPWR_ON_AC="max_performance"
 SATA_LINKPWR_ON_BAT="min_power"
 EOF
+
+        POWER_HELPER="$(dirname "${BASH_SOURCE[0]}")/../../dotfiles/bin/power_profile"
+        bash "$POWER_HELPER" --print-config > /mnt/etc/tlp.d/90-black-ice-auto.conf
+        mkdir -p /mnt/etc/systemd/logind.conf.d
+        cp "$(dirname "${BASH_SOURCE[0]}")/../../config/power/90-black-ice-laptop.conf" \
+            /mnt/etc/systemd/logind.conf.d/90-black-ice-laptop.conf
 
         # Habilitar TLP y enmascarar conflictos
         arch-chroot /mnt systemctl enable tlp.service

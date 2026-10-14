@@ -3,6 +3,7 @@
 
 # --- HARDWARE & DISK ---
 TARGET_DISK="nvme0n1"              # Target disk (nvme0n1, sda, vda, etc.)
+CONFIRM_ERASE=""                  # Set exact /dev/path only after reviewing the disk; empty refuses erasure
 ENABLE_LUKS="yes"                  # Enable full disk encryption
 LUKS_PASSWORD="YourSecurePassword" # LUKS encryption password
 FILESYSTEM="btrfs"                 # Filesystem: btrfs, ext4, xfs, f2fs

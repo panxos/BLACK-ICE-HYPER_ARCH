@@ -1,0 +1,68 @@
+#!/usr/bin/env python3
+"""Órdenes de escritorio compatibles con Hyprlang y Lua."""
+import argparse
+import json
+import re
+import subprocess
+import sys
+
+
+def quote(value):
+    if any(ord(char) < 32 for char in value):
+        raise ValueError("La orden contiene caracteres de control")
+    return json.dumps(value, ensure_ascii=False)
+
+
+def expression(action, argument):
+    value = quote(argument)
+    if action == "exec":
+        return f"hl.exec_cmd({value})"
+    if action in {"focusmonitor", "focuswindow", "workspace"}:
+        key = {"focusmonitor": "monitor", "focuswindow": "window", "workspace": "workspace"}[action]
+        return f"hl.dispatch(hl.dsp.focus({{{key}={value}}}))"
+    if action == "exit":
+        return "hl.dispatch(hl.dsp.exit())"
+    if action == "dpms":
+        if argument not in {"on", "off"}:
+            raise ValueError("Estado DPMS no válido")
+        return f'hl.dispatch(hl.dsp.dpms({{action="{"enable" if argument == "on" else "disable"}"}}))'
+    if action == "setfloating":
+        return f'hl.dispatch(hl.dsp.window.float({{window={value},action="set"}}))'
+    if action in {"resizewindowpixel", "movewindowpixel"}:
+        match = re.fullmatch(r"exact (-?\d+) (-?\d+),(address:0x[0-9a-fA-F]+)", argument)
+        if not match:
+            raise ValueError("Geometría o dirección de ventana no válida")
+        x, y, window = match.groups()
+        method = "resize" if action == "resizewindowpixel" else "move"
+        return f"hl.dispatch(hl.dsp.window.{method}({{window={quote(window)},x={int(x)},y={int(y)},relative=false}}))"
+    raise ValueError("Acción no admitida")
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("action", choices=["exec", "focusmonitor", "focuswindow", "workspace", "exit", "dpms", "setfloating", "resizewindowpixel", "movewindowpixel"])
+    parser.add_argument("argument", nargs="?", default="")
+    args = parser.parse_args()
+    try:
+        code = expression(args.action, args.argument)
+        status = subprocess.run(["hyprctl", "status"], capture_output=True, text=True, timeout=4, check=False)
+        if re.search(r"configProvider:\s*lua\b", status.stdout):
+            command = ["hyprctl", "eval", code]
+        else:
+            command = ["hyprctl", "dispatch", args.action]
+            if args.argument:
+                command.append(args.argument)
+        result = subprocess.run(command, timeout=8, check=False, capture_output=True, text=True)
+        if result.stdout:
+            print(result.stdout, end="")
+        if result.stderr:
+            print(result.stderr, end="", file=sys.stderr)
+        ipc_failed = any(message in result.stdout + result.stderr for message in
+                         ("IPC didn't respond", "Couldn't read", "Couldn't connect"))
+        return result.returncode or int(ipc_failed)
+    except (ValueError, OSError, subprocess.SubprocessError) as error:
+        parser.exit(1, str(error) + "\n")
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

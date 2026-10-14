@@ -1,0 +1,646 @@
+#!/usr/bin/env python3
+"""Telemetría local y supervisor del escritorio BLACK-ICE."""
+import argparse
+import fcntl
+import hashlib
+import json
+import logging
+import math
+import os
+import re
+import select
+import signal
+import socket
+import subprocess
+import sys
+import tempfile
+import time
+from pathlib import Path
+
+from black_ice_conky_binary import selected as conky_binary
+from black_ice_i18n import language as selected_language
+
+HOME = Path.home()
+CONFIG = Path(os.environ.get("XDG_CONFIG_HOME", HOME / ".config"))
+ASSETS = CONFIG / "conky/black-ice"
+STATE = Path(os.environ.get("XDG_STATE_HOME", HOME / ".local/state")) / "black-ice/conky.json"
+RUNTIME = Path(os.environ.get("XDG_RUNTIME_DIR", f"/run/user/{os.getuid()}")) / "black-ice-conky"
+STYLES = {
+    "fsociety": ("Fsociety", "Franja roja centrada · telemetría compacta"),
+    "obsidian": ("Obsidiana", "Cinta angular fina · CPU, memoria y temperatura"),
+    "fracture": ("Fracture", "Chasis angular · CPU, memoria, disco y red"),
+    "signal": ("Signal", "Reloj central · telemetría discreta"),
+    "orbit": ("Orbit", "Instrumentos radiales · composición abierta"),
+    "ribbon": ("Ribbon", "Cinta compacta · más espacio para el fondo"),
+    "terminal": ("Terminal", "Consola técnica · datos en columnas"),
+    "pulse": ("Pulse", "Historial de carga · paisaje de actividad"),
+    "atlas": ("Atlas", "Pantalla completa · instrumentos en las esquinas"),
+    "horizon": ("Horizon", "Pantalla completa · reloj y alas inferiores"),
+    "observatory": ("Observatory", "Pantalla completa · estaciones laterales abiertas"),
+    "polar": ("Polar", "Calendario orbital · reloj en anillos"),
+    "chronos": ("Chronos", "Cronógrafo analógico · instrumentos concéntricos"),
+    "nexus": ("Nexus", "Conexiones curvas · cuatro brazos de telemetría"),
+    "gotham": ("Gotham", "Tipografía grande · fecha y reloj abiertos"),
+    "prism": ("Prism", "Rombos de color · instrumentos suspendidos"),
+    "circuit": ("Circuit", "Pantalla completa · trazos perimetrales"),
+    "scope": ("Scope", "Escalas verticales · lectura instrumental"),
+    "stack": ("Stack", "Columna escalonada · módulos pequeños"),
+    "focus": ("Focus", "Reloj circular · temperatura y memoria"),
+}
+COLORS = {"theme": ("Del tema", None), "swap": ("Acentos invertidos", None),
+          "ice": ("Hielo · cian / azul", ("#7ce9ef", "#89b4fa")),
+          "acid": ("Ácido · lima / cian", ("#c3f46b", "#65d5e6")),
+          "ember": ("Ámbar · naranja / dorado", ("#ffb86b", "#f3df8f")),
+          "orchid": ("Orquídea · violeta / rosa", ("#c5a0ff", "#ffa4cf")),
+          "mono": ("Monocromo · blanco / plata", ("#eef2f6", "#b9c4cf"))}
+FULLSCREEN = {"atlas", "horizon", "observatory", "circuit"}
+POSITIONS = {"top_left": "Arriba izquierda", "top_middle": "Arriba centro", "top_right": "Arriba derecha",
+             "middle_left": "Centro izquierda", "middle_middle": "Centro", "middle_right": "Centro derecha",
+             "bottom_left": "Abajo izquierda", "bottom_middle": "Abajo centro", "bottom_right": "Abajo derecha"}
+VISUAL_KEYS = ("variant", "opacity", "color", "position", "offset_x", "offset_y", "zoom")
+DEFAULT = {"variant": "fracture", "enabled": True, "output": "auto", "outputs": [], "opacity": .78,
+           "color": "theme", "follow_theme": True, "themes": {}, "position": "bottom_middle",
+           "offset_x": 0, "offset_y": 0, "zoom": 1.0}
+FALLBACK = {"bg": "#111820", "fg": "#e3ebf1", "acc1": "#62dce8", "acc2": "#a6bece", "dim": "#8395a4"}
+LOGGER = logging.getLogger("black-ice-conky")
+
+
+def read(path: Path) -> str:
+    try:
+        return path.read_text().strip()
+    except (OSError, UnicodeError):
+        return ""
+
+
+def load_json(path: Path, fallback: dict) -> dict:
+    try:
+        value = json.loads(path.read_text())
+        return value if isinstance(value, dict) else fallback.copy()
+    except (OSError, ValueError):
+        return fallback.copy()
+
+
+def atomic(path: Path, content: str) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+    temporary = path.with_name(path.name + f".{os.getpid()}.tmp")
+    temporary.write_text(content)
+    temporary.chmod(0o600)
+    temporary.replace(path)
+
+
+def lua(value: object) -> str:
+    if value is None:
+        return "nil"
+    if isinstance(value, bool):
+        return "true" if value else "false"
+    if isinstance(value, (int, float)):
+        return str(value) if math.isfinite(value) else "nil"
+    if isinstance(value, str):
+        return json.dumps(value, ensure_ascii=False)
+    if isinstance(value, dict):
+        return "{" + ",".join(f"[{lua(k)}]={lua(v)}" for k, v in value.items()) + "}"
+    if isinstance(value, list):
+        return "{" + ",".join(lua(v) for v in value) + "}"
+    raise TypeError(type(value).__name__)
+
+
+def hypr(*args: str) -> object:
+    result = subprocess.run(["hyprctl", "-j", *args], capture_output=True, text=True, timeout=4, check=True)
+    return json.loads(result.stdout)
+
+
+def select_monitor(monitors: list, preferred: str) -> dict:
+    available = [m for m in monitors if not m.get("disabled") and m.get("dpmsStatus", True)]
+    if not available:
+        return {}
+    return next((m for m in available if m["name"] == preferred), None) or next(
+        (m for m in available if m["name"].startswith(("eDP", "LVDS"))), None
+    ) or next((m for m in available if m.get("focused")), available[0])
+
+
+def select_monitors(monitors: list, prefs: dict) -> list:
+    available = [m for m in monitors if not m.get("disabled") and m.get("dpmsStatus", True)]
+    if prefs["output"] == "all":
+        return available
+    if prefs["output"] == "selected":
+        return [m for m in available if m["name"] in prefs.get("outputs", [])]
+    selected = select_monitor(available, prefs["output"])
+    return [selected] if selected else []
+
+
+def instance_dir(output: str) -> Path:
+    return RUNTIME / hashlib.sha256(output.encode()).hexdigest()[:16]
+
+
+def layout(monitor: dict, variant: str, settings: dict | None = None) -> dict:
+    settings = settings or DEFAULT
+    width, height = monitor["width"], monitor["height"]
+    if monitor.get("transform", 0) % 2:
+        width, height = height, width
+    scale = monitor.get("scale", 1)
+    width, height = round(width / scale), round(height / scale)
+    left, top, right, bottom = monitor.get("reserved", [0, 0, 0, 0])
+    margin = 24 if width < 1600 else 42
+    zoom = settings["zoom"]
+    available_w, available_h = width - left - right, height - top - bottom
+    width_limit = 1920 if variant in FULLSCREEN else {"fsociety": 760, "obsidian": 680, "polar": 540, "chronos": 540, "nexus": 1008,
+        "gotham": 800, "prism": 1008, "scope": 720, "stack": 360, "focus": 720}.get(variant, 1008)
+    canvas_width = max(1, min(width_limit, math.floor((available_w - 2 * margin) / zoom)))
+    compact = canvas_width < 880
+    narrow = canvas_width < 620
+    heights = {"fsociety": (112, 112), "obsidian": (62, 62), "fracture": (204, 350), "signal": (324, 424), "orbit": (284, 370),
+               "ribbon": (136, 216), "terminal": (246, 330), "pulse": (258, 350),
+               "polar": (390, 390), "chronos": (390, 390), "nexus": (340, 450), "gotham": (250, 250),
+               "prism": (242, 380), "scope": (300, 300), "stack": (470, 470), "focus": (290, 390),
+               **dict.fromkeys(FULLSCREEN, (math.floor((available_h - 2 * margin) / zoom),) * 2)}
+    canvas_height = heights[variant][int(compact)]
+    if narrow and variant in ("fracture", "signal"):
+        canvas_height += 90
+    canvas_height = min(canvas_height, max(1, math.floor((available_h - 2 * margin) / zoom)))
+    surface_w, surface_h = max(1, round(canvas_width * zoom)), max(1, round(canvas_height * zoom))
+    vertical, horizontal = settings["position"].split("_")
+    x = {"left": margin, "middle": (available_w - surface_w) // 2, "right": available_w - surface_w - margin}[horizontal]
+    y = {"top": margin, "middle": (available_h - surface_h) // 2, "bottom": available_h - surface_h - margin}[vertical]
+    x = max(0, min(available_w - surface_w, x + settings["offset_x"]))
+    y = max(0, min(available_h - surface_h, y + settings["offset_y"]))
+    return {"width": canvas_width, "height": canvas_height, "surface_width": surface_w, "surface_height": surface_h,
+            "zoom": zoom, "compact": compact, "narrow": narrow, "margin_x": left + x, "margin_y": margin,
+            "gap_x": x, "gap_y": y, "variant": variant, "output": monitor["name"]}
+
+
+def theme() -> dict:
+    style = CONFIG / "waybar/style.css"
+    resolved = style.resolve()
+    name = resolved.parent.name if resolved.parent.parent.name == "themes" else read(CONFIG / "waybar/default_theme")
+    registry = load_json(ASSETS / "palettes.json", {})
+    # Some existing themes publish an explicit Palette metadata header.
+    header = read(style)[:600]
+    declared = dict(re.findall(r"\b(bg|fg|acc1|acc2|dim)=(#[0-9a-fA-F]{6})\b", header))
+    custom = load_json(resolved.parent / "palette.json", {})
+    palette = {**FALLBACK, **registry.get(name, {}), **declared, **custom}
+    palette = {key: value if re.fullmatch(r"#[0-9a-fA-F]{6}", str(value)) else FALLBACK[key]
+               for key, value in palette.items() if key in FALLBACK}
+    typography = load_json(ASSETS / "typography.json", {}).get(name, {})
+    metadata = load_json(resolved.parent / "theme.json", {})
+    typography = {**typography, **{key: metadata[key] for key in ("font", "data_font") if key in metadata}}
+    fonts = {key:value for key,value in typography.items() if key in {"font", "data_font"}
+             and isinstance(value,str) and re.fullmatch(r"[A-Za-z0-9 -]{1,80}",value)}
+    return {"name": name or "BLACK-ICE", **palette, **fonts}
+
+
+def power(supply_root: Path = Path("/sys/class/power_supply")) -> dict:
+    batteries, online = [], []
+    for item in supply_root.glob("*"):
+        if read(item / "scope") == "Device":
+            continue
+        if read(item / "type") == "Battery":
+            batteries.append(item)
+        elif (item / "online").exists():
+            online.append(read(item / "online") == "1")
+    discharging = any(read(b / "status") == "Discharging" for b in batteries)
+    on_battery = bool(batteries) and discharging and not any(online)
+    levels = [int(read(b / "capacity")) for b in batteries if read(b / "capacity").isdigit()]
+    return {"interval": 5 if on_battery else 2, "source": "BAT" if on_battery else "AC" if any(online) else "ENERGÍA",
+            "battery": min(levels) if levels else None}
+
+
+def sensors(root: Path = Path("/sys/class/hwmon")) -> dict:
+    result = {}
+    for item in sorted(root.glob("hwmon*")):
+        name = read(item / "name")
+        for path in sorted(item.glob("temp*_input")):
+            label = read(path.with_name(path.name.replace("_input", "_label")))
+            if name == "coretemp" and label.startswith("Package") or name in ("k10temp", "zenpower") and label in ("Tctl", "Tdie"):
+                result.setdefault("cpu", str(path))
+            if name == "nvme" and label == "Composite":
+                result.setdefault("nvme", str(path))
+        if name in ("thinkpad", "asus", "asus_wmi", "dell_smm", "it87", "nct6775"):
+            for path in sorted(item.glob("fan*_input")):
+                result.setdefault("fan", str(path))
+    return result
+
+
+def sensor_values(paths: dict) -> dict:
+    values = {}
+    for name, path in paths.items():
+        value = read(Path(path))
+        values[name] = float(value) / (1 if name == "fan" else 1000) if value.isdigit() else None
+    return values
+
+
+class Metrics:
+    def __init__(self) -> None:
+        self.previous_cpu = None
+        self.previous_net = {}
+        self.previous_time = time.monotonic()
+        self.paths = sensors()
+        self.history = []
+        self.cpu_count = os.cpu_count() or 1
+        try:
+            result = subprocess.run(["systemd-detect-virt", "--vm"], capture_output=True, text=True, timeout=2, check=False)
+            self.virtualization = (result.stdout.strip() or None) if result.returncode == 0 else None
+        except (OSError, subprocess.TimeoutExpired):
+            self.virtualization = None
+
+    def sample(self) -> dict:
+        cpu = [int(v) for v in read(Path("/proc/stat")).splitlines()[0].split()[1:9]]
+        total, idle = sum(cpu), cpu[3] + cpu[4]
+        usage = None
+        if self.previous_cpu:
+            old_total, old_idle = self.previous_cpu
+            if total > old_total:
+                usage = 100 * (1 - (idle - old_idle) / (total - old_total))
+        self.previous_cpu = total, idle
+        mem = {k: int(v) for k, v in re.findall(r"^(MemTotal|MemAvailable):\s+(\d+)", read(Path("/proc/meminfo")), re.MULTILINE)}
+        now = time.monotonic()
+        elapsed = max(.001, now - self.previous_time)
+        self.previous_time = now
+        counters = {}
+        for line in read(Path("/proc/net/dev")).splitlines()[2:]:
+            if ":" not in line:
+                continue
+            iface, raw = line.split(":", 1)
+            fields = raw.split()
+            if iface.strip() != "lo":
+                counters[iface.strip()] = (int(fields[0]), int(fields[8]))
+        routes = read(Path("/proc/net/route")).splitlines()[1:]
+        iface = next((r.split()[0] for r in routes if len(r.split()) > 3 and r.split()[1] == "00000000" and int(r.split()[3], 16) & 1), "")
+        current, previous = counters.get(iface), self.previous_net.get(iface)
+        rates = [max(0, (a - b) / elapsed) for a, b in zip(current, previous)] if current and previous else [None, None]
+        self.previous_net = counters
+        disk = os.statvfs(HOME)
+        load = read(Path("/proc/loadavg")).split()
+        uptime = read(Path("/proc/uptime")).split()
+        if any(not Path(p).exists() for p in self.paths.values()):
+            self.paths = sensors()
+        if usage is not None:
+            self.history = (self.history + [round(usage, 2)])[-60:]
+        return {"cpu_usage": usage, "ram_used": (mem["MemTotal"] - mem["MemAvailable"]) / 1048576,
+                "ram_total": mem["MemTotal"] / 1048576, "ram_percent": 100 * (1 - mem["MemAvailable"] / mem["MemTotal"]),
+                "free_gib": disk.f_bavail * disk.f_frsize / 1073741824,
+                "disk_percent": 100 * (1 - disk.f_bfree / disk.f_blocks) if disk.f_blocks else None,
+                "load1": float(load[0]) if load else None,
+                "uptime": float(uptime[0]) if uptime else None,
+                "cpu_count": self.cpu_count, "virtualization": self.virtualization,
+                "rx": rates[0], "tx": rates[1], "interface": iface or "sin enlace",
+                "history": self.history, **sensor_values(self.paths), **power()}
+
+
+def conky_config(plan: dict) -> str:
+    settings = {"out_to_x": False, "out_to_wayland": True, "own_window": True,
+                "own_window_type": "override", "own_window_colour": "#00000000",
+                "alignment": "top_left", "gap_x": plan["gap_x"], "gap_y": plan["gap_y"],
+                "minimum_width": plan["surface_width"], "maximum_width": plan["surface_width"],
+                "minimum_height": plan["surface_height"], "border_width": 0, "border_inner_margin": 0,
+                "border_outer_margin": 0, "update_interval": 2,
+                "lua_load": str(ASSETS / "draw.lua"), "lua_draw_hook_post": "black_ice",
+                "use_xft": True, "font": "JetBrains Mono:size=10", "draw_shades": False,
+                "draw_outline": False, "draw_borders": False}
+    return f"conky.config = {lua(settings)}\nconky.text = ''\n"
+
+
+def preferences() -> dict:
+    value = {**DEFAULT, **load_json(STATE, DEFAULT)}
+    if value["variant"] not in STYLES:
+        value["variant"] = "fracture"
+    opacity = value.get("opacity")
+    value["opacity"] = max(.55, min(.95, opacity)) if isinstance(opacity, (int, float)) and math.isfinite(opacity) else .78
+    if value.get("color") not in COLORS:
+        value["color"] = "theme"
+    if not isinstance(value.get("themes"), dict):
+        value["themes"] = {}
+    if not isinstance(value.get("output"), str):
+        value["output"] = "auto"
+    outputs = value.get("outputs", [])
+    value["outputs"] = list(dict.fromkeys(n for n in outputs if isinstance(n, str) and re.fullmatch(r"[A-Za-z0-9_.:-]{1,128}", n))) if isinstance(outputs, list) else []
+    sanitize_position(value)
+    return value
+
+
+def sanitize_position(value: dict) -> None:
+    if value.get("position") not in POSITIONS:
+        value["position"] = "bottom_middle"
+    for key, low, high, default in [("zoom", .65, 1.35, 1.0), ("offset_x", -4000, 4000, 0), ("offset_y", -4000, 4000, 0)]:
+        raw = value.get(key, default)
+        value[key] = max(low, min(high, raw)) if isinstance(raw, (int, float)) and math.isfinite(raw) else default
+        if key.startswith("offset_"):
+            value[key] = round(value[key])
+
+
+def resolved_preferences() -> dict:
+    value = preferences()
+    if value["follow_theme"]:
+        name = theme()["name"]
+        defaults = load_json(ASSETS / "theme-defaults.json", {}).get(name, {})
+        metadata = load_json(CONFIG / "waybar/themes" / name / "theme.json", {})
+        if isinstance(metadata.get("conky"), dict):
+            defaults = {**defaults, **metadata["conky"]}
+        override = value["themes"].get(name, {})
+        settings = {**{key: DEFAULT[key] for key in VISUAL_KEYS}, "variant": "signal", "opacity": .72, **defaults,
+                    **(override if isinstance(override, dict) else {})}
+        value.update({key: settings[key] for key in VISUAL_KEYS})
+        if value["variant"] not in STYLES:
+            value["variant"] = "signal"
+        if value["color"] not in COLORS:
+            value["color"] = "theme"
+        raw = value["opacity"]
+        value["opacity"] = max(.55, min(.95, raw)) if isinstance(raw, (int, float)) and math.isfinite(raw) else .72
+        sanitize_position(value)
+    return value
+
+
+def colored(palette: dict, scheme: str) -> dict:
+    result = palette.copy()
+    if scheme == "swap":
+        result["acc1"], result["acc2"] = result["acc2"], result["acc1"]
+    elif COLORS[scheme][1]:
+        result["acc1"], result["acc2"] = COLORS[scheme][1]
+    return result
+
+
+def previews(scheme: str | None = None, opacity: float | None = None, zoom: float | None = None) -> Path:
+    """Renderizar con Lua/Cairo de Conky sin crear una ventana del escritorio."""
+    prefs = resolved_preferences()
+    if scheme is not None:
+        prefs["color"] = scheme
+    if opacity is not None:
+        prefs["opacity"] = opacity
+    if zoom is not None:
+        prefs["zoom"] = zoom
+    palette = colored(theme(), prefs["color"])
+    root = Path(os.environ.get("XDG_CACHE_HOME", HOME / ".cache")) / "black-ice/conky/previews"
+    digest = hashlib.sha256((json.dumps([palette, prefs["opacity"], prefs["zoom"]], sort_keys=True) + read(ASSETS / "draw.lua")
+                             + read(ASSETS / "preview.lua")).encode()).hexdigest()[:16]
+    target = root / digest
+    target.mkdir(parents=True, exist_ok=True, mode=0o700)
+    if all((target / f"{style}.png").is_file() for style in STYLES):
+        return target
+    collector = Metrics()
+    collector.sample()
+    time.sleep(.12)
+    data = collector.sample()
+    frame = {"theme": palette, "data": data, "opacity": prefs["opacity"], "language": selected_language()}
+    cases = []
+    for style in STYLES:
+        plan = layout({"name": "preview", "width": 1366, "height": 768}, style, prefs)
+        cases.append({"layout": plan, "path": str(target / f"{style}.png")})
+    root.mkdir(parents=True, exist_ok=True, mode=0o700)
+    with tempfile.TemporaryDirectory(prefix="render-", dir=root) as directory:
+        job = Path(directory) / "job.lua"
+        atomic(job, "return " + lua({"frame": frame, "cases": cases}) + "\n")
+        config = Path(directory) / "preview.conf"
+        settings = {"out_to_x": False, "out_to_wayland": False, "out_to_console": True,
+                    "lua_load": str(ASSETS / "draw.lua") + ";" + str(ASSETS / "preview.lua"),
+                    "lua_startup_hook": "preview"}
+        atomic(config, "conky.config=" + lua(settings) + "\nconky.text=''\n")
+        rendered = subprocess.run([conky_binary(), "-c", str(config), "-i", "1"],
+                                  env={**os.environ, "BLACK_ICE_PREVIEW_JOB": str(job)},
+                                  capture_output=True, text=True, check=True, timeout=15)
+    if not all((target / f"{style}.png").is_file() for style in STYLES):
+        raise RuntimeError("No se generaron todas las vistas previas: " + rendered.stderr[-1500:])
+    return target
+
+
+def terminate(child: subprocess.Popen | None) -> None:
+    if child and child.poll() is None:
+        child.terminate()
+        try:
+            child.wait(timeout=4)
+        except subprocess.TimeoutExpired:
+            child.kill()
+            child.wait()
+
+
+def launch(plan: dict) -> subprocess.Popen:
+    monitors = hypr("monitors")
+    focused = next((m["name"] for m in monitors if m.get("focused")), None)
+    changed = focused and focused != plan["output"]
+    if changed:
+        subprocess.run([str(HOME / ".local/bin/black-ice-hypr"), "focusmonitor", plan["output"]], check=True, capture_output=True, timeout=8)
+    directory = instance_dir(plan["output"])
+    atomic(directory / "conky.conf", conky_config(plan))
+    child = None
+    try:
+        child = subprocess.Popen([conky_binary(), "-c", str(directory / "conky.conf")],
+                                 env={**os.environ, "BLACK_ICE_CONKY_FRAME": str(directory / "frame.lua")})
+        deadline = time.monotonic() + 5
+        while time.monotonic() < deadline:
+            if child.poll() is not None:
+                raise RuntimeError("Conky terminó al crear la superficie; revisa el journal del servicio")
+            layers = hypr("layers")
+            actual = [name for name, output in layers.items() for level in output["levels"].values()
+                      for layer in level if layer.get("pid") == child.pid]
+            if actual:
+                if actual != [plan["output"]]:
+                    raise RuntimeError(f"Conky creó su capa en {actual}; salida solicitada: {plan['output']}")
+                return child
+            time.sleep(.1)
+        raise RuntimeError("Conky no creó una capa visible en 5 segundos")
+    except BaseException:
+        terminate(child)
+        raise
+    finally:
+        current = hypr("monitors") if changed else []
+        if changed and any(m.get("focused") and m["name"] == plan["output"] for m in current):
+            subprocess.run([str(HOME / ".local/bin/black-ice-hypr"), "focusmonitor", focused], capture_output=True, timeout=8, check=False)
+
+
+def reconcile(children: dict, plans: dict, palette: dict, data: dict, opacity: float,
+              retries: dict | None = None, now: float | None = None) -> dict:
+    retries = retries if retries is not None else {}
+    now = time.monotonic() if now is None else now
+
+    def failed(name: str, message: str) -> None:
+        count = retries.get(name, {}).get("count", 0) + 1
+        retries[name] = {"count": count, "next": now + min(300, 5 * 2 ** min(count - 1, 6)),
+                         "error": message, "plan": plans[name]}
+        LOGGER.error("salida=%s: %s", name, message)
+
+    for name in list(children):
+        child = children[name]
+        code = child["child"].poll()
+        if name not in plans or child["plan"] != plans[name]:
+            terminate(children.pop(name)["child"])
+            retries.pop(name, None)
+        elif code is not None:
+            terminate(children.pop(name)["child"])
+            failed(name, f"Conky terminó después del arranque (código {code})")
+        elif now - child.get("started", now) >= 30:
+            retries.pop(name, None)
+    for name in list(retries):
+        if name not in plans or retries[name]["plan"] != plans[name]:
+            retries.pop(name)
+    errors = {}
+    for name, plan in plans.items():
+        atomic(instance_dir(name) / "frame.lua", "return " + lua({"layout": plan, "theme": palette, "data": data,
+                                                                      "opacity": opacity, "language": selected_language()}) + "\n")
+        if name not in children:
+            retry = retries.get(name)
+            if retry and now < retry["next"]:
+                errors[name] = retry["error"] + f"; reintento en {math.ceil(retry['next'] - now)} s"
+                continue
+            try:
+                children[name] = {"child": launch(plan), "plan": plan, "started": now}
+            except (OSError, RuntimeError, subprocess.SubprocessError) as error:
+                errors[name] = str(error)
+                failed(name, str(error))
+    return errors
+
+
+def live_status(status: dict, layers: dict, proc: Path = Path("/proc")) -> dict:
+    status = dict(status)
+    actual = {name: {layer.get("pid") for level in output.get("levels", {}).values() for layer in level}
+              for name, output in layers.items()}
+    pids = status.get("pids", {})
+    pids = {name: pid for name, pid in pids.items()
+            if isinstance(pid, int) and pid in actual.get(name, set())
+            and read(proc / str(pid) / "comm") == "conky"
+            and not re.search(r"^State:\s+Z", read(proc / str(pid) / "status"), re.MULTILINE)}
+    errors = dict(status.get("errors", {}))
+    for name in set(status.get("actual_outputs", [])) - set(pids):
+        errors[name] = "Conky no tiene un proceso vivo con capa visible"
+    status.update(pids=pids, actual_outputs=list(pids), actual_output=next(iter(pids), None),
+                  pid=next(iter(pids.values()), None), running=bool(pids), errors=errors)
+    return status
+
+
+def refresh_displays(monitors: list, previous: str | None) -> str:
+    signature = json.dumps(sorted([{key: m.get(key) for key in ("name", "width", "height", "scale", "x", "y", "transform", "dpmsStatus")} for m in monitors], key=lambda m: m["name"]), sort_keys=True)
+    if signature != previous:
+        helper = HOME / ".local/bin/black-ice-wallpaper"
+        if helper.is_file():
+            subprocess.Popen([str(helper), "refresh"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        if previous is not None and (HOME / ".local/bin/waybar_start.sh").is_file():
+            subprocess.run([str(HOME / ".local/bin/black-ice-hypr"), "exec", str(HOME / ".local/bin/waybar_start.sh")], capture_output=True, check=False, timeout=8)
+    return signature
+
+
+def daemon() -> None:
+    RUNTIME.mkdir(parents=True, exist_ok=True, mode=0o700)
+    lock = (RUNTIME / "lock").open("w")
+    try:
+        fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except BlockingIOError:
+        LOGGER.info("El monitor ya está ejecutándose")
+        return
+    running = True
+
+    def stop(_signum: int, _frame: object) -> None:
+        nonlocal running
+        running = False
+
+    signal.signal(signal.SIGTERM, stop)
+    signal.signal(signal.SIGINT, stop)
+    ipc = socket.socket(socket.AF_UNIX)
+    ipc.connect(str(Path(os.environ["XDG_RUNTIME_DIR"]) / "hypr" / os.environ["HYPRLAND_INSTANCE_SIGNATURE"] / ".socket2.sock"))
+    ipc.setblocking(False)
+    monitors = hypr("monitors")
+    display_state = refresh_displays(monitors, None)
+    collector, children, retries = Metrics(), {}, {}
+    refresh_monitors = False
+    try:
+        while running:
+            if refresh_monitors:
+                monitors = hypr("monitors")
+                display_state = refresh_displays(monitors, display_state)
+                refresh_monitors = False
+            prefs = resolved_preferences()
+            palette = colored(theme(), prefs["color"])
+            plans = {m["name"]: layout(m, prefs["variant"], prefs) for m in select_monitors(monitors, prefs)} if prefs["enabled"] else {}
+            data = collector.sample() if plans else {"interval": 5}
+            errors = reconcile(children, plans, palette, data, prefs["opacity"], retries)
+            pids = {name: value["child"].pid for name, value in children.items()}
+            atomic(RUNTIME / "status.json", json.dumps({**prefs, "actual_output": next(iter(pids), None),
+                "actual_outputs": list(pids), "pids": pids, "errors": errors, "theme": palette["name"],
+                "pid": next(iter(pids.values()), None), "restarts": {name: value["count"] for name, value in retries.items()},
+                "interval": max(5 if errors else 0, data["interval"])}))
+            if errors:
+                data["interval"] = max(5, data["interval"])
+            deadline = time.monotonic() + data["interval"]
+            while running and time.monotonic() < deadline:
+                ready, _, _ = select.select([ipc], [], [], max(0, deadline - time.monotonic()))
+                if ready:
+                    events = ipc.recv(65536)
+                    if not events:
+                        running = False
+                        break
+                    refresh_monitors = any(event in events for event in (b"monitoradded", b"monitorremoved", b"configreloaded", b"dpms", b"openlayer", b"closelayer"))
+                    if refresh_monitors:
+                        break
+    finally:
+        for value in children.values():
+            terminate(value["child"])
+        ipc.close()
+        lock.close()
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("action", choices=("daemon", *STYLES, "on", "off", "toggle", "menu", "status", "output", "opacity", "previews", "color", "auto", "reset-theme", "apply"))
+    parser.add_argument("name", nargs="?")
+    args = parser.parse_args()
+    if args.action == "daemon":
+        daemon()
+        return
+    if args.action == "status":
+        status = load_json(RUNTIME / "status.json", preferences())
+        status = live_status(status, hypr("layers"))
+        print(json.dumps(status, ensure_ascii=False, indent=2))
+        return
+    action = args.action
+    if action == "previews":
+        print(previews())
+        return
+    if action == "menu":
+        subprocess.run([str(HOME / ".local/bin/conky_visual")], check=True)
+        return
+    prefs = resolved_preferences()
+    if action in STYLES:
+        prefs.update(variant=action, enabled=True)
+    elif action == "opacity":
+        if args.name is None or not .55 <= float(args.name) <= .95:
+            parser.error("opacity requiere un valor entre 0.55 y 0.95")
+        prefs["opacity"] = float(args.name)
+    elif action == "color":
+        if args.name not in COLORS:
+            parser.error("color requiere: " + ", ".join(COLORS))
+        prefs["color"] = args.name
+    elif action == "auto":
+        if args.name not in ("on", "off"):
+            parser.error("auto requiere on u off")
+        prefs["follow_theme"] = args.name == "on"
+    elif action == "reset-theme":
+        prefs["themes"].pop(theme()["name"], None)
+        prefs["follow_theme"] = True
+    elif action == "apply":
+        requested = json.loads(args.name or "{}")
+        if not isinstance(requested, dict) or requested.get("variant") not in STYLES or requested.get("color") not in COLORS:
+            parser.error("Selección de estilo o color no válida")
+        raw = requested.get("opacity")
+        if not isinstance(raw, (int, float)) or not .55 <= raw <= .95 or not isinstance(requested.get("follow_theme"), bool):
+            parser.error("Opacidad o modo por tema no válido")
+        if "outputs" in requested and (not isinstance(requested["outputs"], list) or any(not isinstance(n, str) or not re.fullmatch(r"[A-Za-z0-9_.:-]{1,128}", n) for n in requested["outputs"])):
+            parser.error("Lista de pantallas no válida")
+        if "output" in requested and not isinstance(requested["output"], str):
+            parser.error("Selección de pantallas no válida")
+        prefs.update({key: requested[key] for key in (*VISUAL_KEYS, "follow_theme", "output", "outputs") if key in requested}, enabled=True)
+        sanitize_position(prefs)
+    elif action == "output":
+        if not args.name:
+            parser.error("output requiere un nombre como eDP-1, DP-1 o auto")
+        prefs["output"] = args.name
+    else:
+        prefs["enabled"] = not prefs["enabled"] if action == "toggle" else action == "on"
+    if action in STYLES or action in ("color", "opacity", "apply"):
+        prefs["themes"][theme()["name"]] = {key: prefs[key] for key in VISUAL_KEYS}
+    atomic(STATE, json.dumps(prefs) + "\n")
+    subprocess.run(["systemctl", "--user", "start", "black-ice-conky.service"], check=True, timeout=10)
+
+
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
+    try:
+        main()
+    except (OSError, ValueError, RuntimeError, subprocess.SubprocessError) as error:
+        LOGGER.error("%s", error)
+        sys.exit(1)

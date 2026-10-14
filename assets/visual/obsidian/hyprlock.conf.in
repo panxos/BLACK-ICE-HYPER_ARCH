@@ -1,0 +1,99 @@
+# BLACK-ICE ARCH — bloqueo Obsidiana
+general {
+    hide_cursor = true
+    ignore_empty_input = true
+}
+
+animations {
+    enabled = false
+}
+
+background {
+    monitor =
+    path = @WALLPAPER@
+    color = rgb(0c1118)
+    blur_passes = 0
+    brightness = 0.78
+}
+
+label {
+    monitor =
+    text = $TIME
+    color = rgb(@FG@)
+    font_size = 94
+    font_family = Rajdhani Medium
+    position = 6%, -60
+    halign = left
+    valign = top
+}
+
+label {
+    monitor =
+    text = cmd[update:60000] ~/.local/bin/black-ice-lock-status date
+    color = rgb(@DIM@)
+    font_size = 15
+    font_family = Noto Sans
+    position = 6%, -210
+    halign = left
+    valign = top
+}
+
+image {
+    monitor =
+    path = @LOCK_FRAME@
+    size = 54
+    rounding = 0
+    border_size = 0
+    position = 0, 7%
+    halign = center
+    valign = bottom
+    zindex = 0
+}
+
+input-field {
+    monitor =
+    size = 380, 52
+    position = 0, 7%
+    halign = center
+    valign = bottom
+    outline_thickness = 1
+    outer_color = rgba(00000000)
+    inner_color = rgba(00000000)
+    font_color = rgb(@FG@)
+    font_family = Noto Sans
+    rounding = 0
+    dots_size = 0.22
+    dots_spacing = 0.32
+    fade_on_empty = false
+    placeholder_text = Desbloquear
+    check_text = Verificando…
+    fail_text = No se pudo desbloquear. Intenta nuevamente.
+    fail_color = rgb(ffbd88)
+    check_color = rgb(@ACC2@)
+    capslock_color = rgb(ffbd88)
+    zindex = 1
+}
+
+label {
+    monitor =
+    text = $LAYOUT
+    color = rgb(@DIM@)
+    font_size = 12
+    font_family = JetBrains Mono
+    position = -5%, 3%
+    halign = right
+    valign = bottom
+}
+
+label {
+    monitor =
+    text = cmd[update:10000] ~/.local/bin/black-ice-lock-status
+    color = rgb(@DIM@)
+    font_size = 12
+    font_family = JetBrains Mono
+    position = 5%, 3%
+    halign = left
+    valign = bottom
+}
+
+bind = ESCAPE, exec, hyprctl dispatch dpms off

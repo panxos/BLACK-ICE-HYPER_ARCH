@@ -1,0 +1,43 @@
+* { font-family: "Noto Sans"; font-size: 13px; }
+.control-center {
+    color: @FG@;
+    background: alpha(@BG@, .97);
+    border: 1px solid alpha(@ACC1@, .7);
+    border-radius: 14px;
+    padding: 18px;
+}
+.notification-row { outline: none; }
+.notification-row:focus .notification { border-color: @ACC1@; }
+.notification {
+    color: @FG@;
+    background: alpha(@BG@, .97);
+    border: 1px solid alpha(@FG@, .25);
+    border-radius: 12px;
+    margin: 8px;
+    padding: 12px;
+}
+.summary { color: @FG@; font-weight: bold; font-size: 14px; }
+.body, .time { color: @DIM@; }
+.notification-action, .close-button, .widget-title > button {
+    background: alpha(@FG@, .07);
+    color: @FG@;
+    border: 1px solid alpha(@FG@, .2);
+    border-radius: 8px;
+    padding: 8px 12px;
+}
+.notification-action:hover, .close-button:hover, .widget-title > button:hover {
+    background: alpha(@ACC1@, .16);
+}
+.widget-title { color: @FG@; font-size: 22px; font-family: Rajdhani; }
+.widget-dnd { color: @DIM@; padding: 12px 0; }
+.widget-dnd > switch:checked { background: @ACC1@; }
+label { color: @FG@; }
+switch { background: alpha(@FG@, .15); border-radius: 4px; }
+switch slider { background: @FG@; border-radius: 3px; }
+.notification-group { margin: 4px 0; }
+.notification-group-header, .notification-group-icon { color: @ACC1@; }
+.notification.critical { border-color: @ACC1@; border-width: 2px; }
+.notification-action > button { color: @FG@; background: alpha(@ACC1@, .12); border-radius: 8px; padding: 8px 12px; }
+.notification-action > button:hover { background: alpha(@ACC1@, .25); }
+.widget-buttons-grid > flowbox > flowboxchild > button { color: @FG@; background: alpha(@FG@, .07); border: 1px solid alpha(@ACC1@, .35); border-radius: 8px; padding: 10px; }
+.widget-buttons-grid > flowbox > flowboxchild > button:hover { background: alpha(@ACC1@, .18); }

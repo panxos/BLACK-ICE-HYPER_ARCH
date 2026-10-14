@@ -1,0 +1,125 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SYSFS_ROOT="${BLACK_ICE_SYSFS_ROOT:-/sys}"
+CPU_DIR="$SYSFS_ROOT/devices/system/cpu/cpu0/cpufreq"
+
+fail() {
+    printf '%s\n' "$*" >&2
+    exit 1
+}
+
+has_word() {
+    [[ " $1 " == *" $2 "* ]]
+}
+
+choose_governor() {
+    local mode="$1" available driver candidate
+    available=$(cat "$CPU_DIR/scaling_available_governors" 2>/dev/null || true)
+    driver=$(cat "$CPU_DIR/scaling_driver" 2>/dev/null || true)
+    if [[ "$mode" == performance ]] && has_word "$available" performance; then
+        printf '%s\n' performance
+        return
+    fi
+    if [[ "$mode" == power-saver ]] && has_word "$available" powersave; then
+        printf '%s\n' powersave
+        return
+    fi
+    if [[ "$driver" == intel_pstate || "$driver" == amd-pstate-epp ]] && has_word "$available" powersave; then
+        printf '%s\n' powersave
+        return
+    fi
+    for candidate in schedutil ondemand conservative powersave performance; do
+        if has_word "$available" "$candidate"; then
+            printf '%s\n' "$candidate"
+            return
+        fi
+    done
+    return 1
+}
+
+print_config() {
+    local adaptive performance preferences choices suffix requested driver
+    adaptive=$(choose_governor auto || true)
+    performance=$(choose_governor performance || true)
+    cat <<'EOF'
+# BLACK-ICE: TLP 1.10+, selección automática según alimentación.
+TLP_AUTO_SWITCH=1
+TLP_PROFILE_AC=BAL
+TLP_PROFILE_BAT=SAV
+CPU_BOOST_ON_AC=1
+CPU_BOOST_ON_BAT=1
+CPU_BOOST_ON_SAV=0
+EOF
+    driver=$(cat "$CPU_DIR/scaling_driver" 2>/dev/null || true)
+    if [[ "$driver" == intel_pstate || "$driver" == intel_cpufreq ]]; then
+        printf 'CPU_MIN_PERF_ON_AC=0\nCPU_MIN_PERF_ON_BAT=0\nCPU_MIN_PERF_ON_SAV=0\n'
+        printf 'CPU_MAX_PERF_ON_AC=100\nCPU_MAX_PERF_ON_BAT=100\nCPU_MAX_PERF_ON_SAV=80\n'
+    fi
+    if [[ -n "$adaptive" && -n "$performance" ]]; then
+        printf 'CPU_SCALING_GOVERNOR_ON_AC=%s\nCPU_SCALING_GOVERNOR_ON_BAT=%s\nCPU_SCALING_GOVERNOR_ON_SAV=%s\n' \
+            "$performance" "$adaptive" "$adaptive"
+    fi
+    preferences=$(cat "$CPU_DIR/energy_performance_available_preferences" 2>/dev/null || true)
+    choices=$(cat "$SYSFS_ROOT/firmware/acpi/platform_profile_choices" 2>/dev/null || true)
+    for suffix in AC BAT SAV; do
+        case "$suffix" in
+            AC) requested=performance ;;
+            BAT) requested=balance_performance ;;
+            SAV) requested=power ;;
+        esac
+        if has_word "$preferences" "$requested"; then
+            printf 'CPU_ENERGY_PERF_POLICY_ON_%s=%s\n' "$suffix" "$requested"
+        fi
+        case "$suffix" in
+            AC) requested=performance ;;
+            BAT) requested=balanced ;;
+            SAV) requested=low-power ;;
+        esac
+        if has_word "$choices" "$requested"; then
+            printf 'PLATFORM_PROFILE_ON_%s=%s\n' "$suffix" "$requested"
+        elif has_word "$choices" balanced; then
+            printf 'PLATFORM_PROFILE_ON_%s=balanced\n' "$suffix"
+        fi
+    done
+}
+
+run_privileged() {
+    if (( EUID == 0 )); then
+        "$@"
+    elif command -v sudo >/dev/null && sudo -n -v 2>/dev/null; then
+        sudo -n "$@"
+    elif command -v pkexec >/dev/null; then
+        pkexec "$@"
+    else
+        fail 'Faltan permisos: ejecuta desde un terminal con sudo o instala un agente Polkit.'
+    fi
+}
+
+apply_profile() {
+    local profile="$1" action governor
+    if command -v tlp >/dev/null && systemctl is-active --quiet tlp.service; then
+        case "$profile" in
+            auto) action=start ;;
+            *) action="$profile" ;;
+        esac
+        run_privileged tlp "$action"
+        printf 'TLP: %s\n' "$profile"
+    elif command -v powerprofilesctl >/dev/null && systemctl is-active --quiet power-profiles-daemon.service; then
+        [[ "$profile" != auto ]] || fail 'Automático requiere TLP; este backend admite perfiles manuales.'
+        powerprofilesctl set "$profile"
+        printf 'power-profiles-daemon: %s\n' "$profile"
+    elif command -v cpupower >/dev/null; then
+        governor=$(choose_governor "$profile") || fail 'La CPU no anuncia un gobernador compatible.'
+        run_privileged cpupower frequency-set -g "$governor"
+        printf 'CPUpower: %s (%s)\n' "$profile" "$governor"
+    else
+        fail 'No hay un gestor de energía disponible.'
+    fi
+}
+
+case "${1:-}" in
+    --print-config) print_config ;;
+    auto|performance|balanced|power-saver) apply_profile "$1" ;;
+    *) printf 'Uso: power_profile {auto|performance|balanced|power-saver|--print-config}\n' >&2; exit 2 ;;
+esac

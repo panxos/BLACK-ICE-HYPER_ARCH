@@ -7,26 +7,37 @@ cd "$USER_HOME" || exit 1
 
 # --- Lista de paquetes ---
 HYPRLAND_PKGS=(
+    # Resolver JACK mediante PipeWire antes de instalar consumidores de audio.
+    "pipewire"
+    "pipewire-pulse"
+    "pipewire-alsa"
+    "pipewire-jack"
+    "wireplumber"
+
     # Compositor y session
     "hyprland"
+    "uwsm"                  # SDDM launches the supported Hyprland session through UWSM
     "hyprpaper"
     "hyprlock"
     "hypridle"
     "hyprcursor"
+    "adwaita-cursors"
+    "xorg-xsetroot"
     "xdg-desktop-portal-hyprland"
     "xdg-desktop-portal-gtk"
     "qt5-wayland"
     "qt6-wayland"
     
     # Barra de estado y launcher
-    "waybar"
+    "waybar-git"             # Incluye IPC compatible con la configuración Lua de Hyprland
     "wofi"
+    "rofi"
+    "archlinux-xdg-menu"
     "wlogout"
     
     # Waybar Dependencies (CRITICAL)
     "jq"                    # JSON parsing for custom modules
-    "ttf-font-awesome"      # Icon font for Waybar
-    "otf-font-awesome"      # OpenType variant
+    "otf-font-awesome"      # Icon font for Waybar
     "pango"                 # Text rendering
     "cairo"                 # Graphics rendering
     "libinput"              # Input handling
@@ -35,8 +46,8 @@ HYPRLAND_PKGS=(
     # Notificaciones ( Fix: SwayNC over Dunst)
     "swaync"
     "libnotify"
-    "libayatana-appindicator-gtk3"
-    "libappindicator-gtk3"
+    "libayatana-appindicator"
+    "libappindicator"
     
     # Manejo de discos y tray
     "udiskie"
@@ -44,15 +55,11 @@ HYPRLAND_PKGS=(
 
     # Terminal y Navegadores
     "kitty"
-    "firefox"
-    "brave-bin"
-    "kate"
-    "neovim"
 
     # File manager y utilidades
     "dolphin"
     "ark"
-    "p7zip"
+    "7zip"
     "unzip"
     "unrar"
     "xdg-user-dirs"
@@ -64,7 +71,7 @@ HYPRLAND_PKGS=(
     "slurp"
     "wl-clipboard"
     "hyprshot"
-    "hyprpicker-git"
+    "hyprpicker"
     "swappy"                # Screenshot editor (Spectacle-like)
     
     # Fuentes e iconos (Extended)
@@ -74,6 +81,7 @@ HYPRLAND_PKGS=(
     "ttf-nerd-fonts-symbols"
     "otf-commit-mono-nerd"   # Mandatory Mecha font
     "ttf-roboto"
+    "noto-fonts"
     "ttf-dseg"               # DSEG7 LCD 7-segment font for hyprlock clock
     "papirus-icon-theme"
     
@@ -85,7 +93,6 @@ HYPRLAND_PKGS=(
     "kvantum"
     "kvantum-qt5"
     "nwg-look"
-    "python-pywal"
     "sddm"
     
     # Utilidades adicionales
@@ -99,7 +106,6 @@ HYPRLAND_PKGS=(
     "bluez-utils"           # Bluetooth tools
     "blueman"               # Bluetooth manager (GUI + Applet)
     # Virtualization & Updates (Scripts Dependencies)
-    "libvirt"               # For KVM status script (virsh)
     "pacman-contrib"        # For updates status script (checkupdates)
     "network-manager-applet"
     "pavucontrol"
@@ -109,6 +115,9 @@ HYPRLAND_PKGS=(
     "playerctl"
     "networkmanager"        # nmcli para wifi_toggle
     "waypaper"              # Selector visual de wallpapers con thumbnails
+    "gtk3"
+    "python-cairo"
+    "conky"
     "python-gobject"        # PyGObject — requerido por theme_visual (GTK3 Python)
     "awww"                  # Wallpaper daemon
     "hypridle"              # Idle daemon
@@ -118,11 +127,6 @@ HYPRLAND_PKGS=(
     "tpm2-tools"            # TPM2 — para tpm2-luks-enroll (LUKS sin contraseña)
     "wev"                   # Wayland event viewer
     "eww"                   # Widget system (music widget, etc.)
-    "pipewire"
-    "pipewire-pulse"
-    "pipewire-alsa"
-    "pipewire-jack"
-    "wireplumber"
     "libnewt"               # For whiptail (interactive menus)
     "chafa"                 # For terminal image display (Fastfetch fallback)
     "lm_sensors"            # For hardware_temp.sh Waybar module (CPU/GPU temps)
@@ -131,7 +135,7 @@ HYPRLAND_PKGS=(
     "bat"                   # cat moderno (alias cat en .zshrc)
     "fzf"                   # Fuzzy finder (sourced en .zshrc)
     "xclip"                 # alias copy en .zshrc
-    "imagemagick"           # requerido por python-pywal y scripts de temas
+    "imagemagick"           # fondos y recursos de temas
 )
 
 # --- Detección de Hardware y Virtualización ( Smart-Detect) ---
@@ -148,7 +152,7 @@ elif [ "$CPU_VENDOR" == "AuthenticAMD" ]; then
 fi
 
 # 2. Virtualización
-VIRT_SYSTEM=$(systemd-detect-virt)
+VIRT_SYSTEM=$(systemd-detect-virt || true)
 IS_VM=false
 case "$VIRT_SYSTEM" in
     vmware)
@@ -221,24 +225,22 @@ log_success "Keyring verificado y actualizado."
 
 log_info "Instalando Hyprland y componentes base..."
 
-# RESOLVE CONFLICTS (Hyprpicker & Jack2)
-if pacman -Q hyprpicker &>/dev/null || pacman -Q hyprpicker-git &>/dev/null; then
-    log_warn "Conflicto detectado: Eliminando hyprpicker para prevenir errores de versión..."
-    sudo -n pacman -Rns --noconfirm hyprpicker hyprpicker-git 2>/dev/null || true
-fi
-if pacman -Q jack2 &>/dev/null; then
-    log_warn "Conflicto detectado: Eliminando jack2 con -Rdd (allow pipewire-jack replacement)..."
-    sudo -n pacman -Rdd --noconfirm jack2 2>/dev/null || \
-        sudo pacman -Rdd --noconfirm jack2 2>/dev/null || true
-fi
-
+# Los conflictos se resuelven mediante transacciones del gestor, sin retirar dependencias a la fuerza.
 for pkg in "${HYPRLAND_PKGS[@]}"; do
+    if [[ "$pkg" == waybar-git && $(pacman -Qq waybar 2>/dev/null || true) == waybar ]]; then
+        if [[ "${NON_INTERACTIVE:-false}" == true ]]; then
+            log_error "Waybar estable requiere una sustitución revisada: sudo pacman -S waybar-git. Repite el despliegue después."
+            exit 1
+        fi
+        sudo pacman -S --needed waybar-git || exit 1
+        continue
+    fi
     safe_install "$pkg" || log_warn "No se pudo instalar $pkg. Se intentará en la fase de personalización."
 done
 
 # --- Validación Post-Instalación ---
 log_info "Validando instalación de componentes críticos..."
-CRITICAL_PKGS=("waybar" "jq" "ttf-font-awesome" "python-pywal" "awww" "imagemagick")
+CRITICAL_PKGS=("hyprland" "uwsm" "hyprlock" "hyprpicker" "kitty" "python-gobject" "python-cairo" "gtk3" "conky" "waybar-git" "jq" "otf-font-awesome" "awww" "imagemagick" "pipewire" "pipewire-pulse" "pipewire-alsa" "pipewire-jack" "wireplumber")
 VALIDATION_FAILED=false
 
 for pkg in "${CRITICAL_PKGS[@]}"; do
@@ -259,19 +261,18 @@ success "Todos los paquetes críticos instalados correctamente"
 
 
 # --- Configuración de Teclado y Locale (desde install.conf.auto) ---
-_KBD="${KEYBOARD_LAYOUT:-es}"
-_LANG="${SYSTEM_LANG:-es_ES}"
+_CONSOLE_KBD="${KEYBOARD_LAYOUT:-es}"
+_KBD=$(console_to_xkb_layout "$_CONSOLE_KBD")
+_LANG="${SYSTEM_LANG:-${LANG:-en_US.UTF-8}}"
+_LANG="${_LANG%%.*}"
 log_info "Aplicando teclado '$_KBD' y locale '${_LANG}.UTF-8'..."
 sudo -n localectl set-x11-keymap "$_KBD"
 sudo -n localectl set-locale "LANG=${_LANG}.UTF-8"
-echo "KEYMAP=$_KBD" | sudo -n tee /etc/vconsole.conf > /dev/null
+sudo -n localectl --no-convert set-keymap "$_CONSOLE_KBD"
 
 # --- Configuración de SDDM (CyberSec Theme) ---
-# Limpiar configuración antigua para evitar conflictos
-# (sddm.conf suele tener prioridad sobre sddm.conf.d, así que lo eliminamos si fue creado por versiones anteriores)
 if [ -f "/etc/sddm.conf" ]; then
-    log_warn "Eliminando /etc/sddm.conf antiguo para priorizar configuración modular (.d)..."
-    sudo rm "/etc/sddm.conf"
+    log_info "Se conserva /etc/sddm.conf; el módulo SDDM actualizará la selección del tema."
 fi
 
 # La configuración del tema se maneja en 06_sddm_setup.sh
@@ -315,7 +316,7 @@ log_info "Instalando scripts de utilidad (EARLY)..."
 # Instalar scripts en ~/bin/ (ruta canónica); ~/.config/bin → symlink creado en 03_terminal_config.sh
 mkdir -p "$USER_HOME/bin"
 if [ -d "$DOTFILES_DIR/bin" ]; then
-    cp -r "$DOTFILES_DIR/bin/"* "$USER_HOME/bin/"
+    cp -r --remove-destination "$DOTFILES_DIR/bin/"* "$USER_HOME/bin/"
     chmod +x "$USER_HOME/bin/"* 2>/dev/null || true
     chown -R "$CURRENT_USER:$CURRENT_USER" "$USER_HOME/bin"
     # Crear symlink ~/.config/bin → ~/bin si no existe aún
@@ -405,8 +406,39 @@ if [ -d "$DOTFILES_DIR/wallpapers" ]; then
     
     log_info "Copiando desde $DOTFILES_DIR/wallpapers/ a $WALLPAPER_DEST/"
     cp -r "$DOTFILES_DIR/wallpapers/"* "$WALLPAPER_DEST/" 2>/dev/null
+
+    # Copiar solo los fondos declarados por temas; el paquete completo de assets
+    # incluye archivos UHD que no se usan y ocupa cientos de megabytes.
+    PROJECT_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
+    CYBER_WALLPAPER_SOURCE="$PROJECT_ROOT/assets/wallpapers/cyber"
+    if [ -d "$CYBER_WALLPAPER_SOURCE" ] && command -v python3 &>/dev/null; then
+        while IFS= read -r wallpaper; do
+            [ -n "$wallpaper" ] || continue
+            if [ -f "$CYBER_WALLPAPER_SOURCE/$wallpaper" ] && [ ! -e "$WALLPAPER_DEST/$wallpaper" ]; then
+                cp -- "$CYBER_WALLPAPER_SOURCE/$wallpaper" "$WALLPAPER_DEST/$wallpaper"
+            fi
+        done < <(python3 - "$DOTFILES_DIR/waybar/themes" <<'PY'
+import glob
+import json
+import os
+import sys
+
+for manifest in glob.glob(os.path.join(sys.argv[1], "*", "theme.json")):
+    try:
+        with open(manifest, encoding="utf-8") as source:
+            theme = json.load(source)
+    except (OSError, ValueError):
+        continue
+    for key in ("wallpaper", "panorama"):
+        value = theme.get(key)
+        if isinstance(value, str) and value and os.path.basename(value) == value:
+            print(value)
+PY
+        )
+        log_info "Fondos de temas declarados copiados desde $CYBER_WALLPAPER_SOURCE"
+    fi
     
-    WALLPAPER_COUNT=$(ls -1 "$WALLPAPER_DEST/" 2>/dev/null | wc -l)
+    WALLPAPER_COUNT=$(find "$WALLPAPER_DEST" -mindepth 1 -maxdepth 1 ! -name '.*' -printf '.' 2>/dev/null | wc -c)
     success "$WALLPAPER_COUNT wallpapers copiados a: $WALLPAPER_DEST"
 
     # --- Descargar wallpapers de gh0stzk (temas Jan, Emilia, Marisol, Melissa) ---
@@ -462,9 +494,9 @@ log_info "Configurando temas GTK e Iconos (Hard Copy for Discovery)..."
 mkdir -p "$USER_HOME/.themes" "$USER_HOME/.local/share/icons" "$USER_HOME/.icons"
 
 # Hard Copy (Definitive Fix for discovery)
-cp -r /usr/share/themes/Sweet-Dark "$USER_HOME/.themes/" 2>/dev/null
-cp -r /usr/share/icons/candy-icons "$USER_HOME/.local/share/icons/" 2>/dev/null
-cp -r /usr/share/icons/candy-icons "$USER_HOME/.icons/" 2>/dev/null
+tar -C /usr/share/themes --exclude='.git' -cf - Sweet-Dark | tar -C "$USER_HOME/.themes" -xf -
+tar -C /usr/share/icons --exclude='.git' -cf - candy-icons | tar -C "$USER_HOME/.local/share/icons" -xf -
+tar -C /usr/share/icons --exclude='.git' -cf - candy-icons | tar -C "$USER_HOME/.icons" -xf -
 
 # Apply Gsettings with DBUS Wrapper
 log_info "Aplicando configuraciones GNOME/GTK (vía dbus-launch)..."
@@ -475,7 +507,7 @@ apply_gsettings() {
 apply_gsettings org.gnome.desktop.interface gtk-theme 'Sweet-Dark'
 apply_gsettings org.gnome.desktop.interface icon-theme 'candy-icons'
 apply_gsettings org.gnome.desktop.interface font-name 'Roboto Medium 11'
-apply_gsettings org.gnome.desktop.interface cursor-theme 'Breeze_Snow'
+apply_gsettings org.gnome.desktop.interface cursor-theme 'Adwaita'
 apply_gsettings org.gnome.desktop.interface color-scheme 'prefer-dark'
 
 # --- Fix Theme branch and Portals (BLACK-ICE CRITICAL FIX) ---
@@ -485,7 +517,7 @@ log_info "Corrigiendo rama de tema (Sweet-Dark) y configuración de Portales..."
 if [ -d "/usr/share/themes/Sweet-Dark" ]; then
     if [ ! -d "/usr/share/themes/Sweet-Dark/.git" ]; then
         # Salir del directorio ANTES de borrarlo (evita CWD inválido en git clone)
-        cd /tmp || true
+        cd "$USER_HOME" || exit 1
         sudo rm -rf /usr/share/themes/Sweet-Dark
         sudo git clone --depth=1 -b Ambar-Blue-Dark https://github.com/EliverLara/Sweet.git /usr/share/themes/Sweet-Dark \
             || log_warn "No se pudo clonar Sweet-Dark desde GitHub, continuando sin tema Ambar-Blue-Dark"
@@ -494,7 +526,7 @@ if [ -d "/usr/share/themes/Sweet-Dark" ]; then
             && { sudo git checkout Ambar-Blue-Dark 2>/dev/null \
                  || sudo git checkout -b Ambar-Blue-Dark origin/Ambar-Blue-Dark 2>/dev/null \
                  || log_warn "No se pudo cambiar rama Sweet-Dark"; }
-        cd "$HOME" || cd /tmp || true
+        cd "$USER_HOME" || exit 1
     fi
     [ -f "/usr/share/themes/Sweet-Dark/index.theme" ] && \
         sudo sed -i 's/GtkTheme=Sweet/GtkTheme=Sweet-Dark/' /usr/share/themes/Sweet-Dark/index.theme
@@ -546,7 +578,7 @@ else
         log_success "Tema Kvantum encontrado en /usr/share/Kvantum"
     else
         # Deep search
-        FOUND_KVANTUM=$(find /usr/share/themes /usr/share/Kvantum -type d -name "Sweet" 2>/dev/null | grep Kvantum | head -n 1)
+        FOUND_KVANTUM=$(find /usr/share/themes /usr/share/Kvantum -type d -path '*/Kvantum/*' -name "Sweet" -print -quit 2>/dev/null) || FOUND_KVANTUM=""
         if [ -n "$FOUND_KVANTUM" ]; then
             ln -snf "$FOUND_KVANTUM" "$USER_HOME/.local/share/Kvantum/Sweet"
             echo -e '[General]\ntheme=Sweet' > "$USER_HOME/.config/Kvantum/kvantum.kvconfig"
@@ -686,7 +718,7 @@ cat > "$USER_HOME/.config/gtk-3.0/settings.ini" << 'EOF'
 gtk-theme-name=Sweet-Dark
 gtk-icon-theme-name=candy-icons
 gtk-font-name=Roboto Medium 10
-gtk-cursor-theme-name=Breeze_Snow
+gtk-cursor-theme-name=Adwaita
 gtk-application-prefer-dark-theme=1
 gtk-color-scheme=prefer-dark
 EOF
@@ -743,7 +775,7 @@ if [ -d "$DOTFILES_DIR/wofi" ]; then
 fi
 
 if [ -d "$DOTFILES_DIR/bin" ]; then
-    cp -r "$DOTFILES_DIR/bin/"* "$USER_HOME/.config/bin/"
+    cp -r --remove-destination "$DOTFILES_DIR/bin/"* "$USER_HOME/.config/bin/"
     if [ -d "$USER_HOME/.config/bin" ]; then
         chmod +x "$USER_HOME/.config/bin/"* 2>/dev/null || true
     fi
@@ -797,7 +829,12 @@ chown -R "$CURRENT_USER":"$CURRENT_USER" "$USER_HOME/.config/kitty"
 chown -R "$CURRENT_USER":"$CURRENT_USER" "$USER_HOME/.config/wofi"
 chown -R "$CURRENT_USER":"$CURRENT_USER" "$WALLPAPER_DEST" 2>/dev/null || true
 
-# --- PLYMOUTH (Boot Splash - via AUR) ---
+# --- PLYMOUTH ---
+if systemd-detect-virt --vm --quiet; then
+    log_info "VM detectada: arranque visible sin splash gráfico."
+    sudo python3 "$SCRIPT_DIR/scripts/configure-vm-boot.py" /etc/default/grub
+    sudo grub-mkconfig -o /boot/grub/grub.cfg
+else
 log_info "Instalando y configurando Plymouth (Boot Splash)..."
 
 # Instalar plymouth con --noscriptlet para evitar que el hook post-install
@@ -849,9 +886,11 @@ else
     log_info "Tema Plymouth $PLYMOUTH_THEME_NAME ya instalado"
 fi
 
-sudo -n plymouth-set-default-theme "$PLYMOUTH_THEME_NAME" 2>/dev/null \
-    && log_success "Plymouth theme: $PLYMOUTH_THEME_NAME" \
-    || log_warn "plymouth-set-default-theme falló — tema puede no activarse"
+if sudo -n plymouth-set-default-theme "$PLYMOUTH_THEME_NAME" 2>/dev/null; then
+    log_success "Plymouth theme: $PLYMOUTH_THEME_NAME"
+else
+    log_warn 'plymouth-set-default-theme falló; el tema puede no activarse'
+fi
 
 # Inyectar hook 'plymouth' en mkinitcpio.conf.
 # El hook debe quedar DESPUÉS de keyboard/keymap para que el mapa VT esté listo.
@@ -872,6 +911,8 @@ fi
 
 if grep -q "plymouth" /etc/mkinitcpio.conf; then
     log_info "Regenerando initramfs con Plymouth..."
+    # El log pertenece al usuario del despliegue, no a root.
+    # shellcheck disable=SC2024
     if sudo -n mkinitcpio -P >> "$LOG_FILE" 2>&1; then
         log_success "initramfs regenerado con Plymouth"
     else
@@ -887,5 +928,6 @@ if ! grep -q "splash" /etc/default/grub; then
 fi
 
 success "Plymouth configurado correctamente"
+fi
 
 success "Hyprland configurado completamente"

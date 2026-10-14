@@ -1,0 +1,326 @@
+{
+  "Anubis-Sethek": {
+    "font": "Oxanium",
+    "data_font": "Oxanium",
+    "size": 12,
+    "weight": 500
+  },
+  "Brenda-Everforest": {
+    "font": "Inter",
+    "data_font": "RobotoMono Nerd Font",
+    "size": 12,
+    "weight": 500
+  },
+  "Daniela-Catppuccin": {
+    "font": "Roboto",
+    "data_font": "RobotoMono Nerd Font",
+    "size": 12,
+    "weight": 500
+  },
+  "Emilia-Angular": {
+    "font": "Oxanium",
+    "data_font": "Oxanium",
+    "size": 12,
+    "weight": 500
+  },
+  "Emilia-TokyoNight": {
+    "font": "Roboto",
+    "data_font": "Roboto",
+    "size": 12,
+    "weight": 500
+  },
+  "Fsociety": {
+    "font": "Roboto",
+    "data_font": "Roboto",
+    "size": 12,
+    "weight": 500
+  },
+  "H4k3r-HTB": {
+    "font": "Ubuntu Sans",
+    "data_font": "RobotoMono Nerd Font",
+    "size": 12,
+    "weight": 500
+  },
+  "Horus-Nightwatch": {
+    "font": "Inter",
+    "data_font": "Inter",
+    "size": 12,
+    "weight": 500
+  },
+  "Isabel-Frappe": {
+    "font": "Roboto",
+    "data_font": "RobotoMono Nerd Font",
+    "size": 12,
+    "weight": 500
+  },
+  "Isis-Lunar": {
+    "font": "Ubuntu Sans",
+    "data_font": "Ubuntu Sans",
+    "size": 12,
+    "weight": 500
+  },
+  "Jan-CyberPunk": {
+    "font": "Oxanium",
+    "data_font": "Oxanium",
+    "size": 12,
+    "weight": 500
+  },
+  "Janis-CyberMagenta": {
+    "font": "Rajdhani",
+    "data_font": "Rajdhani",
+    "size": 14,
+    "weight": 600
+  },
+  "Karla-ZombieNight": {
+    "font": "Rajdhani",
+    "data_font": "Rajdhani",
+    "size": 14,
+    "weight": 600
+  },
+  "Marisol-Dracula": {
+    "font": "Roboto",
+    "data_font": "RobotoMono Nerd Font",
+    "size": 12,
+    "weight": 500
+  },
+  "Matrix-Hacker": {
+    "font": "Share Tech Mono",
+    "data_font": "Share Tech Mono",
+    "size": 13,
+    "weight": 400
+  },
+  "Melissa-Nord": {
+    "font": "Barlow Condensed",
+    "data_font": "Barlow Condensed",
+    "size": 14,
+    "weight": 500
+  },
+  "Mr-Robot": {
+    "font": "Roboto",
+    "data_font": "Roboto",
+    "size": 12,
+    "weight": 500
+  },
+  "Nephthys-Veil": {
+    "font": "Roboto",
+    "data_font": "Roboto",
+    "size": 12,
+    "weight": 500
+  },
+  "Obsidian-Angular": {
+    "font": "Inter",
+    "data_font": "RobotoMono Nerd Font",
+    "size": 12,
+    "weight": 500
+  },
+  "Obsidian-Cobalt": {
+    "font": "Inter",
+    "data_font": "RobotoMono Nerd Font",
+    "size": 12,
+    "weight": 500
+  },
+  "Obsidian-Ember": {
+    "font": "Inter",
+    "data_font": "RobotoMono Nerd Font",
+    "size": 12,
+    "weight": 500
+  },
+  "Obsidian-Frost": {
+    "font": "Inter",
+    "data_font": "RobotoMono Nerd Font",
+    "size": 12,
+    "weight": 500
+  },
+  "Pamela-Lovelace": {
+    "font": "Roboto",
+    "data_font": "RobotoMono Nerd Font",
+    "size": 12,
+    "weight": 500
+  },
+  "Ra-Eclipse": {
+    "font": "Barlow Condensed",
+    "data_font": "Barlow Condensed",
+    "size": 14,
+    "weight": 500
+  },
+  "Sekhmet-Redline": {
+    "font": "Rajdhani",
+    "data_font": "Rajdhani",
+    "size": 14,
+    "weight": 600
+  },
+  "Seth-Tempest": {
+    "font": "Rajdhani",
+    "data_font": "Rajdhani",
+    "size": 14,
+    "weight": 600
+  },
+  "Silvia-Gruvbox": {
+    "font": "Ubuntu Sans",
+    "data_font": "RobotoMono Nerd Font",
+    "size": 12,
+    "weight": 500
+  },
+  "Varinka-Angular": {
+    "font": "Rajdhani",
+    "data_font": "Rajdhani",
+    "size": 14,
+    "weight": 600
+  },
+  "Varinka-Mono": {
+    "font": "Barlow Condensed",
+    "data_font": "Barlow Condensed",
+    "size": 14,
+    "weight": 500
+  },
+  "Yael-Angular": {
+    "font": "Oxanium",
+    "data_font": "Oxanium",
+    "size": 12,
+    "weight": 500
+  },
+  "Yael-OxoCarbon": {
+    "font": "Ubuntu Sans",
+    "data_font": "Ubuntu Sans",
+    "size": 12,
+    "weight": 500
+  },
+  "Zombie-Decay": {
+    "font": "Barlow Condensed",
+    "data_font": "Barlow Condensed",
+    "size": 14,
+    "weight": 500
+  },
+  "s4vitar-darkness": {
+    "font": "Roboto",
+    "data_font": "RobotoMono Nerd Font",
+    "size": 12,
+    "weight": 500
+  },
+  "Horus-Skyline": {
+    "font": "Inter",
+    "data_font": "Inter",
+    "size": 12,
+    "weight": 500
+  },
+  "NSA-Signal": {
+    "font": "Inter",
+    "data_font": "Inter",
+    "size": 12,
+    "weight": 500
+  },
+  "FBI-Casefile": {
+    "font": "Barlow Condensed",
+    "data_font": "Barlow Condensed",
+    "size": 14,
+    "weight": 500
+  },
+  "MI5-Thames": {
+    "font": "Ubuntu Sans",
+    "data_font": "Ubuntu Sans",
+    "size": 12,
+    "weight": 500
+  },
+  "MK11-SubZero": {
+    "font": "Oxanium",
+    "data_font": "Oxanium",
+    "size": 12,
+    "weight": 500
+  },
+  "MK11-Scorpion": {
+    "font": "Rajdhani",
+    "data_font": "Rajdhani",
+    "size": 14,
+    "weight": 600
+  },
+  "Supra-MK4": {
+    "font": "Barlow Condensed",
+    "data_font": "Barlow Condensed",
+    "size": 14,
+    "weight": 500
+  },
+  "Civic-Si-Mugen": {
+    "font": "Roboto",
+    "data_font": "Roboto",
+    "size": 12,
+    "weight": 500
+  },
+  "Skyline-GTR-R34": {
+    "font": "Rajdhani",
+    "data_font": "Rajdhani",
+    "size": 14,
+    "weight": 600
+  },
+  "Anubis-Citadel": {
+    "font": "Oxanium",
+    "data_font": "Oxanium",
+    "size": 12,
+    "weight": 500
+  },
+  "Horus-Moonfall": {
+    "font": "Inter",
+    "data_font": "Inter",
+    "size": 12,
+    "weight": 500
+  },
+  "Seth-Stormkeep": {
+    "font": "Rajdhani",
+    "data_font": "Rajdhani",
+    "size": 14,
+    "weight": 600
+  },
+  "Ra-Afterlight": {
+    "font": "Barlow Condensed",
+    "data_font": "Barlow Condensed",
+    "size": 14,
+    "weight": 500
+  },
+  "Isis-Moonriver": {
+    "font": "Ubuntu Sans",
+    "data_font": "Ubuntu Sans",
+    "size": 12,
+    "weight": 500
+  },
+  "Sekhmet-RedCitadel": {
+    "font": "Rajdhani",
+    "data_font": "Rajdhani",
+    "size": 14,
+    "weight": 600
+  },
+  "Mr-Robot-Safehouse": {
+    "font": "Roboto",
+    "data_font": "Roboto",
+    "size": 12,
+    "weight": 500
+  },
+  "FBI-Fieldwork": {
+    "font": "Barlow Condensed",
+    "data_font": "Barlow Condensed",
+    "size": 14,
+    "weight": 500
+  },
+  "NSA-Intercept": {
+    "font": "Inter",
+    "data_font": "Inter",
+    "size": 12,
+    "weight": 500
+  },
+  "MI5-Operations": {
+    "font": "Ubuntu Sans",
+    "data_font": "Ubuntu Sans",
+    "size": 12,
+    "weight": 500
+  },
+  "Kevin-Mitnick-Condor": {
+    "font": "Barlow Condensed",
+    "data_font": "Roboto",
+    "size": 14,
+    "weight": 500
+  },
+  "Kevin-Mitnick-Condor-Noir": {
+    "font": "Ubuntu Sans",
+    "data_font": "Roboto",
+    "size": 12,
+    "weight": 500
+  }
+}

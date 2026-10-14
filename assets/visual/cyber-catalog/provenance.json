@@ -1,0 +1,54 @@
+{
+  "date": "2026-10-10",
+  "resources": [
+    {
+      "path": "assets/wallpapers/cyber/anubis-sethek.png",
+      "sha256": "f9468873d288c7cbb9daaaab94126517df203fe1afdea744fee9de5837e3a005",
+      "width": 3840,
+      "height": 1848,
+      "origin": "recurso propio de KDE recuperado de h0ruz"
+    },
+    {
+      "path": "assets/wallpapers/cyber/horus-nightwatch.png",
+      "sha256": "bd10393279d388df8efb8fdfca6214c3601f51ed2f6e8069d704e94249d52655",
+      "width": 1672,
+      "height": 941,
+      "origin": "composición original; instrucciones en prompts.json"
+    },
+    {
+      "path": "assets/wallpapers/cyber/isis-lunar.png",
+      "sha256": "5e500c3ec6df80e0f95e32b16582ee9ad7617663b8a3a0ceee399fc83ee086f6",
+      "width": 1672,
+      "height": 941,
+      "origin": "composición original; instrucciones en prompts.json"
+    },
+    {
+      "path": "assets/wallpapers/cyber/mr-robot.png",
+      "sha256": "7b0f7a2348adf4171e2a48fe5caa7a0afcb7c673246bfbef4e43d6116b464497",
+      "width": 1672,
+      "height": 941,
+      "origin": "composición original; instrucciones en prompts.json"
+    },
+    {
+      "path": "assets/wallpapers/cyber/ra-eclipse.png",
+      "sha256": "a89e0abbf0854c0dfe738d185f7ff7c849d6f7db4c2a9a6ed695fb4bbefb834b",
+      "width": 1672,
+      "height": 940,
+      "origin": "composición original; instrucciones en prompts.json"
+    },
+    {
+      "path": "assets/wallpapers/cyber/sekhmet-redline.png",
+      "sha256": "e0a02c6ba73ca85db3f0ee47fa1232bc313e6bf3e2bc5cb49c9346f4952de83d",
+      "width": 1672,
+      "height": 941,
+      "origin": "composición original; instrucciones en prompts.json"
+    },
+    {
+      "path": "assets/wallpapers/cyber/seth-tempest.png",
+      "sha256": "b33e04d2e389a10d14645ef3ad25e93bce81ce6a45b3651009cfb0f552aaace7",
+      "width": 1672,
+      "height": 941,
+      "origin": "composición original; instrucciones en prompts.json"
+    }
+  ]
+}

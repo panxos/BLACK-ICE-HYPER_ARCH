@@ -1,5 +1,127 @@
 # CHANGELOG - BLACK-ICE ARCH
 
+## [4.0.0-dev.2] — Sin publicar — 2026-10-11
+
+### Tor del sistema, idiomas y documentación — 2026-10-14
+
+- Tor transparente para TCP/DNS IPv4 de aplicaciones instaladas, con UID dedicado, filtro nftables independiente y bloqueo de IPv6, UDP restante y reenvío. Caída del daemon conserva el filtro; apagado explícito recupera conexión normal.
+- Comprobados en VM conexión normal sin proxychains, DNS redirigido, bloqueo UDP/IPv6/reenvío y reinicio con filtro anterior a NetworkManager. No equivale a anonimato absoluto ni reemplaza Tor Browser.
+- Módulo compacto con paleta y tipografía de los 54 temas. Control permite apagar Tor y ocultar su indicador; no abre una consola especial.
+- Preferencia español/inglés compartida por Control, Estudio, galerías y centro de sistema; IDs y datos personales conservados. SDDM y Rofi incorporan selección/etiquetas bilingües.
+- Suite GTK aislada por defecto en Xvfb. La ejecución anterior desde la sesión Wayland congelaba el escritorio al abrir ventanas de prueba.
+- `uwsm` ahora es dependencia crítica: SDDM selecciona `hyprland-uwsm.desktop`; sin el gestor la primera sesión Wayland cerraba inmediatamente.
+- Catálogo ampliado a 143 aplicaciones con Tor/nftables opcionales. README e índice renovados, guías completas, seguridad, idiomas y pendientes en ambos idiomas. Sin commit, push, tag ni release.
+
+### Puesto de seguridad — 2026-10-14
+
+- Retirado el flujo anterior de terminal Tor aislada en Podman/Kitty; la activación vigente aplica el filtro de red al sistema y el usuario utiliza sus terminales habituales.
+- Plantillas Juice Shop v19.2.1 y WebGoat v2026.5 en red interna, puertos solo localhost y comprobación HTTP. Corregido UID de WebGoat; ambos respondieron en VM.
+- Perfiles forenses opcionales con fuente/tamaño y comprobación de paquete, ejecutable e inicio. Casos con alcance/VPN, copia de evidencias, SHA256, registro encadenado y resumen saneado.
+- Almacén Podman dedicado, control de preparación/caché, limpieza revisable y vencimiento de laboratorios. Instalación conjunta para usuarios nuevos y definición CI con permisos de lectura.
+- Regresiones de aislamiento, apagado concurrente, exportación y archivos alterados. Revisión visual, servicio físico, copia final a VM y primera ejecución CI pendientes; restricciones del entorno impidieron completar comprobaciones GTK/D-Bus/libvirt. No se publica versión.
+
+### Laboratorios guiados — 2026-10-13
+
+- Tres plantillas: Alpine ligero, Debian con Bash y VM Alpine live. El asistente muestra utilidad y recursos, detecta requisitos y prepara imágenes oficiales con integridad automática, sin pedir hashes manuales.
+- Crear y abrir, consola recuperable, estado real y modo avanzado con selector de qcow2. Requisitos opcionales mediante la autorización normal; fuentes y módulos incluidos en instalaciones nuevas.
+- Comprobación de red, capacidades, nuevos privilegios, montajes, usuario, espacios de nombres y discos antes de abrir. Compatibilidad de Podman con capacidades expandidas y detección de VGA/VNC para QEMU básico.
+- Flujo GTK real, contenedores sin root/red/capacidades y VM arrancada hasta consola comprobados en el laboratorio. Propuestas de privacidad Waybar y forense opcional documentadas, todavía sin implementar.
+- Caché reutilizada sin consultar al registro; creación real comprobada con descarga bloqueada.
+- Control final: 309 pruebas, cinco omitidas, ocho GTK y linters aprobados; 1492 archivos distribuidos y 54 temas sin problemas.
+
+### Datos de Conky en VM — 2026-10-13
+
+- Los veinte estilos reemplazan sensores ausentes por uso CPU en porcentaje, ocupación de disco y CPU disponibles. Se conservan temperaturas y RPM reales cuando existen, incluido el ventilador detenido.
+- Etiquetas CPU / TEMP. y CPU / CARGA sustituyen PAQUETE y distinguen grados de porcentaje. VM muestra hipervisor y tiempo activo; recolector conserva carga media para diagnóstico.
+- Ochenta casos del renderizador Lua y métricas bajo carga real en KVM comprobados. Detalles en [datos de Conky en VM](docs/CONKY_VM_METRICS.md).
+
+### Instalación limpia supervisada — 2026-10-13
+
+- VM de s3th recreada desde disco vacío con la ISO existente. Base y escritorio mínimo comprobados por etapas, reinicios, autenticación SDDM/Hyprlock, fondos automáticos y galería Conky.
+- Reanudación Btrfs corregida sin perder el rechazo de discos distintos con UUID duplicado. Hyprpicker estable y proveedor PipeWire/JACK instalados antes de sus consumidores.
+- Paru conserva la revisión real mediante --confirm --review; --noconfirm se limita a la autorización explícita de AUR sin revisión. Se corrige la combinación ineficaz anterior.
+- Teclado XKB fijado antes del greeter SDDM, conservando Xsetup personalizado. 289 pruebas, cinco omitidas, siete GTK y controles aprobados; siete comprobaciones reales de QA y doctor sin fallos. Matriz física/BIOS/LUKS pendiente.
+
+### Confirmaciones de despliegue — 2026-10-13
+
+- Confirmaciones rutinarias automáticas por defecto, con --yes y alternativa --interactive. Reanudación conserva el plan; modo automático no abre otro menú tras agotar reintentos.
+- Autorización sudo renovada cada 45 segundos mientras dura el despliegue; limpieza al finalizar, fallar o recibir señales. Sin modificar sudoers ni guardar contraseñas.
+- Repositorios con confirmaciones automáticas; Paru usa --confirm --review salvo --allow-unreviewed-aur explícito. Instalación agrupada, dependencias de compilación conservadas y conflictos sin resolución automática destructiva.
+- 283 pruebas, cinco omitidas por pantalla y siete GTK; regresiones de duración, limpieza, locks, opciones y preview aprobadas.
+
+### Recuperación de repositorios — 2026-10-13
+
+- Corregida la autorización sudo vencida después de Reflector: revalidación por módulo y operación crítica, con autenticación en terminal y fallo explícito desatendido. Sin cambiar sudoers ni guardar contraseñas.
+- Reflector limitado a 120 segundos y veinte candidatos, validación HTTPS, publicación por rename y conservación de lista anterior ante fallos. Retirados éxitos falsos y borrado automático del llavero PGP.
+- Comandos críticos de repositorios con reintentos acotados; nombres actuales de libayatana-appindicator y libappindicator. 275 pruebas, cinco omitidas por pantalla y siete GTK; repositorios/paru y política sudo comprobados en VM. Reflector real validado en 86 segundos sobre un destino aislado.
+
+### Interfaz del instalador en consola — 2026-10-13
+
+- Portada con logotipo grande, cian/violeta y alternativa compacta. Menús numerados y mensajes legibles con renderizadores compartidos, sin instalar dependencias gráficas.
+- Ocho etapas de la fase base en orden real; arranque deja de repetir el número de energía. Se conserva la autorización SI/NO, las contraseñas y las opciones de instalación.
+- `install.sh --preview` recorre la interfaz con datos explícitos de demostración, antes de inicializar estado o privilegios. Pruebas PTY cubren opciones inválidas, valor exacto, EOF, anchos y logs sin ANSI.
+- 267 pruebas, cinco omitidas por pantalla, siete GTK y controles del proyecto aprobados. Demo aislada en tty2 de la VM de s3th; instalación en tty1 preservada. Sin publicación ni réplica a h0ruz.
+
+### Limpieza de fondos y cabeceras — 2026-10-13
+
+- Retirados cinco archivos de prueba y copias instaladas, 70 MiB; 138 recursos finales/fuentes conservan sus hashes. Manifiestos depurados y reescalador limitado al catálogo, sin sustituir maestros scene ni duplicar una fuente ya usada por un derivado final.
+- Cabeceras compactas para bootstrap, sistema y escritorio, adaptables a terminales estrechas, con bordes ASCII/UTF-8 y color solo en TTY. Vista previa segura mediante --banner; registros en append y copia del banner sin ANSI.
+- Verificación: 261 pruebas, cinco omitidas por pantalla y siete GTK explícitas, linters y distribución aprobados. Captura real de las tres cabeceras en docs/images/features/installer-banners.png. Sin publicación ni réplica a h0ruz.
+
+### Revisión del escritorio y documentación — 2026-10-13
+
+- Corregido el bloqueo inicial de Waybar 4e207a0 mediante backport local verificado: detección de proveedor con status y fallback antiguo. Clic real aislado pasó de 1924,81 a 1,94 ms; el paquete del sistema permanece intacto.
+- Añadido modo de escena completa para disposiciones con pantallas en distintas filas. Anubis-Sethek vuelve al maestro local centrado de 3840×1848 con recortes nativos; la extensión lateral rechazada se retiró. Recuperación del archivo exacto de otro equipo pendiente de acceso.
+- Catálogo de 54 temas con galería completa de capturas Waybar aisladas y datos de ejemplo; README español/inglés y guías reorganizados según el comportamiento actual.
+- Cinco escritorios persistentes por monitor, identificadores estables y atajos locales; comprobados proveedores Hyprlang/Lua, reconexión y ausencia de bindings duplicados. Fluidez física bajo carga pendiente.
+- Galería Conky con Aplicar sin cerrar, cierre explícito y selección de pantallas; ayuda F1/Super+I basada en bindings activos y comprobación de dependencias.
+- Lanzador Rofi con cabecera del fondo, lista y mosaicos, alternativa Wofi y configuración en Apariencia. Logo Hack4u para s4vitar; permiso de redistribución pendiente.
+- Eliminación reversible de perfiles personales desde galería/Estudio, protección del tema activo y restauración sin sobrescritura.
+- Los derivados mayores verificados no se sustituyen por un reescalado inferior.
+- Copia de instalación filtrada, comprobador de enlaces/galería/distribución, retirada de previews documentales obsoletas y del generador que rotaba el escritorio. Registros locales excluidos de publicación.
+- Ruff ampliado a todo el código Python, sintaxis de scripts y ShellCheck sin errores, 240 pruebas y siete comprobaciones GTK separadas aprobadas. Matriz completa de instalación/energía/rendimiento todavía abierta; sin release.
+
+- Corregida la navegación de Control: seleccionar botones GTK ya no vuelve a activar la sección anterior. Regresión reproducida antes del cambio y verificada con widgets reales.
+- Reanudación por módulo con UUID, huella de configuración, hash del script, comprobaciones de salida e invalidación de dependientes. El particionado no se repite automáticamente.
+- Gestor CLI/GTK de software con cola persistente, cancelación entre transacciones, conciliación y reintentos; proyectos/objetivos y VPN explícita de NetworkManager; laboratorios propios con presupuesto y aislamiento.
+- Helper privilegiado limitado al catálogo y actualizaciones completas, snapshots Btrfs con copia de arranque/ESP y restauración offline. La verificación exige una restauración y arranque previos.
+- Cursor Adwaita disponible y cursor X11 explícito; herramienta de recreación acotada a la VM de QA y resolución indicada. Nuevas pruebas y recolector de evidencia/rendimiento. Validación real en curso; no se publica una release.
+- Instalación limpia: Snapper deja de referenciar usuarios aún inexistentes y los hooks de pacman respetan la retención numérica. La reanudación comprueba también el dispositivo real y la ESP antes de reutilizar montajes.
+- Centro de sistema: apertura en la página solicitada, desplazamiento en pantallas pequeñas y lectura de controles GTK desde el hilo de interfaz. SDDM, GTK y Hyprland utilizan el mismo cursor instalado.
+- Corregido el agente de autorización Qt: Fusion se limita al agente y vistas previas QML; las aplicaciones mantienen su estilo. Bluetooth tiene timeout propio para evitar procesos huérfanos al cerrar Control.
+- Reanudación del escritorio conserva idioma/teclado al omitir repositorios. Los verificadores corresponden a los archivos producidos por cada etapa.
+- Restauración Btrfs desde ISO y arranque comprobados con paquetes, kernel, EFI/initramfs y datos conservados. Laboratorios rootless y límites KVM comprobados en la VM; la aceptación completa sigue abierta.
+- Tres variantes nuevas de puestos de agencias: FBI-Fieldwork, NSA-Intercept y MI5-Operations, con emblemas cinematográficos, barras angulares con bisel, Conky discreto, fondos UHD y accesos SDDM propios. Catálogo de 52 temas; originales anteriores conservados.
+- SDDM conserva resolución de fondos personales y recibe fuentes accesibles al servicio. Corregidos avatar por rol del modelo y bucle de altura.
+- QA virtual: S3/S4 desactivados después de reproducir imagen negra con VirtIO-GPU; pausa del hipervisor disponible. IPC de reanudación compatible con Lua y timeouts tratados como fallos.
+
+## [4.0.0-dev.1] — Sin publicar — 2026-10-11
+
+- Catálogo único de 139 aplicaciones y 20 grupos, perfiles mínimo/escritorio/pentest/completo, selección gráfica o terminal, búsqueda y planes reproducibles. Cancelar omite aplicaciones; IA y Neovim respetan la selección.
+- Vista previa sin cambios, bloqueo de despliegues simultáneos, diagnóstico local y verificador central de desarrollo.
+- Instalador base restringido a ISO live; protege discos montados, swap y volúmenes activos. Confirmación por ruta en automatización, errores críticos detienen el flujo y se espera a udev antes de formatear.
+- Retirados bypass de firmas, eliminaciones -Rdd y sobrescrituras globales. Credenciales por stdin, configuración sensible excluida de copias, sudo con contraseña en instalaciones nuevas y conservación de scripts, snapshots y firewall existentes.
+- Versión central en VERSION; registros privados en el directorio de estado. Bootstrap HTTPS con carpeta única y sin eliminar descargas previas.
+- Migración Lua validada e instalada en s3th para el próximo acceso; conserva monitors.lua generado por nwg-displays y añade soporte a los controles de apariencia.
+- Fondo clásico s4vitar/Hack4u identificado en catálogo externo, procedencia registrada y paleta coherente. Fuentes descargadas de 1920×1080: no se presentan como 4K.
+- Retirados dos archivos obsoletos del directorio anidado Matrix-Hacker/s4vitar-darkness; coincidían con la copia remota antigua y no tenían referencias ejecutables.
+- 158 pruebas funcionales, Ruff y ShellCheck; instalación UEFI/Btrfs sin cifrado en VM nueva de h0ruz, acceso SDDM/Hyprland y escritorio comprobados después de corregir fallos. Matriz ampliada y pruebas físicas pendientes; no se publica release.
+- 43 fondos UHD reescalados localmente, originales intactos, hashes y dimensiones registrados. Git recuperado y fsck aprobado en ambos equipos, sin reset ni cambios de historia.
+- Corregidos auditoría sin LUKS, Snapper sin D-Bus en chroot, registro de snapshots, paquetes antiguos, teclado de consola/XKB, menú XDG mínimo y fallos al repetir copias de temas/scripts.
+- Helpers compatibles con IPC Lua, Waybar con soporte upstream, servicio Conky incluido en instalaciones nuevas y apariencia sincronizada al entrar. Retirados overrides de VM obsoletos y rotación automática de previews al iniciar.
+- Selector nativo de fondos con vista previa si Waypaper no está instalado; verificación del escritorio obligatoria antes del mensaje final de despliegue.
+- Arranque visible sin Plymouth en VM: evita el bloqueo observado con splash al reiniciar y conserva los parámetros de disco/cifrado. Se mantienen los recursos de arranque para equipos físicos.
+- Plan con hitos y aceptación para reanudación por módulos, recuperación por snapshots, software con cola, laboratorios limitados, objetivos/VPN y QA automatizada.
+
+- Estudio de temas visual con arrastre de módulos y Conky, deshacer/rehacer, fuentes, colores, fondos, barras y perfiles personales. Vista previa y aplicación reversible de SDDM.
+- Corregido guardado del peso decimal de fuente que dejaba los perfiles personales sin Waybar; el arranque valida CSS y configuración antes de detener la barra existente.
+- Waybar se ejecuta desde Hyprland para conservar su proceso al cerrar la terminal que aplica el tema.
+- Catálogo de 49 temas, siete familias tipográficas, iconos de escritorios visibles y búsqueda en ambas rutas de la galería. Anubis-Sethek predeterminado; originales conservados.
+- Añadidos agencias, MK11, tres autos y variantes cinematográficas. Fondos propios para Matrix, Nephthys, Jan, Ember y Mr-Robot azul; extensiones de Ra, Sekhmet y Seth activadas según pantallas conectadas. Derivados UHD disponibles; no se presentan como detalle nativo 4K.
+- Corregidos selección del lanzador, menús y contraste de escritorios. Super abre aplicaciones; Super+Alt+T abre Apariencia y Super+Alt+W abre fondos.
+- Kitty, prompt y tipos de archivo comparten la paleta ANSI del tema; las shells abiertas requieren cargar el fragmento nuevo o abrir otra terminal.
+
+
 ## [3.12.5] - 2026-06-27
 
 ### 🛠️ Fixes

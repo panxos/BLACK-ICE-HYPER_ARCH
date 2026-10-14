@@ -1,0 +1,14 @@
+[Unit]
+Description=BLACK-ICE system Tor verification
+Wants=black-ice-tor.service
+After=black-ice-tor.service
+ConditionPathExists=/var/lib/black-ice/tor/enabled
+
+[Service]
+Type=simple
+ExecStart=/usr/lib/black-ice/system-tor watch
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

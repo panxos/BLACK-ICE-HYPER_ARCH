@@ -1,335 +1,200 @@
 #!/usr/bin/env python3
-# cheatsheet — BLACK-ICE ARCH
-# Overlay GTK3 — 3 columnas, estilo gh0stzk-inspired
-# Tecla: Win+I  |  Cierra: Esc / Enter / clic fuera
+"""Atajos activos de BLACK-ICE, con búsqueda y disponibilidad de programas."""
+from __future__ import annotations
 
-import gi
-gi.require_version("Gtk", "3.0")
-from gi.repository import Gtk, Gdk
+import argparse
+import fcntl
+import json
+import os
+import re
+from pathlib import Path
 
-# ── Datos ─────────────────────────────────────────────────────────────────────
-# Cada sección: { title, color (hex fondo header), binds: [(accion, key), ...] }
-
-COLUMNS = [
-    # ── Columna 1: Ventanas / Workspaces / Navegación ─────────────────────────
-    [
-        {
-            "title": "Ventanas",
-            "color": "#00f3ff",
-            "text": "#0d1017",
-            "binds": [
-                ("Terminal",         "Win + Enter"),
-                ("Menú apps",        "Win + D"),
-                ("Cerrar ventana",   "Win + Q"),
-                ("Flotante",         "Win + V"),
-                ("Fullscreen",       "Win + F"),
-                ("Pseudofull",       "Win + Space"),
-                ("Toggle split",     "Win + J"),
-                ("Pseudo tile",      "Win + P"),
-                ("Salir Hyprland",   "Win + M"),
-            ],
-        },
-        {
-            "title": "Workspaces",
-            "color": "#bd93f9",
-            "text": "#0d1017",
-            "binds": [
-                ("Ir a WS 1–5",      "Win + 1…5"),
-                ("Mover a WS 1–5",   "Win+Alt + 1…5"),
-                ("Mover ventana",    "Win + ←↑↓→"),
-                ("Mover (mouse)",    "Win + Btn1"),
-                ("Redimensionar",    "Win + Btn2"),
-            ],
-        },
-        {
-            "title": "Navegación",
-            "color": "#50fa7b",
-            "text": "#0d1017",
-            "binds": [
-                ("Foco ←",           "Win + ←"),
-                ("Foco →",           "Win + →"),
-                ("Foco ↑",           "Win + ↑"),
-                ("Foco ↓",           "Win + ↓"),
-                ("App switcher",     "Win + Tab"),
-            ],
-        },
-    ],
-    # ── Columna 2: Aplicaciones / Herramientas / Capturas ─────────────────────
-    [
-        {
-            "title": "Aplicaciones",
-            "color": "#ffb86c",
-            "text": "#0d1017",
-            "binds": [
-                ("Brave",            "Win+Shift + B"),
-                ("Firefox",          "Win+Shift + F"),
-                ("Dolphin",          "Win+Shift + D"),
-                ("Kate (editor)",    "Win + E"),
-                ("Obsidian",         "Win+Shift + O"),
-                ("Betterbird",       "Win+Shift + E"),
-                ("KeePassXC",        "Win+Shift + K"),
-                ("Caido (proxy)",    "Win+Shift + C"),
-            ],
-        },
-        {
-            "title": "Herramientas",
-            "color": "#ff5555",
-            "text": "#ffffff",
-            "binds": [
-                ("Antigravity",      "Win+Shift + A"),
-                ("Portapapeles",     "Win + H"),
-                ("Contraseñas",      "Win+Shift + X"),
-                ("Terminal Mgr",     "Win+Ctrl + Enter"),
-                ("Music Player",     "Win+Shift + M"),
-                ("Perfil energía",   "Win+Shift + P"),
-                ("Bloquear",         "Win + L"),
-                ("Displays",         "XF86Display"),
-            ],
-        },
-        {
-            "title": "Capturas",
-            "color": "#8be9fd",
-            "text": "#0d1017",
-            "binds": [
-                ("Región → editar",  "Print"),
-                ("Pantalla → clip",  "Shift + Print"),
-                ("Región → arch",    "Win + Print"),
-                ("Pantalla → arch",  "Ctrl + Print"),
-            ],
-        },
-    ],
-    # ── Columna 3: Multimedia / Personalización / Sistema ─────────────────────
-    [
-        {
-            "title": "Multimedia",
-            "color": "#ff79c6",
-            "text": "#0d1017",
-            "binds": [
-                ("Play / Pause",     "F10 · XF86Play"),
-                ("Stop",             "F11 · XF86Stop"),
-                ("Siguiente",        "XF86AudioNext"),
-                ("Anterior",         "XF86AudioPrev"),
-                ("Vol +",            "XF86AudioRaiseVol"),
-                ("Vol -",            "XF86AudioLowerVol"),
-                ("Mute salida",      "XF86AudioMute"),
-                ("Mute micrófono",   "F4 · XF86MicMute"),
-            ],
-        },
-        {
-            "title": "Personalización",
-            "color": "#f1fa8c",
-            "text": "#0d1017",
-            "binds": [
-                ("Selector temas",   "Win+Alt + T"),
-                ("Estilo Wofi",      "Win+Alt + R"),
-                ("Wallpaper",        "Win+Alt + W"),
-                ("Toggle WiFi",      "Win+Alt + F"),
-            ],
-        },
-        {
-            "title": "Sistema",
-            "color": "#a6e3a1",
-            "text": "#0d1017",
-            "binds": [
-                ("Brillo +",         "XF86BrightUp"),
-                ("Brillo -",         "XF86BrightDown"),
-                ("Cheat Sheet",      "Win + I"),
-            ],
-        },
-    ],
-]
-
-# ── CSS ────────────────────────────────────────────────────────────────────────
-CSS = """
-* {
-    font-family: "JetBrainsMono Nerd Font", "JetBrains Mono", monospace;
-}
-
-window {
-    background-color: rgba(13, 17, 23, 0.97);
-}
-
-#root {
-    background-color: transparent;
-}
-
-#title {
-    font-size: 58px;
-    font-weight: bold;
-    letter-spacing: 12px;
-    color: #bd93f9;
-    padding: 28px 0 0 0;
-}
-
-#subtitle {
-    font-size: 12px;
-    color: #6272a4;
-    letter-spacing: 2px;
-    padding: 2px 0 22px 0;
-}
-
-#divider {
-    background-color: rgba(98, 114, 164, 0.35);
-    min-height: 1px;
-    margin: 0 40px 18px 40px;
-}
-
-#columns {
-    padding: 0 28px 28px 28px;
-}
-
-.col {
-    padding: 0 10px;
-}
-
-.sec-header {
-    font-size: 11px;
-    font-weight: bold;
-    letter-spacing: 2px;
-    padding: 3px 12px;
-    border-radius: 2px;
-    margin: 12px 0 5px 0;
-}
-
-.bind-action {
-    font-size: 11px;
-    color: #cdd6f4;
-    padding: 1px 0;
-}
-
-.bind-key {
-    font-size: 10px;
-    color: #6272a4;
-    padding: 1px 0;
-}
-"""
+from black_ice_shortcuts import inventory
+from black_ice_workspaces import IPC
 
 
-class CheatSheet(Gtk.Window):
-    def __init__(self):
-        super().__init__(type=Gtk.WindowType.TOPLEVEL)
+def palette() -> dict:
+    home = Path.home()
+    base = Path(os.environ.get("XDG_CONFIG_HOME", home / ".config"))
+    colors = {"bg": "#0c1118", "fg": "#e6edf3", "acc1": "#27c6ed", "dim": "#a4b5c2"}
+    try:
+        appearance = json.loads((home / ".local/state/black-ice/appearance.json").read_text())
+        colors.update({k: v for k, v in appearance.get("palette", {}).items() if k in colors and re.fullmatch(r"#[0-9A-Fa-f]{6}", str(v))})
+        name = appearance.get("theme", "Anubis-Sethek")
+        metadata = json.loads((base / "waybar/themes" / name / "theme.json").read_text())
+        font = metadata.get("font", "Roboto")
+    except (OSError, ValueError):
+        font = "Roboto"
+    colors["font"] = font if isinstance(font, str) and re.fullmatch(r"[A-Za-z0-9 -]{1,80}", font) else "Roboto"
+    return colors
 
-        self.set_title("BLACK-ICE Cheat Sheet")
-        self.set_decorated(False)
-        self.set_keep_above(True)
-        self.set_position(Gtk.WindowPosition.CENTER)
-        self.set_app_paintable(True)
-        self.fullscreen()
 
-        # Transparencia RGBA
-        screen = self.get_screen()
-        visual = screen.get_rgba_visual()
-        if visual:
-            self.set_visual(visual)
+def show_window() -> None:
+    import gi
+    gi.require_version("Gtk", "3.0")
+    gi.require_version("Gdk", "3.0")
+    from gi.repository import Gdk, GLib, Gtk
 
-        # CSS
-        provider = Gtk.CssProvider()
-        provider.load_from_data(CSS.encode())
-        Gtk.StyleContext.add_provider_for_screen(
-            screen, provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
-        )
+    GLib.set_prgname("black-ice-shortcuts")
 
-        # Eventos de teclado
-        self.connect("key-press-event", self._on_key)
-        self.connect("button-press-event", self._on_click)
-        self.add_events(Gdk.EventMask.BUTTON_PRESS_MASK)
+    class Shortcuts(Gtk.Window):
+        def __init__(self):
+            super().__init__(title="BLACK-ICE — Atajos de teclado")
+            self.set_default_size(980, 620)
+            self.set_type_hint(Gdk.WindowTypeHint.DIALOG)
+            self.set_position(Gtk.WindowPosition.CENTER)
+            self.connect("destroy", Gtk.main_quit)
+            self.connect("key-press-event", self.key_press)
+            colors = palette()
+            css = Gtk.CssProvider()
+            css.load_from_data(f"""
+                window {{ background:{colors['bg']}; color:{colors['fg']}; }}
+                label, entry, button {{ color:{colors['fg']}; font-family:'{colors['font']}'; }}
+                .heading {{ font-size:24px; font-weight:600; }}
+                .category {{ color:{colors['acc1']}; font-size:14px; font-weight:bold; margin-top:16px; }}
+                .key {{ background:alpha({colors['acc1']},.13); border:1px solid alpha({colors['acc1']},.55); border-radius:5px; padding:7px 10px; }}
+                .status {{ color:{colors['dim']}; font-size:11px; }}
+                entry, button {{ background:alpha({colors['fg']},.06); border:1px solid alpha({colors['fg']},.25); padding:8px; }}
+                entry:focus, button:focus {{ border-color:{colors['acc1']}; }}
+                list, scrolledwindow, viewport {{ background:{colors['bg']}; }}
+                list row {{ background:transparent; padding:5px 0; }}
+            """.encode())
+            Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), css, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
+            root = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=14, margin=24)
+            self.add(root)
+            heading = Gtk.Box(spacing=16)
+            title = Gtk.Label(label="Atajos de teclado", xalign=0)
+            title.get_style_context().add_class("heading")
+            heading.pack_start(title, True, True, 0)
+            close = Gtk.Button(label="Cerrar · Esc")
+            close.connect("clicked", lambda _button: self.destroy())
+            heading.pack_end(close, False, False, 0)
+            refresh = Gtk.Button(label="Actualizar")
+            refresh.connect("clicked", self.refresh)
+            heading.pack_end(refresh, False, False, 0)
+            root.pack_start(heading, False, False, 0)
+            self.summary = Gtk.Label(xalign=0)
+            self.summary.set_line_wrap(True)
+            root.pack_start(self.summary, False, False, 0)
+            self.search = Gtk.SearchEntry(placeholder_text="Buscar acción, tecla o programa…")
+            self.search.connect("search-changed", lambda _entry: self.list.invalidate_filter())
+            root.pack_start(self.search, False, False, 0)
+            scroll = Gtk.ScrolledWindow()
+            scroll.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
+            root.pack_start(scroll, True, True, 0)
+            self.list = Gtk.ListBox()
+            self.list.set_selection_mode(Gtk.SelectionMode.NONE)
+            self.list.set_filter_func(self.filter_row)
+            self.list.set_header_func(self.header)
+            scroll.add(self.list)
+            foot = Gtk.Label(label="Win es la tecla Windows · F1 o Win+I para abrir · Disponible comprueba programas; no ejecuta acciones.", xalign=0)
+            foot.set_line_wrap(True)
+            foot.get_style_context().add_class("status")
+            root.pack_start(foot, False, False, 0)
+            self.refresh()
+            self.show_all()
+            self.search.grab_focus()
+            GLib.timeout_add(150, self.place)
 
-        self._build_ui()
-        self.show_all()
+        def place(self):
+            try:
+                ipc = IPC()
+                window = next(c for c in ipc.query("clients") if c["pid"] == os.getpid())
+                address = "address:" + window["address"]
+                if ipc.lua():
+                    ipc.checked("eval hl.dispatch(hl.dsp.window.float({window=" + json.dumps(address) + ',action="set"}))')
+                else:
+                    ipc.checked("dispatch setfloating " + address)
+            except (OSError, ValueError, RuntimeError, StopIteration):
+                pass
+            return False
 
-    # ── Cierre ────────────────────────────────────────────────────────────────
-    def _on_key(self, _w, event):
-        if event.keyval in (Gdk.KEY_Escape, Gdk.KEY_Return, Gdk.KEY_i,
-                            Gdk.KEY_q, Gdk.KEY_F1):
-            Gtk.main_quit()
+        def key_press(self, _widget, event):
+            if event.keyval == Gdk.KEY_Escape:
+                self.destroy()
+                return True
+            return False
 
-    def _on_click(self, _w, _e):
-        Gtk.main_quit()
+        def filter_row(self, row):
+            return self.search.get_text().casefold() in row.search_text
 
-    # ── Construcción UI ───────────────────────────────────────────────────────
-    def _build_ui(self):
-        root = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        root.set_name("root")
-        self.add(root)
+        def header(self, row, before):
+            if before is None or before.category != row.category:
+                label = Gtk.Label(label=row.category, xalign=0)
+                label.get_style_context().add_class("category")
+                row.set_header(label)
+            else:
+                row.set_header(None)
 
-        # ── Título ────────────────────────────────────────────────────────────
-        title = Gtk.Label()
-        title.set_name("title")
-        title.set_markup('<span foreground="#bd93f9">CHEAT SHEET</span>')
-        title.set_halign(Gtk.Align.CENTER)
-        root.pack_start(title, False, False, 0)
+        def refresh(self, *_args):
+            try:
+                entries = inventory()
+            except (OSError, ValueError, TypeError, RuntimeError) as error:
+                self.summary.set_text(f"No se pudo leer Hyprland: {error}. Usa Actualizar para reintentar.")
+                return
+            for row in self.list.get_children():
+                row.destroy()
+            for entry in entries:
+                row = Gtk.ListBoxRow()
+                row.category = entry["category"]
+                row.search_text = " ".join(str(v) for v in entry.values()).casefold()
+                box = Gtk.Box(spacing=18)
+                row.add(box)
+                key = Gtk.Label(label=entry["keys"], xalign=0)
+                key.set_size_request(230, -1)
+                key.set_line_wrap(True)
+                key.get_style_context().add_class("key")
+                box.pack_start(key, False, False, 0)
+                details = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=3)
+                action = Gtk.Label(label=entry["action"], xalign=0)
+                action.set_line_wrap(True)
+                details.pack_start(action, False, False, 0)
+                status = Gtk.Label(label=entry["status"] + (" · mapa " + entry["submap"] if entry["submap"] else ""), xalign=0)
+                status.set_line_wrap(True)
+                status.get_style_context().add_class("status")
+                details.pack_start(status, False, False, 0)
+                box.pack_start(details, True, True, 0)
+                row.set_tooltip_text(entry["command"])
+                self.list.add(row)
+            missing = sum(bool(entry["missing"]) for entry in entries)
+            self.summary.set_text(f"{len(entries)} asignaciones activas · {missing} con programas ausentes · Colores del tema actual")
+            self.list.show_all()
 
-        subtitle = Gtk.Label(label="( Presiona Esc · Enter · I · Q · F1 para cerrar )")
-        subtitle.set_name("subtitle")
-        subtitle.set_halign(Gtk.Align.CENTER)
-        root.pack_start(subtitle, False, False, 0)
+    Shortcuts()
+    Gtk.main()
 
-        # Divisor
-        sep = Gtk.Box()
-        sep.set_name("divider")
-        sep.set_size_request(-1, 1)
-        root.pack_start(sep, False, False, 0)
 
-        # ── Columnas ──────────────────────────────────────────────────────────
-        cols_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL,
-                           spacing=0, homogeneous=True)
-        cols_box.set_name("columns")
-        root.pack_start(cols_box, True, True, 0)
-
-        for col_data in COLUMNS:
-            col = self._build_column(col_data)
-            cols_box.pack_start(col, True, True, 0)
-
-    def _build_column(self, sections):
-        col = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        col.get_style_context().add_class("col")
-
-        for sec in sections:
-            # Header con color de fondo
-            header = Gtk.Label(label=sec["title"].upper())
-            header.get_style_context().add_class("sec-header")
-            header.set_halign(Gtk.Align.START)
-
-            # Color inline vía markup (GTK3 no permite background en label directo,
-            # lo envolvemos en un EventBox coloreado)
-            ebox = Gtk.EventBox()
-            ebox.get_style_context().add_class("sec-header")
-            # Pintar fondo via override_background_color
-            rgba = Gdk.RGBA()
-            rgba.parse(sec["color"])
-            ebox.override_background_color(Gtk.StateFlags.NORMAL, rgba)
-
-            text_rgba = Gdk.RGBA()
-            text_rgba.parse(sec["text"])
-
-            lbl = Gtk.Label(label=sec["title"].upper())
-            lbl.get_style_context().add_class("sec-header")
-            lbl.set_halign(Gtk.Align.START)
-            lbl.override_color(Gtk.StateFlags.NORMAL, text_rgba)
-            ebox.add(lbl)
-            col.pack_start(ebox, False, False, 0)
-
-            # Filas de keybinds
-            for action, key in sec["binds"]:
-                row = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-
-                act_lbl = Gtk.Label(label=action.upper())
-                act_lbl.get_style_context().add_class("bind-action")
-                act_lbl.set_halign(Gtk.Align.START)
-                act_lbl.set_xalign(0)
-
-                key_lbl = Gtk.Label(label=key)
-                key_lbl.get_style_context().add_class("bind-key")
-                key_lbl.set_halign(Gtk.Align.END)
-                key_lbl.set_xalign(1)
-
-                row.pack_start(act_lbl, True, True, 0)
-                row.pack_start(key_lbl, False, False, 0)
-                col.pack_start(row, False, False, 0)
-
-        return col
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--check", action="store_true", help="Imprime asignaciones y dependencias en JSON, sin ejecutar acciones")
+    args = parser.parse_args()
+    if args.check:
+        print(json.dumps(inventory(), ensure_ascii=False, indent=2))
+        return 0
+    runtime = Path(os.environ.get("XDG_RUNTIME_DIR", f"/run/user/{os.getuid()}"))
+    signature = os.environ.get("HYPRLAND_INSTANCE_SIGNATURE", "default")
+    if "/" in signature:
+        parser.error("Firma de Hyprland no válida")
+    with (runtime / f"black-ice-shortcuts-{signature}.lock").open("a+") as lock:
+        try:
+            fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError:
+            lock.seek(0)
+            pid = lock.read().strip()
+            if pid.isdigit():
+                ipc = IPC()
+                for client in ipc.query("clients"):
+                    if client["pid"] == int(pid):
+                        address = "address:" + client["address"]
+                        ipc.checked("eval hl.dispatch(hl.dsp.focus({window=" + json.dumps(address) + "}))" if ipc.lua() else "dispatch focuswindow " + address)
+            return 0
+        lock.seek(0)
+        lock.truncate()
+        lock.write(str(os.getpid()))
+        lock.flush()
+        show_window()
+    return 0
 
 
 if __name__ == "__main__":
-    CheatSheet()
-    Gtk.main()
+    raise SystemExit(main())

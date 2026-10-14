@@ -1,7 +1,7 @@
 #!/bin/bash
 # modules/05_bootloader.sh (Precision Bootloader Setup)
 
-banner "PASO 6" "Gestor de Arranque (GRUB)"
+install_stage 7 'Arranque del sistema / GRUB'
 
 # --- Asegurar Paquetes ---
 log_info "Instalando paquetes críticos para el arranque..."

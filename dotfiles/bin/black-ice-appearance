@@ -1,0 +1,289 @@
+#!/usr/bin/env python3
+"""Aplica recursos visuales compartidos sin un proceso residente."""
+from __future__ import annotations
+
+import argparse
+import configparser
+import fcntl
+import json
+import logging
+import os
+import re
+import subprocess
+import tempfile
+from pathlib import Path
+
+from black_ice_lock import backgrounds
+
+CONFIG = Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config"))
+DATA = Path(os.environ.get("XDG_DATA_HOME", Path.home() / ".local/share")) / "black-ice/obsidian"
+STATE = Path(os.environ.get("XDG_STATE_HOME", Path.home() / ".local/state")) / "black-ice"
+BIN = Path.home() / ".local/bin"
+PALETTE = {"bg": "#0c1118", "acc1": "#27c6ed", "acc2": "#ae90e8", "fg": "#e6edf3", "dim": "#a4b5c2"}
+LOG = logging.getLogger("black-ice-appearance")
+
+
+def read_json(path: Path) -> dict:
+    try:
+        value = json.loads(path.read_text())
+        return value if isinstance(value, dict) else {}
+    except (OSError, ValueError):
+        return {}
+
+
+def atomic(path: Path, content: str) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.NamedTemporaryFile(mode="w", dir=path.parent, delete=False) as handle:
+        handle.write(content)
+        temporary = Path(handle.name)
+    try:
+        temporary.chmod(0o644)
+        temporary.replace(path)
+    finally:
+        temporary.unlink(missing_ok=True)
+
+
+def themes() -> list[str]:
+    root = CONFIG / "waybar/themes"
+    return sorted(p.name for p in root.glob("*") if p.is_dir()
+                  and (p / "config.jsonc").is_file() and (p / "style.css").is_file())
+
+
+def current_theme() -> str:
+    resolved = (CONFIG / "waybar/style.css").resolve()
+    return resolved.parent.name if resolved.parent.parent.name == "themes" else "Anubis-Sethek"
+
+
+def palette(name: str) -> dict:
+    root = CONFIG / "waybar/themes" / name
+    try:
+        header = (root / "style.css").read_text()[:600]
+    except OSError:
+        header = ""
+    known = read_json(CONFIG / "conky/black-ice/palettes.json").get(name, {})
+    declared = dict(re.findall(r"\b(bg|acc1|acc2|fg|dim)=(#[0-9a-fA-F]{6})\b", header))
+    candidate = {**PALETTE, **known, **declared, **read_json(root / "palette.json")}
+    return {key: candidate[key] if isinstance(candidate[key], str)
+            and re.fullmatch(r"#[0-9a-fA-F]{6}", candidate[key]) else value
+            for key, value in PALETTE.items()}
+
+
+def run(args: list[str], check: bool = False) -> subprocess.CompletedProcess:
+    try:
+        return subprocess.run(args, capture_output=True, text=True, timeout=15, check=check)
+    except FileNotFoundError:
+        if check:
+            raise RuntimeError(f"No se encontró {args[0]}") from None
+        return subprocess.CompletedProcess(args, 127, "", "No disponible")
+
+
+def pictures() -> Path:
+    result = run(["xdg-user-dir", "PICTURES"])
+    return Path(result.stdout.strip()) if result.returncode == 0 and result.stdout.strip() else Path.home() / "Pictures"
+
+
+def wallpaper_path() -> Path:
+    config = configparser.ConfigParser(interpolation=None)
+    try:
+        config.read(CONFIG / "waypaper/config.ini")
+        candidate = Path(os.path.expanduser(config.get("Settings", "wallpaper", fallback="")))
+        if candidate.is_file():
+            return candidate
+    except configparser.Error:
+        pass
+    try:
+        candidate = Path((Path.home() / ".cache/current_wallpaper").read_text().strip()).expanduser()
+        if candidate.is_file():
+            return candidate
+    except OSError:
+        pass
+    return DATA / "wallpaper.png"
+
+
+def terminal_colors(colors: dict) -> dict:
+    def mix(first: str, second: str, amount: float) -> str:
+        channels = [round(int(first[i:i + 2], 16) * (1 - amount) + int(second[i:i + 2], 16) * amount)
+                    for i in (1, 3, 5)]
+        return "#" + "".join(f"{channel:02x}" for channel in channels)
+
+    normal = [colors["bg"], mix("#ef6b78", colors["acc1"], .18),
+              mix("#8dc59c", colors["fg"], .12), mix("#d9ba7f", colors["acc2"], .12),
+              colors["acc1"], colors["acc2"], mix(colors["acc1"], colors["acc2"], .45), colors["fg"]]
+    bright = [colors["dim"], *[mix(value, colors["fg"], .24) for value in normal[1:7]],
+              mix(colors["fg"], "#ffffff", .2)]
+    return {f"color{index}": value for index, value in enumerate(normal + bright)}
+
+
+def render(template: str, colors: dict, wallpaper: Path) -> str:
+    path = str(wallpaper)
+    if any(char in path for char in ("\n", "\r", "\x00")):
+        raise ValueError("El nombre del fondo contiene caracteres no válidos")
+    content = (DATA / template).read_text()
+    folder = CONFIG / "waybar/themes" / current_theme()
+    profile = {**read_json(folder / "theme.json"), **read_json(folder / "profile.json")}
+    font, data_font = profile.get("font", ""), profile.get("data_font", "")
+    if re.fullmatch(r"[A-Za-z0-9 ._-]{1,80}", str(font)):
+        content = content.replace("Rajdhani Medium", font).replace("Rajdhani", font).replace("Noto Sans", font)
+        if template == "kitty.conf.in" and re.fullmatch(r"[A-Za-z0-9 ._-]{1,80}", str(data_font)):
+            content += "\nfont_family " + data_font + "\n"
+    if template == "kitty.conf.in":
+        colors = {**colors, **terminal_colors(colors)}
+    if template == "swaync.css.in" and profile.get("shape") == "angular":
+        content = content.replace("border-radius: 14px", "border-radius: 2px").replace("border-radius: 12px", "border-radius: 2px")
+    for key, value in colors.items():
+        replacement = value.lstrip("#") if template == "hyprlock.conf.in" else value
+        source_key = "@" + key.upper() + "@"
+        content = content.replace(source_key, replacement)
+    content = content.replace("@WALLPAPER@", path).replace("@LOCK_FRAME@", str(CONFIG / "black-ice/lock-frame.png"))
+    return backgrounds(content, read_json(STATE / "wallpapers.json"), wallpaper) if template == "hyprlock.conf.in" else content
+
+
+def lock_sync() -> None:
+    wallpaper = wallpaper_path()
+    run([str(BIN / "black-ice-wallpaper"), "prepare", str(wallpaper)], check=True)
+    target = CONFIG / "hypr/hyprlock.conf"
+    if not target.is_file() or target.read_text().startswith("# BLACK-ICE ARCH — bloqueo Obsidiana"):
+        atomic(target, render("hyprlock.conf.in", palette(current_theme()), wallpaper))
+
+
+def sync() -> None:
+    colors = palette(current_theme())
+    wallpaper = wallpaper_path()
+    helper = BIN / "black-ice-wallpaper"
+    if helper.is_file():
+        run([str(helper), "apply", str(wallpaper)], check=True)
+    for template, target in [
+        ("hyprlock.conf.in", CONFIG / "hypr/hyprlock.conf"),
+        ("wofi.css.in", CONFIG / "wofi/style.css"),
+        ("swaync.css.in", CONFIG / "swaync/style.css"),
+        ("kitty.conf.in", CONFIG / "kitty/obsidian.conf"),
+        ("gtk.css.in", CONFIG / "black-ice/palette.css"),
+        ("qt-colors.conf.in", CONFIG / "qt5ct/colors/Black-Ice.conf"),
+        ("qt-colors.conf.in", CONFIG / "qt6ct/colors/Black-Ice.conf"),
+        ("lock-frame.svg.in", CONFIG / "black-ice/lock-frame.svg"),
+    ]:
+        atomic(target, render(template, colors, wallpaper))
+    frame = CONFIG / "black-ice/lock-frame.png"
+    frame_tmp = frame.with_name("lock-frame-new.png")
+    try:
+        run(["magick", "-background", "none", str(frame.with_suffix(".svg")), str(frame_tmp)], check=True)
+        frame_tmp.replace(frame)
+    finally:
+        frame_tmp.unlink(missing_ok=True)
+    atomic(STATE / "appearance.json", json.dumps({"theme": current_theme(), "wallpaper": str(wallpaper), "palette": colors}, indent=2) + "\n")
+    run(["swaync-client", "-rs"])
+    result = run(["pgrep", "-u", str(os.getuid()), "-x", "kitty"])
+    for pid in result.stdout.split():
+        if pid.isdigit():
+            run(["kill", "-USR1", pid])
+    border = f"rgba({colors['acc1'][1:]}ee) rgba({colors['acc2'][1:]}ee) 45deg"
+    atomic(CONFIG / "hypr/obsidian-colors.conf", "general {\n    col.active_border = " + border + "\n}\n")
+    migrator = BIN / "hyprland-migrate"
+    if migrator.is_file():
+        if (CONFIG / "hypr/hyprland.lua").exists():
+            run([str(migrator), "--sync-generated"], check=True)
+        run([str(migrator), "--set-border", border], check=True)
+    else:
+        run(["hyprctl", "keyword", "general:col.active_border", border])
+
+
+def set_wallpaper(path: Path) -> None:
+    path = path.expanduser().resolve()
+    if not path.is_file() or path.suffix.lower() not in {".png", ".jpg", ".jpeg", ".webp", ".avif"}:
+        raise ValueError("Elige una imagen PNG, JPEG, WebP o AVIF existente")
+    if any(char in str(path) for char in ("\n", "\r", "\x00")):
+        raise ValueError("El nombre del fondo contiene caracteres no válidos")
+    helper = BIN / "black-ice-wallpaper"
+    if not helper.is_file():
+        run(["awww", "img", str(path), "--transition-type", "fade", "--transition-duration", "0.4"], check=True)
+    config = configparser.ConfigParser(interpolation=None)
+    config.read(CONFIG / "waypaper/config.ini")
+    if not config.has_section("Settings"):
+        config.add_section("Settings")
+    config.set("Settings", "wallpaper", str(path))
+    import io
+    output = io.StringIO()
+    config.write(output)
+    atomic(CONFIG / "waypaper/config.ini", output.getvalue())
+    atomic(Path.home() / ".cache/current_wallpaper", str(path) + "\n")
+    sync()
+
+
+def apply_theme(name: str) -> None:
+    name = read_json(CONFIG / "waybar/theme-aliases.json").get(name, name)
+    if name not in themes() or not re.fullmatch(r"[A-Za-z0-9_.-]+", name):
+        raise ValueError("El tema no está instalado")
+    subprocess.run([str(BIN / "waybar_start.sh"), name], stdout=subprocess.DEVNULL,
+                   stderr=subprocess.DEVNULL, timeout=15, check=True)
+    metadata = read_json(CONFIG / "waybar/themes" / name / "theme.json")
+    settings = metadata.get("conky")
+    if isinstance(settings, dict):
+        prefs = read_json(STATE / "conky.json")
+        prefs.update({key: settings[key] for key in ("enabled", "output", "outputs") if key in settings})
+        prefs["follow_theme"] = True
+        if isinstance(prefs.get("themes"), dict):
+            prefs["themes"].pop(name, None)
+        atomic(STATE / "conky.json", json.dumps(prefs, ensure_ascii=False, indent=2) + "\n")
+    chosen = metadata.get("wallpaper", read_json(DATA / "theme-wallpapers.json").get(name, ""))
+    custom = metadata.get("wallpaper_path", "")
+    if custom and Path(custom).is_file():
+        set_wallpaper(Path(custom))
+    elif isinstance(chosen, str) and chosen and Path(chosen).name == chosen:
+        candidate = pictures() / "wallpapers" / chosen
+        if candidate.is_file():
+            set_wallpaper(candidate)
+        else:
+            sync()
+    else:
+        sync()
+    from black_ice_theme import defaults, install_sddm, sddm_preview
+    profile = defaults(name)
+    if profile.get("sddm", {}).get("follow", True):
+        work = Path(os.environ.get("XDG_CACHE_HOME", Path.home() / ".cache")) / "black-ice/theme-studio"
+        preview = work / "sddm-apply"
+        if preview.is_symlink():
+            raise ValueError("La vista previa SDDM no puede ser un enlace")
+        if preview.exists():
+            import shutil
+            shutil.rmtree(preview)
+        sddm_preview(profile, preview)
+        install_sddm(preview)
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description="Apariencia compartida de BLACK-ICE")
+    parser.add_argument("action", choices=["themes", "apply", "sync", "lock-sync", "wallpaper", "status"])
+    parser.add_argument("value", nargs="?")
+    args = parser.parse_args()
+    lock = None
+    try:
+        if args.action in {"apply", "sync", "wallpaper"}:
+            runtime = Path(os.environ.get("XDG_RUNTIME_DIR", Path.home() / ".cache"))
+            runtime.mkdir(parents=True, exist_ok=True)
+            lock = (runtime / "black-ice-appearance.lock").open("w")
+            fcntl.flock(lock, fcntl.LOCK_EX)
+        if args.action == "themes":
+            print(json.dumps(themes()))
+        elif args.action == "status":
+            print(json.dumps({"theme": current_theme(), "wallpaper": str(wallpaper_path()), "palette": palette(current_theme())}))
+        elif args.action == "apply" and args.value:
+            apply_theme(args.value)
+        elif args.action == "wallpaper" and args.value:
+            set_wallpaper(Path(args.value))
+        elif args.action == "sync":
+            sync()
+        elif args.action == "lock-sync":
+            lock_sync()
+        else:
+            parser.error("Falta indicar el tema o el fondo")
+    except (OSError, ValueError, RuntimeError, configparser.Error, subprocess.SubprocessError) as error:
+        LOG.error("No se pudo aplicar la apariencia: %s", error)
+        return 1
+    finally:
+        if lock:
+            lock.close()
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

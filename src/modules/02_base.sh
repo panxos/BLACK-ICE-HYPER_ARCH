@@ -1,4 +1,5 @@
 #!/bin/bash
+install_stage 3 'Sistema base y kernel'
 # modules/02_base.sh ( Cyberpunk Edition)
 
 # --- Protocolo Anti-PGP Error (SOTA Fix) ---
@@ -28,14 +29,14 @@ export SELECTED_KERNEL
 success "Núcleo seleccionado: ${NEON_BLUE}$SELECTED_KERNEL${NC}"
 
 # 3. Construcción de lista de paquetes base
-PACKAGES="base base-devel rsync wget sshpass linux-firmware dialog efibootmgr grub git go nano networkmanager sudo vim openssh man-db man-pages texinfo lvm2 screen expect cryptsetup kbd sof-firmware iwd smartmontools xdg-user-dirs wireless_tools wpa_supplicant"
+PACKAGES="base base-devel inetutils rsync wget sshpass linux-firmware dialog efibootmgr grub git go nano networkmanager sudo vim openssh man-db man-pages texinfo lvm2 screen expect cryptsetup kbd sof-firmware iwd smartmontools xdg-user-dirs wireless_tools wpa_supplicant"
 
 # Añadir Kernel y sus Headers correspondientes
 PACKAGES="$PACKAGES $SELECTED_KERNEL ${SELECTED_KERNEL}-headers"
 
 # 4. Detección de Hardware y Optimización de Virtualización
 log_info "Escaneando entorno de hardware/virtualización..."
-VIRT_TYPE=$(systemd-detect-virt)
+VIRT_TYPE=$(systemd-detect-virt || true)
 IS_LAPTOP=false
 
 # Detectar si es laptop (presencia de batería)
@@ -101,62 +102,10 @@ case "${FILESYSTEM:-}" in
     f2fs)  PACKAGES="$PACKAGES f2fs-tools";;
 esac
 
-# 6. Ejecutar pacstrap con Bucle de Reintento
-# 6. Ejecutar pacstrap con Protocolo de Resiliencia Nuclear
-ATTEMPT=1
-while true; do
-    log_info "Iniciando descarga masiva de paquetes de base (Intento $ATTEMPT)..."
-    
-    if pacstrap /mnt $PACKAGES; then
-        success "Núcleo del sistema inyectado correctamente."
-        # Restaurar SigLevel si fue modificado
-        sed -i 's/^SigLevel = Optional TrustAll/#SigLevel = Required DatabaseOptional/' /etc/pacman.conf 2>/dev/null
-        break
-    else
-        log_error "Fallo en pacstrap (Intento $ATTEMPT)."
-        
-        # Protocolo de Emergencia por niveles
-        if [ $ATTEMPT -eq 1 ]; then
-            log_info "Protocolo Nivel 1: Limpieza de caché y re-poblado de llaves..."
-            rm -rf /mnt/var/cache/pacman/pkg/* 2>/dev/null
-            pacman-key --init >/dev/null 2>&1
-            pacman-key --populate archlinux >/dev/null 2>&1
-            pacman -Sy --noconfirm archlinux-keyring >/dev/null 2>&1
-        elif [ $ATTEMPT -eq 2 ]; then
-            log_warn "Protocolo Nivel 2: Los espejos regionales fallan. Cambiando a Espejos Globales (Worldwide)..."
-            # Forzar reflector a buscar los 20 mirrors más rápidos del mundo
-            reflector --latest 20 --protocol https --sort rate --save /etc/pacman.d/mirrorlist >/dev/null 2>&1
-        elif [ $ATTEMPT -eq 3 ]; then
-            echo -e "\n${RED}╔══════════════════════════════════════════════════════╗${NC}"
-            echo -e "${RED}║${NC}  ${BOLD}PROTOCOLO NUCLEAR PGP REQUERIDO                     ${NC} ${RED}║${NC}"
-            echo -e "${RED}╚══════════════════════════════════════════════════════╝${NC}"
-            echo -e "${YELLOW}[WARN] Las firmas PGP siguen fallando a pesar de la limpieza.${NC}"
-            echo -e "${YELLOW}Esto ocurre si la ISO es incompatible con las llaves nuevas.${NC}"
-            
-            BYPASS="No"
-            if [ "${AUTO_MODE:-}" == "true" ]; then
-                BYPASS="Si"
-                log_info "Modo Automático: Activando bypass de PGP temporalmente."
-            else
-                BYPASS=$(ask_option "¿Activar bypass de PGP para la instalación inicial? (Se corregirá tras el reboot)" "Si" "No")
-            fi
-
-            if [ "$BYPASS" == "Si" ]; then
-                log_warn "Relajando SigLevel en /etc/pacman.conf (Host)..."
-                # Modificar SigLevel del sistema host temporalmente para que pacman del live ISO permita instalar
-                sed -i 's/^SigLevel.*/SigLevel = Optional TrustAll/' /etc/pacman.conf
-                sed -i 's/^#SigLevel/SigLevel/' /etc/pacman.conf
-            else
-                log_error "Instalación abortada por fallos de firma persistentes."
-                exit 1
-            fi
-        else
-            log_error "Fallo crítico persistente tras 3 intentos. Abortando."
-            exit 1
-        fi
-        
-        ((ATTEMPT++))
-        log_info "Reintentando en 5 segundos..."
-        sleep 5
-    fi
-done
+log_info "Instalando paquetes base; se conserva la caché si la operación se interrumpe..."
+read -r -a base_packages <<< "$PACKAGES"
+if ! pacstrap /mnt --needed "${base_packages[@]}"; then
+    log_error "Pacstrap falló. Revisa el error anterior y usa --resume; no se borraron paquetes ni se desactivaron firmas."
+    exit 1
+fi
+success "Núcleo del sistema inyectado correctamente."

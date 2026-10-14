@@ -1,0 +1,17 @@
+[Unit]
+Description=BLACK-ICE workspaces per monitor
+After=hyprland-session.target
+PartOf=hyprland-session.target
+StartLimitIntervalSec=60
+StartLimitBurst=3
+
+[Service]
+Type=simple
+ExecStart=%h/.local/bin/black-ice-workspaces daemon
+Restart=on-failure
+RestartSec=5
+UMask=0077
+NoNewPrivileges=yes
+
+[Install]
+WantedBy=hyprland-session.target

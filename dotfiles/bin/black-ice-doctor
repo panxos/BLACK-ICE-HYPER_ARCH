@@ -1,0 +1,78 @@
+#!/usr/bin/env python3
+"""Diagnóstico local de BLACK-ICE sin alterar servicios ni configuración."""
+
+import argparse
+import json
+import os
+import re
+import shutil
+import subprocess
+from pathlib import Path
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--json", action="store_true")
+    args = parser.parse_args()
+    config = Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config"))
+    data = Path(os.environ.get("XDG_DATA_HOME", Path.home() / ".local/share"))
+    checks = []
+
+    def add(name: str, ok: bool, detail: str) -> None:
+        checks.append({"name": name, "ok": ok, "detail": detail})
+
+    for binary in ("Hyprland", "waybar", "kitty", "wofi", "hyprlock", "swaync", "awww", "python3", "black-ice-apps", "black-ice-system", "black-ice-conky", "black-ice-lock"):
+        executable = str(Path.home() / ".local/bin" / binary) if binary.startswith("black-ice-") else binary
+        found = bool(shutil.which(executable))
+        add(binary, found, "disponible" if found else "falta el ejecutable")
+    for relative in ("hypr/hyprland.conf", "hypr/hyprlock.conf", "waybar/config.jsonc", "waybar/style.css", "kitty/kitty.conf", "black-ice/prompt.zsh"):
+        path = config / relative
+        # Las instalaciones antiguas utilizan config en lugar de config.jsonc.
+        exists = path.is_file() or relative == "waybar/config.jsonc" and (config / "waybar/config").is_file()
+        add(relative, exists, "archivo o enlace válido" if exists else "falta o enlace roto")
+    version = data / "black-ice/software/VERSION"
+    add("versión de escritorio", version.is_file(), version.read_text().strip() if version.is_file() else "sin metadatos instalados")
+    lua = config / "hypr/hyprland.lua"
+    if lua.is_file() and shutil.which("Hyprland"):
+        env = dict(os.environ)
+        env.pop("HYPRLAND_INSTANCE_SIGNATURE", None)
+        env.pop("WAYLAND_DISPLAY", None)
+        try:
+            result = subprocess.run(["Hyprland", "--verify-config", "-c", str(lua)], env=env, capture_output=True, text=True, timeout=20, check=False)
+            ok = result.returncode == 0 and "config ok" in result.stdout + result.stderr
+            add("Lua", ok, "configuración validada" if ok else "configuración rechazada")
+        except (OSError, subprocess.TimeoutExpired):
+            add("Lua", False, "no se completó la validación")
+    if os.environ.get("HYPRLAND_INSTANCE_SIGNATURE"):
+        try:
+            result = subprocess.run(["hyprctl", "configerrors"], capture_output=True, text=True, timeout=5, check=False)
+            ok = result.returncode == 0 and not result.stdout.strip()
+            add("sesión Hyprland", ok, "sin errores de configuración" if ok else "consulta hyprctl configerrors")
+            status = subprocess.run(["hyprctl", "status"], capture_output=True, text=True, timeout=5, check=False)
+            provider = re.search(r"configProvider:\s*(\w+)", status.stdout)
+            if status.returncode == 0 and provider:
+                add("formato de la sesión", True, provider[1] + ("; cierra sesión para usar Lua" if lua.is_file() and provider[1] != "lua" else ""))
+            conky = Path.home() / ".local/bin/black-ice-conky"
+            if conky.is_file():
+                result = subprocess.run([str(conky), "status"], capture_output=True, text=True, timeout=8, check=False)
+                try:
+                    value = json.loads(result.stdout) if result.returncode == 0 else {}
+                except ValueError:
+                    value = {}
+                ok = bool(value) and (not value.get("enabled", True) or bool(value.get("running")) and not value.get("errors"))
+                detail = "desactivado por preferencia" if value and not value.get("enabled", True) else "procesos y capas visibles" if ok else "sin dibujo confirmado; consulta black-ice-conky status y el journal"
+                add("Conky", ok, detail)
+        except (OSError, subprocess.TimeoutExpired):
+            add("sesión Hyprland", False, "consulta no disponible")
+    report = {"checks": checks, "failed": sum(not check["ok"] for check in checks)}
+    if args.json:
+        print(json.dumps(report, indent=2, ensure_ascii=False))
+    else:
+        for check in checks:
+            print(f"{'OK' if check['ok'] else 'REVISAR':7} {check['name']}: {check['detail']}")
+        print(f"\n{report['failed']} comprobaciones requieren revisión.")
+    return 1 if report["failed"] else 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

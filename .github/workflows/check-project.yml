@@ -1,0 +1,30 @@
+name: Project checks
+
+on:
+  pull_request:
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: checks-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  arch:
+    runs-on: ubuntu-latest
+    container: archlinux:base-devel
+    timeout-minutes: 20
+    steps:
+      - name: Install validation dependencies
+        run: pacman -Syu --noconfirm --needed git python ruff shellcheck ripgrep python-gobject gtk3 xorg-server-xvfb python-pillow python-cairo librsvg ttf-dejavu
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
+        with:
+          persist-credentials: false
+      - name: Run checks as an unprivileged user
+        run: |
+          useradd --create-home benjie
+          chown -R benjie:benjie "$GITHUB_WORKSPACE"
+          runuser -u benjie -- env HOME=/home/benjie bash scripts/check-project.sh

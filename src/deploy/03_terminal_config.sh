@@ -8,7 +8,7 @@ banner "MÓDULO 4" "Configuración de Terminal (Zsh)"
 # --- Configurar bin/ del usuario (Scripts Tácticos) ---
 log_info "Configurando scripts tácticos (~/bin/ y ~/.config/bin/)..."
 mkdir -p "$USER_HOME/bin"
-cp -rf "$SCRIPT_DIR/dotfiles/bin/"* "$USER_HOME/bin/"
+cp -r --remove-destination "$SCRIPT_DIR/dotfiles/bin/"* "$USER_HOME/bin/"
 chmod +x "$USER_HOME/bin/"* 2>/dev/null || true
 chown -R "$CURRENT_USER:$CURRENT_USER" "$USER_HOME/bin"
 
@@ -18,11 +18,8 @@ if [ ! -e "$USER_HOME/.config/bin" ]; then
     ln -sf "$USER_HOME/bin" "$USER_HOME/.config/bin"
     log_success "~/.config/bin → symlink a ~/bin (Waybar scripts OK)"
 elif [ -d "$USER_HOME/.config/bin" ] && [ ! -L "$USER_HOME/.config/bin" ]; then
-    # Directorio real: copiar contenido y reemplazar con symlink
-    cp -n "$USER_HOME/.config/bin/"* "$USER_HOME/bin/" 2>/dev/null || true
-    rm -rf "$USER_HOME/.config/bin"
-    ln -sf "$USER_HOME/bin" "$USER_HOME/.config/bin"
-    log_success "~/.config/bin convertido a symlink → ~/bin"
+    cp -a --remove-destination "$SCRIPT_DIR/dotfiles/bin/." "$USER_HOME/.config/bin/"
+    log_info "Se conserva el directorio ~/.config/bin y sus scripts personales."
 fi
 
 # --- Instalar Zsh y plugins base ---
@@ -50,7 +47,7 @@ fi
 chown -R "$CURRENT_USER:$CURRENT_USER" "$FZF_TAB_DIR"
 
 # Instalar zsh-sudo manualmente (no siempre disponible en repos oficiales)
-cd "$USER_HOME" || cd /tmp
+cd "$USER_HOME" || exit 1
 sudo -n mkdir -p /usr/share/zsh/plugins/zsh-sudo
 sudo -n curl -L https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/plugins/sudo/sudo.plugin.zsh \
     -o /usr/share/zsh/plugins/zsh-sudo/sudo.plugin.zsh
@@ -72,7 +69,7 @@ fi
 chown -R "$CURRENT_USER:$CURRENT_USER" "$USER_HOME/.powerlevel10k"
 
 # 2. Instalar para root
-if [ -d "/root/.powerlevel10k" ]; then
+if sudo test -d /root/.powerlevel10k; then
     log_info "Powerlevel10k ya existe para root, actualizando..."
     sudo git -C /root/.powerlevel10k pull --depth=1 2>/dev/null || true
 else
@@ -121,10 +118,11 @@ fi
 # --- Configurar Zsh para root (con configs y fastfetch) ---
 log_info "Configurando Zsh para root..."
 
-# .zshrc de root = symlink al del usuario (se mantienen sincronizados)
+# Root conserva una copia propia, sin ejecutar un archivo modificable por el usuario.
 if [ -f "$USER_HOME/.zshrc" ]; then
-    sudo ln -sf "$USER_HOME/.zshrc" /root/.zshrc
-    log_success ".zshrc de root → symlink a $USER_HOME/.zshrc"
+    sudo rm -f /root/.zshrc
+    sudo install -o root -g root -m 600 "$USER_HOME/.zshrc" /root/.zshrc
+    log_success ".zshrc de root instalado como archivo privado"
 fi
 
 # Copiar Fastfetch a root

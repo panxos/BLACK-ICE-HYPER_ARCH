@@ -1,0 +1,11 @@
+[SddmGreeterTheme]
+Name=BLACK-ICE Obsidiana
+Description=Acceso angular de BLACK-ICE ARCH
+Type=sddm-theme
+Version=1.0
+Author=faravena
+License=GPL-3.0-or-later
+MainScript=Main.qml
+ConfigFile=theme.conf
+Theme-Id=black-ice-obsidian
+Theme-API=2.0

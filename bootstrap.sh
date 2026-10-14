@@ -3,15 +3,24 @@
 # BLACK-ICE ARCH - Bootstrap Installer
 # One-command installation from Arch Linux LiveCD
 # 
-# Usage: curl -L http://is.gd/blackice | bash
+# Usage: curl -L https://raw.githubusercontent.com/panxos/BLACK-ICE-HYPER_ARCH/main/bootstrap.sh | bash
 #        curl -L https://cutt.ly/blackice | bash
 #
 # Author: Francisco Aravena (P4nX0Z)
 # Repository: https://github.com/panxos/BLACK-ICE-HYPER_ARCH.git
-# Version: 1.0
+# Version: loaded from VERSION after checkout
 #
 
-set -e
+set -euo pipefail
+BOOTSTRAP_ROOT=$(dirname "$(readlink -f "$0")")
+BANNER_PREVIEW=false
+case "${1:-}" in
+    --banner) BANNER_PREVIEW=true ;;
+    --version) if [[ -f "$BOOTSTRAP_ROOT/VERSION" ]]; then cat "$BOOTSTRAP_ROOT/VERSION"; else echo 'Versión definida por VERSION dentro del checkout descargado.'; fi; exit 0 ;;
+    --help|--dry-run) echo 'Bootstrap: verificar ISO/root/red → clonar por HTTPS → ejecutar instalador con confirmación de disco. No se realizaron cambios.'; exit 0 ;;
+    '') ;;
+    *) echo "Opción desconocida: $1" >&2; exit 2 ;;
+esac
 
 # Colors
 readonly RED='\033[0;31m'
@@ -19,43 +28,43 @@ readonly GREEN='\033[0;32m'
 readonly YELLOW='\033[1;33m'
 readonly BLUE='\033[0;34m'
 readonly CYAN='\033[0;36m'
-readonly MAGENTA='\033[0;35m'
 readonly NC='\033[0m'
 
 # Configuration
 readonly REPO_URL="https://github.com/panxos/BLACK-ICE-HYPER_ARCH.git"
-readonly INSTALL_DIR="/tmp/black-ice-arch"
+INSTALL_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/tmp/work/black-ice-bootstrap-$(date +%Y%m%d-%H%M%S)-$$"
+readonly INSTALL_DIR
 readonly LOG_DIR="$INSTALL_DIR/logs"
 readonly LOG_FILE="$LOG_DIR/bootstrap.log"
 readonly BRANCH="main"
 
 # Pre-initialize log dir
-mkdir -p "$LOG_DIR"
-exec > >(tee -i "$LOG_FILE") 2>&1
+if [[ "$BANNER_PREVIEW" != true ]]; then
+    mkdir -p "$LOG_DIR"
+    exec > >(tee -ai "$LOG_FILE") 2>&1
+fi
 
 # Banner
 show_banner() {
-    clear
-    echo -e "${CYAN}"
-    cat << 'EOF'
-╔════════════════════════════════════════════════════════════════╗
-║                                                                ║
-║     ██████╗ ██╗      █████╗  ██████╗██╗  ██╗                  ║
-║     ██╔══██╗██║     ██╔══██╗██╔════╝██║ ██╔╝                  ║
-║     ██████╔╝██║     ███████║██║     █████╔╝                   ║
-║     ██╔══██╗██║     ██╔══██║██║     ██╔═██╗                   ║
-║     ██████╔╝███████╗██║  ██║╚██████╗██║  ██╗                  ║
-║     ╚═════╝ ╚══════╝╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝                  ║
-║                                                                ║
-║              ICE ARCH - Automated Installer                    ║
-║          Hyprland + Security Tools + Cyberpunk Theme           ║
-║                                                                ║
-╚════════════════════════════════════════════════════════════════╝
-EOF
-    echo -e "${NC}"
-    echo -e "${MAGENTA}Author:${NC} Francisco Aravena (P4nX0Z)"
-    echo -e "${MAGENTA}Repository:${NC} ${REPO_URL}"
-    echo ""
+    if [[ -f "$BOOTSTRAP_ROOT/src/lib/banner.sh" ]]; then
+        # shellcheck source=src/lib/banner.sh
+        source "$BOOTSTRAP_ROOT/src/lib/banner.sh"
+        local version=''
+        [[ ! -f "$BOOTSTRAP_ROOT/VERSION" ]] || version=$(<"$BOOTSTRAP_ROOT/VERSION")
+        black_ice_banner "DESCARGA DEL INSTALADOR" "Canal $BRANCH / Arch Linux + Hyprland" "$version"
+    else
+        local columns="${COLUMNS:-80}" line
+        [[ "$columns" =~ ^[0-9]{1,4}$ ]] || columns=80
+        columns=$((10#$columns))
+        (( columns > 0 )) || columns=80
+        for line in 'BLACK-ICE / ARCH' 'DESCARGA DEL INSTALADOR' "Canal $BRANCH / Arch Linux + Hyprland" 'Francisco Aravena / soporteinfo.net'; do
+            while [[ -n "$line" ]]; do
+                printf '%s\n' "${line:0:columns}"
+                line="${line:columns}"
+            done
+        done
+        printf '\n'
+    fi
 }
 
 # Logging functions
@@ -158,13 +167,9 @@ clone_repository() {
     log_info "Clonando repositorio BLACK-ICE ARCH..."
     
     # Remove existing directory if present (guard: solo eliminar si es ruta esperada)
-    if [ -d "$INSTALL_DIR" ]; then
-        log_warn "Directorio existente encontrado, eliminando..."
-        [[ "$INSTALL_DIR" == /tmp/black-ice* ]] && rm -rf "$INSTALL_DIR"
-    fi
-    
-    # Clone repository
-    if retry_command git clone --depth 1 --branch "$BRANCH" "$REPO_URL" "$INSTALL_DIR"; then
+    # El directorio único ya contiene el registro: clonar en una carpeta hija.
+    local checkout="$INSTALL_DIR/repository"
+    if retry_command git clone --depth 1 --branch "$BRANCH" "$REPO_URL" "$checkout"; then
         log_success "Repositorio clonado exitosamente"
     else
         log_error "Error crítico: No se pudo clonar el repositorio."
@@ -177,7 +182,7 @@ clone_repository() {
 set_permissions() {
     log_info "Configurando permisos de ejecución..."
     
-    cd "$INSTALL_DIR" || exit 1
+    cd "$INSTALL_DIR/repository" || exit 1
     
     # Make install.sh executable
     if [ -f "install.sh" ]; then
@@ -225,7 +230,7 @@ execute_installer() {
     log_info "Iniciando instalador BLACK-ICE ARCH..."
     echo ""
     
-    cd "$INSTALL_DIR" || exit 1
+    cd "$INSTALL_DIR/repository" || exit 1
     
     # Execute install.sh
     if [ -f "install.sh" ]; then
@@ -266,4 +271,8 @@ main() {
 trap 'log_error "Error en línea $LINENO. Abortando."; exit 1' ERR
 
 # Run main
+if [[ "$BANNER_PREVIEW" == true ]]; then
+    show_banner
+    exit 0
+fi
 main "$@"

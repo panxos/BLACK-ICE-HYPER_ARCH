@@ -133,7 +133,21 @@ reflectorupdate() {
   esac
 }
 
-alias pwd='builtin pwd | tee >(wl-copy -n)'
+# --- pwd copia al portapapeles (salta si AI tool) ---
+pwd() {
+    printf '%s\n' "$PWD"
+    [[ -n "$OPENCODE" ]] && return 0
+    local pid=$PPID comm
+    while [[ $pid -gt 1 && -r /proc/$pid/comm ]]; do
+        comm="$(</proc/$pid/comm)"
+        [[ "$comm" == "opencode" || "$comm" == "claude" ]] && return 0
+        pid=$(awk '{print $4}' /proc/$pid/stat 2>/dev/null) || break
+    done
+    if [[ -t 0 ]]; then
+        printf '%s' "$PWD" | wl-copy
+        notify-send -t 1500 "Ruta copiada" "$PWD"
+    fi
+}
 
 # Alias especiales
 alias HOME='cd $HOME'
@@ -1599,7 +1613,7 @@ source /usr/share/zsh/plugins/zsh-sudo/sudo.plugin.zsh
 # Descomenta para ver el tiempo de carga
 # zprof
 export PATH=~/.npm-global/bin:$PATH
-export LS_COLORS='di=1;38;5;141:ln=38;5;81:so=38;5;183:pi=38;5;226:ex=38;5;118:bd=38;5;208:cd=38;5;208:su=38;5;196:sg=38;5;196:tw=38;5;141:ow=38;5;141'
+export LS_COLORS='rs=0:di=1;34:fi=37:ln=36:so=35:pi=33:ex=32:bd=33:cd=33:su=31:sg=31:tw=1;34:ow=1;34:or=31:mi=31'
 
 # opencode
 export PATH="$HOME/.opencode/bin:$PATH"
@@ -1683,9 +1697,14 @@ fw-close() {
     fi
 }
 
-# alias pwd con copia al clipboard
-alias pwd='builtin pwd | tee >(wl-copy -n)'
+# pwd con copia al clipboard definido arriba (línea ~136)
+
+# --- Fastfetch: logo temático (PNG) al abrir terminal, solo en Kitty local ---
+if [ -z "$SSH_CONNECTION" ] && { [ -n "$KITTY_PID" ] || [[ "$TERM" == *"kitty"* ]]; }; then
+    ~/.config/fastfetch/random_logo.sh
+fi
 
 # --- Configuraciones locales (aliases personales, API keys, etc.) ---
 # Crea ~/.zshrc.local para configs que NO deben ir al repo
 [[ -f ~/.zshrc.local ]] && source ~/.zshrc.local
+[[ -f "${XDG_CONFIG_HOME:-$HOME/.config}/black-ice/prompt.zsh" ]] && source "${XDG_CONFIG_HOME:-$HOME/.config}/black-ice/prompt.zsh"

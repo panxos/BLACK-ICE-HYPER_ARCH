@@ -1,0 +1,19 @@
+[Unit]
+Description=BLACK-ICE desktop telemetry (Wayland)
+After=hyprland-session.target
+PartOf=hyprland-session.target
+StartLimitIntervalSec=60
+StartLimitBurst=3
+
+[Service]
+Type=simple
+ExecStart=%h/.local/bin/black-ice-conky daemon
+Restart=on-failure
+RestartSec=5
+KillMode=control-group
+UMask=0077
+NoNewPrivileges=yes
+LimitCORE=0
+
+[Install]
+WantedBy=hyprland-session.target

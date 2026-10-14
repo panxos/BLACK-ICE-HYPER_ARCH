@@ -1,0 +1,9 @@
+{
+  "wallpaper": "nsa-intercept-uhd.png",
+  "shape": "angular",
+  "font": "Inter",
+  "layout": "dual-bottom",
+  "workspace": "shields",
+  "panorama": "nsa-intercept-panorama-uhd.png",
+  "sddm": "black-ice-nsa-intercept"
+}

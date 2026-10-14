@@ -6,7 +6,8 @@ window {
     border: none;
     background-color: rgba(10, 10, 20, 0.96);
     border-radius: 0px;
-    font-family: "JetBrains Mono Nerd Font", monospace;
+    font-family: "Roboto", sans-serif;
+    font-weight: normal;
 }
 
 #input {

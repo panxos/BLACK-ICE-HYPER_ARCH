@@ -50,25 +50,10 @@ return {
   -- Java Support
   {
     "nvim-java/nvim-java",
-    dependencies = {
-      "nvim-java/lua-utils.nvim",
-      "nvim-java/nvim-java-core",
-      "nvim-java/nvim-java-test",
-      "nvim-java/nvim-java-dap",
-      "MunifTanjim/nui.nvim",
-      "neovim/nvim-lspconfig",
-      "mfussenegger/nvim-dap",
-      {
-        "williamboman/mason-lspconfig.nvim",
-        opts = {
-          handlers = {
-            ["jdtls"] = function()
-              require('java').setup()
-            end,
-          },
-        },
-      },
-    },
+    config = function()
+      require("java").setup()
+      vim.lsp.enable("jdtls")
+    end,
   },
 
   -- Debugging Support (DAP)

@@ -1,0 +1,77 @@
+#!/usr/bin/env python3
+"""Cinco escritorios por monitor, sin trasladar las ventanas existentes."""
+from __future__ import annotations
+
+import argparse
+import fcntl
+import logging
+import os
+import select
+import socket
+import subprocess
+from pathlib import Path
+
+from black_ice_workspaces import IPC, reconcile, switch
+
+LOGGER = logging.getLogger("black-ice-workspaces")
+
+
+def refresh_bar() -> None:
+    helper = Path.home() / ".local/bin/waybar_start.sh"
+    if helper.is_file():
+        subprocess.run([str(helper)], timeout=25, check=True, capture_output=True)
+
+
+def daemon() -> None:
+    ipc = IPC()
+    runtime = Path(os.environ.get("XDG_RUNTIME_DIR", f"/run/user/{os.getuid()}"))
+    signature = os.environ.get("HYPRLAND_INSTANCE_SIGNATURE", "desktop")
+    with (runtime / f"black-ice-workspaces-{signature}.lock").open("w") as lock:
+        try:
+            fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError:
+            return
+        with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as events:
+            events.connect(str(ipc.root / ".socket2.sock"))
+            reconcile(ipc)
+            refresh_bar()
+            buffer = b""
+            while data := events.recv(65536):
+                buffer += data
+                lines = buffer.split(b"\n")
+                buffer = lines.pop()
+                if not any(line.startswith((b"monitoradded>>", b"monitoraddedv2>>", b"monitorremoved>>", b"configreloaded>>")) for line in lines):
+                    continue
+                while select.select([events], [], [], .3)[0]:
+                    more = events.recv(65536)
+                    if not more:
+                        return
+                    buffer += more
+                    if b"\n" in buffer:
+                        buffer = buffer.rsplit(b"\n", 1)[-1]
+                reconcile(ipc)
+                refresh_bar()
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("action", choices=("sync", "daemon", "focus", "move"))
+    parser.add_argument("slot", nargs="?", type=int)
+    args = parser.parse_args()
+    try:
+        if args.action == "daemon":
+            daemon()
+        elif args.action == "sync":
+            reconcile(IPC())
+        else:
+            if args.slot is None:
+                parser.error("Indica el escritorio local: 1…5")
+            switch(IPC(), args.action, args.slot)
+    except (OSError, ValueError, TypeError, RuntimeError, subprocess.SubprocessError) as error:
+        LOGGER.error("Workspaces: %s", error)
+        return 1
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

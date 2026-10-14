@@ -6,7 +6,8 @@ window {
     border: 1px solid rgba(176, 38, 255, 0.45);
     background-color: rgba(10, 5, 20, 0.96);
     border-radius: 14px;
-    font-family: "JetBrains Mono Nerd Font", monospace;
+    font-family: "Roboto", sans-serif;
+    font-weight: normal;
 }
 
 #input {
@@ -53,7 +54,6 @@ window {
 #entry:selected {
     background-color: rgba(136, 0, 238, 0.35);
     color: #f0e8ff;
-    border-left: 2px solid #b026ff;
     border-radius: 8px;
 }
 

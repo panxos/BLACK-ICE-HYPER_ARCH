@@ -1,0 +1,9 @@
+{
+  "repository": "https://github.com/google/fonts",
+  "revision": "c5a3a1b83fb771759f48d1abdee0127eaec63a97",
+  "directory": "ofl/oxanium",
+  "sha256": {
+    "OFL.txt": "fe17c0f2581d71b4e1ea7e636e7f4877c29223e11bb1dd1a871e8c3f2a86336b",
+    "Oxanium[wght].ttf": "2ce01d946e1e1ffc8d7eecfffbda8623bedd63eaf811a20488c4b69af45babb0"
+  }
+}

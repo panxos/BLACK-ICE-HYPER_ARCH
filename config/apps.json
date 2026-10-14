@@ -1,0 +1,1028 @@
+{
+  "schema": 1,
+  "groups": {
+    "Browsers": "Navegadores",
+    "DevTools": "Desarrollo y laboratorios",
+    "Security": "Seguridad de escritorio",
+    "AI_Tools": "Asistentes opcionales",
+    "Productivity": "Productividad",
+    "Multimedia": "Multimedia",
+    "Remote": "Acceso remoto",
+    "Cloud": "Archivos y nube",
+    "Office": "Oficina",
+    "System": "Utilidades",
+    "Sec-Recon": "Seguridad · Recon",
+    "Sec-Web": "Seguridad · Web",
+    "Sec-Wireless": "Seguridad · Wireless",
+    "Sec-AD": "Seguridad · AD",
+    "Sec-Crack": "Seguridad · Crack",
+    "Sec-Exploit": "Seguridad · Exploit",
+    "Sec-Sniff": "Seguridad · Sniff",
+    "Sec-RE": "Seguridad · RE",
+    "Sec-Forense": "Seguridad · Forense",
+    "Sec-Net": "Seguridad · Net"
+  },
+  "apps": [
+    {
+      "id": "tor",
+      "name": "Tor",
+      "group": "Security",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "nftables",
+      "name": "nftables",
+      "group": "Security",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "virt-viewer",
+      "name": "Consola gráfica de máquinas virtuales",
+      "group": "DevTools",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "firefox",
+      "name": "Firefox",
+      "group": "Browsers",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "brave-bin",
+      "name": "Brave",
+      "group": "Browsers",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "podman",
+      "name": "Podman (contenedores sin root)",
+      "group": "DevTools",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "docker",
+      "name": "Docker Engine",
+      "group": "DevTools",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "docker-compose",
+      "name": "Docker Compose",
+      "group": "DevTools",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "qemu-full",
+      "name": "QEMU/KVM completo",
+      "group": "DevTools",
+      "heavy": true,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "libvirt",
+      "name": "libvirt",
+      "group": "DevTools",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "virt-manager",
+      "name": "Gestor de máquinas virtuales",
+      "group": "DevTools",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "dnsmasq",
+      "name": "dnsmasq",
+      "group": "DevTools",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "kate",
+      "name": "kate",
+      "group": "DevTools",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "neovim",
+      "name": "Neovim + NvChad",
+      "group": "DevTools",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "caido-desktop",
+      "name": "Caido Desktop",
+      "group": "Security",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "wireshark-qt",
+      "name": "Wireshark - Network Analyzer",
+      "group": "Sec-Sniff",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "ipscan",
+      "name": "ipscan",
+      "group": "Security",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "claude-desktop",
+      "name": "Claude Desktop · cliente de la comunidad",
+      "group": "AI_Tools",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "claude-code-cli",
+      "name": "Claude Code CLI",
+      "group": "AI_Tools",
+      "heavy": false,
+      "source": "npm"
+    },
+    {
+      "id": "obsidian",
+      "name": "obsidian",
+      "group": "Productivity",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "betterbird-bin",
+      "name": "betterbird-bin",
+      "group": "Productivity",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "keepassxc",
+      "name": "KeePassXC",
+      "group": "Productivity",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "vlc",
+      "name": "vlc",
+      "group": "Multimedia",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "imv",
+      "name": "imv",
+      "group": "Multimedia",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "mpv",
+      "name": "mpv",
+      "group": "Multimedia",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "yt-dlp",
+      "name": "yt-dlp",
+      "group": "Multimedia",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "gimp",
+      "name": "gimp",
+      "group": "Multimedia",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "spectacle",
+      "name": "spectacle",
+      "group": "Multimedia",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "mpd",
+      "name": "mpd",
+      "group": "Multimedia",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "ncmpcpp",
+      "name": "ncmpcpp",
+      "group": "Multimedia",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "mpc",
+      "name": "mpc",
+      "group": "Multimedia",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "playerctl",
+      "name": "playerctl",
+      "group": "Multimedia",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "mpd-mpris",
+      "name": "mpd-mpris",
+      "group": "Multimedia",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "anydesk-bin",
+      "name": "anydesk-bin",
+      "group": "Remote",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "rustdesk-bin",
+      "name": "rustdesk-bin",
+      "group": "Remote",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "remmina",
+      "name": "remmina",
+      "group": "Remote",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "freerdp",
+      "name": "freerdp",
+      "group": "Remote",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "filezilla",
+      "name": "filezilla",
+      "group": "Cloud",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "megasync-bin",
+      "name": "MEGAsync",
+      "group": "Cloud",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "onlyoffice-bin",
+      "name": "OnlyOffice",
+      "group": "Office",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "okular",
+      "name": "okular",
+      "group": "Office",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "gparted",
+      "name": "gparted",
+      "group": "System",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "bleachbit",
+      "name": "bleachbit",
+      "group": "System",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "7zip",
+      "name": "7zip",
+      "group": "System",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "ktorrent",
+      "name": "ktorrent",
+      "group": "System",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "speedtest-cli",
+      "name": "speedtest-cli",
+      "group": "System",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "nmap",
+      "name": "Nmap - Network Scanner",
+      "group": "Sec-Recon",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "masscan",
+      "name": "Masscan - Fast Port Scanner",
+      "group": "Sec-Recon",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "rustscan",
+      "name": "RustScan - Modern Port Scanner",
+      "group": "Sec-Recon",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "netdiscover",
+      "name": "Netdiscover - ARP Scanner",
+      "group": "Sec-Recon",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "arp-scan",
+      "name": "ARP-Scan - Network Discovery",
+      "group": "Sec-Recon",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "recon-ng",
+      "name": "Recon-ng - Recon Framework",
+      "group": "Sec-Recon",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "theharvester-git",
+      "name": "TheHarvester - OSINT Tool",
+      "group": "Sec-Recon",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "spiderfoot",
+      "name": "SpiderFoot - OSINT Automation",
+      "group": "Sec-Recon",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "amass",
+      "name": "Amass - Subdomain Enumeration",
+      "group": "Sec-Recon",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "sherlock",
+      "name": "Sherlock - Username Hunter",
+      "group": "Sec-Recon",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "dnsenum2",
+      "name": "DNSenum - DNS Enumeration",
+      "group": "Sec-Recon",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "python-dnsrecon",
+      "name": "DNSrecon - DNS Recon",
+      "group": "Sec-Recon",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "enum4linux",
+      "name": "Enum4Linux - SMB Enumeration",
+      "group": "Sec-Recon",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "burpsuite",
+      "name": "Burp Suite - Web Proxy",
+      "group": "Sec-Web",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "zaproxy",
+      "name": "OWASP ZAP - Web Scanner",
+      "group": "Sec-Web",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "sqlmap",
+      "name": "SQLMap - SQL Injection",
+      "group": "Sec-Web",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "nikto",
+      "name": "Nikto - Web Server Scanner",
+      "group": "Sec-Web",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "wpscan",
+      "name": "WPScan - WordPress Scanner",
+      "group": "Sec-Web",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "whatweb",
+      "name": "WhatWeb - Web Fingerprinting",
+      "group": "Sec-Web",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "gobuster",
+      "name": "Gobuster - Directory Fuzzer",
+      "group": "Sec-Web",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "ffuf",
+      "name": "FFUF - Fast Web Fuzzer",
+      "group": "Sec-Web",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "feroxbuster",
+      "name": "Feroxbuster - Content Discovery",
+      "group": "Sec-Web",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "nuclei",
+      "name": "Nuclei - Vulnerability Scanner",
+      "group": "Sec-Web",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "httpx",
+      "name": "HTTPx - HTTP Toolkit",
+      "group": "Sec-Web",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "commix",
+      "name": "Commix - Command Injection",
+      "group": "Sec-Web",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "xsser",
+      "name": "XSSer - XSS Scanner",
+      "group": "Sec-Web",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "aircrack-ng",
+      "name": "Aircrack-ng - WiFi Security",
+      "group": "Sec-Wireless",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "kismet",
+      "name": "Kismet - Wireless Detector",
+      "group": "Sec-Wireless",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "wifite",
+      "name": "Wifite - Automated WiFi Attack",
+      "group": "Sec-Wireless",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "reaver",
+      "name": "Reaver - WPS Attack",
+      "group": "Sec-Wireless",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "bully",
+      "name": "Bully - WPS Bruteforce",
+      "group": "Sec-Wireless",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "pixiewps",
+      "name": "PixieWPS - WPS Pixie Dust",
+      "group": "Sec-Wireless",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "impacket",
+      "name": "Impacket - Python SMB/MSRPC",
+      "group": "Sec-AD",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "netexec",
+      "name": "NetExec - Modern CME (nxc)",
+      "group": "Sec-AD",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "ruby-evil-winrm",
+      "name": "Evil-WinRM - WinRM Shell",
+      "group": "Sec-AD",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "bloodhound",
+      "name": "BloodHound - AD Mapper [~60min]",
+      "group": "Sec-AD",
+      "heavy": true,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "python-certipy-ad-git",
+      "name": "Certipy - AD CS Attack",
+      "group": "Sec-AD",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "coercer",
+      "name": "Coercer - Forced Auth",
+      "group": "Sec-AD",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "kerbrute-bin",
+      "name": "Kerbrute - Kerberos Bruteforce",
+      "group": "Sec-AD",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "responder",
+      "name": "Responder - LLMNR Poisoner",
+      "group": "Sec-AD",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "smbmap",
+      "name": "SMBMap - SMB Enumeration",
+      "group": "Sec-AD",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "chntpw",
+      "name": "Chntpw - Windows Password Reset",
+      "group": "Sec-AD",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "john",
+      "name": "John the Ripper - Password Cracker",
+      "group": "Sec-Crack",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "hashcat",
+      "name": "Hashcat - GPU Cracker",
+      "group": "Sec-Crack",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "hydra",
+      "name": "Hydra - Network Bruteforcer",
+      "group": "Sec-Crack",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "medusa",
+      "name": "Medusa - Parallel Bruteforcer",
+      "group": "Sec-Crack",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "trufflehog-bin",
+      "name": "TruffleHog - Secret Scanner",
+      "group": "Sec-Crack",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "gitleaks",
+      "name": "Gitleaks - Git Secret Scanner",
+      "group": "Sec-Crack",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "cewl",
+      "name": "CeWL - Wordlist Generator",
+      "group": "Sec-Crack",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "crunch",
+      "name": "Crunch - Wordlist Creator",
+      "group": "Sec-Crack",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "hashid",
+      "name": "HashID - Hash Identifier",
+      "group": "Sec-Crack",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "seclists",
+      "name": "SecLists - Security Wordlists",
+      "group": "Sec-Crack",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "wordlists",
+      "name": "Wordlists - RockYou & More",
+      "group": "Sec-Crack",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "metasploit",
+      "name": "Metasploit Framework",
+      "group": "Sec-Exploit",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "sliver",
+      "name": "Sliver - C2 Framework (Go) [~15min]",
+      "group": "Sec-Exploit",
+      "heavy": true,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "villain-c2-git",
+      "name": "Villain - Reverse Shell Manager",
+      "group": "Sec-Exploit",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "exploitdb",
+      "name": "ExploitDB - Exploit Archive",
+      "group": "Sec-Exploit",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "social-engineer-toolkit",
+      "name": "Social Engineer Toolkit",
+      "group": "Sec-Exploit",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "routersploit",
+      "name": "RouterSploit - Router Exploit",
+      "group": "Sec-Exploit",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "tcpdump",
+      "name": "TCPDump - Packet Sniffer",
+      "group": "Sec-Sniff",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "ettercap",
+      "name": "Ettercap - MITM Framework",
+      "group": "Sec-Sniff",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "bettercap",
+      "name": "Bettercap - Network Attack",
+      "group": "Sec-Sniff",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "mitmproxy",
+      "name": "MITMProxy - HTTP(S) Proxy",
+      "group": "Sec-Sniff",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "macchanger",
+      "name": "MACchanger - MAC Spoofer",
+      "group": "Sec-Sniff",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "scapy",
+      "name": "Scapy - Packet Manipulation",
+      "group": "Sec-Sniff",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "gdb",
+      "name": "GDB - GNU Debugger",
+      "group": "Sec-RE",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "radare2",
+      "name": "Radare2 - Reverse Framework",
+      "group": "Sec-RE",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "ghidra",
+      "name": "Ghidra - NSA RE Tool [~20min]",
+      "group": "Sec-RE",
+      "heavy": true,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "nasm",
+      "name": "NASM - Assembler",
+      "group": "Sec-RE",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "android-apktool",
+      "name": "APKTool - Android Decompiler",
+      "group": "Sec-RE",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "jadx",
+      "name": "JADX - Android Decompiler",
+      "group": "Sec-RE",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "edb-debugger",
+      "name": "EDB - Qt Debugger",
+      "group": "Sec-RE",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "autopsy",
+      "name": "Autopsy - Digital Forensics [~20min]",
+      "group": "Sec-Forense",
+      "heavy": true,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "sleuthkit",
+      "name": "SleuthKit - Forensic Toolkit",
+      "group": "Sec-Forense",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "volatility3",
+      "name": "Volatility3 - Memory Forensics",
+      "group": "Sec-Forense",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "binwalk",
+      "name": "Binwalk - Firmware Analysis",
+      "group": "Sec-Forense",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "foremost",
+      "name": "Foremost - File Recovery",
+      "group": "Sec-Forense",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "perl-image-exiftool",
+      "name": "ExifTool - Metadata Reader",
+      "group": "Sec-Forense",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "steghide",
+      "name": "Steghide - Steganography Tool",
+      "group": "Sec-Forense",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "stegseek",
+      "name": "Stegseek - Steg Cracker",
+      "group": "Sec-Forense",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "hexedit",
+      "name": "HexEdit - Hex Editor",
+      "group": "Sec-Forense",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "openbsd-netcat",
+      "name": "Netcat - Network Swiss Army",
+      "group": "Sec-Net",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "socat",
+      "name": "Socat - Data Relay",
+      "group": "Sec-Net",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "proxychains-ng",
+      "name": "Proxychains - Proxy Forcer",
+      "group": "Sec-Net",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "sshuttle",
+      "name": "SSHuttle - VPN over SSH",
+      "group": "Sec-Net",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "chisel",
+      "name": "Chisel - TCP/UDP Tunnel",
+      "group": "Sec-Net",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "traceroute",
+      "name": "Traceroute - Path Trace",
+      "group": "Sec-Net",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "wireshark-cli",
+      "name": "Wireshark CLI",
+      "group": "Sec-Net",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "bind",
+      "name": "Bind-tools - dig/nslookup",
+      "group": "Sec-Net",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "whois",
+      "name": "Whois - Domain Lookup",
+      "group": "Sec-Net",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "mtr",
+      "name": "MTR - Ping+Traceroute",
+      "group": "Sec-Net",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "iperf3",
+      "name": "IPerf3 - Bandwidth Test",
+      "group": "Sec-Net",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "nethogs",
+      "name": "Nethogs - Bandwidth/Process",
+      "group": "Sec-Net",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "iftop",
+      "name": "Iftop - Bandwidth/Host",
+      "group": "Sec-Net",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "iptraf-ng",
+      "name": "IPTraf-ng - Net Monitor",
+      "group": "Sec-Net",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "minicom",
+      "name": "Minicom - Serial Terminal",
+      "group": "Sec-Net",
+      "heavy": false,
+      "source": "pacman-aur"
+    },
+    {
+      "id": "onesixtyone",
+      "name": "Onesixtyone - SNMP Scanner",
+      "group": "Sec-Net",
+      "heavy": false,
+      "source": "pacman-aur"
+    }
+  ]
+}

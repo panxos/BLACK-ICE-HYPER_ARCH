@@ -1,0 +1,39 @@
+@define-color theme_bg_color @BG@;
+@define-color theme_fg_color @FG@;
+@define-color theme_base_color @BG@;
+@define-color theme_text_color @FG@;
+@define-color theme_selected_bg_color @ACC1@;
+@define-color theme_selected_fg_color @BG@;
+@define-color borders alpha(@FG@, .2);
+@define-color accent_bg_color @ACC1@;
+@define-color accent_fg_color @BG@;
+@define-color window_bg_color @BG@;
+@define-color window_fg_color @FG@;
+@define-color view_bg_color @BG@;
+@define-color view_fg_color @FG@;
+@define-color black_ice_selection mix(@BG@, @ACC1@, .28);
+
+flowbox flowboxchild:selected, flowboxchild:selected, row:selected, #entry:selected {
+    background-color: @black_ice_selection;
+    background-image: none;
+    color: @FG@;
+    outline-color: @ACC1@;
+}
+#entry #text, #entry #img, #entry:selected #text, #entry:selected #img {
+    background-color: transparent;
+    background-image: none;
+    color: @FG@;
+}
+
+menu, .menu, .context-menu, popover.background {
+    background-color: @BG@;
+    background-image: none;
+    color: @FG@;
+    border: 1px solid alpha(@ACC1@, .45);
+}
+menuitem { background-color: transparent; background-image: none; color: @FG@; padding: 7px 12px; }
+menuitem label, popover label { color: @FG@; }
+menuitem:hover, menuitem:selected, menuitem:active { background-color: mix(@BG@, @ACC1@, .20); background-image: none; color: @FG@; }
+menuitem:disabled, menuitem:disabled label { color: @DIM@; }
+tooltip, tooltip.background { background-color: @BG@; color: @FG@; }
+tooltip label { color: @FG@; }

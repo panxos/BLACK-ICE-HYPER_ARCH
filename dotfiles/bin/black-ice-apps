@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+if (( $# == 0 )) && [[ -x "$HOME/.local/bin/black-ice-system" ]]; then
+    exec "$HOME/.local/bin/black-ice-system" software
+fi
+root="${XDG_DATA_HOME:-$HOME/.local/share}/black-ice/software"
+exec python3 "$root/scripts/select-apps.py" --ui gtk --output "${XDG_STATE_HOME:-$HOME/.local/state}/black-ice/apps-plan.json" "$@"

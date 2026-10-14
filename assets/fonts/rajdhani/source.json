@@ -1,0 +1,13 @@
+{
+  "repository": "https://github.com/google/fonts",
+  "revision": "c5a3a1b83fb771759f48d1abdee0127eaec63a97",
+  "directory": "ofl/rajdhani",
+  "sha256": {
+    "OFL.txt": "f62ef357d3a1c3d27edd35a6e1ba350e8a8d13499797964eeadefbf0b3b15d1f",
+    "Rajdhani-Bold.ttf": "691470dd3286a14e9677940d0bf75796179841ba5215cbda1a2c8910a3226afd",
+    "Rajdhani-Light.ttf": "140e9f13af69538161c5780fcf7f81594c069aea887e7bffd417ae1c641213c3",
+    "Rajdhani-Medium.ttf": "12ff7dcfe4c206e3875ac53b1762eab57de6a2fa7f5a86c26b97b88d6591eac2",
+    "Rajdhani-Regular.ttf": "6e1fc228a8318251a6e569502ec57bac1e4656c582f92f59ccecc4688e039b98",
+    "Rajdhani-SemiBold.ttf": "94bbd25a18ca665999feb05a537de9fd2b860dcfb78bbe9ca00270825bf235da"
+  }
+}

@@ -1,0 +1,355 @@
+#!/usr/bin/env python3
+"""Módulos de operaciones y adaptación de Waybar, sin daemon adicional."""
+from __future__ import annotations
+
+import argparse
+import copy
+import fcntl
+import html
+import ipaddress
+import json
+import os
+import re
+import shutil
+import subprocess
+import tempfile
+import time
+import urllib.error
+import urllib.request
+from pathlib import Path
+
+CONFIG = Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config"))
+CACHE = Path(os.environ.get("XDG_CACHE_HOME", Path.home() / ".cache")) / "black-ice/waybar"
+TARGET = CONFIG / "bin/target"
+
+
+def command(args: list[str], timeout: int = 4) -> tuple[int, str]:
+    try:
+        result = subprocess.run(args, capture_output=True, text=True, timeout=timeout, check=False)
+        return result.returncode, result.stdout.strip()
+    except (OSError, subprocess.SubprocessError):
+        return 127, ""
+
+
+def read_json(args: list[str]) -> list:
+    code, text = command(args)
+    try:
+        value = json.loads(text) if code == 0 else []
+        return value if isinstance(value, list) else []
+    except ValueError:
+        return []
+
+
+def result(text: str, tooltip: str, state: str = "connected", address: str = "") -> dict:
+    return {"text": text, "tooltip": html.escape(tooltip), "class": state, "address": address}
+
+
+def tunnel(link: dict) -> bool:
+    kind = link.get("linkinfo", {}).get("info_kind", "")
+    return kind in {"wireguard", "tun", "tap"} or bool(re.match(r"^(tun|tap|wg|utun|cscotun|tailscale|vpn)", link.get("ifname", "")))
+
+
+def network() -> tuple[list, list, list]:
+    return (read_json(["ip", "-j", "address", "show"]),
+            read_json(["ip", "-j", "-d", "link", "show"]),
+            read_json(["ip", "-j", "route", "show", "default"]))
+
+
+def local_ip() -> dict:
+    addresses, links, routes = network()
+    tunnels = {link["ifname"] for link in links if tunnel(link)}
+    for route in sorted(routes, key=lambda item: item.get("metric", 0)):
+        device = route.get("dev", "")
+        if device in tunnels:
+            continue
+        for entry in addresses:
+            if entry.get("ifname") == device:
+                values = [a["local"] for a in entry.get("addr_info", []) if a.get("scope") == "global"]
+                if values:
+                    return result("󰩟 " + values[0], "IP local · " + device + "\n" + "\n".join(values), address=values[0])
+    return result("󰩟 N/D", "No se encontró una dirección local con ruta predeterminada", "disconnected")
+
+
+def vpn() -> dict:
+    addresses, links, _routes = network()
+    active = any(link.get("ifname") == "tun0" and "UP" in link.get("flags", []) and link.get("operstate") != "DOWN" for link in links)
+    ips = [a["local"] for entry in addresses if entry.get("ifname") == "tun0" for a in entry.get("addr_info", [])
+           if a.get("scope") == "global" and is_ip(a.get("local", ""))]
+    if active and ips:
+        return result(ips[0], "VPN de laboratorio · tun0\n" + "\n".join(ips), address=ips[0])
+    return result("No conectado", "Esperando tun0 con una dirección IP · Hack The Box / TryHackMe", "disconnected")
+
+
+def is_ip(value: str) -> bool:
+    try:
+        ipaddress.ip_address(value)
+        return True
+    except ValueError:
+        return False
+
+
+def public_ip() -> dict:
+    CACHE.mkdir(parents=True, exist_ok=True, mode=0o700)
+    path = CACHE / "public.json"
+    with (CACHE / "public.lock").open("w") as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX)
+        identity = (local_ip().get("address", ""), vpn().get("address", ""))
+        try:
+            cached = json.loads(path.read_text())
+        except (OSError, ValueError):
+            cached = {}
+        if not isinstance(cached,dict):
+            cached = {}
+        cached_time = cached.get("time",0)
+        fresh = isinstance(cached_time,(int,float)) and 0 <= time.time() - cached_time < 300
+        if cached.get("identity") == list(identity) and fresh and is_ip(cached.get("ip", "")):
+            value = cached["ip"]
+        else:
+            try:
+                with urllib.request.urlopen("https://api.ipify.org", timeout=3) as response:
+                    value = response.read(128).decode().strip()
+                if not is_ip(value):
+                    raise ValueError("Respuesta IP inválida")
+                with tempfile.NamedTemporaryFile(mode="w", dir=CACHE, delete=False) as output:
+                    json.dump({"ip":value, "identity":identity, "time":time.time()}, output)
+                    temporary = Path(output.name)
+                temporary.replace(path)
+            except (OSError, ValueError, urllib.error.URLError):
+                return result(" N/D", "No se pudo consultar la IP pública", "disconnected")
+    return result(" " + value, "IP pública observada · caché de hasta 5 minutos\n" + value, address=value)
+
+
+def target() -> dict:
+    try:
+        value = re.sub(r"[\x00-\x1f\x7f]"," ",TARGET.read_text() if TARGET.exists() else "").strip()[:240]
+        projects_path = Path(os.environ.get("XDG_STATE_HOME", Path.home() / ".local/state")) / "black-ice/system/projects.json"
+        if projects_path.exists():
+            projects = json.loads(projects_path.read_text())
+            name = projects.get("active", "")
+            if name:
+                address = projects["projects"][name].get("target", "")
+                value = (address + " " + name).strip() if address else ""
+    except (OSError, ValueError, KeyError):
+        value = ""
+    if not value:
+        return result("󰓾 No target", "Haz clic para establecer un objetivo", "inactive")
+    parts = value.split(maxsplit=1)
+    ip = parts[0] if is_ip(parts[0]) else ""
+    return result("󰓾 " + value, "Objetivo\n" + value, "active", ip)
+
+
+def choose_target() -> int:
+    code, value = command(["wofi", "--dmenu", "--prompt", "Objetivo: IP y nombre; vacío conserva el actual"], timeout=3600)
+    if code or not value:
+        return 0
+    if any(ord(c) < 32 for c in value) or len(value) > 240:
+        return 1
+    manager = Path.home() / ".local/bin/black-ice-system"
+    if manager.is_file():
+        parts = value.split(maxsplit=1)
+        return command([str(manager), "target", parts[0], parts[1] if len(parts) > 1 else ""])[0]
+    TARGET.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.NamedTemporaryFile(mode="w", dir=TARGET.parent, delete=False) as output:
+        output.write(value + "\n")
+        temporary = Path(output.name)
+    temporary.replace(TARGET)
+    return 0
+
+
+def copy_address(name: str) -> int:
+    if name not in {"local", "public", "vpn", "target"}:
+        raise ValueError("Módulo sin dirección copiable")
+    value = MODULES[name]().get("address", "")
+    if not value:
+        command(["notify-send", "--app-name=BLACK-ICE", "--icon=dialog-information", "--expire-time=3000",
+                 "Sin IP disponible", "Este módulo no tiene una dirección para copiar."])
+        return 0
+    subprocess.run(["wl-copy"], input=value, text=True, check=True, timeout=3)
+    command(["notify-send", "--app-name=BLACK-ICE", "--icon=edit-copy", "--expire-time=3000",
+             "IP copiada", value])
+    return 0
+
+
+def service(name: str) -> dict:
+    if not shutil.which("docker" if name == "docker" else "virsh"):
+        return result("", "Docker no instalado" if name == "docker" else "KVM: virsh no instalado", "absent")
+    args = ["docker", "ps", "--format", "{{.Names}} · {{.Image}}"] if name == "docker" else ["virsh", "-q", "list", "--state-running", "--name"]
+    code, names = command(args)
+    icon, label = ("", "Docker") if name == "docker" else ("", "KVM")
+    if code:
+        return result(icon + " N/D", label + " no disponible o sin permiso", "unavailable")
+    count = len(names.splitlines()) if names else 0
+    return result(f"{icon} {count}", f"{label} · {count} en ejecución\n{names}", "active" if count else "inactive")
+
+
+def updates() -> dict:
+    code, listing = command(["checkupdates"], timeout=45)
+    if code not in {0, 2}:
+        return result("󰚰 N/D", "No se pudo comprobar actualizaciones", "unavailable")
+    count = len(listing.splitlines()) if listing else 0
+    return result(f"󰚰 {count}", f"{count} actualizaciones\n{listing[:2000]}", "updates" if count else "cleaned")
+
+
+def player() -> dict:
+    code, metadata = command(["playerctl", "metadata", "--format", "{{artist}} — {{title}}"])
+    return result("󰝚 " + metadata, metadata, "active") if code == 0 and metadata else result("", "Sin reproducción", "inactive")
+
+
+def weather() -> dict:
+    helper = CONFIG / "bin/weather_status"
+    if not helper.is_file() or not os.access(helper,os.X_OK):
+        return result("", "Clima sin proveedor configurado", "unavailable")
+    code,text = command([str(helper)])
+    try:
+        value = json.loads(text) if code == 0 else {}
+        if not isinstance(value,dict):
+            raise TypeError("Respuesta de clima inválida")
+        return result(str(value.get("text","")),str(value.get("tooltip","")),"connected" if code == 0 else "unavailable")
+    except (ValueError, TypeError):
+        return result("", "No se pudo consultar el clima", "unavailable")
+
+
+MODULES = {"local":local_ip, "public":public_ip, "vpn":vpn, "target":target, "updates":updates, "player":player,
+           "weather":weather, "docker":lambda:service("docker"), "kvm":lambda:service("kvm")}
+
+
+def config(path: Path, monitors: list | None = None) -> list:
+    source = json.loads(path.read_text())
+    bars = source if isinstance(source, list) else [source]
+    from black_ice_layout import configuration
+    privacy = configuration()[0]["custom/privacy"]
+    settings_path = CONFIG / "black-ice/privacy-ui.json"
+    visible = json.loads(settings_path.read_text()).get("visible", True) if settings_path.exists() else True
+
+    def apply_visibility(items):
+        if not visible:
+            for item in items:
+                for zone in ("modules-left", "modules-center", "modules-right"):
+                    item[zone] = [key for key in item.get(zone, []) if key != "custom/privacy"]
+                for key, definition in item.items():
+                    if key.startswith("group/"):
+                        definition["modules"] = [child for child in definition.get("modules", []) if child != "custom/privacy"]
+        return items
+    for bar in bars:
+        bar["custom/privacy"] = dict(privacy)
+        if "custom/vpn" in bar.get("modules-center", []) and "custom/privacy" not in bar["modules-center"]:
+            bar["modules-center"].append("custom/privacy")
+        if "custom/vpn" in bar.get("modules-left", []) and "custom/privacy" not in bar["modules-left"]:
+            bar["modules-left"].insert(bar["modules-left"].index("custom/vpn") + 1, "custom/privacy")
+        if "custom/control" in bar:
+            bar["custom/control"].setdefault("on-click-right", "swaync-client -t -sw")
+        for name, binary in (("docker", "docker"), ("kvm", "virsh")):
+            if "custom/" + name in bar:
+                bar["custom/" + name].update({"exec-if": "command -v " + binary + " >/dev/null 2>&1", "hide-empty-text": True})
+    if monitors is None:
+        monitors = read_json(["hyprctl", "-j", "monitors"])
+    if not monitors:
+        return apply_visibility(bars)
+    from black_ice_workspaces import configure_bar, plan, read_state
+    workspace_state = plan(monitors, [], read_state(CONFIG / "black-ice/workspaces.json"))
+    rendered = []
+    for monitor in monitors:
+        width = monitor.get("width", 1366)
+        if monitor.get("transform", 0) in {1, 3, 5, 7}:
+            width = monitor.get("height", width)
+        compact = width / max(monitor.get("scale", 1), 0.1) < 1100
+        for original in bars:
+            output = original.get("output")
+            if output and (isinstance(output, str) and output != monitor["name"] or isinstance(output, list) and monitor["name"] not in output):
+                continue
+            bar = copy.deepcopy(original)
+            bar["output"] = monitor["name"]
+            if compact:
+                if len(bars) == 1:
+                    bar["modules-left"] = ["custom/launcher", "group/operations", "custom/vpn", "custom/privacy"]
+                    if original.get("lab-side") == "right":
+                        bar["group/operations"]["modules"] = ["custom/local_ip", "custom/public_ip", "custom/settarget"]
+                    bar["modules-right"] = ["group/system", "group/media", "tray"]
+                    if original.get("lab-side") == "right":
+                        bar["modules-right"].insert(0, "group/lab")
+                        if width / max(monitor.get("scale", 1), 0.1) < 800:
+                            bar["group/lab"]["drawer"] = {"transition-duration": 150}
+                            bar["group/lab"]["modules"] = ["custom/updates", "custom/docker", "custom/kvm"]
+                zones = ("modules-left", "modules-center", "modules-right")
+                for group in ("group/lab", "group/addresses", "group/connectivity", "group/media"):
+                    children = bar.get(group, {}).get("modules", [])
+                    present = {name for zone in zones for name in bar.get(zone, [])}
+                    if children and set(children) <= present:
+                        for zone in zones:
+                            bar[zone] = [group if name == children[0] else name for name in bar.get(zone, []) if name not in children[1:]]
+                for key in ("custom/settarget", "custom/vpn", "custom/local_ip", "custom/public_ip"):
+                    bar[key]["max-length"] = 14
+                if original.get("workspace-side") == "left":
+                    bar["modules-left"] = ["custom/launcher", "hyprland/workspaces"]
+                    bar["modules-center"] = ["group/operations", "custom/vpn", "custom/privacy"]
+            selections = bar.get("profile-modules", {})
+            if selections:
+                for key, zone in selections.items():
+                    if zone == "default":
+                        continue
+                    for location in ("modules-left", "modules-center", "modules-right"):
+                        bar[location] = [name for name in bar.get(location, []) if name != key]
+                    for name, definition in bar.items():
+                        if name.startswith("group/"):
+                            definition["modules"] = [child for child in definition["modules"] if child != key]
+                    target = bar.get("profile-bars", {}).get(key)
+                    target_exists = target in {b.get("position") for b in bars}
+                    if zone != "hidden" and (bar.get("position") == target if target_exists else bar.get("profile-desktop")):
+                        bar["modules-" + zone].append(key)
+            if bar.get("profile-order"):
+                from black_ice_theme import order_modules
+                order_modules(bar, bar["profile-order"])
+            if "hyprland/workspaces" in bar:
+                configure_bar(bar["hyprland/workspaces"], monitor["name"], workspace_state)
+            rendered.append(bar)
+    return apply_visibility(rendered)
+
+
+def privacy_style(path: Path) -> str:
+    palette_path = path.parent / "palette.json"
+    palette = json.loads(palette_path.read_text()) if palette_path.exists() else {}
+    colors = {"muted": palette.get("dim", "#a4b5c2"), "accent": palette.get("acc1", "#27c6ed"),
+              "text": palette.get("fg", "#e6edf3"), "error": "#ef8d9d"}
+    if any(not isinstance(value, str) or not re.fullmatch(r"#[0-9a-fA-F]{6}", value) for value in colors.values()):
+        raise ValueError("La paleta del tema contiene un color inválido")
+    definitions = [f"@define-color ice_privacy_{name} {value};" for name, value in colors.items()]
+    imports = [f'@import url("{source.resolve().as_uri()}");' for source in (path, CONFIG / "waybar/privacy.css")]
+    return "\n".join([*definitions, *imports]) + "\n"
+
+
+def check_style(path: Path) -> None:
+    import gi
+    gi.require_version("Gtk", "3.0")
+    from gi.repository import GLib, Gtk
+    try:
+        Gtk.CssProvider().load_from_path(str(path))
+    except GLib.Error as error:
+        raise ValueError("CSS inválido; se conserva la barra actual: " + str(error)) from error
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("action", choices=[*MODULES, "copy", "choose-target", "config", "check-style", "privacy-style"])
+    parser.add_argument("value", nargs="?")
+    args = parser.parse_args()
+    try:
+        if args.action == "privacy-style":
+            print(privacy_style(Path(args.value or "")), end="")
+        elif args.action == "check-style":
+            check_style(Path(args.value or ""))
+        elif args.action == "config":
+            print(json.dumps(config(Path(args.value or "")), ensure_ascii=False))
+        elif args.action == "choose-target":
+            return choose_target()
+        elif args.action == "copy":
+            return copy_address(args.value)
+        else:
+            print(json.dumps(MODULES[args.action](), ensure_ascii=False))
+    except (OSError, ValueError, KeyError, subprocess.SubprocessError) as error:
+        print(str(error), file=__import__("sys").stderr)
+        return 1
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

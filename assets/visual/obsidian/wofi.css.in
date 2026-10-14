@@ -1,0 +1,27 @@
+window, #window {
+    background: alpha(@BG@, .97);
+    color: @FG@;
+    border: 1px solid @ACC1@;
+    border-radius: 0;
+    font-family: "Noto Sans";
+    font-size: 14px;
+}
+#outer-box { padding: 20px; background: @BG@; }
+#inner-box { background: @BG@; }
+#input {
+    padding: 12px;
+    margin-bottom: 16px;
+    color: @FG@;
+    background: alpha(@FG@, .06);
+    border: 1px solid alpha(@FG@, .25);
+    border-radius: 0;
+    box-shadow: none;
+}
+#input:focus { border-color: @ACC1@; }
+#entry { padding: 12px; border-radius: 0; }
+#entry:selected { background: alpha(@ACC1@, .16); border: none; }
+#entry:selected #text { color: @FG@; }
+#entry #text, #entry #img, #entry:selected #text, #entry:selected #img { background: transparent; background-image: none; }
+#text { color: @FG@; margin-left: 12px; }
+#img { margin-right: 6px; }
+#scroll { background: transparent; }

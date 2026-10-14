@@ -3,11 +3,24 @@
 # GTK3 grid with preview screenshots (like gh0stzk/dotfiles)
 # P4nx0z Edition
 
-import gi
-gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, GdkPixbuf, Pango, GLib
+import hashlib
+import json
 import os
+import queue
+import re
 import subprocess
+import sys
+import threading
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent if Path(__file__).with_name("black_ice_i18n.py").is_file()
+                       else Path.home() / ".local/bin"))
+
+import gi
+
+gi.require_version('Gtk', '3.0')
+gi.require_version('GdkPixbuf', '2.0')
+from gi.repository import GdkPixbuf, GLib, Gtk, Pango
 
 THEMES_DIR  = os.path.expanduser('~/.config/waybar/themes')
 CACHE_THEME = os.path.expanduser('~/.cache/current_theme')
@@ -19,7 +32,7 @@ window {
     background-color: #0d0d0d;
 }
 * {
-    font-family: "JetBrainsMono Nerd Font", "JetBrains Mono", monospace;
+    font-family: "Roboto", "JetBrainsMono Nerd Font", sans-serif;
     color: #e0e0e0;
 }
 .header {
@@ -64,6 +77,20 @@ scrolledwindow {
 """
 
 
+def active_css():
+    try:
+        colors = json.loads(Path.home().joinpath('.local/state/black-ice/appearance.json').read_text()).get('palette', {})
+    except (OSError, ValueError):
+        colors = {}
+    css = CSS
+    for original, key in [('#0d0d0d', 'bg'), ('#1a1a1a', 'bg'), ('#1e1e1e', 'bg'), ('#120020', 'bg'),
+                          ('#00f3ff', 'acc1'), ('#bd00ff', 'acc2'), ('#e0e0e0', 'fg'), ('#aaaaaa', 'dim')]:
+        value = colors.get(key, '')
+        if re.fullmatch(r'#[0-9a-fA-F]{6}', str(value)):
+            css = css.replace(original.encode(), value.encode())
+    return css
+
+
 def get_themes():
     themes = []
     if not os.path.isdir(THEMES_DIR):
@@ -79,27 +106,34 @@ def get_themes():
 
 def get_current():
     try:
-        return open(CACHE_THEME).read().strip()
-    except Exception:
+        return Path(CACHE_THEME).read_text().strip()
+    except OSError:
         return ''
 
 
 class ThemeSelector(Gtk.Window):
     def __init__(self):
         super().__init__(title='  BLACK-ICE Theme Selector')
+        try:
+            self.layouts = json.loads(Path(THEMES_DIR).parent.joinpath('layout-map.json').read_text())
+        except (OSError, ValueError):
+            self.layouts = {}
         self.set_default_size(1000, 620)
         self.set_resizable(True)
         self.connect('destroy', Gtk.main_quit)
         self.connect('key-press-event', self._on_key)
 
         provider = Gtk.CssProvider()
-        provider.load_from_data(CSS)
+        provider.load_from_data(active_css())
         Gtk.StyleContext.add_provider_for_screen(
             self.get_screen(), provider,
             Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
 
         self.themes  = get_themes()
         self.current = get_current()
+        self.preview_jobs = queue.Queue()
+        self.closed = threading.Event()
+        self.connect('destroy', lambda *_: self.closed.set())
 
         outer = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
         self.add(outer)
@@ -112,6 +146,15 @@ class ThemeSelector(Gtk.Window):
 
         sep = Gtk.Separator(orientation=Gtk.Orientation.HORIZONTAL)
         outer.pack_start(sep, False, False, 0)
+        studio = Gtk.Button(label='Crear o editar un tema personalizado')
+        studio.connect('clicked', lambda *_: subprocess.Popen([str(Path.home() / '.local/bin/black-ice-theme-studio')]))
+        outer.pack_start(studio, False, False, 6)
+
+        search = Gtk.SearchEntry()
+        search.set_placeholder_text(f'Buscar entre {len(self.themes)} temas: NSA, MK11, Civic…')
+        search.set_margin_start(16)
+        search.set_margin_end(16)
+        outer.pack_start(search, False, False, 6)
 
         # --- Scrolled FlowBox ---
         scroll = Gtk.ScrolledWindow()
@@ -123,26 +166,87 @@ class ThemeSelector(Gtk.Window):
         flow.set_max_children_per_line(6)
         flow.set_min_children_per_line(3)
         flow.set_homogeneous(True)
+        flow.set_valign(Gtk.Align.START)
         flow.set_selection_mode(Gtk.SelectionMode.NONE)
+        flow.set_filter_func(lambda child: search.get_text().strip().casefold() in child.get_child().get_name().casefold())
+        search.connect('search-changed', lambda *_: flow.invalidate_filter())
         flow.set_margin_start(10)
         flow.set_margin_end(10)
         flow.set_margin_top(10)
         flow.set_margin_bottom(10)
         scroll.add(flow)
 
-        for theme in self.themes:
+        for theme in sorted(self.themes, key=lambda name: name != self.current):
             flow.add(self._make_card(theme))
 
+        from black_ice_i18n import bind
+        bind(self)
         self.show_all()
+        self.preview_worker = threading.Thread(target=self._preview_worker, daemon=True)
+        self.preview_worker.start()
+
+    def _preview_worker(self):
+        try:
+            os.setpriority(os.PRIO_PROCESS, threading.get_native_id(), 10)
+        except OSError:
+            pass
+        while not self.closed.is_set():
+            try:
+                theme, image = self.preview_jobs.get_nowait()
+            except queue.Empty:
+                return
+            pixbuf = self._load_preview(theme)
+            GLib.idle_add(self._show_preview, image, pixbuf)
+
+    def _show_preview(self, image, pixbuf):
+        if not self.closed.is_set():
+            image.set_from_pixbuf(pixbuf)
+        return False
+
+    def _thumbnail(self, source):
+        source = Path(source)
+        stat = source.stat()
+        identity = f'{source.resolve()}:{stat.st_mtime_ns}:{stat.st_size}:{CARD_W}:{CARD_H}'
+        cache = Path(os.environ.get('XDG_CACHE_HOME', Path.home() / '.cache')) / 'black-ice/theme-thumbnails'
+        cache.mkdir(parents=True, exist_ok=True)
+        target = cache / (hashlib.sha256(identity.encode()).hexdigest() + '.png')
+        if target.is_file():
+            try:
+                return GdkPixbuf.Pixbuf.new_from_file(str(target))
+            except GLib.Error:
+                target.unlink(missing_ok=True)
+        pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(str(source), CARD_W, CARD_H, False)
+        temporary = target.with_name(target.stem + f'.{os.getpid()}.png')
+        try:
+            pixbuf.savev(str(temporary), 'png', [], [])
+            temporary.replace(target)
+        finally:
+            temporary.unlink(missing_ok=True)
+        return pixbuf
 
     def _load_preview(self, theme):
         """Load preview.png if available, else generate placeholder."""
+        metadata = os.path.join(THEMES_DIR, theme, 'theme.json')
+        if os.path.isfile(metadata):
+            try:
+                with open(metadata) as handle:
+                    value = json.load(handle)
+                    name = value.get('wallpaper', '')
+                custom = value.get('wallpaper_path', '')
+                if custom and os.path.isfile(custom):
+                    return self._thumbnail(custom)
+                pictures = GLib.get_user_special_dir(GLib.UserDirectory.DIRECTORY_PICTURES) or os.path.expanduser('~/Pictures')
+                if name and os.path.basename(name) == name:
+                    wallpaper = os.path.join(pictures, 'wallpapers', name)
+                    if os.path.isfile(wallpaper):
+                        return self._thumbnail(wallpaper)
+            except (OSError, ValueError, GLib.Error):
+                pass
         preview = os.path.join(THEMES_DIR, theme, 'preview.png')
         if os.path.isfile(preview):
             try:
-                return GdkPixbuf.Pixbuf.new_from_file_at_scale(
-                    preview, CARD_W, CARD_H, False)
-            except Exception:
+                return self._thumbnail(preview)
+            except (OSError, GLib.Error):
                 pass
         # Fallback: plain dark rectangle (no preview yet)
         pb = GdkPixbuf.Pixbuf.new(GdkPixbuf.Colorspace.RGB, False, 8, CARD_W, CARD_H)
@@ -151,8 +255,13 @@ class ThemeSelector(Gtk.Window):
 
     def _make_card(self, theme):
         is_active = (theme == self.current)
+        try:
+            metadata = json.loads(Path(THEMES_DIR).joinpath(theme, 'theme.json').read_text())
+        except (OSError, ValueError):
+            metadata = {}
 
         card = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
+        card.set_name(theme)
         card.get_style_context().add_class('card')
         if is_active:
             card.get_style_context().add_class('active')
@@ -162,15 +271,22 @@ class ThemeSelector(Gtk.Window):
         btn.get_style_context().add_class('card-btn')
         btn.set_relief(Gtk.ReliefStyle.NONE)
         btn.connect('clicked', self._select_theme, theme)
+        locations = {'dual-top':'dos barras · escritorios arriba al centro',
+                     'dual-bottom':'dos barras · escritorios abajo al centro',
+                     'single-top':'una barra superior · escritorios al centro',
+                     'single-bottom':'una barra inferior · escritorios al centro'}
+        layout = metadata.get('layout', self.layouts.get(theme))
+        if layout in locations:
+            btn.set_tooltip_text(locations[layout] + ' · bandeja a la derecha')
 
-        pb  = self._load_preview(theme)
-        img = Gtk.Image.new_from_pixbuf(pb)
+        img = Gtk.Image.new_from_icon_name('image-x-generic', Gtk.IconSize.DIALOG)
+        self.preview_jobs.put((theme, img))
         img.set_size_request(CARD_W, CARD_H)
         btn.add(img)
         card.pack_start(btn, True, True, 0)
 
         # Theme name
-        lbl = Gtk.Label(label=theme)
+        lbl = Gtk.Label(label=metadata.get('label', theme))
         lbl.get_style_context().add_class('theme-name')
         if is_active:
             lbl.get_style_context().add_class('active')
@@ -179,7 +295,26 @@ class ThemeSelector(Gtk.Window):
         lbl.set_halign(Gtk.Align.CENTER)
         card.pack_start(lbl, False, False, 0)
 
+        if theme.startswith('User-'):
+            remove = Gtk.Button(label='Eliminar personalizado')
+            remove.set_sensitive(not is_active)
+            remove.set_tooltip_text('Aplica otro tema antes de eliminar el activo' if is_active else 'Enviar a la papelera; puedes restaurarlo desde el Estudio de temas')
+            remove.connect('clicked', self._delete_theme, theme, card)
+            card.pack_start(remove, False, False, 0)
+
         return card
+
+    def _delete_theme(self, _button, theme, card):
+        import black_ice_theme as model
+        try:
+            model.trash_theme(theme)
+            card.get_parent().destroy()
+            self.themes.remove(theme)
+        except (OSError, ValueError) as error:
+            dialog = Gtk.MessageDialog(transient_for=self, modal=True, message_type=Gtk.MessageType.ERROR,
+                                       buttons=Gtk.ButtonsType.CLOSE, text=str(error))
+            dialog.run()
+            dialog.destroy()
 
     def _select_theme(self, _btn, theme):
         self.hide()

@@ -1,0 +1,25 @@
+{
+  "revision": "bd8f81ddb5c74d5c8897b36ad88b440266245103",
+  "files": [
+    {
+      "file": "inter/Inter-Variable.ttf",
+      "source": "https://raw.githubusercontent.com/google/fonts/bd8f81ddb5c74d5c8897b36ad88b440266245103/ofl/inter/Inter%5Bopsz%2Cwght%5D.ttf",
+      "sha256": "29160a80ff49ddcab2c97711247e08b1fab27a484a329ce8b813d820dc559031"
+    },
+    {
+      "file": "inter/OFL.txt",
+      "source": "https://raw.githubusercontent.com/google/fonts/bd8f81ddb5c74d5c8897b36ad88b440266245103/ofl/inter/OFL.txt",
+      "sha256": "5b9321a4298cfeb6b34354164a1c3afc3db114569984c502b9b35d988fd58c57"
+    },
+    {
+      "file": "ubuntu-sans/UbuntuSans-Variable.ttf",
+      "source": "https://raw.githubusercontent.com/google/fonts/bd8f81ddb5c74d5c8897b36ad88b440266245103/ufl/ubuntusans/UbuntuSans%5Bwdth%2Cwght%5D.ttf",
+      "sha256": "37e90bba45a2a1172d9f6078e45daebaa1b4e537943205cc1309f142a254fe40"
+    },
+    {
+      "file": "ubuntu-sans/LICENCE.txt",
+      "source": "https://raw.githubusercontent.com/google/fonts/bd8f81ddb5c74d5c8897b36ad88b440266245103/ufl/ubuntusans/LICENCE.txt",
+      "sha256": "2f0015108d68627bd788d313f529c21ff4da2c2c42a5e1f3883acc83480f9002"
+    }
+  ]
+}

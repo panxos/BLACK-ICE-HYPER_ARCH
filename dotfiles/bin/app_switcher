@@ -4,7 +4,7 @@
 # Muestra: [WS] AppName — Title
 # Selección → enfoca la ventana
 
-set -uo pipefail
+set -euo pipefail
 
 # Obtener lista de ventanas desde hyprctl
 CLIENTS=$(hyprctl clients -j 2>/dev/null)
@@ -15,7 +15,7 @@ if [ -z "$CLIENTS" ] || [ "$CLIENTS" = "[]" ]; then
 fi
 
 # Construir lista: "ADDRESS|WS CLASS TITLE"
-LIST=$(echo "$CLIENTS" | python3 - << 'PYEOF'
+LIST=$(python3 -c '
 import json, sys
 
 data = json.load(sys.stdin)
@@ -57,9 +57,9 @@ for w in data:
     label = f"[{ws}] {icon} {cls}  —  {title}"
     lines.append(f"{addr}|{label}")
 
-for l in lines:
-    print(l)
-PYEOF
+for line in lines:
+    print(line)
+' <<< "$CLIENTS"
 )
 
 if [ -z "$LIST" ]; then
@@ -68,7 +68,7 @@ if [ -z "$LIST" ]; then
 fi
 
 # Mostrar en wofi (solo la parte después del pipe como label)
-SELECTION=$(echo "$LIST" | cut -d'|' -f2 | \
+SELECTION=$(echo "$LIST" | cut -d'|' -f2- | \
     wofi --dmenu \
          --prompt "󰖯  Ventanas:" \
          --width 600 \
@@ -76,14 +76,14 @@ SELECTION=$(echo "$LIST" | cut -d'|' -f2 | \
          --cache-file /dev/null \
          --no-actions \
          --insensitive \
-         --style ~/.config/wofi/style.css 2>/dev/null)
+         --style ~/.config/wofi/style.css 2>/dev/null) || exit 0
 
 [ -z "$SELECTION" ] && exit 0
 
 # Recuperar address del label seleccionado
-ADDRESS=$(echo "$LIST" | grep -F "|${SELECTION}" | cut -d'|' -f1 | head -1)
+ADDRESS=$(printf '%s\n' "$LIST" | awk -v selected="$SELECTION" 'substr($0, index($0, "|")+1) == selected {print substr($0, 1, index($0, "|")-1); exit}')
 
 [ -z "$ADDRESS" ] && exit 0
 
 # Enfocar ventana
-hyprctl dispatch focuswindow "address:${ADDRESS}" 2>/dev/null
+"$HOME/.local/bin/black-ice-hypr" focuswindow "address:${ADDRESS}" 2>/dev/null

@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+exec 9>"${XDG_RUNTIME_DIR:?}/black-ice-removable.lock"
+flock -n 9 || exit 0
+exec /usr/bin/udiskie --smart-tray --appindicator --notify --automount "$@"

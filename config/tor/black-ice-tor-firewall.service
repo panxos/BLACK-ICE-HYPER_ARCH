@@ -1,0 +1,15 @@
+[Unit]
+Description=BLACK-ICE persistent Tor traffic guard
+DefaultDependencies=no
+After=local-fs.target nftables.service
+Before=network-pre.target
+Wants=network-pre.target
+ConditionPathExists=/var/lib/black-ice/tor/enabled
+
+[Service]
+Type=oneshot
+ExecStart=/usr/lib/black-ice/system-tor firewall
+RemainAfterExit=yes
+
+[Install]
+WantedBy=network-pre.target

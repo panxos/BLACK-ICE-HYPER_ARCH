@@ -1,0 +1,9 @@
+{
+  "repository": "https://github.com/google/fonts",
+  "revision": "c5a3a1b83fb771759f48d1abdee0127eaec63a97",
+  "directory": "ofl/sharetechmono",
+  "sha256": {
+    "ShareTechMono-Regular.ttf": "9ceab1f87414829af259c0f537573ae03ef7dd3147c0b27a36a1a0beb6732677",
+    "OFL.txt": "9d96f445b6e9c701428811d0177f894874f8d6f07ecc30d568c506542368f3ff"
+  }
+}

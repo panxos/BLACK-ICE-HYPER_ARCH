@@ -1,0 +1,20 @@
+#!/usr/bin/env python3
+"""Prepara los fondos actuales y bloquea aunque falle la preparación."""
+import os
+import subprocess
+from pathlib import Path
+
+
+def main() -> None:
+    if subprocess.run(["pgrep", "-u", str(os.getuid()), "-x", "hyprlock"], stdout=subprocess.DEVNULL, check=False).returncode == 0:
+        return
+    helper = Path.home() / ".local/bin/black-ice-appearance"
+    try:
+        subprocess.run(["timeout", "--signal=KILL", "5s", str(helper), "lock-sync"], timeout=7, check=False)
+    except (OSError, subprocess.TimeoutExpired):
+        pass
+    os.execlp("hyprlock", "hyprlock")
+
+
+if __name__ == "__main__":
+    main()

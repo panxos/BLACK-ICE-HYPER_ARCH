@@ -14,12 +14,12 @@ log_info "Instalando CLIs de IA globalmente..."
 install_npm_cli() {
     local pkg="$1"
     local name="$2"
-    if npm list -g --depth=0 "$pkg" &>/dev/null; then
+    if npm list -g --prefix "$USER_HOME/.local" --depth=0 "$pkg" &>/dev/null; then
         log_info "$name ya está instalado"
         return 0
     fi
     log_info "Instalando $name..."
-    if sudo npm install -g "$pkg"; then
+    if npm install -g --prefix "$USER_HOME/.local" "$pkg"; then
         log_success "$name instalado correctamente"
     else
         log_error "Error al instalar $name (continúa)"
@@ -39,7 +39,7 @@ if ! grep -q "claudeupdate" "$ZSH_ALIASES" 2>/dev/null; then
     cat >> "$ZSH_ALIASES" << 'EOF'
 
 # --- IA Update Aliases (BLACK-ICE) ---
-alias claudeupdate='tmp=$(mktemp /tmp/claude-install-XXXXXX.sh) && curl -fsSL https://claude.ai/install.sh -o "$tmp" && bash "$tmp"; rm -f "$tmp"'
+alias claudeupdate='npm update -g --prefix "$HOME/.local" @anthropic-ai/claude-code'
 EOF
     log_info "Aliases de IA agregados a $ZSH_ALIASES"
 else

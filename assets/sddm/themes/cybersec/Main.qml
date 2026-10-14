@@ -7,6 +7,19 @@ Rectangle {
     width: 1920
     height: 1080
     color: "#02060a"
+    property string interfaceLanguage: config.language || "es"
+    function tr(spanish, english) { return interfaceLanguage === "en" ? english : spanish; }
+    ComboBox {
+        anchors.right: parent.right
+        anchors.top: parent.top
+        anchors.margins: 24
+        z: 20
+        width: 150
+        model: ["Español", "English"]
+        currentIndex: container.interfaceLanguage === "en" ? 1 : 0
+        onActivated: container.interfaceLanguage = currentIndex === 1 ? "en" : "es"
+        Accessible.name: container.tr("Idioma", "Language")
+    }
 
     // ═══════════════════════════════════════════════════════════
     //  LAYER 0 — Background image
@@ -207,13 +220,9 @@ Rectangle {
                 font.pixelSize: 11
                 font.family: "JetBrains Mono"
                 property var messages: [
-                    "INTRUSION DETECTION ACTIVE",
-                    "FIREWALL: BLOCKING EXTERNAL TRAFFIC",
-                    "ENCRYPTION LAYER: OPERATIONAL",
-                    "KERNEL INTEGRITY: VERIFIED",
-                    "SECURE BOOT: ENFORCED",
-                    "ALL CONNECTIONS MONITORED",
-                    "AUDIT LOG: RECORDING"
+                    "ARCH LINUX / HYPRLAND",
+                    container.tr("ACCESO SDDM", "SDDM SIGN-IN"),
+                    container.tr("SELECCIONA TU SESIÓN", "SELECT YOUR SESSION")
                 ]
                 property int msgIdx: 0
                 text: "[ " + messages[msgIdx] + " ]"
@@ -312,7 +321,7 @@ Rectangle {
             // Header label
             Text {
                 Layout.alignment: Qt.AlignHCenter
-                text: "⬡ SYSTEM IDENTITY REQUIRED ⬡"
+                text: container.tr("⬡ INICIAR SESIÓN ⬡", "⬡ SIGN IN ⬡")
                 color: "#00f3ff"
                 font.pixelSize: 11
                 font.bold: true
@@ -394,11 +403,9 @@ Rectangle {
                 font.pixelSize: 10
                 font.family: "JetBrains Mono"
                 property var prompts: [
-                    "SCANNING BIOMETRIC_DATA...",
-                    "VERIFYING NEURAL_PATTERN...",
-                    "CHECKING CLEARANCE_LEVEL...",
-                    "LOADING IDENTITY_MATRIX...",
-                    "AUTHENTICATING SESSION..."
+                    container.tr("USUARIO", "USER"),
+                    container.tr("CONTRASEÑA", "PASSWORD"),
+                    container.tr("SESIÓN", "SESSION")
                 ]
                 property int idx: 0
                 text: prompts[idx]
@@ -418,7 +425,7 @@ Rectangle {
             TextField {
                 id: usernameField
                 Layout.fillWidth: true
-                placeholderText: "USER_IDENTITY_"
+                placeholderText: container.tr("USUARIO", "USER")
                 text: userModel.lastUser || ""
                 color: "#e0e0e0"
                 font.pixelSize: 16
@@ -438,7 +445,7 @@ Rectangle {
             TextField {
                 id: passwordField
                 Layout.fillWidth: true
-                placeholderText: "CREDENTIAL_HASH_"
+                placeholderText: container.tr("CONTRASEÑA", "PASSWORD")
                 echoMode: TextInput.Password
                 color: "#00f3ff"
                 font.pixelSize: 16
@@ -500,7 +507,7 @@ Rectangle {
                 }
 
                 contentItem: Text {
-                    text: authButton.pressed ? "[ AUTHENTICATING... ]" : "▶▶  INITIALIZE_AUTH_SESSION  ◀◀"
+                    text: authButton.pressed ? container.tr("[ AUTENTICANDO… ]", "[ AUTHENTICATING… ]") : container.tr("▶▶ INICIAR SESIÓN ◀◀", "▶▶ SIGN IN ◀◀")
                     color: authButton.isHovered ? "#00f3ff" : "#4400f3ff"
                     font.bold: true
                     font.pixelSize: 13
@@ -554,7 +561,7 @@ Rectangle {
 
         Text {
             anchors.centerIn: parent
-            text: "BLACK-ICE ARCH // ALL ACCESS ATTEMPTS LOGGED // UNAUTHORIZED ACCESS PROHIBITED"
+            text: "BLACK-ICE ARCH // " + container.tr("ACCESO AL ESCRITORIO", "DESKTOP SIGN-IN")
             color: "#1a00f3ff"
             font.pixelSize: 10
             font.family: "JetBrains Mono"
@@ -569,7 +576,7 @@ Rectangle {
         target: sddm
 
         function onLoginFailed() {
-            errorMsg.text = "⚠  ACCESS DENIED — INVALID CREDENTIALS"
+            errorMsg.text = container.tr("⚠ ACCESO DENEGADO: REVISA TUS DATOS", "⚠ ACCESS DENIED: CHECK YOUR DETAILS")
             passwordField.text = ""
             passwordField.focus = true
             errorClearTimer.start()

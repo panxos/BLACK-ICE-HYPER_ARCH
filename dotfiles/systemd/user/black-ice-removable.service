@@ -1,0 +1,16 @@
+[Unit]
+Description=BLACK-ICE removable devices and mount notifications
+After=dbus.service
+PartOf=hyprland-session.target
+ConditionEnvironment=WAYLAND_DISPLAY
+StartLimitIntervalSec=60
+StartLimitBurst=3
+
+[Service]
+Type=simple
+ExecStart=%h/.config/bin/udiskie-fix
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=hyprland-session.target

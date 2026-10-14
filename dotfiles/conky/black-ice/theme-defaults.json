@@ -1,0 +1,326 @@
+{
+  "Obsidian-Angular": {
+    "variant": "obsidian",
+    "opacity": 0.72,
+    "zoom": 0.8,
+    "position": "bottom_middle"
+  },
+  "Emilia-Angular": {
+    "variant": "focus",
+    "opacity": 0.6,
+    "zoom": 0.8,
+    "position": "bottom_middle"
+  },
+  "Yael-Angular": {
+    "variant": "signal",
+    "opacity": 0.6,
+    "zoom": 0.8,
+    "position": "bottom_middle"
+  },
+  "Varinka-Angular": {
+    "variant": "focus",
+    "opacity": 0.6,
+    "zoom": 0.8,
+    "position": "bottom_middle"
+  },
+  "Brenda-Everforest": {
+    "variant": "signal",
+    "opacity": 0.6,
+    "zoom": 0.8,
+    "position": "bottom_middle"
+  },
+  "Daniela-Catppuccin": {
+    "variant": "obsidian",
+    "opacity": 0.6,
+    "zoom": 0.8,
+    "position": "bottom_middle"
+  },
+  "Emilia-TokyoNight": {
+    "variant": "ribbon",
+    "opacity": 0.6,
+    "zoom": 0.8,
+    "position": "bottom_middle"
+  },
+  "H4k3r-HTB": {
+    "variant": "obsidian",
+    "opacity": 0.6,
+    "zoom": 0.8,
+    "position": "bottom_middle"
+  },
+  "Isabel-Frappe": {
+    "variant": "ribbon",
+    "opacity": 0.6,
+    "zoom": 0.8,
+    "position": "bottom_middle"
+  },
+  "Jan-CyberPunk": {
+    "variant": "obsidian",
+    "opacity": 0.6,
+    "zoom": 0.8,
+    "position": "bottom_middle"
+  },
+  "Janis-CyberMagenta": {
+    "variant": "focus",
+    "opacity": 0.6,
+    "zoom": 0.8,
+    "position": "bottom_middle"
+  },
+  "Karla-ZombieNight": {
+    "variant": "ribbon",
+    "opacity": 0.6,
+    "zoom": 0.8,
+    "position": "bottom_middle"
+  },
+  "Marisol-Dracula": {
+    "variant": "signal",
+    "opacity": 0.6,
+    "zoom": 0.8,
+    "position": "bottom_middle"
+  },
+  "Matrix-Hacker": {
+    "variant": "terminal",
+    "opacity": 0.6,
+    "zoom": 0.8,
+    "position": "bottom_middle"
+  },
+  "Melissa-Nord": {
+    "variant": "focus",
+    "opacity": 0.6,
+    "zoom": 0.8,
+    "position": "bottom_middle"
+  },
+  "Pamela-Lovelace": {
+    "variant": "obsidian",
+    "opacity": 0.6,
+    "zoom": 0.8,
+    "position": "bottom_middle"
+  },
+  "Silvia-Gruvbox": {
+    "variant": "obsidian",
+    "opacity": 0.6,
+    "zoom": 0.8,
+    "position": "bottom_middle"
+  },
+  "Varinka-Mono": {
+    "variant": "ribbon",
+    "opacity": 0.6,
+    "zoom": 0.8,
+    "position": "bottom_middle"
+  },
+  "Yael-OxoCarbon": {
+    "variant": "obsidian",
+    "opacity": 0.6,
+    "zoom": 0.8,
+    "position": "bottom_middle"
+  },
+  "Zombie-Decay": {
+    "variant": "focus",
+    "opacity": 0.6,
+    "zoom": 0.8,
+    "position": "bottom_middle"
+  },
+  "s4vitar-darkness": {
+    "variant": "ribbon",
+    "opacity": 0.6,
+    "zoom": 0.8,
+    "position": "bottom_middle"
+  },
+  "Obsidian-Cobalt": {
+    "variant": "horizon",
+    "opacity": 0.62,
+    "zoom": 0.8,
+    "position": "bottom_middle"
+  },
+  "Obsidian-Ember": {
+    "variant": "fracture",
+    "opacity": 0.64,
+    "zoom": 0.75,
+    "position": "bottom_middle"
+  },
+  "Obsidian-Frost": {
+    "variant": "ribbon",
+    "opacity": 0.62,
+    "zoom": 0.8,
+    "position": "bottom_middle"
+  },
+  "Mr-Robot": {
+    "variant": "terminal",
+    "opacity": 0.64,
+    "zoom": 0.8,
+    "position": "bottom_middle"
+  },
+  "Fsociety": {
+    "variant": "fsociety",
+    "opacity": 0.58,
+    "zoom": 0.9,
+    "position": "bottom_middle"
+  },
+  "Anubis-Sethek": {
+    "variant": "obsidian",
+    "opacity": 0.64,
+    "zoom": 0.8,
+    "position": "bottom_middle"
+  },
+  "Seth-Tempest": {
+    "variant": "scope",
+    "opacity": 0.6,
+    "zoom": 0.75,
+    "position": "bottom_left"
+  },
+  "Horus-Nightwatch": {
+    "variant": "ribbon",
+    "opacity": 0.6,
+    "zoom": 0.75,
+    "position": "bottom_middle"
+  },
+  "Ra-Eclipse": {
+    "variant": "chronos",
+    "opacity": 0.6,
+    "zoom": 0.75,
+    "position": "bottom_left"
+  },
+  "Isis-Lunar": {
+    "variant": "polar",
+    "opacity": 0.6,
+    "zoom": 0.75,
+    "position": "bottom_left"
+  },
+  "Nephthys-Veil": {
+    "variant": "focus",
+    "opacity": 0.6,
+    "zoom": 0.75,
+    "position": "bottom_left"
+  },
+  "Sekhmet-Redline": {
+    "variant": "fracture",
+    "opacity": 0.62,
+    "zoom": 0.75,
+    "position": "bottom_left"
+  },
+  "Horus-Skyline": {
+    "variant": "ribbon",
+    "opacity": 0.6,
+    "zoom": 0.75,
+    "position": "bottom_middle"
+  },
+  "NSA-Signal": {
+    "variant": "obsidian",
+    "opacity": 0.6,
+    "zoom": 0.8,
+    "position": "bottom_middle"
+  },
+  "FBI-Casefile": {
+    "variant": "ribbon",
+    "opacity": 0.6,
+    "zoom": 0.8,
+    "position": "bottom_middle"
+  },
+  "MI5-Thames": {
+    "variant": "signal",
+    "opacity": 0.6,
+    "zoom": 0.8,
+    "position": "bottom_middle"
+  },
+  "MK11-SubZero": {
+    "variant": "fracture",
+    "opacity": 0.58,
+    "zoom": 0.75,
+    "position": "bottom_middle"
+  },
+  "MK11-Scorpion": {
+    "variant": "signal",
+    "opacity": 0.58,
+    "zoom": 0.75,
+    "position": "bottom_middle"
+  },
+  "Supra-MK4": {
+    "variant": "horizon",
+    "opacity": 0.58,
+    "zoom": 0.75,
+    "position": "bottom_middle"
+  },
+  "Civic-Si-Mugen": {
+    "variant": "ribbon",
+    "opacity": 0.58,
+    "zoom": 0.75,
+    "position": "bottom_middle"
+  },
+  "Skyline-GTR-R34": {
+    "variant": "horizon",
+    "opacity": 0.58,
+    "zoom": 0.75,
+    "position": "bottom_middle"
+  },
+  "Anubis-Citadel": {
+    "variant": "obsidian",
+    "opacity": 0.64,
+    "zoom": 0.8,
+    "position": "bottom_middle"
+  },
+  "Horus-Moonfall": {
+    "variant": "ribbon",
+    "opacity": 0.6,
+    "zoom": 0.75,
+    "position": "bottom_middle"
+  },
+  "Seth-Stormkeep": {
+    "variant": "scope",
+    "opacity": 0.6,
+    "zoom": 0.75,
+    "position": "bottom_middle"
+  },
+  "Ra-Afterlight": {
+    "variant": "chronos",
+    "opacity": 0.6,
+    "zoom": 0.75,
+    "position": "bottom_middle"
+  },
+  "Isis-Moonriver": {
+    "variant": "polar",
+    "opacity": 0.6,
+    "zoom": 0.75,
+    "position": "bottom_middle"
+  },
+  "Sekhmet-RedCitadel": {
+    "variant": "fracture",
+    "opacity": 0.62,
+    "zoom": 0.75,
+    "position": "bottom_middle"
+  },
+  "Mr-Robot-Safehouse": {
+    "variant": "terminal",
+    "opacity": 0.64,
+    "zoom": 0.8,
+    "position": "bottom_middle"
+  },
+  "FBI-Fieldwork": {
+    "variant": "ribbon",
+    "opacity": 0.55,
+    "zoom": 0.72,
+    "position": "bottom_left"
+  },
+  "NSA-Intercept": {
+    "variant": "signal",
+    "opacity": 0.55,
+    "zoom": 0.72,
+    "position": "bottom_left"
+  },
+  "MI5-Operations": {
+    "variant": "obsidian",
+    "opacity": 0.55,
+    "zoom": 0.72,
+    "position": "bottom_left"
+  },
+  "Kevin-Mitnick-Condor": {
+    "variant": "obsidian",
+    "opacity": 0.58,
+    "zoom": 0.85,
+    "position": "bottom_middle"
+  },
+  "Kevin-Mitnick-Condor-Noir": {
+    "variant": "obsidian",
+    "opacity": 0.58,
+    "zoom": 0.85,
+    "position": "bottom_middle"
+  }
+}

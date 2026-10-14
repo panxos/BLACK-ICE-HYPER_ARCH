@@ -1,0 +1,72 @@
+#!/usr/bin/env python3
+"""Control de ONION LINK y verificador periódico de aislamiento."""
+import argparse
+import json
+import os
+import shutil
+import subprocess
+import sys
+import time
+from pathlib import Path
+
+source = Path(__file__).resolve().parents[2] / "src/system"
+data = Path(os.environ.get("XDG_DATA_HOME", Path.home() / ".local/share")) / "black-ice/system"
+sys.path.insert(0, str(source if (source / "privacy.py").is_file() else data))
+from manager import Manager
+from system_privacy import SystemPrivacy as Privacy
+
+
+def menu(privacy):
+    from privacy_ui import show
+    return show(privacy)
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("action", nargs="?", default="menu", choices=("menu", "status", "enable", "disable", "toggle", "verify", "terminal", "logs", "watch"))
+    parser.add_argument("--waybar", action="store_true")
+    args = parser.parse_args()
+    privacy = Privacy(Manager())
+    try:
+        if args.action == "menu":
+            return menu(privacy)
+        if args.action == "watch":
+            manager = Manager()
+            while True:
+                try:
+                    with manager.locked("privacy-monitor"):
+                        privacy.verify()
+                        manager.expire_labs()
+                except (OSError, ValueError, RuntimeError, subprocess.TimeoutExpired) as error:
+                    print(str(error)[-400:], file=sys.stderr, flush=True)
+                time.sleep(10)
+        if args.action == "terminal":
+            subprocess.Popen(privacy.terminal(), start_new_session=True, stdin=subprocess.DEVNULL,
+                             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            result = {"terminal_requested": True}
+        elif args.action == "status":
+            result = privacy.waybar() if args.waybar else privacy.state()
+        elif args.action in {"enable", "toggle"}:
+            result = getattr(privacy, args.action)(lambda text: print(text, file=sys.stderr, flush=True))
+        elif args.action == "verify":
+            result = privacy.request_verify()
+        else:
+            result = getattr(privacy, args.action)()
+        print(json.dumps(result, ensure_ascii=False))
+        return 1 if args.action == "verify" and result.get("phase") == "blocked" else 0
+    except (OSError, TypeError, ValueError, RuntimeError, subprocess.TimeoutExpired) as error:
+        if args.waybar:
+            print(json.dumps({"text": "! Tor", "class": "blocked", "tooltip": str(error)}))
+        else:
+            print(str(error), file=sys.stderr)
+            if args.action == "toggle" and shutil.which("notify-send"):
+                try:
+                    subprocess.run(["notify-send", "--app-name=BLACK-ICE", "--urgency=critical", "Tor: no se completó el cambio", str(error)[-500:]],
+                                   timeout=3, check=False, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                except (OSError, subprocess.TimeoutExpired):
+                    pass
+        return 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

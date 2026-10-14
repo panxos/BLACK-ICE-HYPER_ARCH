@@ -1,187 +1,33 @@
-![BLACK-ICE ARCH Banner](images/banner.png)
+# Atajos de teclado
 
-# BLACK-ICE ARCH — Keyboard Shortcuts
+**F1** o **Super+I** abre la ayuda buscable con la paleta del tema. Lee los bindings de la sesión activa, agrupa acciones y señala ejecutables ausentes. Las funciones Lua opacas sin descripción no se presentan como verificadas.
 
-> Referencia completa de keybinds Hyprland. Presiona **Win+I** para ver el Cheat Sheet interactivo.
+| Atajo predeterminado | Acción |
+|---|---|
+| Super / Super+D | Abrir o cerrar el lanzador |
+| Super+Enter | Kitty |
+| Super+Q | Cerrar ventana |
+| Super+V | Flotante |
+| Super+F | Pantalla completa |
+| Super+Tab | Selector de ventanas |
+| Super+1…5 | Escritorio local del monitor enfocado |
+| Super+Alt+1…5 | Enviar ventana al escritorio local |
+| Super+flechas | Foco entre ventanas |
+| Super+Alt+T | BLACK-ICE Control → Apariencia |
+| Super+Alt+W | Galería de fondos |
+| Super+Shift+F9 | Panel general |
+| Super+F8 | Mostrar u ocultar Conky |
+| Super+Shift+F8 | Galería de estilos Conky |
+| Super+L | Bloquear pantalla |
+| Super+Shift+P | Perfil de energía |
+| Super+H | Portapapeles |
+| Super+Shift+X | Menú KeePassXC |
+| Super+Ctrl+Enter | Sesiones de terminal |
 
----
+La configuración personal puede añadir o modificar atajos. **La ventana F1 es la referencia efectiva**; esta tabla resume los predeterminados. Comprobar que existe un comando no verifica sus credenciales ni todos sus flujos.
 
-## 🪟 Ventanas
+Los escritorios locales muestran cinco posiciones por salida y mantienen identificadores estables. Los atajos de otra pantalla no trasladan automáticamente las ventanas existentes. [Detalles](DESKTOP_STABILITY.md).
 
-| Shortcut | Acción |
-|----------|--------|
-| `Super + Enter` | Abrir terminal Kitty |
-| `Super + Q` | Cerrar ventana activa |
-| `Super + M` | Salir de Hyprland |
-| `Super + V` | Toggle flotante |
-| `Super + F` | Fullscreen (oculta barra) |
-| `Super + Space` | Maximize (mantiene barra) |
-| `Super + P` | Pseudo-tile mode |
-| `Super + J` | Toggle dirección split |
+## Diagnóstico
 
----
-
-## 🗂️ Workspaces
-
-| Shortcut | Acción |
-|----------|--------|
-| `Super + 1…5` | Ir al workspace 1–5 |
-| `Super + Alt + 1…5` | Mover ventana al WS 1–5 |
-| `Super + ←↑↓→` | Mover foco entre ventanas |
-| `Super + Mouse1 drag` | Mover ventana flotante |
-| `Super + Mouse2 drag` | Redimensionar ventana |
-
----
-
-## 🚀 Aplicaciones
-
-| Shortcut | Aplicación |
-|----------|-----------|
-| `Super + D` | Wofi launcher (apps) |
-| `Super + Shift + B` | Brave Browser |
-| `Super + Shift + F` | Firefox |
-| `Super + E` | Kate (editor) |
-| `Super + Shift + T` | Kate (alternativo) |
-| `Super + Shift + D` | Dolphin (archivos) |
-| `Super + Shift + K` | KeePassXC |
-| `Super + Shift + O` | Obsidian |
-| `Super + Shift + E` | Betterbird (email) |
-| `Super + Shift + M` | Music Player (ncmpcpp) |
-| `F12` | Brave Browser (acceso rápido) |
-
----
-
-## 🔧 Herramientas BLACK-ICE
-
-| Shortcut | Herramienta |
-|----------|------------|
-| `Super + I` | **Cheat Sheet** (este overlay) |
-| `Super + Tab` | **App Switcher** (wofi con ventanas abiertas) |
-| `Super + Shift + X` | **Pass Menu** (KeePassXC CLI via wofi) |
-| `Super + Ctrl + Enter` | **Terminal Manager** (sesiones Kitty multi-tab) |
-| `Super + Shift + C` | Caido (proxy web) |
-| `Super + Shift + P` | Perfil de energía (menu) |
-| `Super + H` | Portapapeles (cliphist via wofi) |
-| `Super + L` | Bloquear pantalla (Hyprlock) |
-| `Escape` *(en lockscreen)* | Apagar pantalla (DPMS off) sin desbloquear |
-
----
-
-## 🎨 Personalización
-
-| Shortcut | Acción |
-|----------|--------|
-| `Super + Alt + T` | Selector de temas Waybar |
-| `Super + Alt + R` | Estilo Wofi (4 estilos) |
-| `Super + Alt + W` | Selector de wallpaper (waypaper) |
-| `Super + Alt + F` | Toggle WiFi (nmcli) |
-
----
-
-## 📸 Capturas de Pantalla
-
-| Shortcut | Acción |
-|----------|--------|
-| `Print` | Región → Swappy (editor) |
-| `Shift + Print` | Pantalla completa → Portapapeles |
-| `Super + Print` | Región → `~/Pictures/Screenshots/` |
-| `Ctrl + Print` | Pantalla completa → `~/Pictures/Screenshots/` |
-
----
-
-## 🔊 Multimedia
-
-| Shortcut | Acción |
-|----------|--------|
-| `XF86AudioRaiseVolume` | Volumen + (SwayOSD) |
-| `XF86AudioLowerVolume` | Volumen - (SwayOSD) |
-| `XF86AudioMute` | Mute/unmute salida |
-| `F4 / XF86AudioMicMute` | Mute/unmute micrófono (wpctl) |
-| `F10 / XF86AudioPlay` | Play/Pause (playerctl) |
-| `F11 / XF86AudioStop` | Stop (playerctl) |
-| `XF86AudioNext` | Siguiente pista |
-| `XF86AudioPrev` | Pista anterior |
-| `XF86MonBrightnessUp` | Brillo + (SwayOSD) |
-| `XF86MonBrightnessDown` | Brillo - (SwayOSD) |
-| `XF86WLAN / XF86RFKill` | Toggle WiFi |
-| `XF86Display` | nwg-displays (monitor config) |
-
----
-
-## 🖥️ Terminal Manager — Sesiones Kitty
-
-Abrir con `Super + Ctrl + Enter`:
-
-| Sesión | Tabs | Uso |
-|--------|------|-----|
-| **Pentesting** | 5 (Shell, Recon, Exploit, Monitor, Notas) | HTB / CTF |
-| **Dev** | 4 (Editor nvim, Shell, Git, Docker) | Desarrollo |
-| **SOC** | 5 (Logs, Network, Procesos, Forensics, Shell) | Análisis |
-| Tab → Terminal | 1 | Shell rápido |
-| Tab → Monitor | 1 | htop |
-| Tab → Redes | 1 | `ip a / ss / tcpdump` |
-| Tab → Logs | 1 | `journalctl -f` |
-
----
-
-## 🔑 Pass Menu — KeePassXC CLI
-
-Abrir con `Super + Shift + X`. Requiere `$KEEPASS_DB` en `.zshrc`:
-
-```bash
-export KEEPASS_DB="$HOME/Documents/passwords.kdbx"
-export KEEPASS_KEY="$HOME/Documents/passwords.keyx"  # opcional
-```
-
-Acciones disponibles: copiar contraseña, copiar usuario, copiar TOTP, ver detalles.
-El portapapeles se limpia automáticamente en 30 segundos.
-
----
-
-## 🖱️ Kitty (Terminal)
-
-| Shortcut | Acción |
-|----------|--------|
-| `Ctrl + Shift + C` | Copiar |
-| `Ctrl + Shift + V` | Pegar |
-| `Ctrl + Shift + F` | Toggle fullscreen |
-| `Ctrl + Shift + U` | Insertar carácter Unicode |
-
----
-
-## 🎯 ZSH — Aliases útiles
-
-```bash
-update          # Actualización completa (pacman + AUR)
-cleanup         # Limpiar paquetes huérfanos y cache
-sysinfo         # Info del sistema (fastfetch)
-settarget <IP>  # Fijar target para HTB/CTF
-myip            # IP pública
-localip         # IP local
-ll              # ls -lah
-..  ...  ....   # cd .. / ../.. / ../../..
-```
-
----
-
-## 💡 Tips de Waybar
-
-| Elemento | Acción |
-|----------|--------|
-| Módulo VPN | Click → toggle VPN |
-| Módulo Target | Click → mostrar target IP |
-| Módulo Updates | Click → actualizar sistema |
-| Botón Power | Menú (Lock/Sleep/Reboot/Shutdown/Logout) |
-
----
-
-## 📁 Archivos de configuración
-
-| Archivo | Ruta |
-|---------|------|
-| Hyprland | `~/.config/hypr/hyprland.conf` |
-| Waybar | `~/.config/waybar/themes/<Tema>/config.jsonc` |
-| Kitty | `~/.config/kitty/kitty.conf` |
-| ZSH | `~/.zshrc` |
-| p10k | `~/.p10k.zsh` |
-| Scripts | `~/.config/bin/` |
+Ejecuta `~/.local/bin/cheatsheet --check` para consultar las dependencias. Si F1 no aparece, comprueba que la actualización haya instalado `cheatsheet` y su inclusión en la configuración activa. El instalador conserva bindings personales y evita registrar F1 por duplicado.

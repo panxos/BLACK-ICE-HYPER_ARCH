@@ -64,6 +64,5 @@ awww img "$target_file" \
     --transition-step 90
 
 # Optional: Generate Pywal Colors (Future implementation)
-# wal -i "$target_file"
 
 notify-send -t 2000 "Wallpaper Changed" "$(basename "$target_file")"

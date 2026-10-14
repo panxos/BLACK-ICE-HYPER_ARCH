@@ -1,0 +1,4 @@
+[ColorScheme]
+active_colors=@FG@, @BG@, @BG@, #536a78, #344552, @DIM@, @FG@, #ffffff, @FG@, @BG@, @BG@, #080d13, @ACC1@, @BG@, @ACC1@, @ACC2@, @BG@, #000000, #344552, @FG@, #80e6edf3
+inactive_colors=@FG@, @BG@, @BG@, #536a78, #344552, @DIM@, @FG@, #ffffff, @FG@, @BG@, @BG@, #080d13, @ACC1@, @BG@, @ACC1@, @ACC2@, @BG@, #000000, #344552, @FG@, #80e6edf3
+disabled_colors=@DIM@, @BG@, @BG@, #536a78, #344552, @DIM@, @DIM@, #ffffff, @DIM@, @BG@, @BG@, #080d13, #344552, @DIM@, @ACC1@, @ACC2@, @BG@, #000000, #344552, @DIM@, #80e6edf3

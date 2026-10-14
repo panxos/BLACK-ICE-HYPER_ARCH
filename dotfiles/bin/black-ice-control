@@ -1,0 +1,541 @@
+#!/usr/bin/env python3
+"""Controles locales de BLACK-ICE, activos únicamente mientras la ventana está abierta."""
+from __future__ import annotations
+
+import argparse
+import fcntl
+import json
+import logging
+import os
+import re
+import shutil
+import subprocess
+import threading
+from pathlib import Path
+
+HOME = Path.home()
+BIN = HOME / ".local/bin"
+CONFIG = Path(os.environ.get("XDG_CONFIG_HOME", HOME / ".config"))
+LOG = logging.getLogger("black-ice-control")
+
+
+def command(args: list[str]) -> tuple[int, str]:
+    try:
+        result = subprocess.run(args, capture_output=True, text=True, timeout=8, check=False)
+        return result.returncode, (result.stdout or result.stderr).strip()
+    except (OSError, subprocess.TimeoutExpired) as error:
+        return 1, str(error)
+
+
+def state() -> dict:
+    code, volume_text = command(["wpctl", "get-volume", "@DEFAULT_AUDIO_SINK@"])
+    match = re.search(r"Volume:\s+([0-9.]+)", volume_text) if code == 0 else None
+    volume = round(float(match.group(1)) * 100) if match else None
+    code, brightness_text = command(["brightnessctl", "-c", "backlight", "-m"])
+    match = re.search(r",(\d+)%,", brightness_text) if code == 0 else None
+    brightness = int(match.group(1)) if match else None
+    code, wifi_text = command(["nmcli", "radio", "wifi"])
+    wifi = wifi_text == "enabled" if code == 0 and wifi_text in {"enabled", "disabled"} else None
+    code, bt_text = command(["bluetoothctl", "--timeout", "2", "show"])
+    bt_match = re.search(r"Powered:\s+(yes|no)", bt_text) if code == 0 else None
+    bluetooth = bt_match.group(1) == "yes" if bt_match else None
+    code, power = command([str(CONFIG / "hypr/scripts/ac_guard.sh"), "status"])
+    power = power if code == 0 and power in {"ac", "battery", "vm"} else "unknown"
+    code, appearance = command([str(BIN / "black-ice-appearance"), "status"])
+    try:
+        appearance = json.loads(appearance) if code == 0 else {}
+    except ValueError:
+        appearance = {}
+    if not isinstance(appearance, dict):
+        appearance = {}
+    return {"volume": volume, "muted": "[MUTED]" in volume_text, "brightness": brightness,
+            "wifi": wifi, "bluetooth": bluetooth, "power": power, "appearance": appearance}
+
+
+def action(name: str, value: str = "") -> tuple[int, str]:
+    if name in {"volume", "brightness"}:
+        try:
+            percentage = int(value)
+        except ValueError:
+            return 1, "El valor debe ser un porcentaje entero"
+        if not 0 <= percentage <= 100:
+            return 1, "El porcentaje debe estar entre 0 y 100"
+        args = ["wpctl", "set-volume", "@DEFAULT_AUDIO_SINK@", f"{percentage}%"] if name == "volume" else [
+            "brightnessctl", "-c", "backlight", "set", f"{max(5, percentage)}%"]
+    elif name == "mute":
+        args = ["wpctl", "set-mute", "@DEFAULT_AUDIO_SINK@", "toggle"]
+    elif name in {"wifi", "bluetooth"} and value in {"on", "off"}:
+        args = ["nmcli", "radio", "wifi", value] if name == "wifi" else ["bluetoothctl", "power", value]
+    elif name == "profile" and value in {"auto", "performance", "balanced", "power-saver"}:
+        args = [str(CONFIG / "bin/power_profile"), value]
+    elif name == "theme":
+        args = [str(BIN / "black-ice-appearance"), "apply", value]
+    elif name == "launcher-style":
+        from black_ice_launcher import STYLES
+        if value not in STYLES:
+            return 1, "Estilo de menú inválido"
+        args = [str(BIN / "black-ice-launcher"), "set", value]
+    elif name == "lock":
+        args = ["loginctl", "lock-session"]
+    elif name == "suspend":
+        code, source = command([str(CONFIG / "hypr/scripts/ac_guard.sh"), "status"])
+        if code or source != "battery":
+            return 1, "La suspensión está habilitada solo con batería"
+        args = [str(CONFIG / "hypr/scripts/ac_guard.sh"), "suspend"]
+    elif name in {"poweroff", "reboot"}:
+        args = ["systemctl", name]
+    elif name == "logout":
+        args = [str(BIN / "black-ice-hypr"), "exit"]
+    else:
+        return 1, "Acción no válida"
+    return command(args)
+
+
+def gui(initial_page: str) -> int:
+    import gi
+    gi.require_version("Gtk", "3.0")
+    gi.require_version("Gdk", "3.0")
+    from black_ice_i18n import bind, language, set_language
+    from gi.repository import Gdk, GLib, Gtk
+
+    class Controls(Gtk.Window):
+        def __init__(self) -> None:
+            super().__init__(title="BLACK-ICE — Control")
+            self.set_default_size(790, 570)
+            self.set_type_hint(Gdk.WindowTypeHint.DIALOG)
+            self.set_position(Gtk.WindowPosition.CENTER)
+            self.connect("destroy", self.close)
+            self.connect("key-press-event", self.key)
+            self.reading = False
+            self.float_attempts = 0
+            self.busy = False
+            self.revision = 0
+            self.pending = {}
+            self.closed = False
+            self.loading = True
+            self.navigating = False
+            self.timers = {}
+            self.snapshot = {}
+            self.switches = {}
+            self.scales = {}
+            self.value_labels = {}
+            self.apply_css()
+
+            root = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0, margin=24)
+            self.add(root)
+            heading = Gtk.Box(spacing=12)
+            title = Gtk.Label(label="CONTROL", xalign=0)
+            title.get_style_context().add_class("title")
+            heading.pack_start(title, True, True, 0)
+            close = self.icon_button("window-close-symbolic", "Cerrar")
+            close.connect("clicked", lambda *_: self.destroy())
+            heading.pack_end(close, False, False, 0)
+            root.pack_start(heading, False, False, 0)
+
+            body = Gtk.Box(spacing=26, margin_top=22, margin_bottom=12)
+            root.pack_start(body, True, True, 0)
+            navigation = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8)
+            navigation.set_size_request(160, -1)
+            body.pack_start(navigation, False, False, 0)
+            self.stack = Gtk.Stack()
+            self.stack.set_transition_type(Gtk.StackTransitionType.CROSSFADE)
+            self.stack.set_transition_duration(120)
+            body.pack_start(self.stack, True, True, 0)
+            pages = [("system", "Sistema", "preferences-system-symbolic"),
+                     ("appearance", "Apariencia", "applications-graphics-symbolic"),
+                     ("network", "Red", "network-wireless-symbolic"),
+                     ("bluetooth", "Bluetooth", "bluetooth-symbolic"),
+                     ("energy", "Energía", "battery-symbolic"),
+                     ("session", "Sesión", "system-shutdown-symbolic")]
+            self.navigation = {}
+            for key, label, icon in pages:
+                button = Gtk.ToggleButton()
+                row = Gtk.Box(spacing=12)
+                row.pack_start(Gtk.Image.new_from_icon_name(icon, Gtk.IconSize.BUTTON), False, False, 0)
+                row.pack_start(Gtk.Label(label=label, xalign=0), True, True, 0)
+                button.add(row)
+                button.connect("clicked", lambda _b, selected=key: self.navigate(selected))
+                navigation.pack_start(button, False, False, 0)
+                self.navigation[key] = button
+                content = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=16)
+                scroll = Gtk.ScrolledWindow()
+                scroll.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
+                scroll.add(content)
+                self.stack.add_named(scroll, key)
+                setattr(self, key + "_page", content)
+            self.build_system()
+            self.build_appearance()
+            self.launch_button(self.system_page, "Centro de software · instalar y reintentar", [str(BIN / "black-ice-system"), "software"])
+            self.launch_button(self.system_page, "Actualizaciones y recuperación", [str(BIN / "black-ice-system"), "recovery"])
+            self.launch_button(self.system_page, "Laboratorios aislados", [str(BIN / "black-ice-system"), "labs"])
+            self.launch_button(self.system_page, "Diagnóstico del escritorio", ["kitty", "--hold", "-e", str(BIN / "black-ice-doctor")])
+            self.build_connectivity()
+            self.launch_button(self.network_page, "Proyectos, objetivos y VPN", [str(BIN / "black-ice-system"), "projects"])
+            self.build_energy()
+            self.build_session()
+            self.feedback = Gtk.Label(label="", xalign=0)
+            self.feedback.set_line_wrap(True)
+            self.feedback.get_style_context().add_class("muted")
+            root.pack_start(self.feedback, False, False, 0)
+            bind(self)
+            self.show_all()
+            self.navigate(initial_page if initial_page in self.navigation else "system")
+            self.poll()
+            self.poll_timer = GLib.timeout_add_seconds(5, self.poll)
+            GLib.timeout_add(150, self.float_window)
+
+        def apply_css(self) -> None:
+            code, text = command([str(BIN / "black-ice-appearance"), "status"])
+            try:
+                colors = json.loads(text).get("palette", {}) if code == 0 else {}
+            except ValueError:
+                colors = {}
+            default = {"bg":"#0c1118", "fg":"#e6edf3", "acc1":"#27c6ed", "acc2":"#ae90e8", "dim":"#a4b5c2"}
+            colors = {key: colors.get(key, value) if re.fullmatch(r"#[0-9a-fA-F]{6}", str(colors.get(key, value))) else value
+                      for key, value in default.items()}
+            css = Gtk.CssProvider()
+            css.load_from_data(f"""
+                window {{background: {colors['bg']}; color: {colors['fg']}; border: 1px solid alpha({colors['acc1']}, .5);}}
+                * {{font-family: 'Roboto'; font-size: 13px;}}
+                label {{color: {colors['fg']};}}
+                .title {{font-family: 'Roboto'; font-size: 26px; font-weight: 600;}}
+                .muted {{color: {colors['dim']}; font-size: 12px;}}
+                .value {{font-family: 'RobotoMono Nerd Font'; color: {colors['acc1']};}}
+                button {{background: alpha({colors['fg']}, .04); color: {colors['fg']}; border: 1px solid alpha({colors['fg']}, .14); border-radius: 0; padding: 10px 12px; box-shadow: none;}}
+                button:hover, button:focus {{background: alpha({colors['acc1']}, .1); border-color: {colors['acc1']};}}
+                button:checked {{background: alpha({colors['acc1']}, .13); border-color: {colors['acc1']};}}
+                button:disabled {{opacity: .45;}}
+                scale trough {{background: alpha({colors['fg']}, .12); min-height: 4px; border: none;}}
+                scale highlight {{background: {colors['acc1']}; min-height: 4px;}}
+                scale slider {{background: {colors['acc1']}; border: none; min-width: 12px; min-height: 12px; box-shadow: none;}}
+                switch {{background: alpha({colors['fg']}, .18); border-radius: 4px;}}
+                switch:checked {{background: {colors['acc1']};}}
+                switch slider {{background: {colors['fg']}; border-radius: 3px;}}
+                combobox button {{background: alpha({colors['fg']}, .05);}}
+                menu {{background: {colors['bg']}; color: {colors['fg']};}}
+                menuitem {{background:transparent; color:{colors['fg']};}}
+                menuitem label {{color:{colors['fg']};}}
+                menuitem:hover {{background:mix({colors['bg']},{colors['acc1']},.2);}}
+                separator {{background: alpha({colors['fg']}, .12);}}
+            """.encode())
+            Gtk.StyleContext.add_provider_for_screen(self.get_screen(), css, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
+            self.css = css
+
+        def icon_button(self, icon: str, tooltip: str) -> Gtk.Button:
+            button = Gtk.Button()
+            button.add(Gtk.Image.new_from_icon_name(icon, Gtk.IconSize.BUTTON))
+            button.set_tooltip_text(tooltip)
+            return button
+
+        def text(self, page, text: str, muted: bool = False) -> None:
+            label = Gtk.Label(label=text, xalign=0)
+            label.set_line_wrap(True)
+            if muted:
+                label.get_style_context().add_class("muted")
+            page.pack_start(label, False, False, 0)
+
+        def launch_button(self, page, text: str, args: list[str]) -> None:
+            button = Gtk.Button(label=text)
+            button.set_sensitive(bool(shutil.which(args[0]) or Path(args[0]).is_file()))
+            button.connect("clicked", lambda *_: subprocess.Popen(args, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL))
+            page.pack_start(button, False, False, 0)
+
+        def build_system(self) -> None:
+            language_row = Gtk.Box(spacing=10)
+            language_row.pack_start(Gtk.Label(label="Idioma", xalign=0), True, True, 0)
+            languages = Gtk.ComboBoxText()
+            languages.append("es", "Español")
+            languages.append("en", "English")
+            languages.set_active_id(language())
+            languages.connect("changed", lambda widget: set_language(widget.get_active_id()))
+            language_row.pack_end(languages, False, False, 0)
+            self.system_page.pack_start(language_row, False, False, 0)
+            for key, label, icon in [("volume", "Volumen", "audio-volume-high-symbolic"),
+                                     ("brightness", "Brillo", "display-brightness-symbolic")]:
+                group = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8)
+                row = Gtk.Box(spacing=10)
+                row.pack_start(Gtk.Image.new_from_icon_name(icon, Gtk.IconSize.BUTTON), False, False, 0)
+                row.pack_start(Gtk.Label(label=label, xalign=0), True, True, 0)
+                value = Gtk.Label(label="Leyendo…")
+                value.get_style_context().add_class("value")
+                row.pack_end(value, False, False, 0)
+                self.value_labels[key] = value
+                group.pack_start(row, False, False, 0)
+                scale = Gtk.Scale.new_with_range(Gtk.Orientation.HORIZONTAL, 5 if key == "brightness" else 0, 100, 1)
+                scale.set_draw_value(False)
+                scale.connect("value-changed", self.scale_changed, key)
+                self.scales[key] = scale
+                group.pack_start(scale, False, False, 0)
+                self.system_page.pack_start(group, False, False, 0)
+            mute = Gtk.Button(label="Silenciar / activar audio")
+            mute.connect("clicked", lambda *_: self.perform("mute"))
+            self.system_page.pack_start(mute, False, False, 0)
+            self.launch_button(self.system_page, "Dispositivos de audio", ["pavucontrol"])
+            self.launch_button(self.system_page, "Pantallas y escala", ["nwg-displays"])
+
+        def build_appearance(self) -> None:
+            self.theme_label = Gtk.Label(label="Tema actual", xalign=0)
+            self.theme_label.get_style_context().add_class("muted")
+            self.appearance_page.pack_start(self.theme_label, False, False, 0)
+            self.theme_combo = Gtk.ComboBoxText()
+            code, text = command([str(BIN / "black-ice-appearance"), "themes"])
+            try:
+                for name in json.loads(text) if code == 0 else []:
+                    self.theme_combo.append(name, name)
+            except ValueError:
+                pass
+            current_theme = (CONFIG / "waybar/style.css").resolve().parent.name
+            self.theme_combo.set_active_id(current_theme)
+            self.appearance_page.pack_start(self.theme_combo, False, False, 0)
+            apply = Gtk.Button(label="Aplicar tema")
+            apply.connect("clicked", lambda *_: self.perform("theme", self.theme_combo.get_active_id() or ""))
+            self.appearance_page.pack_start(apply, False, False, 0)
+            self.launch_button(self.appearance_page, "Galería de temas", [str(BIN / "theme_visual")])
+            self.launch_button(self.appearance_page, "Estudio de temas · crear y personalizar", [str(BIN / "black-ice-theme-studio")])
+            from black_ice_launcher import STYLES, preferences
+            self.text(self.appearance_page, "Menú de aplicaciones · Win+D")
+            self.launcher_combo = Gtk.ComboBoxText()
+            for name, label in STYLES.items():
+                self.launcher_combo.append(name, label)
+            self.launcher_combo.set_active_id(preferences()["style"])
+            self.appearance_page.pack_start(self.launcher_combo, False, False, 0)
+            launcher_apply = Gtk.Button(label="Guardar estilo del menú")
+            launcher_apply.connect("clicked", lambda *_: self.perform("launcher-style", self.launcher_combo.get_active_id() or ""))
+            self.appearance_page.pack_start(launcher_apply, False, False, 0)
+            self.launch_button(self.appearance_page, "Probar menú de aplicaciones", [str(BIN / "black-ice-launcher")])
+            self.launch_button(self.appearance_page, "Elegir wallpaper", [str(BIN / "black-ice-wallpapers")])
+            self.launch_button(self.appearance_page, "Estilo, colores y posición de Conky", [str(BIN / "black-ice-conky"), "menu"])
+            self.launch_button(self.appearance_page, "Mostrar / ocultar Conky", [str(BIN / "black-ice-conky"), "toggle"])
+            self.text(self.appearance_page, "Los cambios de tema conservan los ajustes de Conky. El bloqueo sigue el fondo elegido.", True)
+
+        def build_connectivity(self) -> None:
+            for key, page, label, explanation, editor in [
+                ("wifi", self.network_page, "Wi-Fi", "La conexión depende de NetworkManager.", "nm-connection-editor"),
+                ("bluetooth", self.bluetooth_page, "Bluetooth", "Se habilita cuando hay un adaptador disponible.", "blueman-manager"),
+            ]:
+                row = Gtk.Box(spacing=20)
+                row.pack_start(Gtk.Label(label=label, xalign=0), True, True, 0)
+                switch = Gtk.Switch()
+                switch.connect("state-set", self.switch_changed, key)
+                row.pack_end(switch, False, False, 0)
+                self.switches[key] = switch
+                page.pack_start(row, False, False, 0)
+                self.text(page, explanation, True)
+                self.launch_button(page, "Administrar conexiones" if key == "wifi" else "Administrar dispositivos", [editor])
+
+        def build_energy(self) -> None:
+            self.power_label = Gtk.Label(label="Leyendo alimentación…", xalign=0)
+            self.power_label.set_line_wrap(True)
+            self.energy_page.pack_start(self.power_label, False, False, 0)
+            self.text(self.energy_page, "El modo automático usa el controlador de energía existente. La suspensión se mantiene habilitada solo con batería.", True)
+            self.profile = Gtk.ComboBoxText()
+            for value, label in [("auto", "Automático"), ("performance", "Rendimiento"),
+                                 ("balanced", "Equilibrado"), ("power-saver", "Ahorro")]:
+                self.profile.append(value, label)
+            self.profile.set_active_id("auto")
+            self.energy_page.pack_start(self.profile, False, False, 0)
+            apply = Gtk.Button(label="Aplicar perfil")
+            apply.connect("clicked", lambda *_: self.perform("profile", self.profile.get_active_id()))
+            self.energy_page.pack_start(apply, False, False, 0)
+            self.text(self.energy_page, "Elegir una opción no cambia el perfil hasta presionar Aplicar.", True)
+
+        def build_session(self) -> None:
+            self.text(self.session_page, "Acciones de la sesión")
+            for key, label, icon in [("lock", "Bloquear", "system-lock-screen-symbolic"),
+                                     ("suspend", "Suspender", "weather-clear-night-symbolic"),
+                                     ("logout", "Cerrar sesión", "system-log-out-symbolic"),
+                                     ("reboot", "Reiniciar", "system-reboot-symbolic"),
+                                     ("poweroff", "Apagar", "system-shutdown-symbolic")]:
+                button = Gtk.Button()
+                row = Gtk.Box(spacing=12)
+                row.pack_start(Gtk.Image.new_from_icon_name(icon, Gtk.IconSize.BUTTON), False, False, 0)
+                row.pack_start(Gtk.Label(label=label, xalign=0), True, True, 0)
+                button.add(row)
+                button.connect("clicked", lambda _b, name=key, title=label: self.confirm(name, title))
+                self.session_page.pack_start(button, False, False, 0)
+                if key == "suspend":
+                    self.suspend_button = button
+
+        def navigate(self, key: str) -> None:
+            if self.navigating or key not in self.navigation:
+                return
+            self.navigating = True
+            try:
+                self.stack.set_visible_child_name(key)
+                for name, button in self.navigation.items():
+                    button.set_active(name == key)
+            finally:
+                self.navigating = False
+
+        def scale_changed(self, scale, key: str) -> None:
+            if self.loading:
+                return
+            self.value_labels[key].set_text(f"{round(scale.get_value())}%")
+            if key in self.timers:
+                GLib.source_remove(self.timers.pop(key))
+            self.timers[key] = GLib.timeout_add(350, self.commit_scale, key)
+
+        def commit_scale(self, key: str) -> bool:
+            self.timers.pop(key, None)
+            self.perform(key, str(round(self.scales[key].get_value())))
+            return False
+
+        def switch_changed(self, _switch, value: bool, key: str) -> bool:
+            if not self.loading:
+                self.perform(key, "on" if value else "off")
+            return True
+
+        def perform(self, name: str, value: str = "") -> None:
+            if self.closed:
+                return
+            if self.busy:
+                if name in {"volume", "brightness", "wifi", "bluetooth"}:
+                    self.pending[name] = value
+                return
+            self.busy = True
+            self.revision += 1
+            self.feedback.set_text("Aplicando…")
+            def worker():
+                code, output = action(name, value)
+                GLib.idle_add(self.completed, name, code, output)
+            threading.Thread(target=worker, daemon=True).start()
+
+        def completed(self, name: str, code: int, output: str) -> bool:
+            if self.closed:
+                return False
+            self.busy = False
+            self.feedback.set_text((output[:240] or "Cambio aplicado") if code == 0 else "No se aplicó: " + output[:240])
+            if code == 0 and name == "theme":
+                Gtk.StyleContext.remove_provider_for_screen(self.get_screen(), self.css)
+                self.apply_css()
+            self.poll()
+            if self.pending:
+                pending = next(iter(self.pending))
+                self.perform(pending, self.pending.pop(pending))
+            return False
+
+        def poll(self) -> bool:
+            if self.closed:
+                return False
+            if self.reading or self.busy:
+                return True
+            self.reading = True
+            revision = self.revision
+            def worker():
+                GLib.idle_add(self.show_state, state(), revision)
+            threading.Thread(target=worker, daemon=True).start()
+            return True
+
+        def show_state(self, snapshot: dict, revision: int | None = None) -> bool:
+            if self.closed:
+                return False
+            self.reading = False
+            if self.busy or (revision is not None and revision != self.revision):
+                return False
+            self.loading = True
+            self.snapshot = snapshot
+            for key, scale in self.scales.items():
+                value = snapshot[key]
+                scale.set_sensitive(value is not None)
+                if not scale.has_focus() and key not in self.timers:
+                    scale.set_value(value if value is not None else 0)
+                suffix = " · silencio" if key == "volume" and snapshot["muted"] else ""
+                if key not in self.timers:
+                    self.value_labels[key].set_text(f"{value}%{suffix}" if value is not None else "No disponible")
+            for key, switch in self.switches.items():
+                switch.set_sensitive(snapshot[key] is not None)
+                switch.set_state(snapshot[key] is True)
+                switch.set_active(snapshot[key] is True)
+            source = {"ac": "Conectado a corriente", "battery": "Usando batería", "vm": "Máquina virtual", "unknown": "Alimentación no disponible"}[snapshot["power"]]
+            self.power_label.set_text(source)
+            self.suspend_button.set_sensitive(snapshot["power"] == "battery")
+            current = snapshot["appearance"].get("theme", "")
+            self.theme_label.set_text("Tema actual: " + current)
+            if not self.theme_combo.get_active_id():
+                self.theme_combo.set_active_id(current)
+            self.loading = False
+            return False
+
+        def confirm(self, name: str, title: str) -> None:
+            if name == "lock":
+                self.perform(name)
+                return
+            dialog = Gtk.MessageDialog(transient_for=self, modal=True, message_type=Gtk.MessageType.QUESTION,
+                                       buttons=Gtk.ButtonsType.OK_CANCEL, text=f"¿{title}?")
+            dialog.format_secondary_text("Guarda tu trabajo antes de continuar.")
+            response = dialog.run()
+            dialog.destroy()
+            if response == Gtk.ResponseType.OK:
+                self.perform(name)
+
+        def float_window(self) -> bool:
+            if self.closed:
+                return False
+            code, text = command(["hyprctl", "clients", "-j"])
+            try:
+                clients = json.loads(text) if code == 0 else []
+                own = next((item for item in clients if item.get("pid") == os.getpid()), None)
+                if not own:
+                    self.float_attempts += 1
+                    return self.float_attempts < 8
+                if own:
+                    address = own["address"]
+                    code, text = command(["hyprctl", "monitors", "-j"])
+                    monitors = json.loads(text) if code == 0 else []
+                    monitor = next((item for item in monitors if item["id"] == own["monitor"]), None)
+                    if not monitor:
+                        return False
+                    mw, mh = monitor["width"] / monitor["scale"], monitor["height"] / monitor["scale"]
+                    if monitor.get("transform", 0) % 2:
+                        mw, mh = mh, mw
+                    left, top, right, bottom = monitor.get("reserved", [0, 0, 0, 0])
+                    width, height = min(790, round(mw - left - right - 32)), min(570, round(mh - top - bottom - 32))
+                    x = monitor["x"] + left + round((mw - left - right - width) / 2)
+                    y = monitor["y"] + top + round((mh - top - bottom - height) / 2)
+                    command([str(BIN / "black-ice-hypr"), "setfloating", "address:" + address])
+                    command([str(BIN / "black-ice-hypr"), "resizewindowpixel", f"exact {width} {height},address:{address}"])
+                    command([str(BIN / "black-ice-hypr"), "movewindowpixel", f"exact {x} {y},address:{address}"])
+                    command(["hyprctl", "setprop", "address:" + address, "rounding", "0"])
+            except (ValueError, KeyError):
+                pass
+            return False
+
+        def key(self, _window, event) -> bool:
+            if event.keyval == Gdk.KEY_Escape:
+                self.destroy()
+                return True
+            return False
+
+        def close(self, *_args) -> None:
+            self.closed = True
+            if hasattr(self, "poll_timer"):
+                GLib.source_remove(self.poll_timer)
+            for timer in self.timers.values():
+                GLib.source_remove(timer)
+            Gtk.StyleContext.remove_provider_for_screen(self.get_screen(), self.css)
+            Gtk.main_quit()
+
+    Controls()
+    Gtk.main()
+    return 0
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description="Centro de control de BLACK-ICE")
+    parser.add_argument("page", nargs="?", default="system")
+    parser.add_argument("--status", action="store_true")
+    args = parser.parse_args()
+    if args.status:
+        print(json.dumps(state()))
+        return 0
+    runtime = Path(os.environ.get("XDG_RUNTIME_DIR", HOME / ".cache"))
+    with (runtime / "black-ice-control.lock").open("w") as lock:
+        try:
+            fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError:
+            return 0
+        return gui(args.page)
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

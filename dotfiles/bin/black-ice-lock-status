@@ -1,0 +1,27 @@
+#!/usr/bin/env python3
+import datetime
+import sys
+from pathlib import Path
+
+if sys.argv[1:] == ["date"]:
+    today = datetime.datetime.now(tz=datetime.timezone.utc).astimezone().date()
+    days = ("Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo")
+    months = ("enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre")
+    print(f"{days[today.weekday()]}, {today.day} de {months[today.month - 1]}")
+    raise SystemExit(0)
+
+values = []
+for supply in Path("/sys/class/power_supply").glob("*"):
+    try:
+        if (supply / "type").read_text().strip() != "Battery":
+            continue
+        if (supply / "scope").exists() and (supply / "scope").read_text().strip() == "Device":
+            continue
+        capacity = int((supply / "capacity").read_text())
+        status = (supply / "status").read_text().strip()
+        if 0 <= capacity <= 100:
+            values.append(f"{capacity}%" + (" · Cargando" if status == "Charging" else ""))
+    except (OSError, ValueError):
+        continue
+if values:
+    print("Batería " + " / ".join(values))

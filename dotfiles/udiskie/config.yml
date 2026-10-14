@@ -1,0 +1,12 @@
+program_options:
+  file_manager: dolphin
+  terminal: kitty --directory
+  menu: nested
+notifications:
+  device_added: false
+  device_mounted: 8
+  device_unmounted: 4
+  device_removed: 4
+  job_failed: -1
+notification_actions:
+  device_mounted: [browse, terminal]

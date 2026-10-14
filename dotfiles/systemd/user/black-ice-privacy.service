@@ -1,0 +1,13 @@
+[Unit]
+Description=BLACK-ICE Tor verification and laboratory expiry
+After=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=%h/.local/bin/black-ice-privacy watch
+Restart=on-failure
+RestartSec=10
+TimeoutStopSec=35
+
+[Install]
+WantedBy=default.target

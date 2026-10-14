@@ -58,6 +58,8 @@ log_info "Iniciando instalación silenciosa de complementos (Mason/TS)..."
 # jdtls (Java)
 
 sudo -u "$CURRENT_USER" nvim --headless "+Lazy! sync" +qa 2>/dev/null
-sudo -u "$CURRENT_USER" nvim --headless "+MasonInstall pyright black isort debugpy clangd codelldb dockerls jdtls" +qa 2>/dev/null
+if ! sudo -u "$CURRENT_USER" nvim --headless "+MasonInstall pyright black isort debugpy clangd codelldb dockerls jdtls" +qa 2>/dev/null; then
+    log_warn "Mason no pudo instalar herramientas en modo headless. Quedan declaradas para el primer inicio interactivo de Neovim."
+fi
 
 success "Neovim con NvChad v2.5 configurado correctamente"

@@ -1,0 +1,30 @@
+[Unit]
+Description=BLACK-ICE system Tor client
+Requires=black-ice-tor-firewall.service
+After=black-ice-tor-firewall.service network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=black-ice-tor
+Group=black-ice-tor
+StateDirectory=black-ice-tor
+StateDirectoryMode=0700
+ExecStart=/usr/bin/tor -f /etc/black-ice/torrc
+Restart=always
+RestartSec=5
+MemoryMax=512M
+CPUQuota=100%
+TasksMax=128
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictAddressFamilies=AF_INET AF_UNIX AF_NETLINK
+CapabilityBoundingSet=
+LockPersonality=yes
+RestrictSUIDSGID=yes
+
