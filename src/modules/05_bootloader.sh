@@ -39,19 +39,31 @@ echo "[INFO] Iniciando configuración de GRUB ($BOOT_MODE)..."
 # Intentamos generar el mapa de teclado para GRUB
 mkdir -p /boot/grub/layouts
 
-# Buscamos el mapa de teclado en el sistema
-MAP_PATH=\$(find /usr/share/kbd/keymaps/ -type f -name "${KEYMAP}.map.gz" 2>/dev/null | head -n 1)
+# grub-mklayout no entiende los .map.gz de kbd: necesita la salida de ckbcomp (layout XKB).
+# Sin ckbcomp o sin layout XKB equivalente, el menú GRUB queda con teclado US.
+case "${KEYMAP}" in
+    es) XKB_LAYOUT=es ;;
+    la-latin1) XKB_LAYOUT=latam ;;
+    us) XKB_LAYOUT=us ;;
+    uk) XKB_LAYOUT=gb ;;
+    de|de-latin1|de-latin1-nodeadkeys) XKB_LAYOUT=de ;;
+    fr|fr-latin1|fr-latin9) XKB_LAYOUT=fr ;;
+    it|it2) XKB_LAYOUT=it ;;
+    pt-latin1|pt-latin9) XKB_LAYOUT=pt ;;
+    br-abnt2) XKB_LAYOUT=br ;;
+    *) XKB_LAYOUT="" ;;
+esac
 
-if [ -n "\$MAP_PATH" ]; then
-    echo "[INFO] Generando layout de teclado GRUB: ${KEYMAP} (\$MAP_PATH)"
-    if zcat "\$MAP_PATH" | grub-mklayout -o /boot/grub/layouts/terminal_layout.gkb; then
+if [ -n "\$XKB_LAYOUT" ] && command -v ckbcomp >/dev/null 2>&1; then
+    echo "[INFO] Generando layout de teclado GRUB: ${KEYMAP} (xkb: \$XKB_LAYOUT)"
+    if timeout 30 ckbcomp "\$XKB_LAYOUT" 2>/dev/null </dev/null | timeout 30 grub-mklayout -o /boot/grub/layouts/terminal_layout.gkb 2>/dev/null; then
         echo "[OK] Layout GRUB generado correctamente para: ${KEYMAP}"
     else
-        echo "[WARN] grub-mklayout falló para '${KEYMAP}'. El menú GRUB usará teclado US."
+        echo "[WARN] No se pudo generar el layout GRUB para '${KEYMAP}'. El menú GRUB usará teclado US."
         rm -f /boot/grub/layouts/terminal_layout.gkb
     fi
 else
-    echo "[WARN] No se encontró '${KEYMAP}.map.gz' en /usr/share/kbd/keymaps/. El menú GRUB usará teclado US."
+    echo "[WARN] Sin ckbcomp o sin layout XKB para '${KEYMAP}'. El menú GRUB usará teclado US."
 fi
 
 # 2. Configuración de /etc/default/grub

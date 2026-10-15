@@ -32,7 +32,11 @@ else
 
     echo -e "\n${BOLD}2. Formatos Regionales (Moneda/Fecha):${NC}"
     echo -e "${GREY}(Basado en tu elección de ${SELECTED_COUNTRY:-})${NC}"
-    SYSTEM_LOCALE=$(ask_option "Confirma o elige los formatos regionales:" "$DEFAULT_LOCALE" "en_US" "es_CL" "es_ES")
+    LOCALE_CHOICES=("$DEFAULT_LOCALE")
+    for candidate in en_US es_CL es_ES; do
+        [[ "$candidate" == "$DEFAULT_LOCALE" ]] || LOCALE_CHOICES+=("$candidate")
+    done
+    SYSTEM_LOCALE=$(ask_option "Confirma o elige los formatos regionales:" "${LOCALE_CHOICES[@]}")
     
     success "Configuración de localización fijada: Lang=$SYSTEM_LANG | Locale=$SYSTEM_LOCALE"
 fi
