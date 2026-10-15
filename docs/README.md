@@ -2,7 +2,7 @@
 
 [English](README.en.md) · [Guía completa](GUIDE.md) · [Todos los pendientes](PENDING.md)
 
-BLACK-ICE ARCH 4.0.0-dev.2 es un candidato en validación. Estas guías describen el código del árbol actual; la rama remota puede contener una versión anterior.
+BLACK-ICE ARCH 4.0.0-dev.2 es un candidato en validación, publicado en `main` sin release. Estas guías describen el código del árbol actual.
 
 | Quiero… | Guía |
 |---|---|

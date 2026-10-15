@@ -1,8 +1,19 @@
-# Instalación 4.0.0-dev.2 — sin publicar
+# Instalación 4.0.0-dev.2 — candidato sin release
 
 `VERSION` define la versión propia. Los banners, planes y metadatos de escritorio la leen; las versiones de Arch y sus paquetes siguen sus repositorios. No se modifican entradas históricas del changelog.
 
-Esta preparación permanece en el árbol local. La descarga de la rama pública sigue entregando lo que esté publicado allí, no estos cambios pendientes.
+Este candidato está publicado en la rama `main` y no tiene tag ni release. Lo que descargas desde `main`, `bootstrap.sh` o los atajos `is.gd/blackice` y `cutt.ly/blackice` es este código.
+
+## Instalación rápida desde la ISO de Arch
+
+Con la ISO oficial arrancada y con red:
+
+```bash
+curl -L https://is.gd/blackice | bash
+# alternativa: curl -L https://cutt.ly/blackice | bash
+```
+
+Ambos atajos redirigen a `bootstrap.sh` (`https://raw.githubusercontent.com/panxos/BLACK-ICE-HYPER_ARCH/main/bootstrap.sh`). El script comprueba ISO, root y red, clona el repositorio por HTTPS en una carpeta única y ejecuta `install.sh`, que pide confirmación del disco. Para revisarlo antes: `curl -L https://is.gd/blackice -o bootstrap.sh && less bootstrap.sh && bash bootstrap.sh`. Los atajos están descritos en [URL_SHORTENERS.md](URL_SHORTENERS.md). Sin atajos, usa la instalación manual: `git clone`, `sudo bash install.sh` y, tras reiniciar, `bash deploy_hyprland.sh`.
 
 ## Elegir aplicaciones
 
@@ -105,4 +116,4 @@ Verificación del 2026-10-13: 267 pruebas, cinco omitidas por pantalla, siete GT
 
 El caso UEFI/Btrfs sin cifrado y perfil minimal pasó desde disco vacío hasta SDDM/Hyprland, Conky y bloqueo. La reanudación reconoce Btrfs ya montado y mantiene la protección frente a otra unidad con UUID duplicado. El módulo SDDM fija XKB antes del greeter mediante scripts/configure-sddm-keyboard.py, conservando DisplayCommand personalizados.
 
-289 pruebas y siete GTK aprobadas; siete controles reales de QA y doctor sin fallos. Resultados, errores, evidencias y alcance en el registro privado `docs/VM_VALIDATION_V4.md` y [REPOSITORY_RECOVERY.md](REPOSITORY_RECOVERY.md). Aplicaciones opcionales y matriz física/BIOS/LUKS siguen pendientes.
+289 pruebas y siete GTK aprobadas; siete controles reales de QA y doctor sin fallos. Resultados, errores, evidencias y alcance en [REPOSITORY_RECOVERY.md](REPOSITORY_RECOVERY.md). Aplicaciones opcionales y matriz física/BIOS/LUKS siguen pendientes.

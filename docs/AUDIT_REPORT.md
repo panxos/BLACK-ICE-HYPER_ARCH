@@ -44,6 +44,6 @@ Git local pasó `git fsck --full --no-reflogs` sin objetos faltantes; los objeto
 
 ## Verificación local posterior — 2026-10-15
 
-Se corrigió una aserción que no consideraba el argumento `timeout=8` enviado por el control de brillo. `bash scripts/check-project.sh` volvió a ejecutarse completo: **347 pruebas aprobadas**, lint y sintaxis aprobados, distribución de 1.439 archivos y 54 temas sin problemas. La suite muestra avisos deprecados de `PyGObject`/Python 3.14, sin fallos asociados.
+Se corrigió una aserción que no consideraba el argumento `timeout=8` enviado por el control de brillo. `bash scripts/check-project.sh` volvió a ejecutarse completo: **347 pruebas aprobadas** (354 tras la auditoría del 2026-10-15), lint y sintaxis aprobados, distribución de 1.439 archivos y 54 temas sin problemas. La suite muestra avisos deprecados de `PyGObject`/Python 3.14, sin fallos asociados.
 
 `gitleaks detect --no-git --redact --source .` revisó 77,66 MB y no encontró secretos en el árbol actual. La CI remota aprobó el candidato publicado y la suite local pasó. La instalación limpia descrita arriba sí se completó; sigue pendiente la actualización entre versiones y la matriz física indicada en [pendientes](PENDING.md).

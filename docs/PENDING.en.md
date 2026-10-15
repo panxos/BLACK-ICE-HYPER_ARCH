@@ -2,7 +2,7 @@
 
 [Español](PENDING.md) · [Guide](GUIDE.en.md)
 
-Local candidate 4.0.0-dev.2, updated 2026-10-15. This list separates pending acceptance from future proposals. A proposal is not implemented functionality, and VM evidence is not physical hardware acceptance.
+Candidate 4.0.0-dev.2 (published on `main`, no release), updated 2026-10-15. This list separates pending acceptance from future proposals. A proposal is not implemented functionality, and VM evidence is not physical hardware acceptance.
 
 ## Release blockers
 
@@ -23,7 +23,7 @@ Local candidate 4.0.0-dev.2, updated 2026-10-15. This list separates pending acc
 | Distribution | Final package and clean installation of new components | Manifest, matching hashes, binaries and services |
 | Publication | Diff review, commit/tag/release | Later authorization and closure of the blockers above |
 
-CI: closed for the current configuration. The `Project checks` workflow passed on 2026-10-15; the local suite also passed 347 tests.
+CI: closed for the current configuration. The `Project checks` workflow passed on 2026-10-15; the local suite also passed 354 tests.
 
 ## Additional security acceptance
 

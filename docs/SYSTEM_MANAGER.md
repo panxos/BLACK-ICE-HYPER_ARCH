@@ -1,6 +1,6 @@
 # Gestores de sistema — 4.0.0-dev.2
 
-Candidato local, sin publicar. Control incorpora accesos a Software, Actualizaciones, Proyectos/VPN, Laboratorios y Seguridad. La implementación está en validación; las pruebas unitarias no sustituyen una restauración o instalación real.
+Candidato publicado en `main`, sin release. Control incorpora accesos a Software, Actualizaciones, Proyectos/VPN, Laboratorios y Seguridad. La implementación está en validación; las pruebas unitarias no sustituyen una restauración o instalación real.
 
 ## Instalación y reanudación
 

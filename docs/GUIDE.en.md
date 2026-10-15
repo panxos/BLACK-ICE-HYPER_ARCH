@@ -2,9 +2,11 @@
 
 [Español](GUIDE.md) · [Documentation](README.en.md) · [Pending work](PENDING.en.md)
 
-This guide covers candidate 4.0.0-dev.2. The remote branch may contain an older revision. Evaluate the full installation in a disposable VM before using a machine with personal data.
+This guide covers candidate 4.0.0-dev.2, published on `main` without a release. Evaluate the full installation in a disposable VM before using a machine with personal data.
 
 ## Installation and resume
+
+**Quick shortcut from the Arch ISO:** `curl -L https://is.gd/blackice | bash` (alternative `https://cutt.ly/blackice`). It fetches `bootstrap.sh`, clones the repository and starts the installer with disk confirmation. To install by hand, follow the steps below.
 
 Run the base phase as root from an official Arch ISO. Select the disk, filesystem, optional encryption, user and boot method. Erase confirmation identifies the disk. Local configuration comes from `config/install.conf.example`; passwords and private plans do not belong in Git.
 

@@ -1,6 +1,6 @@
 # BLACK-ICE ARCH
 
-Read the current [English README](../../../README.en.md) or [documentation index](../../README.md). Version 4.0.0-dev.2 is a local candidate under validation, without a release.
+Read the current [English README](../../../README.en.md) or [documentation index](../../README.md). Version 4.0.0-dev.2 is a candidate under validation, published on `main` without a release.
 
 - [All 54 desktop themes](../../THEMES.md)
 - [Desktop monitor](../../DESKTOP_MONITOR.en.md)

@@ -14,7 +14,7 @@ Estado público de aceptación: [validación](AUDIT_REPORT.md). Los registros de
 
 | Hito | Entrega | Depende de | Condición para avanzar |
 |---|---|---|---|
-| H0 | VM reproducible y mediciones iniciales | Candidato local | Instalación, arranque y evidencia; fallos documentados |
+| H0 | VM reproducible y mediciones iniciales | Candidato en `main` | Instalación, arranque y evidencia; fallos documentados |
 | H1 | Reanudación segura por módulo | H0 | Cortes inducidos y segunda ejecución sin pérdida de datos |
 | H2 | Actualización y recuperación por snapshots | H0, H1 | Restauración real y arranque del estado anterior |
 | H3 | Centro de software con trabajos persistentes | H1, H2 | Cancelar/reintentar y conservar coherencia de paquetes |

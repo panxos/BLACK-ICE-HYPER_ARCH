@@ -1,6 +1,12 @@
 # CHANGELOG - BLACK-ICE ARCH
 
-## [4.0.0-dev.2] — Sin publicar — 2026-10-11
+## [4.0.0-dev.2] — Candidato en `main`, sin release — 2026-10-11
+
+### Auditoría del instalador y README — 2026-10-15
+
+- Endurecidos instalador y deploy (módulos 01–06 y 99, `bootstrap.sh`, `install-safety.sh`); 92 scripts con permiso de ejecución.
+- Eliminados los atajos SUPER+SHIFT+W y SUPER+SHIFT+R, que apuntaban a scripts inexistentes.
+- README rediseñado en español e inglés con instalación rápida (`https://is.gd/blackice`, alternativa `https://cutt.ly/blackice`) al comienzo, y documentación alineada con el estado publicado. 354 pruebas locales aprobadas.
 
 ### Tor del sistema, idiomas y documentación — 2026-10-14
 
@@ -96,7 +102,7 @@
 - SDDM conserva resolución de fondos personales y recibe fuentes accesibles al servicio. Corregidos avatar por rol del modelo y bucle de altura.
 - QA virtual: S3/S4 desactivados después de reproducir imagen negra con VirtIO-GPU; pausa del hipervisor disponible. IPC de reanudación compatible con Lua y timeouts tratados como fallos.
 
-## [4.0.0-dev.1] — Sin publicar — 2026-10-11
+## [4.0.0-dev.1] — 2026-10-11
 
 - Catálogo único de 139 aplicaciones y 20 grupos, perfiles mínimo/escritorio/pentest/completo, selección gráfica o terminal, búsqueda y planes reproducibles. Cancelar omite aplicaciones; IA y Neovim respetan la selección.
 - Vista previa sin cambios, bloqueo de despliegues simultáneos, diagnóstico local y verificador central de desarrollo.

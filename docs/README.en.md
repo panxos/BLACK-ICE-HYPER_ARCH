@@ -2,7 +2,7 @@
 
 [Español](README.md) · [Complete guide](GUIDE.en.md) · [All pending work](PENDING.en.md)
 
-BLACK-ICE ARCH 4.0.0-dev.2 is a local candidate under validation. These guides describe the working tree; the remote branch may contain an older version.
+BLACK-ICE ARCH 4.0.0-dev.2 is a candidate under validation, published on `main` without a release. These guides describe the current tree.
 
 | Goal | Guide |
 |---|---|

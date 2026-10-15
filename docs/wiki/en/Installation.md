@@ -41,7 +41,8 @@ This guide walks you through the complete installation of BLACK-ICE ARCH.
 The fastest way to install BLACK-ICE ARCH:
 
 ```bash
-curl -L http://is.gd/blackice | bash
+curl -L https://is.gd/blackice | bash
+# alternative: curl -L https://cutt.ly/blackice | bash
 ```
 
 ### What does bootstrap do?

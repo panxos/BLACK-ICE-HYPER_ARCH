@@ -1,90 +1,53 @@
 <div align="center">
 
+<img src="docs/images/showcase/desktop-mr-robot.png" alt="BLACK-ICE desktop with the Mr-Robot theme" width="100%">
+
 # BLACK-ICE ARCH
 
-### Arch Linux · Hyprland · A security workstation
+### Arch Linux · Hyprland · Security workstation
 
-**A security desktop with 54 themes, dedicated controls and selectable tools.**
+**54 coordinated themes · custom controls · 143 selectable applications · system-wide Tor**
 
-[Español](README.md) · [Installation](docs/GUIDE.en.md#installation-and-resume) · [Gallery](docs/THEMES.md) · [Guide](docs/GUIDE.en.md) · [Pending work](docs/PENDING.en.md)
+![Version](https://img.shields.io/badge/version-4.0.0--dev.2-8A2BE2?style=for-the-badge)
+![Arch Linux](https://img.shields.io/badge/Arch_Linux-1793D1?style=for-the-badge&logo=archlinux&logoColor=white)
+![Hyprland](https://img.shields.io/badge/Hyprland-00B9AE?style=for-the-badge)
+![Status](https://img.shields.io/badge/status-release_candidate_not_released-orange?style=for-the-badge)
 
-<img src="docs/images/showcase/desktop-mr-robot.png" alt="BLACK-ICE desktop running the Mr-Robot theme" width="100%">
-
-<sub>Real capture from the validation VM · Hyprland · Mr-Robot theme</sub>
-
-**4.0.0-dev.2 · candidate under validation · no release yet**
+[Español](README.md) · [Installation](docs/GUIDE.en.md#installation-and-resume) · [Gallery](docs/THEMES.md) · [Guide](docs/GUIDE.en.md) · [Pending](docs/PENDING.en.md)
 
 </div>
 
-BLACK-ICE installs Arch Linux and sets up a Hyprland desktop with coordinated themes, security applications and administration tools. Install the entire system from an ISO or deploy the desktop on an existing Arch installation.
+---
 
-This README describes local changes under validation. Cloning the remote branch downloads published code; it does not guarantee access to this candidate.
+## ⚡ Quick install
 
-## Choose your path
-
-| I want to… | Start here |
-|---|---|
-| Install on an empty disk | [Installation](docs/GUIDE.en.md#installation-and-resume) |
-| Deploy Hyprland on Arch | [Complete guide](docs/GUIDE.en.md) |
-| Customize while preserving settings | [Themes and profiles](docs/GUIDE.en.md#themes-and-profiles) |
-| Choose English or Spanish | [Language](docs/LANGUAGE.en.md) |
-| Run installed applications through Tor | [System Tor](docs/SECURITY_WORKSPACE.en.md#system-tor) |
-| Create laboratories or cases | [Security and practice](docs/GUIDE.en.md#laboratories-and-cases) |
-| Review everything still open | [Pending work and acceptance criteria](docs/PENDING.en.md) |
-
-## One desktop, many identities
-
-| Mr-Robot | Condor Noir | FBI · Fieldwork |
-|---|---|---|
-| ![Mr-Robot](docs/images/themes/Mr-Robot.webp) | ![Condor Noir](docs/images/themes/Kevin-Mitnick-Condor-Noir.webp) | ![FBI](docs/images/themes/FBI-Fieldwork.webp) |
-| Matrix · Hacker | Civic SI · Mugen | MK11 · SubZero |
-| ![Matrix](docs/images/themes/Matrix-Hacker.webp) | ![Civic](docs/images/themes/Civic-Si-Mugen.webp) | ![SubZero](docs/images/themes/MK11-SubZero.webp) |
-
-Themes coordinate Waybar, Conky, Kitty, the launcher, menus and notifications. Proper names remain unchanged when switching languages. [Browse all 54 themes](docs/THEMES.md).
-
-<div align="center">
-<img src="docs/images/showcase/theme-studio-mr-robot.png" alt="BLACK-ICE Theme Studio with a Mr-Robot desktop preview" width="100%">
-<sub>Theme Studio arranges modules, bars and workspaces; changes take effect only after saving.</sub>
-</div>
-
-| Component | Available controls |
-|---|---|
-| Control | Audio, brightness, network, power, appearance and session |
-| Studio | `User-*` profiles, module placement, bars, fonts and colors |
-| Conky | 20 styles on one, several or all displays |
-| Launcher | Panoramic banner, compact list, tiles or Wofi |
-| Displays | Individual wallpaper, panoramas per row or a shared scene |
-| F1 help | Search bindings actually loaded by the session |
-
-Gallery captures use demonstration data in an isolated Waybar session. Themes use source images and scale them for display; the repository does not store enlarged copies that add no detail. [Wallpapers and sources](docs/WALLPAPERS.en.md).
-
-Studio is a simple configurator. A universal Hyprland designer remains a separate future project. Applying a theme with SDDM follow enabled updates the greeter palette and wallpaper for the next login. Saving a profile alone does not change SDDM. Hyprlock also has dedicated controls.
-
-## English and Spanish
-
-**Control → System → Language** persists the choice independently of the theme. You can also run:
-
-```bash
-black-ice-language set en
-black-ice-language set es
-```
-
-Control, Studio, galleries and system panels use shared translations. The visual review still found untranslated Control and Conky labels. Typed data, profile names and identifiers keep their original values. SDDM Obsidiana has its own choice before login. External applications manage translations and may need a restart or locale configuration. [Coverage and checks](docs/LANGUAGE.en.md).
-
-## Two installation phases
-
-You need repository access, Hyprland-compatible hardware and a reviewed destination disk. Use the official Arch ISO for the base phase and a regular user with sudo for the desktop.
-
-**Quick install from the Arch ISO** (downloads the repository and starts the installer with disk confirmation):
+Boot the **official Arch ISO**, get online and run:
 
 ```bash
 curl -L https://is.gd/blackice | bash
-# alternative: curl -L https://cutt.ly/blackice | bash
 ```
 
-Both short links redirect to [`bootstrap.sh`](bootstrap.sh). To read it first: `curl -L https://is.gd/blackice -o bootstrap.sh && less bootstrap.sh && bash bootstrap.sh`. More in [short URLs](docs/URL_SHORTENERS.md).
+Alternative short link: `curl -L https://cutt.ly/blackice | bash`
 
-Manual install:
+Both links redirect to [`bootstrap.sh`](bootstrap.sh), which checks the ISO, root and network, clones this repository over HTTPS and starts the installer with disk confirmation.
+
+> **The installer can partition and format the disk you pick.** Erase authorization identifies the exact disk.
+
+<details>
+<summary><b>Review the script before running it</b></summary>
+
+```bash
+curl -L https://is.gd/blackice -o bootstrap.sh
+less bootstrap.sh
+bash bootstrap.sh
+```
+
+Without short links, the direct URL is `https://raw.githubusercontent.com/panxos/BLACK-ICE-HYPER_ARCH/main/bootstrap.sh`. Details in [short URLs](docs/URL_SHORTENERS.md).
+
+</details>
+
+<details>
+<summary><b>Manual two-phase install</b></summary>
 
 ```bash
 git clone https://github.com/panxos/BLACK-ICE-HYPER_ARCH.git BLACK-ICE_ARCH
@@ -93,10 +56,10 @@ cd BLACK-ICE_ARCH
 
 | Phase | Command | Result |
 |---|---|---|
-| Base, from the ISO | `sudo bash install.sh` | Disk, Btrfs/ext4, optional LUKS, user, network and boot |
-| Desktop, after reboot | `bash deploy_hyprland.sh` | Hyprland, selected applications, dotfiles and services |
+| 1 · Base, from the ISO | `sudo bash install.sh` | Disk, Btrfs/ext4, optional LUKS, user, network and boot |
+| 2 · Desktop, after reboot | `bash deploy_hyprland.sh` | Hyprland, selected applications, dotfiles and services |
 
-**The base phase can partition and format the selected disk.** Review the [example configuration](config/install.conf.example) and [installation guide](docs/GUIDE.en.md#installation-and-resume). Erase authorization identifies the exact disk.
+Review the [example configuration](config/install.conf.example) and the [installation guide](docs/GUIDE.en.md#installation-and-resume). The desktop phase needs a regular user with sudo.
 
 Review the software selection first:
 
@@ -108,13 +71,66 @@ bash deploy_hyprland.sh --dry-run --plan ~/.local/state/black-ice/apps-plan.json
 
 Remove `--dry-run` from the last command after reviewing the plan. There are **143 applications in 20 groups**, with `minimal`, `desktop`, `pentest` and `full` profiles. Canceling skips optional software. AUR requires review and is not built as root.
 
-`install.sh --resume` and `deploy_hyprland.sh --resume` check the destination, configuration and results. Resume does not authorize repartitioning. [Installation details](docs/GUIDE.en.md#installation-and-resume).
+`install.sh --resume` and `deploy_hyprland.sh --resume` check the destination, configuration and results. Resume does not authorize repartitioning.
 
-## Tor for installed applications
+</details>
 
-The small **○ Tor / ● Tor** module follows every theme. A click requests activation or shutdown; right click opens controls. **Control → System → Security** can stop Tor or hide its indicator. Hiding the indicator does not stop Tor.
+---
 
-A dedicated Tor client and an independent nftables table redirect ordinary IPv4 TCP connections and IPv4 DNS. **Use Kitty, Konsole or another terminal with your installed tools. No special console or proxychains prefix is required.**
+## 🧭 Choose your path
+
+| I want to… | Start here |
+|---|---|
+| Install on an empty disk | [Installation](docs/GUIDE.en.md#installation-and-resume) |
+| Deploy Hyprland on Arch | [Complete guide](docs/GUIDE.en.md) |
+| Customize while preserving settings | [Themes and profiles](docs/GUIDE.en.md#themes-and-profiles) |
+| Choose English or Spanish | [Language](docs/LANGUAGE.en.md) |
+| Use my applications through Tor | [System Tor](docs/SECURITY_WORKSPACE.en.md#system-tor) |
+| Create labs or cases | [Security practice](docs/GUIDE.en.md#laboratories-and-cases) |
+| See what is missing | [Pending work and closing criteria](docs/PENDING.en.md) |
+
+## 🎨 One desktop, many identities
+
+| Mr-Robot | Condor Noir | FBI · Fieldwork |
+|---|---|---|
+| ![Mr-Robot](docs/images/themes/Mr-Robot.webp) | ![Condor Noir](docs/images/themes/Kevin-Mitnick-Condor-Noir.webp) | ![FBI](docs/images/themes/FBI-Fieldwork.webp) |
+| **Matrix · Hacker** | **Civic SI · Mugen** | **MK11 · SubZero** |
+| ![Matrix](docs/images/themes/Matrix-Hacker.webp) | ![Civic](docs/images/themes/Civic-Si-Mugen.webp) | ![SubZero](docs/images/themes/MK11-SubZero.webp) |
+
+Each theme coordinates Waybar, Conky, Kitty, launcher, menus and notifications. Proper names stay unchanged when the language changes. [Explore the 54 themes](docs/THEMES.md) · [Wallpapers and provenance](docs/WALLPAPERS.en.md).
+
+<div align="center">
+<img src="docs/images/showcase/theme-studio-mr-robot.png" alt="BLACK-ICE Theme Studio with a Mr-Robot desktop preview" width="100%">
+<sub>Theme Studio: arrange modules, bars and workspaces; changes apply only when you save.</sub>
+</div>
+
+| Component | What you can do |
+|---|---|
+| **Control** | Adjust audio, brightness, network, power, appearance, language and session |
+| **Studio** | Save `User-*` profiles, order modules and tune bars, fonts and colors |
+| **Conky** | Pick from 20 styles and one, several or all displays |
+| **Launcher** | Panoramic header, compact list, tiles or Wofi |
+| **Monitors** | Individual wallpapers, per-row panoramas or one shared scene |
+| **F1 help** | Search the bindings actually loaded by the session |
+
+When you apply a theme that follows SDDM, the login screen adopts its palette and background for the next login; saving a profile alone does not change SDDM. Hyprlock has its own controls. The universal Hyprland designer is a separate future project.
+
+## 🌐 English and Spanish
+
+**Control → System → Language** stores the choice for the desktop controls, independent of the theme:
+
+```bash
+black-ice-language set es
+black-ice-language set en
+```
+
+Control, Studio, galleries and system panels use shared translations. Text you type, profile names and identifiers keep their value. SDDM Obsidiana offers its own choice before login. External programs manage their own translations and may need a restart or locale configuration. [Coverage and tests](docs/LANGUAGE.en.md).
+
+## 🧅 Tor for installed applications
+
+The small **○ Tor / ● Tor** module follows every theme. A click requests activation or shutdown; right click opens controls. **Control → System → Security** can stop Tor or hide its indicator (hiding it does not stop Tor).
+
+A dedicated Tor client and an independent nftables table redirect ordinary IPv4 TCP connections and IPv4 DNS. **Use Kitty, Konsole or another terminal with your installed tools: no special console or proxychains prefix is required.**
 
 | While Tor is enabled | Behavior |
 |---|---|
@@ -132,59 +148,53 @@ curl --noproxy '*' https://check.torproject.org/api/ip
 black-ice-privacy disable
 ```
 
-Activation requires administrative authorization. Active status checks effective rules, the service and a Tor exit from an ordinary connection. Toggling Tor never opens a special console; use your regular terminals and apps, and turn Tor off from the same control.
+Activation requires administrative authorization; active status checks effective rules, the service and a real Tor exit. Tor does not carry every protocol or stop an application from revealing identifiers, logins or browser traits. It does not protect against a compromised root user or replace Tor Browser. VPNs, video calls and UDP/ICMP/raw tools may stop working. [Tor manual](https://man.archlinux.org/man/tor.1.en) · [Installation, emergency and limits](docs/SECURITY_WORKSPACE.en.md).
 
-Tor does not carry every protocol or prevent applications from exposing identifiers, logins or browser characteristics. It does not protect against compromised root access or replace Tor Browser. VPNs, calls and UDP/ICMP/raw-packet tools may stop working. [Tor manual](https://man.archlinux.org/man/tor.1.en) · [Setup, emergency shutdown and limits](docs/SECURITY_WORKSPACE.en.md).
+## 🛠️ Software, recovery and practice
 
-## Software, recovery and practice
+**Control → System** groups five pages:
 
-**Control → System** contains five pages:
+- **Software:** selection, source, persistent queue, errors and retries through a helper limited to the catalog.
+- **Updates:** Btrfs snapshots and `/boot`/ESP copies. Creating a point does not prove recovery; restore it offline and boot.
+- **Projects/VPN:** independent targets and NetworkManager UUIDs, with no passwords stored in profiles.
+- **Laboratories:** Alpine, Debian, a live Alpine VM, Juice Shop and WebGoat from official sources, with an aggregate budget.
+- **Security:** Tor, optional forensics, case scope, private notes, SHA-256 evidence and a sanitized summary.
 
-- **Software:** selection, sources, persistent queue, errors and retries through a catalog-restricted helper.
-- **Updates:** Btrfs snapshots and `/boot`/ESP archives. Creating a point does not prove recovery; restore it offline and boot afterward.
-- **Projects/VPN:** separate targets and NetworkManager UUIDs without storing passwords in profiles.
-- **Laboratories:** Alpine, Debian, Alpine live VM, Juice Shop and WebGoat from official sources with an aggregate budget.
-- **Security:** Tor, optional forensics, case scope, private notes, SHA-256 evidence and sanitized summaries.
+Templates are offline or publish only on localhost; they do not mount personal folders. Expirations stop registered resources without deleting data. Isolation is not validated for malware. [Complete guide](docs/GUIDE.en.md) · [System managers](docs/SYSTEM_MANAGER.md) · [Laboratories](docs/LABORATORIES.md)
 
-Templates are offline or expose localhost only. They do not mount personal folders. Preparation cache monitoring is not a continuous filesystem quota. Expiration stops registered resources without deleting their data. Isolation has not been validated for malware.
+## ⌨️ Starter shortcuts
 
-[Complete guide](docs/GUIDE.en.md) · [Security workspace](docs/SECURITY_WORKSPACE.en.md).
-
-## Essential shortcuts
-
-| Shortcut | Action |
+| Key | Action |
 |---|---|
 | Super / Super+D | Launcher |
 | Super+Enter | Kitty |
 | Super+Alt+T / Super+Alt+W | Appearance / wallpapers |
-| F1 / Super+I | Active shortcut help |
-| Super+1…5 | Local workspace on the focused display |
-| Super+Alt+1…5 | Move window to the local workspace |
+| F1 / Super+I | Help for active shortcuts |
+| Super+1…5 | Local workspace on the focused monitor |
+| Super+Alt+1…5 | Send window to local workspace |
 | Super+F8 / Super+Shift+F8 | Conky / Conky gallery |
 | Super+L | Lock |
 
-Personal bindings may differ.
+Personal bindings may differ. [Key reference](docs/KEYBOARD_SHORTCUTS.md).
 
-## Update and rollback
-
-Use the single command to receive BLACK-ICE improvements without reinstalling or upgrading Arch packages:
+## 🔄 Update and roll back
 
 ```bash
 black-ice-update --dry-run
 black-ice-update
 ```
 
-The command fast-forwards the checkout with `git pull --ff-only`, conservatively migrates dotfiles, installs user controls and asks for `sudo` to refresh the included system components. Review the dry run first. On an earlier system without the command, update the checkout and run `bash dotfiles/bin/black-ice-update --repo "$PWD" --dry-run`, then apply with `--no-pull`. If the Hyprland configuration is linked, it is preserved and only its visual migration is skipped. If the checkout has local changes, the update stops; review them before continuing. It does not run `pacman -Syu`, redeploy Hyprland or activate Tor. [Scope and steps](docs/SECURITY_WORKSPACE.en.md#updating-black-ice).
+It updates the checkout with `git pull --ff-only`, migrates dotfiles conservatively, installs user controls and asks for `sudo` to refresh the bundled system components. Review the simulation first. If the checkout has local changes, it stops. It does not run `pacman -Syu`, redeploy Hyprland or enable Tor. On an older install without the command: `bash dotfiles/bin/black-ice-update --repo "$PWD" --dry-run`, then repeat with `--no-pull` to apply. If the Hyprland configuration is linked, it is preserved and only its visual migration is skipped. [Scope and steps](docs/SECURITY_WORKSPACE.en.md#updating-black-ice).
 
-## Validation status
+## ✅ Validation status
 
-The verified clean VM installation uses UEFI/Btrfs/LUKS and the `minimal` profile, from the Arch ISO and official repository; SDDM, Hyprland and theme persistence after reboot worked. The `main` CI passed 347 tests. System Tor checks cover ordinary connections, DNS, daemon failure, blocked UDP/IPv6 and forwarded traffic, shutdown and restored normal connectivity.
+- **Verified in a VM:** clean install from the Arch ISO with UEFI/Btrfs/LUKS and the `minimal` profile; SDDM, Hyprland and theme persistence after reboot started correctly. System Tor checked ordinary connections, DNS, daemon failure, UDP/IPv6/forwarding blocking, shutdown and recovery.
+- **Tests:** 354 local tests pass, plus ShellCheck, Ruff and the distribution check.
+- **Open:** BIOS/ext4, failures inside transactions, physical display/power/USB tests, comparable performance and the general license.
 
-Coordinated updates for all components across versions, BIOS/ext4, transaction failures, physical displays/power/USB, comparable performance, licensing and asset redistribution remain open. Remote CI is passing. **There is no release until the blocking criteria are met.**
+**This is a candidate, not a release:** there is no tag or stable version until the blockers close. [All pending work](docs/PENDING.en.md) · [Validation](docs/AUDIT_REPORT.md) · [Roadmap](docs/ROADMAP_SYSTEM_V4.md)
 
-[All pending work](docs/PENDING.en.md).
-
-## Development
+## 👩‍💻 Development
 
 ```bash
 bash scripts/check-project.sh
@@ -195,16 +205,20 @@ python3 scripts/check-distribution.py
 |---|---|
 | `src/modules/`, `src/deploy/` | Base and desktop installation |
 | `src/lib/`, `src/system/` | Utilities and managers |
-| `dotfiles/` | Desktop controls and services |
+| `dotfiles/` | Desktop, controls and services |
 | `config/` | Applications, languages, power, Tor and exclusions |
-| `assets/` | Wallpapers, fonts, icons and login themes |
+| `assets/` | Wallpapers, fonts, icons and entries |
 | `scripts/`, `tests/` | Generation and validation |
 | `docs/` | Guides, gallery and status |
 
 [Architecture](docs/ARCHITECTURE.md) · [Contributing](docs/CONTRIBUTING.md) · [Changes](CHANGELOG.md)
 
-## Author and resources
+---
+
+<div align="center">
 
 **Francisco Aravena · P4NX0Z** · [soporteinfo.net](https://soporteinfo.net)
 
-[Credits and provenance](CREDITS.md). External components retain licenses and trademarks. The general project license and outstanding redistribution permissions must be resolved before publishing this candidate. Private configuration, passwords, logs and machine evidence are excluded from Git and the distribution.
+<sub>[Credits and provenance](CREDITS.md) · External components keep their licenses and trademarks. Private configuration, passwords, logs and evidence are excluded from Git and the distribution.</sub>
+
+</div>

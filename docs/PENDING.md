@@ -2,7 +2,7 @@
 
 [English](PENDING.en.md) · [Guía](GUIDE.md) · [Roadmap](ROADMAP_SYSTEM_V4.md)
 
-Estado del candidato local 4.0.0-dev.2, actualizado 2026-10-15. Esta lista reúne aceptación pendiente y propuestas futuras. No convierte una propuesta en función implementada ni una comprobación de VM en aceptación física.
+Estado del candidato 4.0.0-dev.2 (publicado en `main`, sin release), actualizado 2026-10-15. Esta lista reúne aceptación pendiente y propuestas futuras. No convierte una propuesta en función implementada ni una comprobación de VM en aceptación física.
 
 ## Bloqueos antes de release
 
@@ -23,7 +23,7 @@ Estado del candidato local 4.0.0-dev.2, actualizado 2026-10-15. Esta lista reún
 | Distribución | Pack final y componentes nuevos desde una instalación vacía | Manifiesto íntegro, hashes, binarios y servicios contrastados |
 | Publicación | Revisión del diff, commit/tag/release | Autorización posterior y cierre de los bloqueos anteriores |
 
-CI: cerrada para la configuración actual. El workflow `Project checks` aprobó el commit publicado `b6e5830` el 2026-10-15; la suite local actual también pasó sus 347 pruebas.
+CI: cerrada para la configuración actual. El workflow `Project checks` aprobó un commit anterior (`b6e5830`) el 2026-10-15; la suite local actual también pasó sus 354 pruebas.
 
 ## Aceptación adicional de seguridad
 

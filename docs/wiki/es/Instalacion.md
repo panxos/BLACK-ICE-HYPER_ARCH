@@ -1,6 +1,6 @@
 # Instalación
 
-Consulta [Instalador 4.0](../../INSTALLER_V4.md) antes de comenzar. El candidato local todavía no está publicado en la rama remota.
+Consulta [Instalador 4.0](../../INSTALLER_V4.md) antes de comenzar. El candidato está publicado en `main`, sin release.
 
 La fase base usa `sudo bash install.sh` desde la ISO Arch y particiona el disco elegido. Después de reiniciar e iniciar sesión como usuario normal, `bash deploy_hyprland.sh` configura el escritorio.
 
