@@ -295,7 +295,7 @@ class BackendTests(unittest.TestCase):
             self.assertEqual(backend.local_ip()["address"],"192.0.2.2")
 
     def test_service_failure_never_reports_zero_running(self):
-        with patch.object(backend,"command",return_value=(1,"")):
+        with patch.object(backend.shutil,"which",return_value="/usr/bin/tool"), patch.object(backend,"command",return_value=(1,"")):
             for name in ("docker","kvm"):
                 self.assertEqual(backend.service(name)["class"],"unavailable")
                 self.assertIn("N/D",backend.service(name)["text"])
