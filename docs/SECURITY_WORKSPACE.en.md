@@ -75,6 +75,16 @@ black-ice-update
 
 The command uses the checkout registered during installation. It fast-forwards Git, migrates dotfiles without wholesale replacement of personal configuration, installs BLACK-ICE Control and user components, then asks for `sudo` to update an allowlisted set of system files and units. It stops if Git finds local changes. Review those changes and, when applying from an already reviewed checkout, use `black-ice-update --no-pull`. You can also specify a checkout with `black-ice-update --repo /path/BLACK-ICE_ARCH`.
 
+On an earlier installation that does not have `black-ice-update` yet, enter the updated checkout and run the launcher from there:
+
+```bash
+git pull --ff-only
+bash dotfiles/bin/black-ice-update --repo "$PWD" --dry-run
+bash dotfiles/bin/black-ice-update --repo "$PWD" --no-pull
+```
+
+The process installs the launcher and records the checkout for future updates. If the Hyprland configuration is linked, it preserves it and skips only its visual migration; user controls and system components still update.
+
 `--dry-run` downloads and writes nothing. Each installer protects its own operations; if a step fails, later steps stop and you can rerun after resolving the issue. There is no atomic rollback across user files, root files and systemd. This flow installs no packages, does not run `pacman -Syu`, redeploy the desktop, restart the session or activate Tor. If Waybar does not reflect an improvement, restart it manually with `~/.local/bin/waybar_start.sh`.
 
 The old Podman Tor environment protected only its own terminal and was removed from the candidate and installer. When upgrading an older installation, local files and resources from that environment are not imported into the new daemon; inspect the private store before cleaning up old data.

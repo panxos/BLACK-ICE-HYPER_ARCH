@@ -48,6 +48,11 @@ def dirty_checkout(repo: Path) -> bool:
     return bool(result.stdout.strip())
 
 
+def hyprland_config_is_linked() -> bool:
+    config = Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config")) / "hypr"
+    return config.is_symlink() or (config / "hyprland.conf").is_symlink()
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--repo", help="Ruta al checkout de BLACK-ICE")
@@ -72,8 +77,12 @@ def main(argv: list[str] | None = None) -> int:
                     return result
 
         dry = args.dry_run
+        migration_options = ["--repo", str(repo), "--no-pull"]
+        if hyprland_config_is_linked():
+            migration_options.append("--skip-migration")
+            print("Configuración Hyprland enlazada: se conservará y se omitirá solo la migración visual.")
         steps = [
-            ("Migración conservadora y actualización de comandos", ["bash", "dotfiles/bin/dotfiles-update", "--repo", str(repo), "--no-pull"] + (["--dry-run"] if dry else [])),
+            ("Migración conservadora y actualización de comandos", ["bash", "dotfiles/bin/dotfiles-update"] + migration_options + (["--dry-run"] if dry else [])),
             ("Controles y componentes del usuario", [sys.executable, "scripts/install-security-workspace.py"] + (["--dry-run"] if dry else [])),
         ]
         for label, command in steps:

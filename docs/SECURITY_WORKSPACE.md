@@ -75,6 +75,16 @@ black-ice-update
 
 El comando usa el checkout registrado durante la instalación. Actualiza Git con `--ff-only`, migra dotfiles sin reemplazar en bloque la configuración personal, instala BLACK-ICE Control y componentes de usuario, y finalmente solicita `sudo` para actualizar una lista acotada de archivos y unidades de sistema. Si Git detecta cambios locales, se detiene para protegerlos. Revisa esos cambios y, si ya tienes una copia revisada, puedes usar `black-ice-update --no-pull`. También puedes indicar el checkout con `black-ice-update --repo /ruta/BLACK-ICE_ARCH`.
 
+En una instalación anterior que todavía no tenga `black-ice-update`, entra al checkout actualizado y ejecuta el lanzador desde ahí:
+
+```bash
+git pull --ff-only
+bash dotfiles/bin/black-ice-update --repo "$PWD" --dry-run
+bash dotfiles/bin/black-ice-update --repo "$PWD" --no-pull
+```
+
+El proceso instala el lanzador y registra el checkout para las siguientes actualizaciones. Si la configuración Hyprland está enlazada, la conserva y omite únicamente su migración visual; los controles y componentes del sistema siguen actualizándose.
+
 `--dry-run` no descarga ni escribe archivos. Cada instalador protege sus propias operaciones; si falla un paso, los siguientes no corren y puedes repetir el comando después de resolverlo. No existe una reversión global atómica entre los archivos de usuario, root y systemd. Este flujo no instala paquetes, no ejecuta `pacman -Syu`, no vuelve a desplegar el escritorio, no reinicia la sesión ni activa Tor. Si Waybar no refleja una mejora, reiníciala manualmente con `~/.local/bin/waybar_start.sh`.
 
 El entorno Tor antiguo de Podman protegía únicamente su propia terminal y fue retirado del candidato y del instalador. Al actualizar una instalación anterior, los archivos locales y recursos de ese entorno no se convierten automáticamente en estado del nuevo daemon; revisa el almacén privado antes de limpiar datos antiguos.

@@ -3,6 +3,7 @@ set -euo pipefail
 
 DRY_RUN=false
 NO_PULL=false
+SKIP_MIGRATION=false
 REPO_DIR="${BLACK_ICE_REPO:-}"
 SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)
 REPO_PATH_FILE="${XDG_STATE_HOME:-$HOME/.local/state}/black-ice/repository"
@@ -15,10 +16,11 @@ while [[ $# -gt 0 ]]; do
     case "$1" in
         --dry-run) DRY_RUN=true ;;
         --no-pull) NO_PULL=true ;;
+        --skip-migration) SKIP_MIGRATION=true ;;
         --no-restart) : ;;
         --repo) REPO_DIR="${2:?Falta la ruta del repositorio}"; shift ;;
         --help|-h)
-            printf '%s\n' 'Uso: dotfiles-update [--repo RUTA] [--no-pull] [--dry-run] [--no-restart]'
+            printf '%s\n' 'Uso: dotfiles-update [--repo RUTA] [--no-pull] [--dry-run] [--skip-migration]'
             exit 0 ;;
         *) printf 'Opción no admitida: %s\n' "$1" >&2; exit 2 ;;
     esac
@@ -37,7 +39,7 @@ fi
 REPO_DIR=$(cd -- "$REPO_DIR" && pwd -P)
 MIGRATOR="$REPO_DIR/dotfiles/bin/hyprland-migrate"
 [[ -f "$MIGRATOR" ]] || { printf '%s\n' 'El repositorio no contiene la migración.' >&2; exit 1; }
-if [[ -L "${XDG_CONFIG_HOME:-$HOME/.config}/hypr" || -L "${XDG_CONFIG_HOME:-$HOME/.config}/hypr/hyprland.conf" ]]; then
+if [[ "$SKIP_MIGRATION" == false && ( -L "${XDG_CONFIG_HOME:-$HOME/.config}/hypr" || -L "${XDG_CONFIG_HOME:-$HOME/.config}/hypr/hyprland.conf" ) ]]; then
     printf '%s\n' 'La configuración Hyprland usa un symlink. Crea una copia local antes de actualizar.' >&2
     exit 1
 fi
@@ -47,17 +49,27 @@ if [[ "$NO_PULL" == false ]]; then
         printf '%s\n' '[SIMULACIÓN] git pull --ff-only; no se descargan cambios.'
     else
         git -C "$REPO_DIR" pull --ff-only
-        exec bash "$REPO_DIR/dotfiles/bin/dotfiles-update" --repo "$REPO_DIR" --no-pull
+        next_args=(--repo "$REPO_DIR" --no-pull)
+        [[ "$SKIP_MIGRATION" == false ]] || next_args+=(--skip-migration)
+        exec bash "$REPO_DIR/dotfiles/bin/dotfiles-update" "${next_args[@]}"
     fi
 fi
 
 if [[ "$DRY_RUN" == true ]]; then
-    python3 "$MIGRATOR" --dry-run
+    if [[ "$SKIP_MIGRATION" == true ]]; then
+        printf '%s\n' '[SIMULACIÓN] Migración de Hyprland omitida; se conservará la configuración enlazada.'
+    else
+        python3 "$MIGRATOR" --dry-run
+    fi
     printf '%s\n' '[SIMULACIÓN] Se publicarían los comandos de actualización y migración.'
     exit 0
 fi
 
-python3 "$MIGRATOR"
+if [[ "$SKIP_MIGRATION" == true ]]; then
+    printf '%s\n' 'Se conserva la configuración Hyprland enlazada; migración visual omitida.'
+else
+    python3 "$MIGRATOR"
+fi
 install -d "$HOME/.local/bin"
 for name in hyprland-migrate dotfiles-update dotfiles-rollback black-ice-update; do
     install -m 755 "$REPO_DIR/dotfiles/bin/$name" "$HOME/.local/bin/$name"

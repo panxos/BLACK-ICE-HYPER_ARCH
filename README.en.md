@@ -163,7 +163,7 @@ black-ice-update --dry-run
 black-ice-update
 ```
 
-The command fast-forwards the checkout with `git pull --ff-only`, conservatively migrates dotfiles, installs user controls and asks for `sudo` to refresh the included system components. Review the dry run first. If the checkout has local changes, it stops; inspect them and use `black-ice-update --no-pull` when applying from that copy. It does not run `pacman -Syu`, redeploy Hyprland or activate Tor. [Scope and steps](docs/SECURITY_WORKSPACE.en.md#updating-black-ice).
+The command fast-forwards the checkout with `git pull --ff-only`, conservatively migrates dotfiles, installs user controls and asks for `sudo` to refresh the included system components. Review the dry run first. On an earlier system without the command, update the checkout and run `bash dotfiles/bin/black-ice-update --repo "$PWD" --dry-run`, then apply with `--no-pull`. If the Hyprland configuration is linked, it is preserved and only its visual migration is skipped. If the checkout has local changes, the update stops; review them before continuing. It does not run `pacman -Syu`, redeploy Hyprland or activate Tor. [Scope and steps](docs/SECURITY_WORKSPACE.en.md#updating-black-ice).
 
 ## Validation status
 
