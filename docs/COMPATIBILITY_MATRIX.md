@@ -9,8 +9,8 @@ Versión evaluada: **4.0.0-dev.2**. “Implementado” indica una ruta de códig
 | Proveedor Lua | Comprobado en compositor aislado y QA | Migración preparada; activar al volver a iniciar sesión |
 | KVM, UEFI, Btrfs, LUKS, perfil `minimal` | Comprobado en QA 2026-10-15 | Instalación limpia desde ISO + repo oficial, arranque SDDM/Hyprland y persistencia del tema |
 | BIOS/ext4 y combinaciones alternativas | Implementadas parcialmente; matriz pendiente | No atribuirles el resultado UEFI/Btrfs/LUKS |
-| Actualización selectiva de BLACK-ICE Control | Implementada y documentada | Actualizar checkout, ejecutar `scripts/install-security-workspace.py` y reiniciar Waybar |
-| Actualización unificada entre versiones BLACK-ICE | Pendiente | Coordinar componentes de usuario/root, dotfiles, servicios, migraciones y rollback |
+| Actualización unificada de BLACK-ICE | Implementada localmente | `black-ice-update --dry-run` revisa; `black-ice-update` coordina checkout, dotfiles, controles de usuario y componentes de sistema; no actualiza Arch ni activa Tor |
+| Salto desde una versión anterior | Pendiente de aceptación | Aplicar en una VM anterior reproducible y probar preferencias, servicios y recuperación por etapa |
 | VMware, Xen, VirtualBox, Hyper-V | Detección en código; no verificado en este candidato | Faltan instalaciones propias |
 | Dos o tres monitores alineados | Distribución comprobada con fixtures | Revisión de encuadre y hotplug físico pendientes |
 | Tres salidas Hyprland aisladas | Comprobado | Escritorios persistentes, selección y reconexión |

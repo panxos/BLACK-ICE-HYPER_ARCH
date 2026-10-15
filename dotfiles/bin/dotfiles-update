@@ -59,7 +59,7 @@ fi
 
 python3 "$MIGRATOR"
 install -d "$HOME/.local/bin"
-for name in hyprland-migrate dotfiles-update dotfiles-rollback; do
+for name in hyprland-migrate dotfiles-update dotfiles-rollback black-ice-update; do
     install -m 755 "$REPO_DIR/dotfiles/bin/$name" "$HOME/.local/bin/$name"
 done
 install -d -m 700 "$(dirname -- "$REPO_PATH_FILE")"

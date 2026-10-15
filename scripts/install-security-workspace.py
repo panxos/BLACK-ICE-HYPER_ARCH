@@ -17,7 +17,7 @@ def files(home):
     result.append((ROOT / "config/i18n/en.json", data.parent / "i18n/en.json", 0o644))
     result.append((ROOT / "config/apps.json", data.parent / "software/config/apps.json", 0o644))
     result.append((ROOT / "scripts/select-apps.py", data.parent / "software/scripts/select-apps.py", 0o755))
-    for name in ("black-ice-system", "black-ice-privacy", "black-ice-waybar", "black_ice_layout.py", "black_ice_theme.py", "waybar_start.sh",
+    for name in ("black-ice-system", "black-ice-privacy", "black-ice-waybar", "black-ice-update", "black_ice_layout.py", "black_ice_theme.py", "waybar_start.sh",
                  "black_ice_i18n.py", "black-ice-language", "black-ice-control", "black-ice-theme-studio", "theme_visual", "conky_visual", "black_ice_launcher.py"):
         result.append((ROOT / "dotfiles/bin" / name, home / ".local/bin" / name, 0o755))
     result.append((ROOT / "dotfiles/waybar/privacy.css", config / "waybar/privacy.css", 0o644))

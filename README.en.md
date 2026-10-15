@@ -156,14 +156,14 @@ Personal bindings may differ.
 
 ## Update and rollback
 
-Inspect the plan from a reviewed checkout:
+Use the single command to receive BLACK-ICE improvements without reinstalling or upgrading Arch packages:
 
 ```bash
-bash dotfiles/bin/dotfiles-update --no-pull --dry-run
-bash dotfiles/bin/dotfiles-update --no-pull
+black-ice-update --dry-run
+black-ice-update
 ```
 
-You can receive BLACK-ICE improvements without reinstalling Arch. From the checkout used to install it, run `git pull --ff-only`, preview with `python3 scripts/install-security-workspace.py --dry-run`, apply with `python3 scripts/install-security-workspace.py`, then restart Waybar. That installer updates BLACK-ICE Control and user components. `dotfiles-update` handles dotfiles and visual migrations; it does not install every component. Coordinating all improvements and services across previous versions remains open. [Detailed steps](docs/SECURITY_WORKSPACE.en.md#updating-the-controls).
+The command fast-forwards the checkout with `git pull --ff-only`, conservatively migrates dotfiles, installs user controls and asks for `sudo` to refresh the included system components. Review the dry run first. If the checkout has local changes, it stops; inspect them and use `black-ice-update --no-pull` when applying from that copy. It does not run `pacman -Syu`, redeploy Hyprland or activate Tor. [Scope and steps](docs/SECURITY_WORKSPACE.en.md#updating-black-ice).
 
 ## Validation status
 

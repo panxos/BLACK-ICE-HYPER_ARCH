@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)
+REPO_PATH_FILE="${XDG_STATE_HOME:-$HOME/.local/state}/black-ice/repository"
+REPO_DIR="${BLACK_ICE_REPO:-}"
+
+if [[ -z "$REPO_DIR" && -r "$REPO_PATH_FILE" ]]; then
+    IFS= read -r REPO_DIR < "$REPO_PATH_FILE" || true
+fi
+if [[ -z "$REPO_DIR" ]]; then
+    for candidate in "$SCRIPT_DIR/../.." "$PWD" "$HOME/BLACK-ICE_ARCH"; do
+        if [[ -f "$candidate/scripts/black-ice-update.py" ]]; then
+            REPO_DIR=$candidate
+            break
+        fi
+    done
+fi
+[[ -n "$REPO_DIR" ]] || { printf '%s\n' 'No encuentro el checkout de BLACK-ICE. Usa --repo RUTA.' >&2; exit 1; }
+REPO_DIR=$(cd -- "$REPO_DIR" && pwd -P)
+exec python3 "$REPO_DIR/scripts/black-ice-update.py" --repo "$REPO_DIR" "$@"

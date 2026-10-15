@@ -59,7 +59,7 @@ if [ -f "$SCRIPT_DIR/dotfiles/bin/xdg-open-wayland" ]; then
 fi
 
 # Scripts de gestión BLACK-ICE
-for _script in dotfiles-update dotfiles-rollback hyprland-migrate power_profile power_profile_menu.sh waybar_start.sh tpm2-luks-enroll; do
+for _script in dotfiles-update dotfiles-rollback black-ice-update hyprland-migrate power_profile power_profile_menu.sh waybar_start.sh tpm2-luks-enroll; do
     if [ -f "$SCRIPT_DIR/dotfiles/bin/$_script" ]; then
         cp "$SCRIPT_DIR/dotfiles/bin/$_script" "$USER_HOME/.local/bin/$_script"
         chmod +x "$USER_HOME/.local/bin/$_script"
@@ -67,6 +67,12 @@ for _script in dotfiles-update dotfiles-rollback hyprland-migrate power_profile 
         log_success "$_script instalado en ~/.local/bin/"
     fi
 done
+
+# Registrar el checkout de origen para que el actualizador único encuentre el repositorio.
+install -d -m 700 -o "$CURRENT_USER" -g "$CURRENT_USER" "$USER_HOME/.local/state/black-ice"
+printf '%s\n' "$SCRIPT_DIR" > "$USER_HOME/.local/state/black-ice/repository"
+chown "$CURRENT_USER:$CURRENT_USER" "$USER_HOME/.local/state/black-ice/repository"
+chmod 600 "$USER_HOME/.local/state/black-ice/repository"
 
 # Configurar navegador cuando existe uno instalado y no hay una preferencia válida.
 _browser=$(xdg-settings get default-web-browser 2>/dev/null || true)

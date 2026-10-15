@@ -8,7 +8,7 @@ Estado del candidato local 4.0.0-dev.2, actualizado 2026-10-15. Esta lista reún
 
 | Área | Pendiente | Se cierra con |
 |---|---|---|
-| Actualización unificada | Coordinar las rutas existentes para desplegar mejoras de BLACK-ICE (componentes de usuario, root, dotfiles y migraciones) desde versiones anteriores | Partir de una versión anterior reproducible, aplicar componentes compatibles, comprobar servicios y preferencias, y probar rollback. La actualización selectiva de Control ya existe; falta el flujo unificado |
+| Actualización desde versión anterior | Verificar el comando unificado en una instalación anterior reproducible y definir recuperación coordinada si falla una etapa | Aplicar desde un checkout anterior en una VM; revisar preferencias, servicios y componentes privilegiados; probar recuperación por etapa. El flujo detiene etapas posteriores, pero no ofrece rollback global atómico |
 | Matriz | BIOS/ext4 y otras combinaciones de firmware, sistema de archivos y cifrado | Registros reproducibles por combinación; UEFI/Btrfs/LUKS tiene una instalación limpia registrada |
 | Transacciones | Falta de espacio, hooks fallidos e interrupciones dentro de actualización/instalación | Abortos controlados y recuperación comprobada sin éxito falso |
 | Recuperación | Retención de archivos de arranque, cuotas y fallos adicionales | Restauraciones reales con kernel, paquetes, ESP y datos consistentes |
@@ -41,7 +41,7 @@ Tor del sistema ya comprobó en VM TCP normal, DNS redirigido, caída del daemon
 
 El 2026-10-15 también se comprobó en VM la autorización de cambio de tema, la aplicación visual de Obsidian-Cobalt y su persistencia en SDDM tras reiniciar; esa verificación ya no está pendiente.
 
-El 2026-10-14 la instalación UEFI/Btrfs detectó que faltaba `uwsm`; se agregó como dependencia. El 2026-10-15 se instaló desde cero en VM, desde la ISO de Arch y el repositorio oficial, con UEFI/Btrfs/LUKS y perfil básico `minimal`; SDDM y Hyprland iniciaron y el cambio de tema persistió tras reiniciar. Este proyecto está orientado a instalaciones nuevas en VM y bare metal. Para actualizar BLACK-ICE Control ya existe una ruta selectiva documentada: actualizar el checkout y ejecutar `scripts/install-security-workspace.py`. Falta coordinar todos los componentes y servicios en un solo flujo de actualización entre versiones.
+El 2026-10-14 la instalación UEFI/Btrfs detectó que faltaba `uwsm`; se agregó como dependencia. El 2026-10-15 se instaló desde cero en VM, desde la ISO de Arch y el repositorio oficial, con UEFI/Btrfs/LUKS y perfil básico `minimal`; SDDM y Hyprland iniciaron y el cambio de tema persistió tras reiniciar. Este proyecto está orientado a instalaciones nuevas en VM y bare metal. Ahora existe `black-ice-update` para coordinar mejoras de usuario, root, dotfiles y migraciones; falta validar el salto desde una instalación anterior reproducible.
 
 ## Revisión visual y contenido
 
@@ -57,7 +57,6 @@ El 2026-10-14 la instalación UEFI/Btrfs detectó que faltaba `uwsm`; se agregó
 
 | Propuesta | Falta implementar o ampliar |
 |---|---|
-| Actualizador unificado | Paquetes, dotfiles y migraciones con una transacción coordinada |
 | Centro de software | Desinstalación revisable completa, historial, progreso y archivado de cola |
 | Cuotas reales | Límites físicos continuos de imágenes, ISO y datos, por proyecto |
 | Diagnóstico exportable | Saneamiento general de IP, rutas personales, tokens y vista previa |

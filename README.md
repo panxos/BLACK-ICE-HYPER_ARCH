@@ -156,14 +156,14 @@ Los bindings personales pueden variar. [Referencia de teclas](docs/KEYBOARD_SHOR
 
 ## Actualizar y revertir
 
-Desde una copia revisada, inspecciona el plan:
+Usa el comando único para recibir mejoras de BLACK-ICE sin reinstalar ni actualizar los paquetes de Arch:
 
 ```bash
-bash dotfiles/bin/dotfiles-update --no-pull --dry-run
-bash dotfiles/bin/dotfiles-update --no-pull
+black-ice-update --dry-run
+black-ice-update
 ```
 
-Sí puedes recibir mejoras de BLACK-ICE sin reinstalar Arch. Desde el clon usado para instalarlo, ejecuta `git pull --ff-only`, revisa `python3 scripts/install-security-workspace.py --dry-run`, aplica `python3 scripts/install-security-workspace.py` y reinicia Waybar. Ese instalador actualiza BLACK-ICE Control y componentes de usuario. `dotfiles-update` cubre dotfiles y migraciones visuales; no instala todos los componentes. La coordinación de todas las mejoras y servicios desde versiones anteriores sigue pendiente. [Pasos detallados](docs/SECURITY_WORKSPACE.md#actualizar-los-controles).
+El comando actualiza el checkout con `git pull --ff-only`, migra dotfiles de forma conservadora, instala controles de usuario y pide `sudo` para refrescar los componentes de sistema incluidos. Revisa primero la simulación. Si el checkout tiene cambios locales, se detiene; revísalos y usa `black-ice-update --no-pull` cuando quieras aplicar desde esa copia. No ejecuta `pacman -Syu`, no vuelve a desplegar Hyprland y no activa Tor. [Alcance y pasos](docs/SECURITY_WORKSPACE.md#actualizar-black-ice).
 
 ## Estado de validación
 

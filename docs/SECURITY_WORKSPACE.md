@@ -59,19 +59,23 @@ sudo /usr/lib/black-ice/system-tor disable
 
 Este comando elimina solamente la tabla de este modo y detiene/deshabilita sus servicios. No vacía el ruleset ni detiene Tor ajeno. La conexión directa vuelve por una acción explícita.
 
-## Actualizar los controles
+## Actualizar BLACK-ICE
 
-Desde el clon del repositorio que se usó para instalar BLACK-ICE, trae la mejora y revisa qué archivos actualizará:
+El comando unificado aplica mejoras del proyecto sobre una instalación existente, sin reinstalar Arch ni actualizar sus paquetes. Primero revisa el plan:
 
 ```bash
-git pull --ff-only
-python3 scripts/install-security-workspace.py --dry-run
-python3 scripts/install-security-workspace.py
-sudo bash scripts/install-system-tor.sh
-~/.local/bin/waybar_start.sh
+black-ice-update --dry-run
 ```
 
-Ejecuta `git pull` dentro del checkout correcto y los instaladores como el usuario normal, excepto el instalador Tor, que necesita `sudo`. El primer instalador incluye `black-ice-control`, módulos, comandos, idiomas y estilos; rechaza destinos enlazados y revierte archivos si falla una escritura. El instalador Tor actualiza componentes propiedad de root y **no activa reglas**. No reinstala Arch. El modo Tor sigue siendo opcional y requiere activación.
+Luego aplica la actualización:
+
+```bash
+black-ice-update
+```
+
+El comando usa el checkout registrado durante la instalación. Actualiza Git con `--ff-only`, migra dotfiles sin reemplazar en bloque la configuración personal, instala BLACK-ICE Control y componentes de usuario, y finalmente solicita `sudo` para actualizar una lista acotada de archivos y unidades de sistema. Si Git detecta cambios locales, se detiene para protegerlos. Revisa esos cambios y, si ya tienes una copia revisada, puedes usar `black-ice-update --no-pull`. También puedes indicar el checkout con `black-ice-update --repo /ruta/BLACK-ICE_ARCH`.
+
+`--dry-run` no descarga ni escribe archivos. Cada instalador protege sus propias operaciones; si falla un paso, los siguientes no corren y puedes repetir el comando después de resolverlo. No existe una reversión global atómica entre los archivos de usuario, root y systemd. Este flujo no instala paquetes, no ejecuta `pacman -Syu`, no vuelve a desplegar el escritorio, no reinicia la sesión ni activa Tor. Si Waybar no refleja una mejora, reiníciala manualmente con `~/.local/bin/waybar_start.sh`.
 
 El entorno Tor antiguo de Podman protegía únicamente su propia terminal y fue retirado del candidato y del instalador. Al actualizar una instalación anterior, los archivos locales y recursos de ese entorno no se convierten automáticamente en estado del nuevo daemon; revisa el almacén privado antes de limpiar datos antiguos.
 
