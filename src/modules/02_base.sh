@@ -29,7 +29,7 @@ export SELECTED_KERNEL
 success "Núcleo seleccionado: ${NEON_BLUE}$SELECTED_KERNEL${NC}"
 
 # 3. Construcción de lista de paquetes base
-PACKAGES="base base-devel inetutils rsync wget sshpass linux-firmware dialog efibootmgr grub git go nano networkmanager sudo vim openssh man-db man-pages texinfo lvm2 screen expect cryptsetup kbd sof-firmware iwd smartmontools xdg-user-dirs wireless_tools wpa_supplicant"
+PACKAGES="base base-devel zram-generator inetutils rsync wget sshpass linux-firmware dialog efibootmgr grub git go nano networkmanager sudo vim openssh man-db man-pages texinfo lvm2 screen expect cryptsetup kbd sof-firmware iwd smartmontools xdg-user-dirs wireless_tools wpa_supplicant"
 
 # Añadir Kernel y sus Headers correspondientes
 PACKAGES="$PACKAGES $SELECTED_KERNEL ${SELECTED_KERNEL}-headers"

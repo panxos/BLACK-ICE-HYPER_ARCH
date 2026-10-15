@@ -12,7 +12,7 @@ detect_power_profile() {
         POWER_PROFILE="performance"  # VM → siempre alto rendimiento
         DEVICE_TYPE="vm"
         VIRT_NAME=$(systemd-detect-virt)
-    elif [[ -d /sys/class/power_supply/BAT0 ]] || [[ -d /sys/class/power_supply/BAT1 ]]; then
+    elif [[ -d /sys/class/power_supply/BAT0 ]] || [[ -d /sys/class/power_supply/BAT1 ]] || [[ -d /sys/class/power_supply/battery ]]; then
         POWER_PROFILE="auto"  # Laptop → perfiles dinámicos
         DEVICE_TYPE="laptop"
         VIRT_NAME="none"
@@ -122,7 +122,7 @@ EOF
             /mnt/etc/systemd/logind.conf.d/90-black-ice-laptop.conf
 
         # Habilitar TLP y enmascarar conflictos
-        arch-chroot /mnt systemctl enable tlp.service
+        arch-chroot /mnt systemctl enable tlp.service || log_warn "No se pudo habilitar tlp.service (¿paquete tlp ausente?)"
         arch-chroot /mnt systemctl mask systemd-rfkill.service systemd-rfkill.socket
 
         # Activar sensores de hardware

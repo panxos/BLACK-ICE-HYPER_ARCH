@@ -109,7 +109,7 @@ if command -v megasync &>/dev/null; then
 else
     log_info "MEGAsync no instalado — omitiendo autostart y watcher"
 fi
-if command -v megasync &>/dev/null && [ -f "$SCRIPT_DIR/dotfiles/systemd/user/megasync-watcher.service" ]; then
+if command -v megasync &>/dev/null && [ -f "$SCRIPT_DIR/dotfiles/systemd/user/megasync-watcher.service" ] && [ -x "$USER_HOME/.config/bin/megasync-watcher.sh" ]; then
     mkdir -p "$USER_HOME/.config/systemd/user"
     cp "$SCRIPT_DIR/dotfiles/systemd/user/megasync-watcher.service" \
         "$USER_HOME/.config/systemd/user/megasync-watcher.service"

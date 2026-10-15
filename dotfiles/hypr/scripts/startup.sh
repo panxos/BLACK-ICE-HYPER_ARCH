@@ -76,5 +76,5 @@ if systemctl --user cat black-ice-removable.service >/dev/null 2>&1; then
 elif ! pgrep -u "$(id -u)" -f '^/usr/bin/python.*udiskie|^/usr/bin/udiskie' >/dev/null; then
     "$HOME/.config/bin/udiskie-fix" &
 fi
-"$HOME/.config/bin/battery_notify.sh" &
+[ -x "$HOME/.config/bin/battery_notify.sh" ] && "$HOME/.config/bin/battery_notify.sh" &
 kbuildsycoca6 &

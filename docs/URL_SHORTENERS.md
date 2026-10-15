@@ -103,7 +103,7 @@ Una vez configuradas las URLs, probar la instalación completa:
 
 ```bash
 # Opción 1: is.gd
-curl -L http://is.gd/blackice | bash
+curl -L https://is.gd/blackice | bash
 
 # Opción 2: cutt.ly
 curl -L https://cutt.ly/blackice | bash
@@ -113,7 +113,7 @@ curl -L https://cutt.ly/blackice | bash
 
 ```bash
 # Descargar el bootstrap sin ejecutar
-curl -L http://is.gd/blackice -o /tmp/bootstrap.sh
+curl -L https://is.gd/blackice -o /tmp/bootstrap.sh
 
 # Verificar contenido
 head -20 /tmp/bootstrap.sh
@@ -213,7 +213,7 @@ Una vez configuradas, puedes promocionar la instalación como:
 **Instalación en un solo comando:**
 
 \`\`\`bash
-curl -L http://is.gd/blackice | bash
+curl -L https://is.gd/blackice | bash
 \`\`\`
 
 Instala Arch Linux + Hyprland + 104 herramientas de pentesting automáticamente.
@@ -227,7 +227,7 @@ Instala Arch Linux + Hyprland + 104 herramientas de pentesting automáticamente.
 From Arch Linux LiveCD:
 
 \`\`\`bash
-curl -L http://is.gd/blackice | bash
+curl -L https://is.gd/blackice | bash
 \`\`\`
 ```
 
@@ -235,7 +235,7 @@ curl -L http://is.gd/blackice | bash
 
 ```
 "Para instalar BLACK-ICE ARCH, simplemente ejecuta:
-curl -L http://is.gd/blackice | bash"
+curl -L https://is.gd/blackice | bash"
 ```
 
 ---
@@ -248,7 +248,7 @@ Los usuarios pueden verificar el script antes de ejecutarlo:
 
 ```bash
 # Descargar sin ejecutar
-curl -L http://is.gd/blackice -o bootstrap.sh
+curl -L https://is.gd/blackice -o bootstrap.sh
 
 # Revisar contenido
 less bootstrap.sh
@@ -266,7 +266,7 @@ Puedes proporcionar un checksum SHA256:
 sha256sum bootstrap.sh
 
 # Los usuarios pueden verificar:
-curl -L http://is.gd/blackice | sha256sum
+curl -L https://is.gd/blackice | sha256sum
 # Comparar con el hash publicado
 ```
 
@@ -277,6 +277,6 @@ curl -L http://is.gd/blackice | sha256sum
 ✅ **is.gd**: <http://is.gd/blackice>  
 ✅ **cutt.ly**: <https://cutt.ly/blackice>  
 ✅ **Target**: <https://raw.githubusercontent.com/panxos/BLACK-ICE-HYPER_ARCH/main/bootstrap.sh>  
-✅ **Comando**: `curl -L http://is.gd/blackice | bash`
+✅ **Comando**: `curl -L https://is.gd/blackice | bash`
 
 **¡Listo para usar!** 🚀

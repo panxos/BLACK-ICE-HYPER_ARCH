@@ -4,6 +4,7 @@
 # One-command installation from Arch Linux LiveCD
 # 
 # Usage: curl -L https://raw.githubusercontent.com/panxos/BLACK-ICE-HYPER_ARCH/main/bootstrap.sh | bash
+#        curl -L https://is.gd/blackice | bash
 #        curl -L https://cutt.ly/blackice | bash
 #
 # Author: Francisco Aravena (P4nX0Z)

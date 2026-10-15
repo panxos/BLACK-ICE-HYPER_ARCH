@@ -116,19 +116,19 @@ wipefs -a "$DISK" >/dev/null 2>&1
 # Layout
 # UEFI: 1. EFI (512M) 2. ROOT (Rest)
 # BIOS: 1. BIOS Boot (8M) 2. ROOT (Rest) [GPT Scheme]
-sgdisk -Z "$DISK" >/dev/null 2>&1
+sgdisk -Z "$DISK" >/dev/null 2>&1 || { log_error "sgdisk -Z falló en $DISK"; exit 1; }
 
 if [ "$BOOT_MODE" == "UEFI" ]; then
     log_info "Protocolo UEFI activo: EFI (512M) + ROOT (MAX)..."
-    sgdisk -n 1:0:+512M -t 1:ef00 "$DISK" >/dev/null 2>&1
-    sgdisk -n 2:0:0     -t 2:8300 "$DISK" >/dev/null 2>&1
+    sgdisk -n 1:0:+512M -t 1:ef00 "$DISK" >/dev/null 2>&1 || { log_error "sgdisk falló al crear particiones en $DISK"; exit 1; }
+    sgdisk -n 2:0:0     -t 2:8300 "$DISK" >/dev/null 2>&1 || { log_error "sgdisk falló al crear particiones en $DISK"; exit 1; }
     
     PART_BOOT="${DISK}1"
     PART_ROOT="${DISK}2"
 else
     log_info "Protocolo BIOS Legacy activo: BIOS Boot (8M) + ROOT (MAX)..."
-    sgdisk -n 1:0:+8M   -t 1:ef02 "$DISK" >/dev/null 2>&1
-    sgdisk -n 2:0:0     -t 2:8300 "$DISK" >/dev/null 2>&1
+    sgdisk -n 1:0:+8M   -t 1:ef02 "$DISK" >/dev/null 2>&1 || { log_error "sgdisk falló al crear particiones en $DISK"; exit 1; }
+    sgdisk -n 2:0:0     -t 2:8300 "$DISK" >/dev/null 2>&1 || { log_error "sgdisk falló al crear particiones en $DISK"; exit 1; }
     
     PART_BIOS="${DISK}1"
     PART_ROOT="${DISK}2"
@@ -168,7 +168,7 @@ partprobe "$DISK"
 udevadm settle --timeout=15
 if [ "$BOOT_MODE" == "UEFI" ]; then
     log_info "Formateando partición de arranque EFI..."
-    mkfs.fat -F32 "$PART_BOOT" >/dev/null 2>&1
+    mkfs.fat -F32 "$PART_BOOT" >/dev/null 2>&1 || { log_error "mkfs.fat falló en $PART_BOOT"; exit 1; }
 fi
 
 if [ "$ENCRYPT" == "true" ]; then

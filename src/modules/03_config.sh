@@ -139,7 +139,7 @@ if [ -d /var/lib/iwd ]; then
             # Extract SSID and Passphrase
             SSID=$(basename "$psk_file" .psk)
             # Intentar leer Passphrase (formato [Security])
-            PASSPHRASE=$(grep "Passphrase=" "$psk_file" | cut -d= -f2 | tr -d '\r')
+            PASSPHRASE=$({ grep "Passphrase=" "$psk_file" || true; } | cut -d= -f2 | tr -d '\r')
             
             if [ -n "$PASSPHRASE" ]; then
                 # Generar UUID único
@@ -227,7 +227,7 @@ if ! arch-chroot /mnt /bin/bash -c "mkinitcpio -P"; then
     log_info "Iniciando protocolo de auto-reparación: Re-sincronizando núcleo y herramientas..."
     
     # Reparación: Limpiar cache y forzar re-instalación de componentes de arranque
-    arch-chroot /mnt /bin/bash -c "pacman -Scc --noconfirm && pacman -Sy --noconfirm ${SELECTED_KERNEL:-linux} ${SELECTED_KERNEL:-linux}-headers linux-firmware mkinitcpio"
+    arch-chroot /mnt /bin/bash -c "pacman -Syu --needed --noconfirm ${SELECTED_KERNEL:-linux} ${SELECTED_KERNEL:-linux}-headers linux-firmware mkinitcpio"
     
     log_info "Reintentando generación de initramfs tras reparación..."
     if ! arch-chroot /mnt /bin/bash -c "mkinitcpio -P"; then

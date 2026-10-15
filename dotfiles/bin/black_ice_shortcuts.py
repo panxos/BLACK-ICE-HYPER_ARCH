@@ -19,8 +19,8 @@ APPS = {"kitty": "Terminal Kitty", "dolphin": "Archivos · Dolphin", "kate": "Ed
         "cheatsheet": "Ver atajos", "app_switcher": "Cambiar aplicación", "terminal_manager": "Gestor de terminales",
         "pass_menu": "Menú de contraseñas", "music_player": "Reproductor de música", "music_widget": "Widget de música",
         "power_profile_menu.sh": "Perfil de energía", "wifi_toggle": "Activar o desactivar Wi-Fi",
-        "save_theme_wall": "Guardar tema y fondo", "wofi_style_selector": "Estilo del menú",
-        "rofi_theme_selector": "Tema de Rofi", "dev": "Herramientas de desarrollo"}
+        "wofi_style_selector": "Estilo del menú",
+        "dev": "Herramientas de desarrollo"}
 
 
 def commands(command: str) -> list[str]:

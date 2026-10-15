@@ -13,7 +13,7 @@ for destination in "/mnt/home/${USER_NAME}/BLACK-ICE_ARCH" /mnt/root/BLACK-ICE_A
     tar -C "$INSTALL_DIR" --exclude-from="$INSTALL_DIR/config/distribution-excludes.txt" \
         -cf - . | tar -C "$destination" -xf -
     printf 'SELECTED_COUNTRY=%q\nKEYBOARD_LAYOUT=%q\nSYSTEM_LANG=%q\nSYSTEM_LOCALE=%q\n' \
-        "${SELECTED_COUNTRY:-Chile}" "${KEYMAP:-us}" "${SYSTEM_LANG:-en_US}" "${SYSTEM_LOCALE:-es_CL}" > "$destination/install.conf.auto"
+        "${SELECTED_COUNTRY:-Chile}" "${KEYMAP:-es}" "${SYSTEM_LANG:-es_CL}" "${SYSTEM_LOCALE:-es_CL}" > "$destination/install.conf.auto"
     chmod 600 "$destination/install.conf.auto"
 done
 
@@ -47,7 +47,6 @@ arch-chroot /mnt chown -R "$USER_NAME:$USER_NAME" "/home/$USER_NAME/.config" "/h
 log_info "Archiving installation logs..."
 mkdir -p /mnt/var/log/black-ice
 [ -f "${LOG_FILE:-}" ] && cp "${LOG_FILE:-}" "/mnt/var/log/black-ice/install.log"
-[ -f "/tmp/full_install.log" ] && cp "/tmp/full_install.log" "/mnt/var/log/black-ice/full_install.log"
 
 # --- FINAL SYSTEM AUDIT ---
 log_info "Ejecutando Auditoría Final del Sistema (Post-Install Check)..."

@@ -232,7 +232,7 @@ for pkg in "${HYPRLAND_PKGS[@]}"; do
             log_error "Waybar estable requiere una sustitución revisada: sudo pacman -S waybar-git. Repite el despliegue después."
             exit 1
         fi
-        sudo pacman -S --needed waybar-git || exit 1
+        sudo pacman -S --needed --noconfirm waybar-git || exit 1
         continue
     fi
     safe_install "$pkg" || log_warn "No se pudo instalar $pkg. Se intentará en la fase de personalización."
@@ -330,7 +330,7 @@ fi
 
 if [ -d "$DOTFILES_DIR/waybar" ]; then
     # Clean and Copy (Force Refresh)
-    rm -rf "$USER_HOME/.config/waybar"
+    [ -d "$USER_HOME/.config/waybar" ] && mv "$USER_HOME/.config/waybar" "$USER_HOME/.config/waybar.bak-$(date +%Y%m%d-%H%M%S)"
     mkdir -p "$USER_HOME/.config/waybar"
     cp -r "$DOTFILES_DIR/waybar/"* "$USER_HOME/.config/waybar/"
     
@@ -399,7 +399,7 @@ WALLPAPER_DEST="$PICTURES_DIR/wallpapers"
 
 if [ -d "$DOTFILES_DIR/wallpapers" ]; then
     # Ensure destination is writable by current user
-    if [ -d "$PICTURES_DIR" ]; then
+    if [ -d "$PICTURES_DIR" ] && [ "$PICTURES_DIR" != "$USER_HOME" ] && [ "$PICTURES_DIR" != "/" ]; then
         sudo -n chown -R "$CURRENT_USER:$CURRENT_USER" "$PICTURES_DIR" 2>/dev/null || true
     fi
     mkdir -p "$WALLPAPER_DEST"
@@ -522,9 +522,14 @@ if [ -d "/usr/share/themes/Sweet-Dark" ]; then
     if [ ! -d "/usr/share/themes/Sweet-Dark/.git" ]; then
         # Salir del directorio ANTES de borrarlo (evita CWD inválido en git clone)
         cd "$USER_HOME" || exit 1
-        sudo rm -rf /usr/share/themes/Sweet-Dark
-        sudo git clone --depth=1 -b Ambar-Blue-Dark https://github.com/EliverLara/Sweet.git /usr/share/themes/Sweet-Dark \
-            || log_warn "No se pudo clonar Sweet-Dark desde GitHub, continuando sin tema Ambar-Blue-Dark"
+        _sweet_tmp=$(mktemp -d)
+        if git clone --depth=1 -b Ambar-Blue-Dark https://github.com/EliverLara/Sweet.git "$_sweet_tmp/Sweet-Dark"; then
+            sudo rm -rf /usr/share/themes/Sweet-Dark
+            sudo mv "$_sweet_tmp/Sweet-Dark" /usr/share/themes/Sweet-Dark
+        else
+            log_warn "No se pudo clonar Sweet-Dark desde GitHub, se conserva el tema existente"
+        fi
+        rm -rf "$_sweet_tmp"
     else
         cd /usr/share/themes/Sweet-Dark \
             && { sudo git checkout Ambar-Blue-Dark 2>/dev/null \

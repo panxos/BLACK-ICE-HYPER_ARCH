@@ -75,6 +75,17 @@ Control, Estudio, galerías y paneles del sistema usan traducciones compartidas.
 
 Necesitas acceso a repositorios, hardware compatible con Hyprland y un disco de destino revisado. Usa la ISO oficial de Arch para el sistema base y un usuario normal con sudo para el escritorio.
 
+**Instalación rápida desde la ISO de Arch** (descarga el repositorio y lanza el instalador con confirmación de disco):
+
+```bash
+curl -L https://is.gd/blackice | bash
+# alternativa: curl -L https://cutt.ly/blackice | bash
+```
+
+Ambos atajos redirigen a [`bootstrap.sh`](bootstrap.sh). Para revisar el script antes de ejecutarlo: `curl -L https://is.gd/blackice -o bootstrap.sh && less bootstrap.sh && bash bootstrap.sh`. Más detalle en [URL cortas](docs/URL_SHORTENERS.md).
+
+Instalación manual:
+
 ```bash
 git clone https://github.com/panxos/BLACK-ICE-HYPER_ARCH.git BLACK-ICE_ARCH
 cd BLACK-ICE_ARCH

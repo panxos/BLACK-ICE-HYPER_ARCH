@@ -5,7 +5,7 @@ install_stage 7 'Arranque del sistema / GRUB'
 
 # --- Asegurar Paquetes ---
 log_info "Instalando paquetes críticos para el arranque..."
-pacstrap /mnt grub efibootmgr ttf-dejavu 2>/dev/null
+pacstrap /mnt grub efibootmgr ttf-dejavu >>"${LOG_FILE:-/dev/null}" 2>&1 || { log_error "pacstrap de paquetes de arranque falló"; exit 1; }
 
 # --- Sincronización de Variables ---
 : "${PART_ROOT:?PART_ROOT no está definido — abortando bootloader}"
@@ -58,7 +58,7 @@ fi
 # Habilitar soporte de disco cifrado si aplica
 if [ "$ENCRYPT" == "true" ] || [ "$ENABLE_LUKS" == "yes" ]; then
     echo "[INFO] Habilitando soporte de disco cifrado (CRYPTODISK)..."
-    echo "GRUB_ENABLE_CRYPTODISK=y" >> /etc/default/grub
+    grep -Fxq "GRUB_ENABLE_CRYPTODISK=y" /etc/default/grub || echo "GRUB_ENABLE_CRYPTODISK=y" >> /etc/default/grub
 fi
 
 # Parámetros del Kernel
@@ -78,8 +78,8 @@ sed -i "s|GRUB_CMDLINE_LINUX_DEFAULT=\".*\"|GRUB_CMDLINE_LINUX_DEFAULT=\"\$GRUB_
 # Configurar terminal de entrada
 if [ -f /boot/grub/layouts/terminal_layout.gkb ]; then
     sed -i "s/#GRUB_TERMINAL_INPUT=console/GRUB_TERMINAL_INPUT=at_keyboard/" /etc/default/grub
-    echo "insmod keylayouts" >> /etc/grub.d/40_custom
-    echo "keymap /boot/grub/layouts/terminal_layout.gkb" >> /etc/grub.d/40_custom
+    grep -Fxq "insmod keylayouts" /etc/grub.d/40_custom || echo "insmod keylayouts" >> /etc/grub.d/40_custom
+    grep -Fxq "keymap /boot/grub/layouts/terminal_layout.gkb" /etc/grub.d/40_custom || echo "keymap /boot/grub/layouts/terminal_layout.gkb" >> /etc/grub.d/40_custom
 fi
 
 # 3. Solucionar error de 'console font'

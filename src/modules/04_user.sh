@@ -33,7 +33,7 @@ else
     while true; do
         echo -ne "${NEON_BLUE}[USER]${NC} Introduce el nombre del nuevo usuario (ej: benjie): "
         read -r USER_NAME < /dev/tty
-        if [[ "$USER_NAME" =~ ^[a-z_][a-z0-9_-]*$ ]]; then
+        if [[ "$USER_NAME" != "root" && "$USER_NAME" =~ ^[a-z_][a-z0-9_-]*$ ]]; then
             break
         else
             log_error "Identificador inválido. Solo minúsculas, números y guiones."
@@ -98,6 +98,6 @@ if ! printf "%s\0%s\0%s\0" "$ROOT_PASS" "$USER_NAME" "$USER_PASS" | arch-chroot 
 fi
 rm /mnt/root/user_config.sh
 # Limpiar variables de entorno con contraseñas
-unset ROOT_PASS USER_PASS ROOT_PASSWORD USER_PASSWORD LUKS_PASS LUKS_PASSWORD
+unset ROOT_PASS USER_PASS ROOT_PASS_CONFIRM USER_PASS_CONFIRM ROOT_PASSWORD USER_PASSWORD LUKS_PASS LUKS_PASSWORD
 
 success "Entorno de identidades asegurado y Operador listo."
