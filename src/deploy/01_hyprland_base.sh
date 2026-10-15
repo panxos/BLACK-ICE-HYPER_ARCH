@@ -407,6 +407,10 @@ if [ -d "$DOTFILES_DIR/wallpapers" ]; then
     log_info "Copiando desde $DOTFILES_DIR/wallpapers/ a $WALLPAPER_DEST/"
     cp -r "$DOTFILES_DIR/wallpapers/"* "$WALLPAPER_DEST/" 2>/dev/null
 
+    for legacy_wallpaper in ANUBIS-DEATH.jpg HORUS-CYBER.jpg ISIS-MAGIC.jpg RA-SOLAR.jpg black-ice-default.png; do
+        rm -f -- "$WALLPAPER_DEST/$legacy_wallpaper"
+    done
+
     # Copiar solo los fondos declarados por temas; el paquete completo de assets
     # incluye archivos UHD que no se usan y ocupa cientos de megabytes.
     PROJECT_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)

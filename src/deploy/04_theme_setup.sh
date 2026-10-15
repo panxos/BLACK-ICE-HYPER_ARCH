@@ -10,35 +10,21 @@ log_info "Configurando tema cyberpunk..."
 # --- Wallpapers: crear directorio, generar default, descargar pack opcional ---
 PICTURES_DIR=$(sudo -u "$CURRENT_USER" xdg-user-dir PICTURES 2>/dev/null || echo "$USER_HOME/Pictures")
 WALL_DIR="$PICTURES_DIR/wallpapers"
-WALL_DEFAULT="$WALL_DIR/black-ice-default.png"
+WALL_DEFAULT="$WALL_DIR/black-ice-obsidian.png"
+WALL_DEFAULT_SOURCE="$SCRIPT_DIR/assets/sddm/themes/black-ice-obsidian/assets/wallpaper.png"
 
 log_info "Preparando directorio de wallpapers..."
 mkdir -p "$WALL_DIR/gh0stzk"
 chown -R "$CURRENT_USER:$CURRENT_USER" "$WALL_DIR"
 
-# 1. Generar wallpaper BLACK-ICE con imagemagick (siempre disponible, no depende de red)
-if command -v convert &>/dev/null && [ ! -f "$WALL_DEFAULT" ]; then
-    log_info "Generando wallpaper BLACK-ICE default con imagemagick..."
-    convert -size 1920x1080 \
-        gradient:"#010810-#040f20" \
-        -fill "#00f3ff" -stroke "#00f3ff" -strokewidth 1 \
-        -draw "line 0,2 1920,2" \
-        -draw "line 0,1077 1920,1077" \
-        -fill "#051525" \
-        -draw "rectangle 580,380 1340,700" \
-        -fill "#00f3ff" \
-        -font "DejaVu-Sans-Bold" -pointsize 110 \
-        -gravity Center -annotate +0-40 "BLACK-ICE" \
-        -font "DejaVu-Sans" -pointsize 28 \
-        -fill "#bc00ff" \
-        -gravity Center -annotate +0+65 "ARCH LINUX  //  HYPRLAND  //  PENTESTING" \
-        -fill "#00f3ff" -pointsize 14 \
-        -gravity South -annotate +0+18 "[ ENCRYPTION ACTIVE ]  [ ALL SESSIONS MONITORED ]  [ UNAUTHORIZED ACCESS PROHIBITED ]" \
-        "$WALL_DEFAULT" 2>/dev/null && \
-        chown "$CURRENT_USER:$CURRENT_USER" "$WALL_DEFAULT" && \
-        log_success "Wallpaper default generado: $WALL_DEFAULT" || \
-        log_warn "imagemagick: no se pudo generar wallpaper default"
+# 1. Usar la imagen de fondo actual del tema, también disponible sin internet.
+if [ ! -f "$WALL_DEFAULT_SOURCE" ]; then
+    log_error "No se encontró el wallpaper base del tema: $WALL_DEFAULT_SOURCE"
+    exit 1
 fi
+install -m 644 "$WALL_DEFAULT_SOURCE" "$WALL_DEFAULT"
+chown "$CURRENT_USER:$CURRENT_USER" "$WALL_DEFAULT"
+log_success "Wallpaper base instalado: $WALL_DEFAULT"
 
 # 2. Intentar descargar pack gh0stzk (Emilia-TokyoNight) si hay internet
 EMILIA_DIR="$WALL_DIR/gh0stzk/Emilia-TokyoNight"
@@ -74,10 +60,10 @@ print("\n".join([url for url in urls if url and url.lower().endswith((".jpg", ".
             fi
         done
     else
-        log_warn "No se pudo obtener listado de wallpapers — usando default generado"
+        log_warn "No se pudo obtener listado de wallpapers — usando el fondo local del tema"
     fi
 else
-    log_warn "Sin internet — usando wallpaper generado localmente"
+    log_warn "Sin internet — usando el fondo local del tema"
 fi
 
 # 3. Actualizar waypaper config con el wallpaper activo real

@@ -13,7 +13,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 CONVERTER_REV = "4d69a9b52ce09c9b113a1642e537cd2fa4754a09"
@@ -196,7 +196,7 @@ def commit(changes: dict[Path, bytes], originals: dict[Path, bytes], work: Path,
     for path, data in originals.items():
         if path.read_bytes() != data:
             raise MigrationError("La configuración cambió durante la validación; repite la migración.")
-    snapshot = state_root() / (datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S") + "-" + work.name)
+    snapshot = state_root() / (datetime.now(UTC).strftime("%Y%m%dT%H%M%S") + "-" + work.name)
     snapshot.mkdir(parents=True, mode=0o700)
     snapshot.chmod(0o700)
     for index, (path, data) in enumerate(originals.items()):

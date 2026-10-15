@@ -1,6 +1,8 @@
 import importlib.machinery
 import importlib.util
 import json
+import os
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -139,6 +141,39 @@ class WallpaperTests(unittest.TestCase):
             self.assertEqual(command.call_count, 4)
             self.assertTrue(all(i["source"] == str(self.single) and not i["panoramic"] for i in first["outputs"]))
             self.assertEqual(json.loads((self.root / "state.json").read_text())["theme"], "Anubis-Sethek")
+
+
+class WallpaperStartupTests(unittest.TestCase):
+    def test_startup_uses_packaged_default_instead_of_legacy_horus_wallpaper(self):
+        parent = Path.home() / ".cache/tmp/work"
+        parent.mkdir(parents=True, exist_ok=True)
+        with tempfile.TemporaryDirectory(dir=parent) as directory:
+            home = Path(directory)
+            walls = home / "Pictures/wallpapers"
+            walls.mkdir(parents=True)
+            (walls / "HORUS-CYBER.jpg").write_bytes(b"legacy wallpaper")
+            default = walls / "black-ice-obsidian.png"
+            default.write_bytes(b"current wallpaper")
+            (home / ".cache").mkdir()
+            bin_dir = home / "bin"
+            bin_dir.mkdir()
+            log = home / "awww.log"
+            (bin_dir / "xdg-user-dir").write_text("#!/bin/sh\nprintf '%s/Pictures\\n' \"$HOME\"\n")
+            (bin_dir / "awww").write_text("#!/bin/sh\nprintf '%s\\n' \"$*\" >> \"$AW_LOG\"\n")
+            for tool in (bin_dir / "xdg-user-dir", bin_dir / "awww"):
+                tool.chmod(0o755)
+
+            result = subprocess.run(
+                ["bash", str(ROOT / "dotfiles/hypr/scripts/set_wallpaper.sh")],
+                capture_output=True,
+                text=True,
+                check=False,
+                env={**os.environ, "HOME": str(home), "PATH": f"{bin_dir}:{os.environ['PATH']}", "AW_LOG": str(log)},
+            )
+
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertIn(f"img {default} --transition-type none", log.read_text())
+            self.assertEqual((home / ".cache/current_wallpaper").read_text().strip(), str(default))
 
 
 if __name__ == "__main__":

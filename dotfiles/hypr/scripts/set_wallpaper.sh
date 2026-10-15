@@ -32,42 +32,14 @@ if [[ -f "$CACHE_FILE" ]]; then
     fi
 fi
 
-# 4. Fallback: HORUS-CYBER default (Si existe explícitamente)
-if [[ -f "$WALLPAPER_DIR/HORUS-CYBER.jpg" ]]; then
-    awww img "$WALLPAPER_DIR/HORUS-CYBER.jpg" --transition-type none
-    echo "$WALLPAPER_DIR/HORUS-CYBER.jpg" > "$CACHE_FILE"
+# 3. Fallback estable: imagen base incluida por el instalador.
+DEFAULT_WALLPAPER="$WALLPAPER_DIR/black-ice-obsidian.png"
+if [[ -f "$DEFAULT_WALLPAPER" ]]; then
+    echo "$DEFAULT_WALLPAPER" > "$CACHE_FILE"
+    awww img "$DEFAULT_WALLPAPER" --transition-type none
     exit 0
 fi
 
-# 6. Fallback: First image found
-WALLPAPER=$(find "$WALLPAPER_DIR" -type f \( -name "*.png" -o -name "*.jpg" -o -name "*.mp4" \) 2>/dev/null | head -n 1)
-
-if [ -f "$WALLPAPER" ]; then
-    echo "$WALLPAPER" > "$CACHE_FILE"
-    
-    if [[ "$WALLPAPER" == *.mp4 ]]; then
-        # Handle Video Wallpaper
-        pkill awww-daemon 2>/dev/null
-        pkill mpvpaper 2>/dev/null
-        # Give it a small moment to release the layer
-        sleep 0.5
-        mpvpaper -o "no-audio --loop" "*" "$WALLPAPER" &>/dev/null &
-    else
-        # Handle Static Image
-        pkill mpvpaper 2>/dev/null
-        if ! pgrep -x "awww-daemon" > /dev/null; then
-            awww-daemon &
-            _awww_sock="${XDG_RUNTIME_DIR}/${WAYLAND_DISPLAY}-awww-daemon.sock"
-            for _i in $(seq 1 10); do
-                [ -S "$_awww_sock" ] && break
-                sleep 0.1
-            done
-            unset _i _awww_sock
-        fi
-        awww img "$WALLPAPER" --transition-type grow
-    fi
-else
-    _tmp=$(mktemp --suffix=.png)
-    convert -size 1920x1080 xc:'#0a0a0a' "$_tmp" 2>/dev/null && awww img "$_tmp" 2>/dev/null
-    rm -f "$_tmp"
-fi
+_tmp=$(mktemp --suffix=.png)
+convert -size 1920x1080 xc:'#0a0a0a' "$_tmp" 2>/dev/null && awww img "$_tmp" 2>/dev/null
+rm -f "$_tmp"

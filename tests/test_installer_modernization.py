@@ -200,7 +200,10 @@ class OptionalWallpaperTests(unittest.TestCase):
             home = Path(directory)
             walls = home / "Pictures/wallpapers"
             walls.mkdir(parents=True)
-            (walls / "black-ice-default.png").write_bytes(b"included wallpaper")
+            project = home / "project"
+            source_wall = project / "assets/sddm/themes/black-ice-obsidian/assets/wallpaper.png"
+            source_wall.parent.mkdir(parents=True)
+            source_wall.write_bytes(b"shipped theme wallpaper")
             (home / ".settarget").write_text("existing-project-target\n")
             script = '''
 set -euo pipefail
@@ -221,9 +224,12 @@ source "$MODULE"
             result = subprocess.run(["bash", "-c", script], capture_output=True, text=True, check=False,
                                     env={**os.environ, "API_RESPONSE": response, "USER_HOME": str(home),
                                          "CURRENT_USER": "benjie", "DOTFILES_DIR": str(home / "dotfiles"),
+                                         "SCRIPT_DIR": str(project),
                                          "MODULE": str(ROOT / "src/deploy/04_theme_setup.sh")})
             self.assertEqual(result.returncode, 0, result.stderr)
             self.assertEqual((home / ".settarget").read_text(), "existing-project-target\n")
+            self.assertEqual((walls / "black-ice-obsidian.png").read_bytes(), b"shipped theme wallpaper")
+            self.assertFalse((walls / "black-ice-default.png").exists())
 
     def test_empty_optional_wallpaper_list_does_not_abort(self):
         self.run_theme("[]")
