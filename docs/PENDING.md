@@ -23,7 +23,7 @@ Estado del candidato local 4.0.0-dev.2, actualizado 2026-10-15. Esta lista reún
 | Distribución | Pack final y componentes nuevos desde una instalación vacía | Manifiesto íntegro, hashes, binarios y servicios contrastados |
 | Publicación | Revisión del diff, commit/tag/release | Autorización posterior y cierre de los bloqueos anteriores |
 
-CI: cerrada para la configuración actual. El workflow `Project checks` aprobó el commit publicado `6ec1505` el 2026-10-15; la suite local actual también pasó sus 347 pruebas. La ejecución remota no incluye los cambios locales de esta revisión.
+CI: cerrada para la configuración actual. El workflow `Project checks` aprobó el commit publicado `b6e5830` el 2026-10-15; la suite local actual también pasó sus 347 pruebas.
 
 ## Aceptación adicional de seguridad
 
