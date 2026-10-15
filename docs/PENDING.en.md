@@ -8,7 +8,7 @@ Local candidate 4.0.0-dev.2, updated 2026-10-15. This list separates pending acc
 
 | Area | Remaining work | Acceptance evidence |
 |---|---|---|
-| Upgrade | Design and test upgrading from a previous BLACK-ICE version while migrating compatible configuration | Start from a reproducible older version, upgrade to the current candidate, verify boot, services and user data, and test rollback after failure |
+| Unified component update | Coordinate existing paths for BLACK-ICE improvements (user/root components, dotfiles and migrations) across previous versions | Start from a reproducible older version, apply compatible components, verify services/preferences and test rollback. Selective Control updates exist; the unified flow is missing |
 | Matrix | BIOS/ext4 and other firmware, filesystem and encryption combinations | Reproducible installation, reboot and recovery records; UEFI/Btrfs/LUKS has one clean VM installation record |
 | Transactions | Disk exhaustion, failed hooks and interruptions inside operations | Controlled aborts and actual recovery without false success |
 | Recovery | Boot-file retention, quotas and further failure cases | Restored kernel, packages, ESP and consistent personal data |
@@ -39,7 +39,7 @@ CI: closed for the current configuration. The `Project checks` workflow passed o
 
 System Tor already passed ordinary TCP, redirected DNS, daemon failure, blocked UDP/IPv6/forwarding, shutdown and reboot checks in the VM, with filtering before NetworkManager. The former Podman/Kitty console was removed; the control does not open a terminal and Tor applies to system applications within the documented scope. This does not establish absolute anonymity or replace Tor Browser.
 
-The project targets fresh installs in VMs and on bare metal. On 2026-10-15, a clean VM install from the Arch ISO and official repository used UEFI/Btrfs/LUKS with the basic `minimal` profile; SDDM, Hyprland and theme persistence after reboot were checked. A full upgrade from a previous BLACK-ICE version has not completed acceptance. `dotfiles-update` migrates desktop configuration; it is not a complete BLACK-ICE system-version updater.
+The project targets fresh installs in VMs and on bare metal. On 2026-10-15, a clean VM install from the Arch ISO and official repository used UEFI/Btrfs/LUKS with the basic `minimal` profile; SDDM, Hyprland and theme persistence after reboot were checked. To update BLACK-ICE Control, a documented selective path already exists: update the checkout and run `scripts/install-security-workspace.py`. Coordinating every component and service through one version-to-version update flow remains open.
 
 ## Visual and content review
 

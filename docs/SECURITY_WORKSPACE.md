@@ -61,16 +61,17 @@ Este comando elimina solamente la tabla de este modo y detiene/deshabilita sus s
 
 ## Actualizar los controles
 
-Desde una copia revisada del candidato:
+Desde el clon del repositorio que se usó para instalar BLACK-ICE, trae la mejora y revisa qué archivos actualizará:
 
 ```bash
+git pull --ff-only
 python3 scripts/install-security-workspace.py --dry-run
 python3 scripts/install-security-workspace.py
 sudo bash scripts/install-system-tor.sh
 ~/.local/bin/waybar_start.sh
 ```
 
-El primer instalador se ejecuta como usuario normal. Distribuye módulos, comandos, idiomas y estilo; rechaza destinos enlazados y revierte archivos si falla una escritura. El segundo instala los componentes propiedad de root y **no activa reglas**. Un despliegue nuevo incluye ambos pasos. El modo sigue siendo opcional y requiere activación.
+Ejecuta `git pull` dentro del checkout correcto y los instaladores como el usuario normal, excepto el instalador Tor, que necesita `sudo`. El primer instalador incluye `black-ice-control`, módulos, comandos, idiomas y estilos; rechaza destinos enlazados y revierte archivos si falla una escritura. El instalador Tor actualiza componentes propiedad de root y **no activa reglas**. No reinstala Arch. El modo Tor sigue siendo opcional y requiere activación.
 
 El entorno Tor antiguo de Podman protegía únicamente su propia terminal y fue retirado del candidato y del instalador. Al actualizar una instalación anterior, los archivos locales y recursos de ese entorno no se convierten automáticamente en estado del nuevo daemon; revisa el almacén privado antes de limpiar datos antiguos.
 

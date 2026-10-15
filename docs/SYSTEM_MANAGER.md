@@ -40,7 +40,7 @@ El inicio de un laboratorio vuelve a comprobar sus límites. El apagado forzado 
 
 ## Cobertura pendiente
 
-Faltan retención de copias de arranque por cuota, actualización completa entre versiones BLACK-ICE (sistema, dotfiles y migraciones), archivado de trabajos, cuotas físicas y snapshots de laboratorios, VPN contra un servidor real y la matriz completa de fallos/instalación. Los vencimientos y controles de preparación ya tienen implementación, con distribución final/revisión nativa pendientes. Los hooks Snapper usan retención numérica; eso no sustituye una cuota para las copias privadas de `/boot` ni demuestra toda la aceptación del plan.
+Faltan retención de copias de arranque por cuota, un actualizador unificado de mejoras BLACK-ICE (componentes de usuario/root, dotfiles, servicios y migraciones), archivado de trabajos, cuotas físicas y snapshots de laboratorios, VPN contra un servidor real y la matriz completa de fallos/instalación. Los vencimientos y controles de preparación ya tienen implementación, con distribución final/revisión nativa pendientes. Los hooks Snapper usan retención numérica; eso no sustituye una cuota para las copias privadas de `/boot` ni demuestra toda la aceptación del plan.
 
 ## Evidencia
 

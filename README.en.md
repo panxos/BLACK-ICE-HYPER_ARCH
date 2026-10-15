@@ -163,13 +163,13 @@ bash dotfiles/bin/dotfiles-update --no-pull --dry-run
 bash dotfiles/bin/dotfiles-update --no-pull
 ```
 
-This command updates dotfiles and visual migrations; **it does not update a complete BLACK-ICE version**. Upgrading between previous versions still needs design and acceptance. Visual installers preserve preferences through manifests and protected rollback. [Update the new controls](docs/SECURITY_WORKSPACE.en.md#updating-the-controls) or inspect Lua migration before the next login. Dotfile rollback and whole-system recovery are different mechanisms.
+You can receive BLACK-ICE improvements without reinstalling Arch. From the checkout used to install it, run `git pull --ff-only`, preview with `python3 scripts/install-security-workspace.py --dry-run`, apply with `python3 scripts/install-security-workspace.py`, then restart Waybar. That installer updates BLACK-ICE Control and user components. `dotfiles-update` handles dotfiles and visual migrations; it does not install every component. Coordinating all improvements and services across previous versions remains open. [Detailed steps](docs/SECURITY_WORKSPACE.en.md#updating-the-controls).
 
 ## Validation status
 
 The verified clean VM installation uses UEFI/Btrfs/LUKS and the `minimal` profile, from the Arch ISO and official repository; SDDM, Hyprland and theme persistence after reboot worked. The `main` CI passed 347 tests. System Tor checks cover ordinary connections, DNS, daemon failure, blocked UDP/IPv6 and forwarded traffic, shutdown and restored normal connectivity.
 
-Full version-to-version upgrades, BIOS/ext4, transaction failures, physical displays/power/USB, comparable performance, licensing and asset redistribution remain open. Remote CI is passing. **There is no release until the blocking criteria are met.**
+Coordinated updates for all components across versions, BIOS/ext4, transaction failures, physical displays/power/USB, comparable performance, licensing and asset redistribution remain open. Remote CI is passing. **There is no release until the blocking criteria are met.**
 
 [All pending work](docs/PENDING.en.md).
 

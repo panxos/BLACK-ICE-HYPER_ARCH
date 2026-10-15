@@ -8,7 +8,7 @@ Estado del candidato local 4.0.0-dev.2, actualizado 2026-10-15. Esta lista reún
 
 | Área | Pendiente | Se cierra con |
 |---|---|---|
-| Actualización | Diseñar y probar la actualización desde una versión anterior de BLACK-ICE, migrando configuración compatible | Partir de una versión anterior reproducible, actualizar al candidato vigente, comprobar arranque/servicios/datos y probar rollback |
+| Actualización unificada | Coordinar las rutas existentes para desplegar mejoras de BLACK-ICE (componentes de usuario, root, dotfiles y migraciones) desde versiones anteriores | Partir de una versión anterior reproducible, aplicar componentes compatibles, comprobar servicios y preferencias, y probar rollback. La actualización selectiva de Control ya existe; falta el flujo unificado |
 | Matriz | BIOS/ext4 y otras combinaciones de firmware, sistema de archivos y cifrado | Registros reproducibles por combinación; UEFI/Btrfs/LUKS tiene una instalación limpia registrada |
 | Transacciones | Falta de espacio, hooks fallidos e interrupciones dentro de actualización/instalación | Abortos controlados y recuperación comprobada sin éxito falso |
 | Recuperación | Retención de archivos de arranque, cuotas y fallos adicionales | Restauraciones reales con kernel, paquetes, ESP y datos consistentes |
@@ -41,7 +41,7 @@ Tor del sistema ya comprobó en VM TCP normal, DNS redirigido, caída del daemon
 
 El 2026-10-15 también se comprobó en VM la autorización de cambio de tema, la aplicación visual de Obsidian-Cobalt y su persistencia en SDDM tras reiniciar; esa verificación ya no está pendiente.
 
-El 2026-10-14 la instalación UEFI/Btrfs detectó que faltaba `uwsm`; se agregó como dependencia. El 2026-10-15 se instaló desde cero en VM, desde la ISO de Arch y el repositorio oficial, con UEFI/Btrfs/LUKS y perfil básico `minimal`; SDDM y Hyprland iniciaron y el cambio de tema persistió tras reiniciar. Este proyecto está orientado a instalaciones nuevas en VM y bare metal. La actualización de una versión anterior es un requisito distinto y sigue sin aceptación completa: `dotfiles-update` migra dotfiles/configuración visual, no actualiza por sí solo el sistema BLACK-ICE completo.
+El 2026-10-14 la instalación UEFI/Btrfs detectó que faltaba `uwsm`; se agregó como dependencia. El 2026-10-15 se instaló desde cero en VM, desde la ISO de Arch y el repositorio oficial, con UEFI/Btrfs/LUKS y perfil básico `minimal`; SDDM y Hyprland iniciaron y el cambio de tema persistió tras reiniciar. Este proyecto está orientado a instalaciones nuevas en VM y bare metal. Para actualizar BLACK-ICE Control ya existe una ruta selectiva documentada: actualizar el checkout y ejecutar `scripts/install-security-workspace.py`. Falta coordinar todos los componentes y servicios en un solo flujo de actualización entre versiones.
 
 ## Revisión visual y contenido
 

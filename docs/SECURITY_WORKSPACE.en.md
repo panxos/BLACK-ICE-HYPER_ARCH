@@ -61,16 +61,17 @@ This removes only the mode's table and stops/disables its services. It does not 
 
 ## Updating the controls
 
-From a reviewed candidate checkout:
+From the repository checkout used to install BLACK-ICE, fetch the improvement and preview the files it will update:
 
 ```bash
+git pull --ff-only
 python3 scripts/install-security-workspace.py --dry-run
 python3 scripts/install-security-workspace.py
 sudo bash scripts/install-system-tor.sh
 ~/.local/bin/waybar_start.sh
 ```
 
-Run the first installer as the regular desktop user. It distributes modules, commands, languages and styles, rejects linked destinations and rolls back files after a write failure. The root installer installs privileged components and **does not activate traffic rules**. New deployments include both steps. Activation remains optional.
+Run `git pull` inside the correct checkout and the installers as the regular desktop user, except the Tor installer, which requires `sudo`. The first installer includes `black-ice-control`, modules, commands, languages and styles; it rejects linked destinations and rolls files back after a write failure. The Tor installer updates root-owned components and **does not activate traffic rules**. This does not reinstall Arch. Tor remains optional and requires activation.
 
 The old Podman Tor environment protected only its own terminal and was removed from the candidate and installer. When upgrading an older installation, local files and resources from that environment are not imported into the new daemon; inspect the private store before cleaning up old data.
 

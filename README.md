@@ -163,13 +163,13 @@ bash dotfiles/bin/dotfiles-update --no-pull --dry-run
 bash dotfiles/bin/dotfiles-update --no-pull
 ```
 
-Este comando actualiza dotfiles y migraciones visuales; **no actualiza por sí solo una versión completa de BLACK-ICE**. La actualización entre versiones anteriores sigue pendiente de diseño y aceptación. Los instaladores visuales conservan preferencias mediante manifiestos y reversión. [Actualiza los controles nuevos](docs/SECURITY_WORKSPACE.md#actualizar-los-controles) o revisa [la migración Lua](docs/HYPRLAND_LUA_MIGRATION.md) antes del siguiente acceso. Revertir dotfiles y recuperar todo el sistema son mecanismos diferentes.
+Sí puedes recibir mejoras de BLACK-ICE sin reinstalar Arch. Desde el clon usado para instalarlo, ejecuta `git pull --ff-only`, revisa `python3 scripts/install-security-workspace.py --dry-run`, aplica `python3 scripts/install-security-workspace.py` y reinicia Waybar. Ese instalador actualiza BLACK-ICE Control y componentes de usuario. `dotfiles-update` cubre dotfiles y migraciones visuales; no instala todos los componentes. La coordinación de todas las mejoras y servicios desde versiones anteriores sigue pendiente. [Pasos detallados](docs/SECURITY_WORKSPACE.md#actualizar-los-controles).
 
 ## Estado de validación
 
 La instalación limpia comprobada en VM usa UEFI/Btrfs/LUKS y el perfil `minimal`, desde ISO de Arch y repositorio oficial; SDDM, Hyprland y la persistencia del tema tras reiniciar iniciaron correctamente. La CI de `main` pasó 347 pruebas. Tor del sistema comprobó conexión normal, DNS, caída, bloqueo UDP/IPv6 y tráfico reenviado, apagado y recuperación de conectividad.
 
-Siguen abiertos el actualizador completo entre versiones, BIOS/ext4, fallos dentro de transacciones, pruebas físicas de pantallas/energía/USB, rendimiento comparable, licencia y redistribución de recursos. La CI remota está aprobada. **No hay release hasta cerrar los bloqueos.**
+Siguen abiertos la actualización coordinada de todos los componentes entre versiones, BIOS/ext4, fallos dentro de transacciones, pruebas físicas de pantallas/energía/USB, rendimiento comparable, licencia y redistribución de recursos. La CI remota está aprobada. **No hay release hasta cerrar los bloqueos.**
 
 [Todos los pendientes](docs/PENDING.md) · [Validación](docs/AUDIT_REPORT.md) · [Roadmap](docs/ROADMAP_SYSTEM_V4.md)
 

@@ -22,7 +22,7 @@ El estado de privacidad desde Waybar, forense opcional y laboratorios web está 
 | Mejora | Qué aporta | Criterio de aceptación |
 |---|---|---|
 | CI por pull request | Ejecutar sintaxis, linters, pruebas, enlaces y filtros de distribución antes de integrar | Un cambio inválido bloquea la comprobación; ningún job publica una release |
-| Actualización de versiones | Actualizar una instalación BLACK-ICE anterior coordinando paquetes, dotfiles y migraciones, con diagnóstico y rollback | Actualizar una versión anterior reproducible, comprobar arranque/servicios/configuración y recuperar un fallo inducido |
+| Actualizador unificado de componentes | Coordinar mejoras de BLACK-ICE en componentes de usuario/root, dotfiles, servicios y migraciones, con diagnóstico y rollback | Actualizar una versión anterior reproducible, comprobar servicios/preferencias y recuperar un fallo inducido |
 | Centro de software completo | Desinstalación revisable, historial, progreso por trabajo y archivado de cola | Dependencias preservadas, cola recuperable después de reinicio y errores accionables |
 | Presupuestos y vencimiento de laboratorios | Cuotas de imágenes/discos, limpieza por proyecto y tiempo máximo de ejecución | El límite agregado se cumple dentro del invitado y tras reconexión |
 | Diagnóstico exportable saneado | Compartir entorno, versiones y fallos sin IP, rutas personales ni tokens | Fixtures con datos sensibles se exportan ocultos; vista previa antes de guardar |
