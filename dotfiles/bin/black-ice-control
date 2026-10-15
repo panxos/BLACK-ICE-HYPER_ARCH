@@ -19,9 +19,9 @@ CONFIG = Path(os.environ.get("XDG_CONFIG_HOME", HOME / ".config"))
 LOG = logging.getLogger("black-ice-control")
 
 
-def command(args: list[str]) -> tuple[int, str]:
+def command(args: list[str], timeout: int = 8) -> tuple[int, str]:
     try:
-        result = subprocess.run(args, capture_output=True, text=True, timeout=8, check=False)
+        result = subprocess.run(args, capture_output=True, text=True, timeout=timeout, check=False)
         return result.returncode, (result.stdout or result.stderr).strip()
     except (OSError, subprocess.TimeoutExpired) as error:
         return 1, str(error)
@@ -88,7 +88,7 @@ def action(name: str, value: str = "") -> tuple[int, str]:
         args = [str(BIN / "black-ice-hypr"), "exit"]
     else:
         return 1, "Acción no válida"
-    return command(args)
+    return command(args, timeout=150 if name == "theme" else 8)
 
 
 def gui(initial_page: str) -> int:

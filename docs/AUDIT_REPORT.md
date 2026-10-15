@@ -18,7 +18,7 @@ El compositor aislado comprobó cinco escritorios persistentes en cada una de tr
 
 | Comprobación | Resultado registrado |
 |---|---|
-| Instalación limpia UEFI/Btrfs sin LUKS | Arranque, acceso y escritorio |
+| Instalación limpia UEFI/Btrfs/LUKS, perfil `minimal`, desde ISO + repo oficial (2026-10-15) | Arranque, SDDM, Hyprland y persistencia del tema tras reinicio en VM |
 | Interrupción entre módulos | Reanudación y conservación de datos |
 | Recuperación offline | Restauración de paquete/archivo y arranque con kernel/ESP |
 | Software gráfico | Instalación y reintento después de corregir autorización Qt |
@@ -27,11 +27,11 @@ El compositor aislado comprobó cinco escritorios persistentes en cada una de tr
 | SDDM de agencias | Autenticación y retorno a Hyprland |
 | Suspensión S3/S4 virtual | Fallo gráfico reproducible; desactivada en QA |
 
-Los registros completos contienen datos del entorno y se conservan fuera de la distribución. No se ejecutó una nueva instalación completa durante la revisión documental.
+Los registros completos contienen datos del entorno y se conservan fuera de la distribución. La instalación limpia confirma este escenario de VM; no prueba equipos físicos, BIOS/ext4 ni una segunda ejecución preservando datos.
 
 ## Abierto antes de publicar
 
-- Una pasada completa del árbol final y matriz BIOS/ext4/LUKS.
+- Una segunda ejecución completa preservando datos y matriz BIOS/ext4.
 - Fallos inducidos dentro de transacciones y retención por cuota.
 - VPN externa real y sistema invitado KVM anidado.
 - USB físico y sus acciones; energía física y hotplug/HiDPI.
@@ -41,3 +41,9 @@ Los registros completos contienen datos del entorno y se conservan fuera de la d
 Git local pasó `git fsck --full --no-reflogs` sin objetos faltantes; los objetos colgantes no constituyen corrupción. No se publicaron commits, etiquetas ni release.
 
 [Compatibilidad](COMPATIBILITY_MATRIX.md) · [Sistema](SYSTEM_MANAGER.md) · [Roadmap](ROADMAP_SYSTEM_V4.md).
+
+## Verificación local posterior — 2026-10-15
+
+Se corrigió una aserción que no consideraba el argumento `timeout=8` enviado por el control de brillo. `bash scripts/check-project.sh` volvió a ejecutarse completo: **347 pruebas aprobadas**, lint y sintaxis aprobados, distribución de 1.439 archivos y 54 temas sin problemas. La suite muestra avisos deprecados de `PyGObject`/Python 3.14, sin fallos asociados.
+
+`gitleaks detect --no-git --redact --source .` revisó 77,66 MB y no encontró secretos en el árbol actual. La CI remota aprobada corresponde al commit publicado `6ec1505`; no ejecuta ni valida los cambios locales sin publicar. La instalación limpia descrita arriba sí se completó; sigue pendiente la segunda ejecución preservando datos y la matriz física indicada en [pendientes](PENDING.md).

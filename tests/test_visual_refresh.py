@@ -140,7 +140,9 @@ class ControlsTests(unittest.TestCase):
     def test_brightness_keeps_screen_readable(self):
         with patch.object(controls, "command", return_value=(0, "")) as execute:
             controls.action("brightness", "0")
-            execute.assert_called_once_with(["brightnessctl", "-c", "backlight", "set", "5%"])
+            execute.assert_called_once_with(
+                ["brightnessctl", "-c", "backlight", "set", "5%"], timeout=8
+            )
 
     def test_suspend_requires_current_battery_status(self):
         with patch.object(controls, "command", return_value=(0, "ac")) as execute:

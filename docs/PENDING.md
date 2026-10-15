@@ -2,14 +2,14 @@
 
 [English](PENDING.en.md) · [Guía](GUIDE.md) · [Roadmap](ROADMAP_SYSTEM_V4.md)
 
-Estado del candidato local 4.0.0-dev.2, actualizado 2026-10-14. Esta lista reúne aceptación pendiente y propuestas futuras. No convierte una propuesta en función implementada ni una comprobación de VM en aceptación física.
+Estado del candidato local 4.0.0-dev.2, actualizado 2026-10-15. Esta lista reúne aceptación pendiente y propuestas futuras. No convierte una propuesta en función implementada ni una comprobación de VM en aceptación física.
 
 ## Bloqueos antes de release
 
 | Área | Pendiente | Se cierra con |
 |---|---|---|
-| Instalación | Repetir el ciclo completo desde disco vacío después de agregar `uwsm` como dependencia crítica | Disco vacío, acceso, red, software y segunda ejecución preservando datos; el ciclo limpio anterior detectó la falta de `uwsm` al iniciar SDDM y el código ya está corregido |
-| Matriz | BIOS, ext4 y LUKS; combinaciones soportadas | Registros reproducibles de instalación, reinicio y recuperación |
+| Instalación | Probar una segunda ejecución completa sobre el sistema ya instalado, preservando datos | Repetición de despliegue y verificación de datos/configuración conservados |
+| Matriz | BIOS/ext4 y otras combinaciones de firmware, sistema de archivos y cifrado | Registros reproducibles por combinación; UEFI/Btrfs/LUKS tiene una instalación limpia registrada |
 | Transacciones | Falta de espacio, hooks fallidos e interrupciones dentro de actualización/instalación | Abortos controlados y recuperación comprobada sin éxito falso |
 | Recuperación | Retención de archivos de arranque, cuotas y fallos adicionales | Restauraciones reales con kernel, paquetes, ESP y datos consistentes |
 | Software | Aplicaciones opcionales y fuentes AUR seleccionadas | Instalación/inicio de cada selección; errores y reintentos verificables |
@@ -21,15 +21,15 @@ Estado del candidato local 4.0.0-dev.2, actualizado 2026-10-14. Esta lista reún
 | Licencia | Licencia general del proyecto | Decisión expresa y archivo correspondiente |
 | Recursos | Redistribución de fondos, logos y otros recursos externos | Procedencia, permisos y exclusión de lo no redistribuible |
 | Distribución | Pack final y componentes nuevos desde una instalación vacía | Manifiesto íntegro, hashes, binarios y servicios contrastados |
-| CI | Primera ejecución remota de la definición local | Comprobaciones aprobadas; un cambio inválido debe bloquearlas |
 | Publicación | Revisión del diff, commit/tag/release | Autorización posterior y cierre de los bloqueos anteriores |
+
+CI: cerrada para la configuración actual. El workflow `Project checks` aprobó el commit publicado `6ec1505` el 2026-10-15; la suite local actual también pasó sus 347 pruebas. La ejecución remota no incluye los cambios locales de esta revisión.
 
 ## Aceptación adicional de seguridad
 
 | Área | Pendiente | Se cierra con |
 |---|---|---|
 | Tor | Prueba sostenida en hardware y escenarios de VPN/red real | Sin salida directa, estados correctos y reversión comprobada |
-| Acceso y wallpaper | Confirmar visualmente SDDM y el escritorio en el próximo login de la VM QA | El tema Mr-Robot y el wallpaper ya están configurados; no se reinició la sesión tras corregirlos |
 | Perfiles forenses | Instalar y usar todos los perfiles opcionales | Paquete, ejecutable, sonda y ejercicio real por herramienta |
 | Laboratorios web | Aceptación final después de actualizar controles | Localhost, aislamiento, datos, vencimiento y limpieza de recursos QA |
 | Caché/vencimiento | Reconexión, reinicio y límites adicionales | Servicio activo, expiración real y limpieza exclusiva de recursos propios |
@@ -39,7 +39,9 @@ Estado del candidato local 4.0.0-dev.2, actualizado 2026-10-14. Esta lista reún
 
 Tor del sistema ya comprobó en VM TCP normal, DNS redirigido, caída del daemon, UDP/IPv6/reenvío bloqueados, apagado y reinicio con filtro previo a NetworkManager. Se retiró la consola Podman/Kitty anterior; el control no abre terminal y Tor aplica a las aplicaciones del sistema dentro del alcance descrito. Esto no acredita anonimato absoluto ni sustituye Tor Browser.
 
-El 2026-10-14 se probó instalación limpia UEFI/Btrfs sin LUKS, reanudación conservando el sistema y despliegue del perfil mínimo hasta el corte de aceptación configurado. El primer inicio detectó que faltaba `uwsm` para la sesión Hyprland de SDDM; se añadió a los paquetes y a la lista crítica, y la VM QA quedó iniciada con esa dependencia. Falta repetir el ciclo completo de instalación y despliegue usando desde el comienzo este candidato corregido.
+El 2026-10-15 también se comprobó en VM la autorización de cambio de tema, la aplicación visual de Obsidian-Cobalt y su persistencia en SDDM tras reiniciar; esa verificación ya no está pendiente.
+
+El 2026-10-14 la instalación UEFI/Btrfs detectó que faltaba `uwsm`; se agregó como dependencia. El 2026-10-15 se instaló desde cero en VM, desde la ISO de Arch y el repositorio oficial, con UEFI/Btrfs/LUKS y perfil básico `minimal`; SDDM y Hyprland iniciaron y el cambio de tema persistió tras reiniciar. Esto cierra la repetición limpia para ese escenario. Aún falta repetir el despliegue sobre el sistema ya instalado para verificar conservación de datos.
 
 ## Revisión visual y contenido
 
