@@ -32,7 +32,11 @@ readonly NC='\033[0m'
 
 # Configuration
 readonly REPO_URL="https://github.com/panxos/BLACK-ICE-HYPER_ARCH.git"
-INSTALL_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/tmp/work/black-ice-bootstrap-$(date +%Y%m%d-%H%M%S)-$$"
+CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
+if [[ -z "${XDG_CACHE_HOME:-}" && -d /run/archiso/cowspace ]]; then
+    CACHE_HOME=/tmp
+fi
+INSTALL_DIR="$CACHE_HOME/tmp/work/black-ice-bootstrap-$(date +%Y%m%d-%H%M%S)-$$"
 readonly INSTALL_DIR
 readonly LOG_DIR="$INSTALL_DIR/logs"
 readonly LOG_FILE="$LOG_DIR/bootstrap.log"
