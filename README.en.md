@@ -163,13 +163,13 @@ bash dotfiles/bin/dotfiles-update --no-pull --dry-run
 bash dotfiles/bin/dotfiles-update --no-pull
 ```
 
-Visual installers preserve preferences through manifests and protected rollback. [Update the new controls](docs/SECURITY_WORKSPACE.en.md#updating-the-controls) or inspect Lua migration before the next login. Dotfile rollback and whole-system recovery are different mechanisms.
+This command updates dotfiles and visual migrations; **it does not update a complete BLACK-ICE version**. Upgrading between previous versions still needs design and acceptance. Visual installers preserve preferences through manifests and protected rollback. [Update the new controls](docs/SECURITY_WORKSPACE.en.md#updating-the-controls) or inspect Lua migration before the next login. Dotfile rollback and whole-system recovery are different mechanisms.
 
 ## Validation status
 
-Evidence covers an unencrypted UEFI/Btrfs KVM installation, resume, SDDM/Hyprland login and offline recovery followed by boot. System Tor checks cover ordinary connections, DNS, daemon failure, blocked UDP/IPv6 and forwarded traffic, shutdown and restored normal connectivity.
+The verified clean VM installation uses UEFI/Btrfs/LUKS and the `minimal` profile, from the Arch ISO and official repository; SDDM, Hyprland and theme persistence after reboot worked. The `main` CI passed 347 tests. System Tor checks cover ordinary connections, DNS, daemon failure, blocked UDP/IPv6 and forwarded traffic, shutdown and restored normal connectivity.
 
-BIOS/ext4/LUKS, transaction failures, physical displays/power/USB, comparable performance and redistribution review remain open. CI has a local definition; its first remote execution is pending. **There is no release until the blocking criteria are met.**
+Full version-to-version upgrades, BIOS/ext4, transaction failures, physical displays/power/USB, comparable performance, licensing and asset redistribution remain open. Remote CI is passing. **There is no release until the blocking criteria are met.**
 
 [All pending work](docs/PENDING.en.md).
 

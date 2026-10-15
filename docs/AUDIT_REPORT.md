@@ -27,11 +27,11 @@ El compositor aislado comprobó cinco escritorios persistentes en cada una de tr
 | SDDM de agencias | Autenticación y retorno a Hyprland |
 | Suspensión S3/S4 virtual | Fallo gráfico reproducible; desactivada en QA |
 
-Los registros completos contienen datos del entorno y se conservan fuera de la distribución. La instalación limpia confirma este escenario de VM; no prueba equipos físicos, BIOS/ext4 ni una segunda ejecución preservando datos.
+Los registros completos contienen datos del entorno y se conservan fuera de la distribución. La instalación limpia confirma este escenario de VM; no prueba equipos físicos, BIOS/ext4 ni una actualización entre versiones BLACK-ICE.
 
 ## Abierto antes de publicar
 
-- Una segunda ejecución completa preservando datos y matriz BIOS/ext4.
+- Una actualización desde una versión anterior y matriz BIOS/ext4.
 - Fallos inducidos dentro de transacciones y retención por cuota.
 - VPN externa real y sistema invitado KVM anidado.
 - USB físico y sus acciones; energía física y hotplug/HiDPI.
@@ -46,4 +46,4 @@ Git local pasó `git fsck --full --no-reflogs` sin objetos faltantes; los objeto
 
 Se corrigió una aserción que no consideraba el argumento `timeout=8` enviado por el control de brillo. `bash scripts/check-project.sh` volvió a ejecutarse completo: **347 pruebas aprobadas**, lint y sintaxis aprobados, distribución de 1.439 archivos y 54 temas sin problemas. La suite muestra avisos deprecados de `PyGObject`/Python 3.14, sin fallos asociados.
 
-`gitleaks detect --no-git --redact --source .` revisó 77,66 MB y no encontró secretos en el árbol actual. La CI remota aprobó el commit `b6e5830`, que incluye los cambios de esta revisión. La instalación limpia descrita arriba sí se completó; sigue pendiente la segunda ejecución preservando datos y la matriz física indicada en [pendientes](PENDING.md).
+`gitleaks detect --no-git --redact --source .` revisó 77,66 MB y no encontró secretos en el árbol actual. La CI remota aprobó el candidato publicado y la suite local pasó. La instalación limpia descrita arriba sí se completó; sigue pendiente la actualización entre versiones y la matriz física indicada en [pendientes](PENDING.md).

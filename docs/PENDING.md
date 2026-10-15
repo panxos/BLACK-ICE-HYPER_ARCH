@@ -8,7 +8,7 @@ Estado del candidato local 4.0.0-dev.2, actualizado 2026-10-15. Esta lista reún
 
 | Área | Pendiente | Se cierra con |
 |---|---|---|
-| Instalación | Probar una segunda ejecución completa sobre el sistema ya instalado, preservando datos | Repetición de despliegue y verificación de datos/configuración conservados |
+| Actualización | Diseñar y probar la actualización desde una versión anterior de BLACK-ICE, migrando configuración compatible | Partir de una versión anterior reproducible, actualizar al candidato vigente, comprobar arranque/servicios/datos y probar rollback |
 | Matriz | BIOS/ext4 y otras combinaciones de firmware, sistema de archivos y cifrado | Registros reproducibles por combinación; UEFI/Btrfs/LUKS tiene una instalación limpia registrada |
 | Transacciones | Falta de espacio, hooks fallidos e interrupciones dentro de actualización/instalación | Abortos controlados y recuperación comprobada sin éxito falso |
 | Recuperación | Retención de archivos de arranque, cuotas y fallos adicionales | Restauraciones reales con kernel, paquetes, ESP y datos consistentes |
@@ -41,7 +41,7 @@ Tor del sistema ya comprobó en VM TCP normal, DNS redirigido, caída del daemon
 
 El 2026-10-15 también se comprobó en VM la autorización de cambio de tema, la aplicación visual de Obsidian-Cobalt y su persistencia en SDDM tras reiniciar; esa verificación ya no está pendiente.
 
-El 2026-10-14 la instalación UEFI/Btrfs detectó que faltaba `uwsm`; se agregó como dependencia. El 2026-10-15 se instaló desde cero en VM, desde la ISO de Arch y el repositorio oficial, con UEFI/Btrfs/LUKS y perfil básico `minimal`; SDDM y Hyprland iniciaron y el cambio de tema persistió tras reiniciar. Esto cierra la repetición limpia para ese escenario. Aún falta repetir el despliegue sobre el sistema ya instalado para verificar conservación de datos.
+El 2026-10-14 la instalación UEFI/Btrfs detectó que faltaba `uwsm`; se agregó como dependencia. El 2026-10-15 se instaló desde cero en VM, desde la ISO de Arch y el repositorio oficial, con UEFI/Btrfs/LUKS y perfil básico `minimal`; SDDM y Hyprland iniciaron y el cambio de tema persistió tras reiniciar. Este proyecto está orientado a instalaciones nuevas en VM y bare metal. La actualización de una versión anterior es un requisito distinto y sigue sin aceptación completa: `dotfiles-update` migra dotfiles/configuración visual, no actualiza por sí solo el sistema BLACK-ICE completo.
 
 ## Revisión visual y contenido
 

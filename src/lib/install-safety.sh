@@ -18,6 +18,6 @@ validate_target_disk() {
 
 require_live_environment() {
     [[ -e /run/archiso/bootmnt ]] || {
-        log_error "El instalador base requiere una ISO live de Arch. Para actualizar usa dotfiles-update."; return 1;
+        log_error "El instalador base solo se ejecuta desde una ISO live de Arch; no actualiza un sistema instalado."; return 1;
     }
 }

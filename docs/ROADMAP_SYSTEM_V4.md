@@ -22,7 +22,7 @@ El estado de privacidad desde Waybar, forense opcional y laboratorios web está 
 | Mejora | Qué aporta | Criterio de aceptación |
 |---|---|---|
 | CI por pull request | Ejecutar sintaxis, linters, pruebas, enlaces y filtros de distribución antes de integrar | Un cambio inválido bloquea la comprobación; ningún job publica una release |
-| Actualizador unificado | Coordinar paquetes, dotfiles y migraciones en una operación con diagnóstico previo | Recuperar un fallo inducido y confirmar arranque; conservar ajustes personales |
+| Actualización de versiones | Actualizar una instalación BLACK-ICE anterior coordinando paquetes, dotfiles y migraciones, con diagnóstico y rollback | Actualizar una versión anterior reproducible, comprobar arranque/servicios/configuración y recuperar un fallo inducido |
 | Centro de software completo | Desinstalación revisable, historial, progreso por trabajo y archivado de cola | Dependencias preservadas, cola recuperable después de reinicio y errores accionables |
 | Presupuestos y vencimiento de laboratorios | Cuotas de imágenes/discos, limpieza por proyecto y tiempo máximo de ejecución | El límite agregado se cumple dentro del invitado y tras reconexión |
 | Diagnóstico exportable saneado | Compartir entorno, versiones y fallos sin IP, rutas personales ni tokens | Fixtures con datos sensibles se exportan ocultos; vista previa antes de guardar |
@@ -30,7 +30,7 @@ El estado de privacidad desde Waybar, forense opcional y laboratorios web está 
 | Restauración ensayada periódicamente | Comprobar que un punto de recuperación arranca en un clon | Informe automático distingue snapshot creado de recuperación comprobada |
 | Perfiles de trabajo por proyecto | Abrir terminales, notas y herramientas del objetivo con confirmación de VPN | Cambiar proyecto no reutiliza objetivos ni conexiones ajenas |
 
-CI ya tiene definición local, pendiente de primera ejecución remota. Caché/vencimientos y resumen saneado de casos tienen implementación parcial de estos criterios: no hay cuota física continua ni diagnóstico general exportable. Actualizador unificado, archivos de recursos y ensayos periódicos siguen propuestos. Ninguna fila debe darse por aceptada solo por aparecer en este documento.
+CI remota aprobada el 2026-10-15. Caché/vencimientos y resumen saneado de casos tienen implementación parcial de estos criterios: no hay cuota física continua ni diagnóstico general exportable. La actualización entre versiones, los archivos de recursos y los ensayos periódicos siguen pendientes o propuestos. Ninguna fila debe darse por aceptada solo por aparecer en este documento.
 
 ## Fuera de este release
 

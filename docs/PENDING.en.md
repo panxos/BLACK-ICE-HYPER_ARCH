@@ -2,14 +2,14 @@
 
 [Español](PENDING.md) · [Guide](GUIDE.en.md)
 
-Local candidate 4.0.0-dev.2, updated 2026-10-14. This list separates pending acceptance from future proposals. A proposal is not implemented functionality, and VM evidence is not physical hardware acceptance.
+Local candidate 4.0.0-dev.2, updated 2026-10-15. This list separates pending acceptance from future proposals. A proposal is not implemented functionality, and VM evidence is not physical hardware acceptance.
 
 ## Release blockers
 
 | Area | Remaining work | Acceptance evidence |
 |---|---|---|
-| Installation | Repeat the complete empty-disk cycle after adding `uwsm` as a critical dependency | Empty disk, login, network, software and a second run preserving data; the previous clean cycle exposed the missing `uwsm` dependency at SDDM startup and the source is now fixed |
-| Matrix | BIOS, ext4, LUKS and supported combinations | Reproducible installation, reboot and recovery records |
+| Upgrade | Design and test upgrading from a previous BLACK-ICE version while migrating compatible configuration | Start from a reproducible older version, upgrade to the current candidate, verify boot, services and user data, and test rollback after failure |
+| Matrix | BIOS/ext4 and other firmware, filesystem and encryption combinations | Reproducible installation, reboot and recovery records; UEFI/Btrfs/LUKS has one clean VM installation record |
 | Transactions | Disk exhaustion, failed hooks and interruptions inside operations | Controlled aborts and actual recovery without false success |
 | Recovery | Boot-file retention, quotas and further failure cases | Restored kernel, packages, ESP and consistent personal data |
 | Software | Selected optional applications and AUR sources | Installation/startup checks for each selection, errors and retries |
@@ -21,15 +21,15 @@ Local candidate 4.0.0-dev.2, updated 2026-10-14. This list separates pending acc
 | Licensing | General project license | Explicit decision and license file |
 | Resources | Redistribution of wallpapers, logos and other external assets | Provenance, permissions and removal from distribution where required |
 | Distribution | Final package and clean installation of new components | Manifest, matching hashes, binaries and services |
-| CI | First remote execution of the local definition | Passing checks and rejection of an invalid change |
 | Publication | Diff review, commit/tag/release | Later authorization and closure of the blockers above |
+
+CI: closed for the current configuration. The `Project checks` workflow passed on 2026-10-15; the local suite also passed 347 tests.
 
 ## Additional security acceptance
 
 | Area | Remaining work | Acceptance evidence |
 |---|---|---|
 | Tor | Sustained physical-machine and real network/VPN scenarios | No direct fallback, correct states and verified recovery |
-| Greeter and wallpaper | Visually confirm SDDM and the desktop at the next QA VM login | Mr-Robot and its wallpaper are configured; the session was not restarted after the fixes |
 | Forensic profiles | Install and use every optional profile | Package, executable, probe and actual exercise per tool |
 | Web laboratories | Final acceptance after control updates | Localhost exposure, isolation, data, expiration and QA cleanup |
 | Cache/expiration | Reconnection, reboot and further limits | Active service, actual expiration and cleanup of owned resources only |
@@ -39,7 +39,7 @@ Local candidate 4.0.0-dev.2, updated 2026-10-14. This list separates pending acc
 
 System Tor already passed ordinary TCP, redirected DNS, daemon failure, blocked UDP/IPv6/forwarding, shutdown and reboot checks in the VM, with filtering before NetworkManager. The former Podman/Kitty console was removed; the control does not open a terminal and Tor applies to system applications within the documented scope. This does not establish absolute anonymity or replace Tor Browser.
 
-On 2026-10-14, a clean UEFI/Btrfs installation without LUKS, a preserving resume, and the minimal deployment through its configured acceptance stop were tested. The first login exposed the missing `uwsm` dependency for SDDM's Hyprland session; it was added to the package list and critical-package check, and the QA VM now boots with it. Repeat the full installation and deployment cycle from the start using this corrected candidate.
+The project targets fresh installs in VMs and on bare metal. On 2026-10-15, a clean VM install from the Arch ISO and official repository used UEFI/Btrfs/LUKS with the basic `minimal` profile; SDDM, Hyprland and theme persistence after reboot were checked. A full upgrade from a previous BLACK-ICE version has not completed acceptance. `dotfiles-update` migrates desktop configuration; it is not a complete BLACK-ICE system-version updater.
 
 ## Visual and content review
 
