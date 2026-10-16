@@ -144,6 +144,26 @@ retry_command() {
     done
 }
 
+# La ISO de Arch limita su espacio de escritura (cowspace) a 256 MB y el clon pesa unos 500 MB.
+ensure_workspace() {
+    local cow=/run/archiso/cowspace needed_mb=1536 ram_mb target_mb free_mb
+    [[ -d "$cow" ]] || return 0
+    ram_mb=$(awk '/^MemTotal:/ {print int($2 / 1024)}' /proc/meminfo)
+    target_mb=$(( ram_mb / 2 > 4096 ? 4096 : ram_mb / 2 ))
+    if (( target_mb < needed_mb )); then
+        log_error "Poca memoria RAM (${ram_mb} MB): el instalador necesita al menos $((needed_mb * 2)) MB para descargarse en la ISO."
+        exit 1
+    fi
+    log_info "Ampliando el espacio temporal de la ISO a ${target_mb} MB..."
+    mount -o "remount,size=${target_mb}M" "$cow" || {
+        log_error "No se pudo ampliar el espacio temporal de la ISO."
+        exit 1
+    }
+    free_mb=$(df -Pm "$CACHE_HOME" | awk 'NR==2 {print $4}')
+    (( free_mb >= needed_mb )) || { log_error "Espacio libre insuficiente en $CACHE_HOME: ${free_mb} MB (se necesitan ${needed_mb} MB)."; exit 1; }
+    log_success "Espacio temporal: ${free_mb} MB libres"
+}
+
 # Install required dependencies for bootstrap
 install_dependencies() {
     log_info "Instalando dependencias necesarias..."
@@ -257,6 +277,7 @@ main() {
     check_internet
     
     # Bootstrap process
+    ensure_workspace
     install_dependencies
     clone_repository
     set_permissions

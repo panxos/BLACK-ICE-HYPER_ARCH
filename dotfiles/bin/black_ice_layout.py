@@ -26,7 +26,7 @@ def configuration(layout: str = "dual-top") -> list:
         "bluetooth":{"format":"󰂯", "format-disabled":"󰂲", "format-connected":"󰂱", "tooltip-format":"{status}", "on-click":"~/.local/bin/black-ice-control bluetooth"},
         "pulseaudio":{"format":"󰕾 {volume}%", "format-muted":"󰝟", "on-click":"~/.local/bin/black-ice-control", "on-click-right":"wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"},
         "battery":{"format":"{capacity}%", "format-charging":"󰂄 {capacity}%", "states":{"warning":25,"critical":10}},
-        "clock":{"format":"{:%H:%M}", "tooltip-format":"{:%A, %d de %B}"},
+        "clock":{"format":"{:%H:%M}", "tooltip-format":"{:L%A, %d de %B}"},
         "custom/control":{"format":"\uf013", "tooltip-format":"Ajustes · clic derecho: notificaciones", "on-click":"~/.local/bin/black-ice-control", "on-click-right":"swaync-client -t -sw"},
         "custom/power":{"format":"󰐥", "tooltip":False, "on-click":"~/.local/bin/black-ice-control session"},
         "tray":{"icon-size":14,"spacing":8},

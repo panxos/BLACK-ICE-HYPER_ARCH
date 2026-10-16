@@ -31,6 +31,8 @@ Alternative short link: `curl -L https://cutt.ly/blackice | bash`
 
 Both links redirect to [`bootstrap.sh`](bootstrap.sh), which checks the ISO, root and network, clones this repository over HTTPS and starts the installer with disk confirmation.
 
+**RAM:** the ISO keeps the download in memory, so the machine needs at least 3 GB (the bootstrap enlarges the scratch space for you and warns if it is not enough). 4 GB or more is comfortable; I have not measured that margin.
+
 > **The installer can partition and format the disk you pick.** Erase authorization identifies the exact disk.
 
 <details>

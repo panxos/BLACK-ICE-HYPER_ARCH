@@ -31,6 +31,8 @@ Alternativa con el otro atajo: `curl -L https://cutt.ly/blackice | bash`
 
 Los dos atajos redirigen a [`bootstrap.sh`](bootstrap.sh), que verifica la ISO, el usuario root y la red, clona este repositorio por HTTPS y lanza el instalador pidiendo confirmación del disco.
 
+**Memoria RAM:** la ISO guarda la descarga en RAM, así que el equipo necesita al menos 3 GB (el bootstrap amplía el espacio temporal por ti y avisa si no alcanza). Con 4 GB o más vas tranquilo; ese margen no lo he medido.
+
 **Recorrido paso a paso con capturas:** [BLACK-ICE ARCH: un escritorio hecho para mi trabajo diario](https://soporteinfo.net/blog/black-ice-arch-un-escritorio-hecho-para-mi-trabajo-diario) en el blog de SoporteInfo.
 
 > **El instalador puede particionar y formatear el disco que elijas.** La autorización de borrado identifica el disco exacto.

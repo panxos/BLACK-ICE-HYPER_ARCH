@@ -80,7 +80,7 @@
     },
     "clock": {
       "format": "{:%H:%M}",
-      "tooltip-format": "{:%A, %d de %B}"
+      "tooltip-format": "{:L%A, %d de %B}"
     },
     "custom/control": {
       "format": "",
