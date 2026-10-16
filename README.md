@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="docs/images/showcase/desktop-mr-robot.png" alt="Escritorio BLACK-ICE con el tema Mr-Robot" width="100%">
+<img src="docs/images/showcase/blackice-cover.jpg" alt="BLACK-ICE ARCH: Arch Linux, Hyprland, 54 temas, módulos propios y herramientas de seguridad" width="100%">
 
 # BLACK-ICE ARCH
 

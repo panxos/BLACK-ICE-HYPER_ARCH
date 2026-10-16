@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="docs/images/showcase/desktop-mr-robot.png" alt="BLACK-ICE desktop with the Mr-Robot theme" width="100%">
+<img src="docs/images/showcase/blackice-cover.jpg" alt="BLACK-ICE ARCH: Arch Linux, Hyprland, 54 themes, custom modules and security tools" width="100%">
 
 # BLACK-ICE ARCH
 
