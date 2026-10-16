@@ -323,7 +323,7 @@ def show_window() -> None:
                 title.get_style_context().add_class("section")
                 header.pack_start(title, False, False, 0)
                 section.pack_start(header, False, False, 0)
-                rule = Gtk.Box(margin_bottom=7)
+                rule = Gtk.Box(margin_bottom=14)
                 rule.get_style_context().add_class("rule")
                 section.pack_start(rule, False, False, 0)
                 widgets = []
