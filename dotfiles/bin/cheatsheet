@@ -146,7 +146,7 @@ def show_window() -> None:
                 .subtitle {{ color:{dim}; font-size:12px; letter-spacing:1px; }}
                 .section {{ font-size:16px; font-weight:700; }}
                 .rule {{ background:{rgba(acc, .35)}; min-height:1px; }}
-                .ring {{ background:{rgba(bg, .55)}; border:1.5px dashed {rgba(acc, .65)}; border-radius:50%; min-width:30px; min-height:30px; }}
+                .ring {{ background:{rgba(bg, .55)}; border:1.5px dashed {rgba(acc, .65)}; border-radius:50%; min-width:28px; min-height:28px; }}
                 .keycap {{ background:{rgba(fg, .09)}; border:1px solid {rgba(fg, .32)}; border-bottom:2px solid {acc}; border-radius:5px; padding:0 6px; font-weight:bold; font-size:11px; }}
                 .plus {{ color:{dim}; font-size:11px; }}
                 .tag {{ color:{acc}; font-size:10px; font-weight:bold; }}
@@ -154,9 +154,9 @@ def show_window() -> None:
                 .warn {{ color:#ffb347; font-size:11px; font-weight:bold; }}
                 scrolledwindow, viewport {{ background:transparent; }}
                 scrolledwindow undershoot, scrolledwindow overshoot {{ background:none; }}
-                entry {{ background:{rgba(bg, .75)}; border:1px solid {rgba(acc, .5)}; border-radius:20px; padding:8px 16px; font-size:14px; }}
+                entry {{ background:{rgba(bg, .75)}; border:1px solid {rgba(acc, .5)}; border-radius:14px; padding:3px 10px; font-size:12px; min-height:0; }}
                 entry:focus {{ border-color:{acc}; box-shadow:0 0 14px {rgba(acc, .45)}; }}
-                button {{ background:{rgba(bg, .75)}; border:1px solid {rgba(fg, .28)}; border-radius:10px; padding:7px 16px; }}
+                button {{ background:{rgba(bg, .75)}; border:1px solid {rgba(fg, .28)}; border-radius:10px; padding:2px 12px; min-height:0; font-size:12px; }}
                 button:hover {{ border-color:{acc}; background:{rgba(acc, .18)}; }}
                 .hint {{ color:{dim}; font-size:11px; }}
             """.encode())
@@ -166,7 +166,7 @@ def show_window() -> None:
             backdrop = Gtk.DrawingArea()
             backdrop.connect("draw", self.paint)
             stage.add(backdrop)
-            root = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8, margin_start=54, margin_end=54, margin_top=68, margin_bottom=46)
+            root = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8, margin_start=54, margin_end=54, margin_top=66, margin_bottom=40)
             stage.add_overlay(root)
             top = Gtk.Box(spacing=14)
             names = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=2)
@@ -177,13 +177,13 @@ def show_window() -> None:
             self.summary.get_style_context().add_class("subtitle")
             names.pack_start(self.summary, False, False, 0)
             top.pack_start(names, False, False, 0)
-            self.search = Gtk.SearchEntry(placeholder_text="Buscar acción, tecla o programa…")
-            self.search.connect("search-changed", self.apply_filter)
-            top.pack_start(self.search, True, True, 20)
+            top.pack_start(Gtk.Box(), True, True, 0)
             refresh = Gtk.Button(label="Actualizar")
+            refresh.set_valign(Gtk.Align.START)
             refresh.connect("clicked", self.refresh)
             top.pack_start(refresh, False, False, 0)
             close = Gtk.Button(label="Cerrar · Esc")
+            close.set_valign(Gtk.Align.START)
             close.connect("clicked", lambda _button: self.destroy())
             top.pack_start(close, False, False, 0)
             root.pack_start(top, False, False, 0)
@@ -195,7 +195,13 @@ def show_window() -> None:
             foot = Gtk.Label(label="F1 o Win+I abre y cierra esta ayuda · Win es la tecla principal; Shift mueve o envía, Alt ajusta · «Falta» indica un programa no instalado; la ayuda nunca ejecuta acciones.", xalign=0)
             foot.set_line_wrap(True)
             foot.get_style_context().add_class("hint")
-            root.pack_start(foot, False, False, 0)
+            self.search = Gtk.SearchEntry(placeholder_text="Buscar atajo…")
+            self.search.set_size_request(280, -1)
+            self.search.connect("search-changed", self.apply_filter)
+            bottom = Gtk.Box(spacing=18, margin_top=10)
+            bottom.pack_start(foot, True, True, 0)
+            bottom.pack_start(self.search, False, False, 0)
+            root.pack_start(bottom, False, False, 0)
             self.refresh()
             self.show_all()
             self.apply_filter()
@@ -262,7 +268,7 @@ def show_window() -> None:
             ring.get_style_context().add_class("ring")
             label = entry["action"].casefold()
             names = next((names for token, names in ICONS if token in label), GROUP_ICONS.get(entry["category"], GROUP_ICONS["Otros"]))
-            ring.set_center_widget(self.icon(names, 18))
+            ring.set_center_widget(self.icon(names, 16))
             box.pack_start(ring, False, False, 0)
             text = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0, valign=Gtk.Align.CENTER)
             caps = Gtk.Box(spacing=4)
@@ -307,7 +313,7 @@ def show_window() -> None:
             groups: dict[str, list[dict]] = {}
             for entry in condense(entries):
                 groups.setdefault(entry["category"], []).append(entry)
-            lanes = [Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10, valign=Gtk.Align.START) for _ in range(4)]
+            lanes = [Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8, valign=Gtk.Align.START) for _ in range(4)]
             load = [0.0] * 4
             for name, rows in sorted(groups.items(), key=lambda item: -len(item[1])):
                 section = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=5)
@@ -317,7 +323,7 @@ def show_window() -> None:
                 title.get_style_context().add_class("section")
                 header.pack_start(title, False, False, 0)
                 section.pack_start(header, False, False, 0)
-                rule = Gtk.Box()
+                rule = Gtk.Box(margin_bottom=7)
                 rule.get_style_context().add_class("rule")
                 section.pack_start(rule, False, False, 0)
                 widgets = []
