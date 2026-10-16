@@ -54,6 +54,7 @@ log_info "Ejecutando Auditoría Final del Sistema (Post-Install Check)..."
 source "$INSTALL_DIR/src/lib/post-install-audit.sh"
 if audit_installed_system /mnt "${SELECTED_KERNEL:-linux}" "${ENCRYPT:-false}"; then
     printf 'BLACK_ICE_VERSION=%s\n' "$BLACK_ICE_VERSION" > /mnt/etc/black-ice-release
+    sync
     log_success "Instalación y auditoría completadas."
 else
     log_error "La auditoría final falló. Corrige los errores antes de reiniciar."

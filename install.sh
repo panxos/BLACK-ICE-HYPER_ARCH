@@ -250,7 +250,7 @@ print_step 'INSTALACIÓN BASE COMPLETADA'
 log_success "Sistema listo para reiniciar."
 log_info "Después del reinicio, inicia sesión con $USER_NAME."
 log_info 'Continúa con: cd ~/BLACK-ICE_ARCH && bash deploy_hyprland.sh'
-log_success "Distribución de teclado '${KEYMAP:-us}' configurada para GRUB, initramfs (LUKS) y SDDM."
+log_success "Distribución de teclado '${KEYMAP:-us}' configurada para consola, initramfs (LUKS) y SDDM."
 echo -e "\nEscribe ${BOLD}reboot${NC} para reiniciar."
 
 # --- Guardar configuración para uso futuro con escapado seguro ---

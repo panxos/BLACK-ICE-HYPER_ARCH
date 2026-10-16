@@ -7,6 +7,9 @@
 - Endurecidos instalador y deploy (módulos 01–06 y 99, `bootstrap.sh`, `install-safety.sh`); 92 scripts con permiso de ejecución.
 - Eliminados los atajos SUPER+SHIFT+W y SUPER+SHIFT+R, que apuntaban a scripts inexistentes.
 - README rediseñado en español e inglés con instalación rápida (`https://is.gd/blackice`, alternativa `https://cutt.ly/blackice`) al comienzo, y documentación alineada con el estado publicado. 354 pruebas locales aprobadas.
+- Instalación de punta a punta comprobada en VM UEFI/Btrfs: ISO oficial de Arch, `curl -L https://is.gd/blackice | bash`, 8 etapas del instalador, reinicio por GRUB, `deploy_hyprland.sh --profile minimal` y login en SDDM Obsidiana hasta Hyprland con Waybar y Conky.
+- Corregido un cuelgue de GRUB: `grub-mklayout` ya no recibe mapas de teclado de consola; usa `ckbcomp` con tiempo límite y, si falta, avisa y deja el menú con teclado US. El menú de formatos regionales ya no repite `es_CL`.
+- La instalación base ejecuta `sync` al terminar y el mensaje final ya no promete teclado de GRUB cuando este cae a US.
 
 ### Tor del sistema, idiomas y documentación — 2026-10-14
 
