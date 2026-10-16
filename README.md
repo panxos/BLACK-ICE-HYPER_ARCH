@@ -190,7 +190,7 @@ Actualiza el checkout con `git pull --ff-only`, migra dotfiles de forma conserva
 
 - **Verificado en VM:** instalación limpia desde la ISO de Arch con UEFI/Btrfs/LUKS y perfil `minimal`; SDDM, Hyprland y la persistencia del tema tras reiniciar iniciaron correctamente. Tor del sistema comprobó conexión normal, DNS, caída, bloqueo UDP/IPv6/reenvío, apagado y recuperación.
 - **Pruebas:** 354 pruebas locales aprobadas, además de ShellCheck, Ruff y comprobación de distribución.
-- **Abierto:** BIOS/ext4, fallos dentro de transacciones, pruebas físicas de pantallas/energía/USB, rendimiento comparable y la licencia general.
+- **Abierto:** BIOS/ext4, fallos dentro de transacciones, pruebas físicas de pantallas/energía/USB y rendimiento comparable.
 
 **Es un candidato, no un release:** no hay tag ni versión estable hasta cerrar los bloqueos. [Todos los pendientes](docs/PENDING.md) · [Validación](docs/AUDIT_REPORT.md) · [Roadmap](docs/ROADMAP_SYSTEM_V4.md)
 
@@ -219,6 +219,6 @@ python3 scripts/check-distribution.py
 
 **Francisco Aravena · P4NX0Z** · [soporteinfo.net](https://soporteinfo.net)
 
-<sub>[Créditos y procedencia](CREDITS.md) · Los componentes externos conservan sus licencias y marcas. Configuraciones privadas, contraseñas, registros y evidencias quedan excluidos de Git y de la distribución.</sub>
+<sub>[Créditos y procedencia](CREDITS.md) · Licencia: [PolyForm Noncommercial con autorización](LICENSE). Los componentes externos conservan sus licencias y marcas. Configuraciones privadas, contraseñas, registros y evidencias quedan excluidos de Git y de la distribución.</sub>
 
 </div>

@@ -18,7 +18,7 @@ Estado del candidato 4.0.0-dev.2 (publicado en `main`, sin release), actualizado
 | USB | Reconexión y acciones de avisos | Montaje real, abrir archivos/terminal y conservar historial |
 | Fluidez | Cambios de escritorios con carga e inactividad prolongada | Revisión física sin fallo intermitente y datos comparables |
 | Rendimiento | Baseline equivalente y consumo con/sin Conky | Tres muestras sostenidas de diez minutos en condiciones iguales |
-| Licencia | Licencia general del proyecto | Decisión expresa y archivo correspondiente |
+| Licencia | Licencia propia fijada (PolyForm Noncommercial + autorización); falta verificar el permiso de redistribución del logo Hack4u y de los fondos externos | Verificación por recurso en `CREDITS.md` |
 | Recursos | Redistribución de fondos, logos y otros recursos externos | Procedencia, permisos y exclusión de lo no redistribuible |
 | Distribución | Pack final y componentes nuevos desde una instalación vacía | Manifiesto íntegro, hashes, binarios y servicios contrastados |
 | Publicación | Revisión del diff, commit/tag/release | Autorización posterior y cierre de los bloqueos anteriores |

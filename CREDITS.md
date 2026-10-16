@@ -24,6 +24,6 @@ El logo Hack4u se obtuvo del sitio solicitado para el homenaje s4vitar; su permi
 
 `assets/wallpapers/cyber/sources.json` registra fuentes externas. Los temas apuntan directamente a las imágenes fuente; el catálogo no incluye copias reescaladas que aumentan el tamaño sin añadir detalle.
 
-## Pendiente de publicación
+## Licencia
 
-El árbol no contiene un archivo LICENSE general verificable. Se debe definir la licencia del código propio y completar la revisión de recursos externos antes de la publicación del candidato. La atribución por sí sola no equivale a permiso de redistribución.
+El código y los recursos originales se publican bajo [PolyForm Noncommercial 1.0.0 con cláusula de autorización](LICENSE). Los componentes de terceros listados arriba conservan su licencia: `dotfiles/wallpapers/` (asociado a gh0stzk/dotfiles) y `assets/themes/grub/cyberpunk_arcade/` son GPL-3.0, y las fuentes son OFL o Ubuntu Font Licence. La licencia propia no los cubre. El permiso de redistribución del logo Hack4u sigue sin verificarse.

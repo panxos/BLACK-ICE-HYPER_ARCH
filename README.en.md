@@ -190,7 +190,7 @@ It updates the checkout with `git pull --ff-only`, migrates dotfiles conservativ
 
 - **Verified in a VM:** clean install from the Arch ISO with UEFI/Btrfs/LUKS and the `minimal` profile; SDDM, Hyprland and theme persistence after reboot started correctly. System Tor checked ordinary connections, DNS, daemon failure, UDP/IPv6/forwarding blocking, shutdown and recovery.
 - **Tests:** 354 local tests pass, plus ShellCheck, Ruff and the distribution check.
-- **Open:** BIOS/ext4, failures inside transactions, physical display/power/USB tests, comparable performance and the general license.
+- **Open:** BIOS/ext4, failures inside transactions, physical display/power/USB tests and comparable performance.
 
 **This is a candidate, not a release:** there is no tag or stable version until the blockers close. [All pending work](docs/PENDING.en.md) · [Validation](docs/AUDIT_REPORT.md) · [Roadmap](docs/ROADMAP_SYSTEM_V4.md)
 
@@ -219,6 +219,6 @@ python3 scripts/check-distribution.py
 
 **Francisco Aravena · P4NX0Z** · [soporteinfo.net](https://soporteinfo.net)
 
-<sub>[Credits and provenance](CREDITS.md) · External components keep their licenses and trademarks. Private configuration, passwords, logs and evidence are excluded from Git and the distribution.</sub>
+<sub>[Credits and provenance](CREDITS.md) · License: [PolyForm Noncommercial with authorization](LICENSE). External components keep their licenses and trademarks. Private configuration, passwords, logs and evidence are excluded from Git and the distribution.</sub>
 
 </div>

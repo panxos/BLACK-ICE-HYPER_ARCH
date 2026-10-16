@@ -18,7 +18,7 @@ Candidate 4.0.0-dev.2 (published on `main`, no release), updated 2026-10-15. Thi
 | USB | Reconnection and notification actions | Real mount, file-manager/terminal actions and retained history |
 | Responsiveness | Workspace switching under load and prolonged idle | Physical review and comparable evidence |
 | Performance | Equivalent baseline and Conky on/off consumption | Three sustained ten-minute samples under equal conditions |
-| Licensing | General project license | Explicit decision and license file |
+| Licensing | Own license set (PolyForm Noncommercial + authorization); redistribution permission for the Hack4u logo and external wallpapers is still unverified | Per-asset check in `CREDITS.md` |
 | Resources | Redistribution of wallpapers, logos and other external assets | Provenance, permissions and removal from distribution where required |
 | Distribution | Final package and clean installation of new components | Manifest, matching hashes, binaries and services |
 | Publication | Diff review, commit/tag/release | Later authorization and closure of the blockers above |
