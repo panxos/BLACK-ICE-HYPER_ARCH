@@ -120,7 +120,7 @@ def show_window() -> None:
             super().__init__(title="BLACK-ICE — Atajos de teclado")
             screen = Gdk.Display.get_default().get_primary_monitor() or Gdk.Display.get_default().get_monitor(0)
             area = screen.get_workarea() if screen else None
-            self.set_default_size(min(1240, area.width - 60) if area else 1240, min(740, area.height - 50) if area else 740)
+            self.set_default_size(min(1240, area.width - 20) if area else 1240, min(780, area.height - 20) if area else 780)
             self.set_type_hint(Gdk.WindowTypeHint.DIALOG)
             self.set_position(Gtk.WindowPosition.CENTER)
             self.connect("destroy", Gtk.main_quit)
@@ -166,7 +166,7 @@ def show_window() -> None:
             backdrop = Gtk.DrawingArea()
             backdrop.connect("draw", self.paint)
             stage.add(backdrop)
-            root = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8, margin=20, margin_top=62)
+            root = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8, margin_start=54, margin_end=54, margin_top=68, margin_bottom=46)
             stage.add_overlay(root)
             top = Gtk.Box(spacing=14)
             names = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=2)
