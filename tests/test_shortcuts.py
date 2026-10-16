@@ -39,6 +39,16 @@ class ShortcutTests(unittest.TestCase):
         self.assertEqual(rows[0]["action"], "Ver atajos")
         self.assertIn("sin inspección", rows[0]["status"])
 
+    def test_lua_binds_without_description_are_resolved_from_hyprland_conf(self):
+        with tempfile.TemporaryDirectory() as directory:
+            conf = Path(directory) / "hyprland.conf"
+            conf.write_text("$mainMod = SUPER\n$terminal = kitty\nbind = $mainMod, Return, exec, $terminal\nbind = $mainMod SHIFT, Q, killactive,\n")
+            self.assertEqual(shortcuts.conf_binds(conf)[(64, "return")], ("exec", "kitty"))
+            with patch.object(shortcuts, "conf_binds", return_value=shortcuts.conf_binds(conf)), patch.object(shortcuts.shutil, "which", return_value="/usr/bin/kitty"):
+                rows = shortcuts.inventory([{"key": "Return", "modmask": 64, "dispatcher": "__lua", "arg": "5"},
+                                            {"key": "Q", "modmask": 65, "dispatcher": "__lua", "arg": "6"}])
+        self.assertEqual({row["action"] for row in rows}, {"Terminal Kitty", "Cerrar ventana"})
+
     def test_release_mouse_and_modifier_labels(self):
         self.assertEqual(shortcuts.shortcut({"key": "SUPER_L", "modmask": 64, "release": True}), "Win · al soltar")
         self.assertEqual(shortcuts.shortcut({"key": "T", "modmask": 72}), "Win + Alt + T")

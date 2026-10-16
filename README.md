@@ -115,7 +115,7 @@ Cada tema coordina Waybar, Conky, Kitty, lanzador, menús y notificaciones. Los 
 | **Conky** | Elegir entre 20 estilos y una, varias o todas las pantallas |
 | **Lanzador** | Cabecera panorámica, lista compacta, mosaicos o Wofi |
 | **Monitores** | Fondos individuales, panoramas por fila o una escena compartida |
-| **Ayuda F1** | Buscar los bindings realmente cargados por la sesión |
+| **Ayuda F1** | Panel con fondo del tema, íconos por acción y los atajos realmente cargados por la sesión |
 
 Al aplicar un tema con seguimiento de SDDM, el acceso adopta su paleta y fondo para el próximo inicio de sesión; guardar un perfil por sí solo no cambia SDDM. Hyprlock tiene controles propios. El diseñador universal de Hyprland es un proyecto futuro independiente.
 

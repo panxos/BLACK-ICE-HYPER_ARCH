@@ -2,6 +2,12 @@
 
 ## [4.0.0-dev.2] — Candidato en `main`, sin release — 2026-10-11
 
+### Ayuda F1 rediseñada — 2026-10-16
+
+- La ayuda F1 usa el fondo del tema, cuatro columnas sin scroll, íconos por acción y teclas en cápsulas; se quitó el teclado dibujado.
+- Los atajos hermanos se condensan (`Win + 1–5`, flechas) y los repetidos se unen en una sola fila.
+- Lee también los binds de `hyprland.lua`; las categorías ahora son Programas, Herramientas, Escritorio, Escritorios, Capturas, Ventanas, Multimedia y Sistema.
+
 ### Auditoría del instalador y README — 2026-10-15
 
 - Endurecidos instalador y deploy (módulos 01–06 y 99, `bootstrap.sh`, `install-safety.sh`); 92 scripts con permiso de ejecución.

@@ -23,6 +23,13 @@ APPS = {"kitty": "Terminal Kitty", "dolphin": "Archivos · Dolphin", "kate": "Ed
         "dev": "Herramientas de desarrollo"}
 
 
+MEDIA = (("play-pause", "Reproducir / pausa"), ("playerctl stop", "Detener música"), ("playerctl next", "Pista siguiente"),
+         ("playerctl previous", "Pista anterior"), ("output-volume raise", "Subir volumen"), ("output-volume lower", "Bajar volumen"),
+         ("output-volume mute", "Silenciar sonido"), ("pamixer -t", "Silenciar sonido"), ("@DEFAULT_SOURCE@", "Silenciar micrófono"),
+         ("brightness raise", "Más brillo"), ("brightness lower", "Menos brillo"), ("brightnessctl", "Brillo de pantalla"))
+PROGRAMS = {"kitty", "dolphin", "kate", "brave", "firefox", "obsidian", "betterbird", "keepassxc", "caido"}
+
+
 def commands(command: str) -> list[str]:
     try:
         lexer = shlex.shlex(command, posix=True, punctuation_chars="|&;()")
@@ -71,7 +78,7 @@ def describe(dispatcher: str, argument: str) -> tuple[str, str]:
     if "black-ice-workspaces" in argument:
         match = re.search(r"\b(focus|move)\s+([1-5])\b", argument)
         return "Escritorios", (("Ir al escritorio local " if match[1] == "focus" else "Mover al escritorio local ") + match[2]) if match else "Escritorios por monitor"
-    for token, label in (("black-ice-control appearance", "Apariencia"), ("black-ice-control", "Centro de control"),
+    for token, label in (("black-ice-control appearance", "Estudio de temas"), ("black-ice-control", "Centro de control"),
                          ("black-ice-conky menu", "Estilos de Conky"), ("black-ice-conky toggle", "Mostrar u ocultar Conky"),
                          ("black-ice-wallpapers", "Cambiar fondo"), ("black-ice-launcher", "Menú de aplicaciones")):
         if token in argument:
@@ -84,11 +91,12 @@ def describe(dispatcher: str, argument: str) -> tuple[str, str]:
         return "Escritorio", "Menú de aplicaciones"
     if "lock-session" in argument or "hyprlock" in argument:
         return "Sistema", "Bloquear pantalla"
-    if any(token in argument for token in ("playerctl", "swayosd-client", "pamixer", "brightnessctl", "wpctl")):
-        return "Multimedia", argument.replace("~/.local/bin/", "")
+    for token, label in MEDIA:
+        if token in argument:
+            return "Multimedia", label
     first = commands(argument)
     name = Path(first[0]).name if first else argument
-    return "Aplicaciones", APPS.get(name, name)
+    return ("Programas" if name in PROGRAMS else "Herramientas"), APPS.get(name, name)
 
 
 def shortcut(binding: dict) -> str:
@@ -102,10 +110,51 @@ def shortcut(binding: dict) -> str:
     return " + ".join(keys) + (" · al soltar" if binding.get("release") else "")
 
 
+MODIFIERS = {"SUPER": 64, "MOD4": 64, "WIN": 64, "CTRL": 4, "CONTROL": 4, "ALT": 8, "MOD1": 8, "SHIFT": 1}
+
+
+def conf_binds(path: Path | None = None) -> dict[tuple[int, str], tuple[str, str]]:
+    """Lee hyprland.conf para recuperar la acción de los atajos que Hyprland publica como callbacks Lua."""
+    path = path or Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config")) / "hypr/hyprland.conf"
+    try:
+        lines = path.read_text().splitlines()
+    except OSError:
+        return {}
+    variables = {m[1]: m[2].strip() for line in lines if (m := re.match(r"\s*(\$\w+)\s*=\s*(.*)", line))}
+    found: dict[tuple[int, str], tuple[str, str]] = {}
+    for line in lines:
+        match = re.match(r"\s*bind[a-z]*\s*=\s*(.*)", line)
+        if not match:
+            continue
+        body = match[1]
+        for name in sorted(variables, key=len, reverse=True):
+            body = body.replace(name, variables[name])
+        parts = [part.strip() for part in body.split(",", 3)]
+        if len(parts) < 3:
+            continue
+        mask = sum(MODIFIERS.get(word.upper(), 0) for word in re.split(r"[\s+_]+", parts[0]) if word)
+        found[(mask, parts[1].casefold())] = (parts[2], parts[3] if len(parts) > 3 else "")
+    try:
+        lua = path.with_suffix(".lua").read_text()
+    except OSError:
+        return found
+    for spec, command in re.findall(r'hl\.bind\((?:mainMod\s*\.\.\s*)?"([^"]+)"\s*,\s*hl\.dsp\.exec_cmd\("((?:[^"\\]|\\.)*)"\)', lua):
+        words = [word.strip() for word in ("SUPER" + spec if spec.lstrip().startswith("+") else spec).split("+")]
+        mask = sum(MODIFIERS.get(word.upper(), 0) for word in words[:-1])
+        if words[-1].upper() in {"SUPER_L", "SUPER_R"}:
+            mask |= 64
+        found.setdefault((mask, words[-1].casefold()), ("exec", command.replace('\\"', '"')))
+    return found
+
+
 def inventory(bindings: list[dict] | None = None) -> list[dict]:
     rows = []
+    known = None
     for binding in IPC().query("binds") if bindings is None else bindings:
         dispatcher, argument = binding.get("dispatcher", ""), binding.get("arg", "")
+        if dispatcher == "__lua" and not binding.get("description"):
+            known = conf_binds() if known is None else known
+            dispatcher, argument = known.get((binding.get("modmask", 0), str(binding.get("key", "")).casefold()), (dispatcher, argument))
         category, label = describe(dispatcher, argument)
         label = binding.get("description") or label
         missing = missing_commands(argument) if dispatcher == "exec" else []

@@ -29,72 +29,206 @@ def palette() -> dict:
     return colors
 
 
+def wallpaper() -> str:
+    try:
+        value = json.loads((Path.home() / ".local/state/black-ice/appearance.json").read_text()).get("wallpaper", "")
+    except (OSError, ValueError):
+        return ""
+    return value if isinstance(value, str) and Path(value).is_file() else ""
+
+
+def rgba(color: str, alpha: float) -> str:
+    return f"rgba({int(color[1:3], 16)},{int(color[3:5], 16)},{int(color[5:7], 16)},{alpha})"
+
+
+KEYS = {"XF86AudioRaiseVolume": "Vol +", "XF86AudioLowerVolume": "Vol −", "XF86AudioMute": "Mute", "XF86AudioMicMute": "Mic",
+        "XF86AudioNext": "Sig.", "XF86AudioPrev": "Ant.", "XF86AudioPlay": "Play", "XF86AudioPause": "Play", "XF86AudioStop": "Stop",
+        "XF86MonBrightnessUp": "Brillo +", "XF86MonBrightnessDown": "Brillo −", "XF86Display": "Pantalla", "XF86RFKill": "Wi-Fi", "XF86WLAN": "Wi-Fi"}
+ICONS = (("terminales", ["utilities-terminal"]), ("kitty", ["kitty", "utilities-terminal"]), ("kate", ["kate", "accessories-text-editor"]),
+         ("brave", ["brave-browser", "brave", "web-browser"]), ("firefox", ["firefox"]), ("dolphin", ["system-file-manager"]),
+         ("obsidian", ["obsidian", "accessories-text-editor"]), ("correo", ["thunderbird", "mail-client"]),
+         ("menú de contraseñas", ["dialog-password", "keepassxc"]), ("keepassxc", ["keepassxc", "dialog-password"]),
+         ("caido", ["network-server", "security-high"]), ("atajos", ["preferences-desktop-keyboard-shortcuts", "input-keyboard"]),
+         ("cambiar aplicación", ["preferences-system-windows", "window-duplicate"]), ("wi-fi", ["network-wireless"]),
+         ("estilo del menú", ["preferences-desktop-theme"]), ("pantallas", ["preferences-desktop-display", "video-display"]),
+         ("música", ["multimedia-audio-player", "audio-x-generic"]), ("energía", ["battery", "preferences-system-power"]),
+         ("centro de control", ["preferences-system"]), ("estudio de temas", ["preferences-desktop-theme"]),
+         ("fondo", ["preferences-desktop-wallpaper", "image-x-generic"]), ("menú de aplicaciones", ["start-here", "view-app-grid"]),
+         ("portapapeles", ["edit-paste", "klipper"]), ("capturar", ["applets-screenshooter", "camera-photo"]),
+         ("bloquear", ["system-lock-screen"]), ("cerrar sesión", ["system-log-out"]), ("cerrar ventana", ["window-close"]),
+         ("pantalla completa", ["view-fullscreen"]), ("maximizar", ["window-maximize"]), ("flotante", ["window-duplicate"]),
+         ("pseudotiling", ["view-grid", "view-app-grid"]), ("división", ["view-split-left-right", "view-grid"]),
+         ("cambiar foco", ["go-jump", "input-keyboard"]), ("mover ventana", ["transform-move", "input-mouse"]),
+         ("redimensionar", ["transform-scale", "input-mouse"]), ("mover al escritorio", ["go-next", "user-desktop"]),
+         ("escritorio local", ["user-desktop", "preferences-desktop-workspaces"]), ("subir volumen", ["audio-volume-high"]),
+         ("bajar volumen", ["audio-volume-low"]), ("silenciar sonido", ["audio-volume-muted"]),
+         ("micrófono", ["microphone-sensitivity-muted", "audio-input-microphone-muted", "audio-input-microphone"]),
+         ("más brillo", ["display-brightness", "brightness-high"]), ("menos brillo", ["display-brightness", "brightness-low"]),
+         ("reproducir", ["media-playback-start"]), ("detener", ["media-playback-stop"]), ("siguiente", ["media-skip-forward"]),
+         ("anterior", ["media-skip-backward"]))
+GROUP_ICONS = {"Programas": ["applications-all", "applications-development"], "Herramientas": ["applications-utilities", "preferences-system"],
+               "Escritorio": ["user-desktop"], "Escritorios": ["preferences-desktop-workspaces", "view-grid"],
+               "Capturas": ["applets-screenshooter", "camera-photo"], "Ventanas": ["preferences-system-windows", "window-duplicate"],
+               "Multimedia": ["applications-multimedia", "multimedia-audio-player"], "Sistema": ["system-shutdown", "preferences-system"],
+               "Otros": ["applications-other"]}
+ORDER = ["Programas", "Herramientas", "Escritorio", "Escritorios", "Capturas", "Ventanas", "Multimedia", "Sistema", "Otros"]
+ARROWS = {"izquierda": "←", "derecha": "→", "arriba": "↑", "abajo": "↓"}
+
+
+def friendly(combo: str) -> str:
+    main, _, extra = combo.partition(" · ")
+    return " + ".join(KEYS.get(part, part) for part in main.split(" + ")) + (" · " + extra if extra else "")
+
+
+def condense(entries: list[dict]) -> list[dict]:
+    """Une atajos hermanos (1–5, flechas, teclas equivalentes) para que la lista entre completa en pantalla."""
+    groups: dict[tuple[str, str], list[dict]] = {}
+    for entry in entries:
+        label = re.sub(r" (\d|· (izquierda|derecha|arriba|abajo))$", "", entry["action"])
+        groups.setdefault((entry["category"], label), []).append(entry)
+    rows = []
+    for (category, label), items in groups.items():
+        combos = sorted({friendly(item["keys"]) for item in items}, key=lambda combo: (len(combo), combo))
+        if len(items) > 1 and all(item["action"] != label for item in items):
+            heads = {combo.rsplit(" + ", 1)[0] for combo in combos}
+            lasts = [combo.rsplit(" + ", 1)[1] for combo in combos]
+            if len(heads) == 1:
+                tail = "".join(lasts) if all(last in "←→↑↓" for last in lasts) else lasts[0] + "–" + lasts[-1]
+                combos = [heads.pop() + " + " + tail]
+        rows.append({"category": "Escritorios" if category == "Otros" and "escritorio" in label.casefold() else category, "action": label, "combos": combos[:2], "all": combos,
+                     "missing": sorted({name for item in items for name in item["missing"]}), "command": items[0]["command"],
+                     "text": " ".join(str(v) for item in items for v in item.values()).casefold()})
+    rows.sort(key=lambda row: (ORDER.index(row["category"]) if row["category"] in ORDER else 99, row["combos"][0]))
+    return rows
+
+
 def show_window() -> None:
     import gi
     gi.require_version("Gtk", "3.0")
     gi.require_version("Gdk", "3.0")
-    from gi.repository import Gdk, GLib, Gtk
+    gi.require_version("GdkPixbuf", "2.0")
+    from gi.repository import Gdk, GdkPixbuf, GLib, Gtk
+    import cairo
 
     GLib.set_prgname("black-ice-shortcuts")
+
+    def rgb(color: str) -> tuple[float, float, float]:
+        return tuple(int(color[i:i + 2], 16) / 255 for i in (1, 3, 5))
 
     class Shortcuts(Gtk.Window):
         def __init__(self):
             super().__init__(title="BLACK-ICE — Atajos de teclado")
-            self.set_default_size(980, 620)
+            screen = Gdk.Display.get_default().get_primary_monitor() or Gdk.Display.get_default().get_monitor(0)
+            area = screen.get_workarea() if screen else None
+            self.set_default_size(min(1240, area.width - 60) if area else 1240, min(740, area.height - 50) if area else 740)
             self.set_type_hint(Gdk.WindowTypeHint.DIALOG)
             self.set_position(Gtk.WindowPosition.CENTER)
             self.connect("destroy", Gtk.main_quit)
             self.connect("key-press-event", self.key_press)
-            colors = palette()
+            self.colors = colors = palette()
+            self.items: list[tuple[dict, Gtk.Widget]] = []
+            self.sections: list[tuple[Gtk.Widget, list[Gtk.Widget]]] = []
+            self.pixbuf = self.scaled = None
+            self.theme = Gtk.IconTheme()
+            self.theme.set_custom_theme("Papirus-Dark")
+            art = wallpaper()
+            if art:
+                try:
+                    self.pixbuf = GdkPixbuf.Pixbuf.new_from_file(art)
+                except GLib.Error:
+                    self.pixbuf = None
+            acc, fg, bg, dim = colors["acc1"], colors["fg"], colors["bg"], colors["dim"]
             css = Gtk.CssProvider()
             css.load_from_data(f"""
-                window {{ background:{colors['bg']}; color:{colors['fg']}; }}
-                label, entry, button {{ color:{colors['fg']}; font-family:'{colors['font']}'; }}
-                .heading {{ font-size:24px; font-weight:600; }}
-                .category {{ color:{colors['acc1']}; font-size:14px; font-weight:bold; margin-top:16px; }}
-                .key {{ background:alpha({colors['acc1']},.13); border:1px solid alpha({colors['acc1']},.55); border-radius:5px; padding:7px 10px; }}
-                .status {{ color:{colors['dim']}; font-size:11px; }}
-                entry, button {{ background:alpha({colors['fg']},.06); border:1px solid alpha({colors['fg']},.25); padding:8px; }}
-                entry:focus, button:focus {{ border-color:{colors['acc1']}; }}
-                list, scrolledwindow, viewport {{ background:{colors['bg']}; }}
-                list row {{ background:transparent; padding:5px 0; }}
+                window {{ background:{bg}; color:{fg}; }}
+                label, entry, button {{ color:{fg}; font-family:'{colors['font']}'; }}
+                .title {{ font-size:30px; font-weight:800; letter-spacing:7px; color:{acc}; text-shadow:0 0 18px {rgba(acc, .75)}; }}
+                .subtitle {{ color:{dim}; font-size:12px; letter-spacing:1px; }}
+                .section {{ font-size:16px; font-weight:700; }}
+                .rule {{ background:{rgba(acc, .35)}; min-height:1px; }}
+                .ring {{ background:{rgba(bg, .55)}; border:1.5px dashed {rgba(acc, .65)}; border-radius:50%; min-width:30px; min-height:30px; }}
+                .keycap {{ background:{rgba(fg, .09)}; border:1px solid {rgba(fg, .32)}; border-bottom:2px solid {acc}; border-radius:5px; padding:0 6px; font-weight:bold; font-size:11px; }}
+                .plus {{ color:{dim}; font-size:11px; }}
+                .tag {{ color:{acc}; font-size:10px; font-weight:bold; }}
+                .action {{ color:{fg}; font-size:12px; }}
+                .warn {{ color:#ffb347; font-size:11px; font-weight:bold; }}
+                scrolledwindow, viewport {{ background:transparent; }}
+                scrolledwindow undershoot, scrolledwindow overshoot {{ background:none; }}
+                entry {{ background:{rgba(bg, .75)}; border:1px solid {rgba(acc, .5)}; border-radius:20px; padding:8px 16px; font-size:14px; }}
+                entry:focus {{ border-color:{acc}; box-shadow:0 0 14px {rgba(acc, .45)}; }}
+                button {{ background:{rgba(bg, .75)}; border:1px solid {rgba(fg, .28)}; border-radius:10px; padding:7px 16px; }}
+                button:hover {{ border-color:{acc}; background:{rgba(acc, .18)}; }}
+                .hint {{ color:{dim}; font-size:11px; }}
             """.encode())
             Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), css, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
-            root = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=14, margin=24)
-            self.add(root)
-            heading = Gtk.Box(spacing=16)
-            title = Gtk.Label(label="Atajos de teclado", xalign=0)
-            title.get_style_context().add_class("heading")
-            heading.pack_start(title, True, True, 0)
-            close = Gtk.Button(label="Cerrar · Esc")
-            close.connect("clicked", lambda _button: self.destroy())
-            heading.pack_end(close, False, False, 0)
+            stage = Gtk.Overlay()
+            self.add(stage)
+            backdrop = Gtk.DrawingArea()
+            backdrop.connect("draw", self.paint)
+            stage.add(backdrop)
+            root = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8, margin=20, margin_top=62)
+            stage.add_overlay(root)
+            top = Gtk.Box(spacing=14)
+            names = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=2)
+            title = Gtk.Label(label="ATAJOS", xalign=0)
+            title.get_style_context().add_class("title")
+            names.pack_start(title, False, False, 0)
+            self.summary = Gtk.Label(xalign=0)
+            self.summary.get_style_context().add_class("subtitle")
+            names.pack_start(self.summary, False, False, 0)
+            top.pack_start(names, False, False, 0)
+            self.search = Gtk.SearchEntry(placeholder_text="Buscar acción, tecla o programa…")
+            self.search.connect("search-changed", self.apply_filter)
+            top.pack_start(self.search, True, True, 20)
             refresh = Gtk.Button(label="Actualizar")
             refresh.connect("clicked", self.refresh)
-            heading.pack_end(refresh, False, False, 0)
-            root.pack_start(heading, False, False, 0)
-            self.summary = Gtk.Label(xalign=0)
-            self.summary.set_line_wrap(True)
-            root.pack_start(self.summary, False, False, 0)
-            self.search = Gtk.SearchEntry(placeholder_text="Buscar acción, tecla o programa…")
-            self.search.connect("search-changed", lambda _entry: self.list.invalidate_filter())
-            root.pack_start(self.search, False, False, 0)
+            top.pack_start(refresh, False, False, 0)
+            close = Gtk.Button(label="Cerrar · Esc")
+            close.connect("clicked", lambda _button: self.destroy())
+            top.pack_start(close, False, False, 0)
+            root.pack_start(top, False, False, 0)
             scroll = Gtk.ScrolledWindow()
             scroll.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
             root.pack_start(scroll, True, True, 0)
-            self.list = Gtk.ListBox()
-            self.list.set_selection_mode(Gtk.SelectionMode.NONE)
-            self.list.set_filter_func(self.filter_row)
-            self.list.set_header_func(self.header)
-            scroll.add(self.list)
-            foot = Gtk.Label(label="Win es la tecla Windows · F1 o Win+I para abrir · Disponible comprueba programas; no ejecuta acciones.", xalign=0)
+            self.columns = Gtk.Box(spacing=26, homogeneous=True, valign=Gtk.Align.START)
+            scroll.add(self.columns)
+            foot = Gtk.Label(label="F1 o Win+I abre y cierra esta ayuda · Win es la tecla principal; Shift mueve o envía, Alt ajusta · «Falta» indica un programa no instalado; la ayuda nunca ejecuta acciones.", xalign=0)
             foot.set_line_wrap(True)
-            foot.get_style_context().add_class("status")
+            foot.get_style_context().add_class("hint")
             root.pack_start(foot, False, False, 0)
             self.refresh()
             self.show_all()
+            self.apply_filter()
             self.search.grab_focus()
             GLib.timeout_add(150, self.place)
+
+        def paint(self, area, cr):
+            width, height = area.get_allocated_width(), area.get_allocated_height()
+            if self.pixbuf:
+                scale = max(width / self.pixbuf.get_width(), height / self.pixbuf.get_height())
+                size = (max(1, int(self.pixbuf.get_width() * scale)), max(1, int(self.pixbuf.get_height() * scale)))
+                if not self.scaled or (self.scaled.get_width(), self.scaled.get_height()) != size:
+                    self.scaled = self.pixbuf.scale_simple(size[0], size[1], GdkPixbuf.InterpType.BILINEAR)
+                Gdk.cairo_set_source_pixbuf(cr, self.scaled, (width - size[0]) / 2, (height - size[1]) / 2)
+                cr.paint()
+            red, green, blue = rgb(self.colors["bg"])
+            veil = cairo.LinearGradient(0, 0, 0, height)
+            veil.add_color_stop_rgba(0, red, green, blue, .80 if self.pixbuf else 1)
+            veil.add_color_stop_rgba(1, red, green, blue, .93 if self.pixbuf else 1)
+            cr.set_source(veil)
+            cr.paint()
+            return False
+
+        def icon(self, names: list[str], size: int):
+            for theme in (self.theme, Gtk.IconTheme.get_default()):
+                for name in names:
+                    try:
+                        info = theme.lookup_icon(name, size, Gtk.IconLookupFlags.FORCE_SIZE)
+                        if info:
+                            return Gtk.Image.new_from_pixbuf(info.load_icon())
+                    except GLib.Error:
+                        continue
+            return Gtk.Image.new_from_icon_name("applications-other-symbolic", Gtk.IconSize.SMALL_TOOLBAR)
 
         def place(self):
             try:
@@ -115,16 +249,51 @@ def show_window() -> None:
                 return True
             return False
 
-        def filter_row(self, row):
-            return self.search.get_text().casefold() in row.search_text
+        def apply_filter(self, *_args):
+            text = self.search.get_text().casefold()
+            for entry, widget in self.items:
+                widget.set_visible(text in entry["text"])
+            for header, rows in self.sections:
+                header.set_visible(any(row.get_visible() for row in rows))
 
-        def header(self, row, before):
-            if before is None or before.category != row.category:
-                label = Gtk.Label(label=row.category, xalign=0)
-                label.get_style_context().add_class("category")
-                row.set_header(label)
-            else:
-                row.set_header(None)
+        def row(self, entry: dict):
+            box = Gtk.Box(spacing=10)
+            ring = Gtk.Box()
+            ring.get_style_context().add_class("ring")
+            label = entry["action"].casefold()
+            names = next((names for token, names in ICONS if token in label), GROUP_ICONS.get(entry["category"], GROUP_ICONS["Otros"]))
+            ring.set_center_widget(self.icon(names, 18))
+            box.pack_start(ring, False, False, 0)
+            text = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0, valign=Gtk.Align.CENTER)
+            caps = Gtk.Box(spacing=4)
+            for position, combo in enumerate(entry["combos"]):
+                if position and len(entry["combos"][0].split(" + ")) > 2:
+                    break
+                if position:
+                    caps.pack_start(Gtk.Label(label="ó"), False, False, 3)
+                main, _, extra = combo.partition(" · ")
+                for index, name in enumerate(main.split(" + ")):
+                    if index:
+                        plus = Gtk.Label(label="+")
+                        plus.get_style_context().add_class("plus")
+                        caps.pack_start(plus, False, False, 0)
+                    cap = Gtk.Label(label=name)
+                    cap.get_style_context().add_class("keycap")
+                    caps.pack_start(cap, False, False, 0)
+                if extra:
+                    tag = Gtk.Label(label=extra)
+                    tag.get_style_context().add_class("tag")
+                    caps.pack_start(tag, False, False, 4)
+            text.pack_start(caps, False, False, 0)
+            detail = entry["action"] + (" · Falta: " + ", ".join(entry["missing"]) if entry["missing"] else "")
+            action = Gtk.Label(label=detail, xalign=0)
+            action.set_ellipsize(3)
+            action.set_max_width_chars(30)
+            action.get_style_context().add_class("warn" if entry["missing"] else "action")
+            text.pack_start(action, False, False, 0)
+            box.pack_start(text, True, True, 0)
+            box.set_tooltip_text(entry["command"] + "\n" + "  ·  ".join(entry["all"]) if entry["command"] else "  ·  ".join(entry["all"]))
+            return box
 
         def refresh(self, *_args):
             try:
@@ -132,33 +301,41 @@ def show_window() -> None:
             except (OSError, ValueError, TypeError, RuntimeError) as error:
                 self.summary.set_text(f"No se pudo leer Hyprland: {error}. Usa Actualizar para reintentar.")
                 return
-            for row in self.list.get_children():
-                row.destroy()
-            for entry in entries:
-                row = Gtk.ListBoxRow()
-                row.category = entry["category"]
-                row.search_text = " ".join(str(v) for v in entry.values()).casefold()
-                box = Gtk.Box(spacing=18)
-                row.add(box)
-                key = Gtk.Label(label=entry["keys"], xalign=0)
-                key.set_size_request(230, -1)
-                key.set_line_wrap(True)
-                key.get_style_context().add_class("key")
-                box.pack_start(key, False, False, 0)
-                details = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=3)
-                action = Gtk.Label(label=entry["action"], xalign=0)
-                action.set_line_wrap(True)
-                details.pack_start(action, False, False, 0)
-                status = Gtk.Label(label=entry["status"] + (" · mapa " + entry["submap"] if entry["submap"] else ""), xalign=0)
-                status.set_line_wrap(True)
-                status.get_style_context().add_class("status")
-                details.pack_start(status, False, False, 0)
-                box.pack_start(details, True, True, 0)
-                row.set_tooltip_text(entry["command"])
-                self.list.add(row)
+            for child in self.columns.get_children():
+                child.destroy()
+            self.items, self.sections = [], []
+            groups: dict[str, list[dict]] = {}
+            for entry in condense(entries):
+                groups.setdefault(entry["category"], []).append(entry)
+            lanes = [Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10, valign=Gtk.Align.START) for _ in range(4)]
+            load = [0.0] * 4
+            for name, rows in sorted(groups.items(), key=lambda item: -len(item[1])):
+                section = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=5)
+                header = Gtk.Box(spacing=8)
+                header.pack_start(self.icon(GROUP_ICONS.get(name, GROUP_ICONS["Otros"]), 22), False, False, 0)
+                title = Gtk.Label(label=name, xalign=0)
+                title.get_style_context().add_class("section")
+                header.pack_start(title, False, False, 0)
+                section.pack_start(header, False, False, 0)
+                rule = Gtk.Box()
+                rule.get_style_context().add_class("rule")
+                section.pack_start(rule, False, False, 0)
+                widgets = []
+                for entry in rows:
+                    widget = self.row(entry)
+                    section.pack_start(widget, False, False, 0)
+                    self.items.append((entry, widget))
+                    widgets.append(widget)
+                self.sections.append((section, widgets))
+                lane = load.index(min(load))
+                lanes[lane].pack_start(section, False, False, 0)
+                load[lane] += len(rows) + 1.3
+            for lane in lanes:
+                self.columns.pack_start(lane, True, True, 0)
             missing = sum(bool(entry["missing"]) for entry in entries)
-            self.summary.set_text(f"{len(entries)} asignaciones activas · {missing} con programas ausentes · Colores del tema actual")
-            self.list.show_all()
+            self.summary.set_text(f"{len(entries)} asignaciones activas · {missing} con programas ausentes · colores del tema actual")
+            self.columns.show_all()
+            self.apply_filter()
 
     Shortcuts()
     Gtk.main()
