@@ -31,6 +31,8 @@ Alternativa con el otro atajo: `curl -L https://cutt.ly/blackice | bash`
 
 Los dos atajos redirigen a [`bootstrap.sh`](bootstrap.sh), que verifica la ISO, el usuario root y la red, clona este repositorio por HTTPS y lanza el instalador pidiendo confirmación del disco.
 
+**Recorrido paso a paso con capturas:** [BLACK-ICE ARCH: un escritorio hecho para mi trabajo diario](https://soporteinfo.net/blog/black-ice-arch-un-escritorio-hecho-para-mi-trabajo-diario) en el blog de SoporteInfo.
+
 > **El instalador puede particionar y formatear el disco que elijas.** La autorización de borrado identifica el disco exacto.
 
 <details>

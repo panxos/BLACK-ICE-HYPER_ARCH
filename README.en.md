@@ -44,6 +44,8 @@ bash bootstrap.sh
 
 Without short links, the direct URL is `https://raw.githubusercontent.com/panxos/BLACK-ICE-HYPER_ARCH/main/bootstrap.sh`. Details in [short URLs](docs/URL_SHORTENERS.md).
 
+**Step-by-step walkthrough with screenshots (in Spanish):** [BLACK-ICE ARCH: un escritorio hecho para mi trabajo diario](https://soporteinfo.net/blog/black-ice-arch-un-escritorio-hecho-para-mi-trabajo-diario) on the SoporteInfo blog.
+
 </details>
 
 <details>
